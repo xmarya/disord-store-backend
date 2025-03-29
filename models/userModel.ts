@@ -1,7 +1,8 @@
-// import "@/models/storeModel"; // ✅ Make sure Store is registered before User
+import "./storeModel"; // ✅ Make sure Store is registered before User
 import { UserDocument } from "../_Types/User";
-import { Model, Query, Schema, model, models } from "mongoose";
+import { Model, Query, Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 // UserModel is only used when creating the Mongoose model at the last of the file (after creating the Schema).
 type UserModel = Model<UserDocument>;
@@ -192,10 +193,10 @@ userSchema.virtual("planExpiresInDays").get(function () {
   // we'll take it and convert it into a day by dividing by dividing by (1000 * 60 * 60 * 24) .
 });
 
-userSchema.pre(/^find/, function (this: Query<any, any>, next) {
-  this.populate("myStore");
-  next();
-});
+// userSchema.pre(/^find/, function (this: Query<any, any>, next) {
+//   this.populate("myStore").select("_id");
+//   next();
+// });
 
 /* OLD CODE (kept for reference): 
     userSchema.pre("save", function (next) {
@@ -215,6 +216,7 @@ userSchema.pre(/^find/, function (this: Query<any, any>, next) {
 userSchema.pre("save", async function(next) {
   // STEP 1) check if the user isNew and the signMethod is credentials: (the condition this.credentials is for getting rid ot possibly undefined error)
   if(this.isNew && this.signMethod === "credentials" && this.credentials){
+    console.log("if(this.isNew && this.signMethod === credentials && this.credentials)");
     this.credentials.password = await bcrypt.hash(this.credentials?.password, 13);
     next();
   }
@@ -222,6 +224,7 @@ userSchema.pre("save", async function(next) {
 
 userSchema.pre("save", async function(next) {
   if(this.isModified("credentials") && this.credentials) {
+    console.log(`this.isModified("credentials") && this.credentials`);
     this.credentials.password = await bcrypt.hash(this.credentials.password, 13);
     this.credentials.passwordChangedAt = new Date();
   }
@@ -232,6 +235,7 @@ userSchema.pre("save", async function(next) {
 // this pre hook is to set the passwordChangedAt:
 userSchema.pre("save", async function(next) {
   if(this.credentials && this.isModified(this.credentials.password)) {
+    console.log("this.credentials && this.isModified(this.credentials.password)");
     this.credentials.passwordChangedAt = new Date();
   }
   next();
@@ -249,7 +253,27 @@ userSchema.methods.comparePasswords = async function(providedPassword:string, us
    return result;
 }
 
+userSchema.methods.generateRandomToken = async function() {
+
+  //STEP 1) generate the token:
+  const randomToken = crypto.randomBytes(32).toString("hex");
+
+  //STEP 2) start an expiring time for the GRT:
+  const tokenExpiresIn = new Date(Date.now() + 5 * 60 *1000); // lasts for 5 minutes
+
+  //STEP 3) store the token after hashing/expiring time in credentials: 
+  this.credentials.passwordResetToken = crypto.createHash("sha256").update(randomToken).digest("hex");
+  this.credentials.passwordResetExpires = tokenExpiresIn;
+
+  //STEP 4) saving the changes:
+  await this.save({ validateBeforeSave: false });
+  console.log({randomToken}, this.credentials.passwordResetExpires);
+
+
+  return randomToken;
+}
+
 // model(Document, Model)
-const User = models?.User || model<UserDocument, UserModel>("User", userSchema);
+const User = model<UserDocument, UserModel>("User", userSchema);
 
 export default User;
