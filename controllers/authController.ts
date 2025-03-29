@@ -11,9 +11,9 @@ import crypto from "crypto"
 export const credentialsSignup = catchAsync(async (request, response, next) => {
   sanitisedData(request.body, next);
 
-  const { email, credentials, username }: Pick<UserBasic, "email" | "username" | "credentials"> = request.body;
+  const { email, password, passwordConfirm, username } = request.body;
 
-  if (!email || !username || !credentials?.password || !credentials.passwordConfirm) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
+  if (!email || !username || !password || !passwordConfirm) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
 
   // STEP 1) check if the email exist or not:
   const isEmailExist = await User.findOne({ email });
@@ -24,13 +24,13 @@ export const credentialsSignup = catchAsync(async (request, response, next) => {
   if (isUsernameExist) return next(new AppError(400, "الرجاء اختيار اسم مستخدم آخر"));
 
   //STEP 3) check both passwords:
-  const isMatching = credentials?.password === credentials?.passwordConfirm;
+  const isMatching = password === passwordConfirm;
   if (!isMatching) return next(new AppError(400, "كلمات المرور غير متطابقة"));
 
   const newUser = await User.create({
     signMethod: "credentials",
     email,
-    credentials: { password: credentials?.password },
+    credentials: { password} ,
     username,
   });
 

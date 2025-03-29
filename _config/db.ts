@@ -5,7 +5,7 @@ export async function dbStartConnection() {
 
   try {
     // const db = process.env.NODE_ENV === "production" ? process.env.DB_ATLAS : process.env.LOCAL_DB;
-    const db: string = process.env.LOCAL_DB as string;
+    const db: string = process.env.ATLAS_DB as string;
     // for connecting to MongoDB Atlas, TLS/SSL is enabled by default.
     await mongoose.connect(db);
     console.log("the db is connected...");
