@@ -1,7 +1,7 @@
 import { ProductBasic } from "../_Types/Product";
 import { RankingDocument } from "../_Types/Ranking";
 import { StoreBasic } from "../_Types/Store";
-import { Model, Query, Schema, model, models } from "mongoose";
+import { Model, Query, Schema, model } from "mongoose";
 
 type RankingModel = Model<RankingDocument>;
 const rankingSchema = new Schema<RankingDocument>(
@@ -46,7 +46,6 @@ rankingSchema.pre(/^find/, function (this: Query<any, any>, next) {
 // the solution => function(this: Query<any,any>, next)
 
 const Ranking =
-  models?.Ranking ||
   model<RankingDocument, RankingModel>("Ranking", rankingSchema);
 
 export default Ranking;

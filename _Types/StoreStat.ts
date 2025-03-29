@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 export interface StoreState {
-  _id:string,
+  id: string;
   store: Types.ObjectId;
   date: Date;
   daily: number;

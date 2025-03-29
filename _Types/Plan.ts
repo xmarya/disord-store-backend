@@ -1,10 +1,9 @@
-
 export interface Plan {
-  _id:string,
+  id: string;
   planName: string;
   price: {
-    riyal:number,
-    dollar:number
+    riyal: number;
+    dollar: number;
   };
 }
 
@@ -26,4 +25,3 @@ export interface PlanQuota extends Plan {
 }
 
 export type PlanDocument = Plan & PlanDetails & PlanQuota;
-

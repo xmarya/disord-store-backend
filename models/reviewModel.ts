@@ -1,5 +1,5 @@
 import { ReviewDocument } from "../_Types/Reviews";
-import { Model, Schema, model, models } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 
 type ReviewModel = Model<ReviewDocument>;
 
@@ -47,7 +47,6 @@ const reviewSchema = new Schema<ReviewDocument>(
   }
 );
 
-const Review =
-  models?.Review || model<ReviewDocument, ReviewModel>("Review", reviewSchema);
+const Review =model<ReviewDocument, ReviewModel>("Review", reviewSchema);
 
 export default Review;

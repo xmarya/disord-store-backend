@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 export interface Cart {
-  _id:string,
+  id: string;
   user: Types.ObjectId;
   productsList: [
     {
@@ -10,7 +10,7 @@ export interface Cart {
       price: number;
       image: string;
       quantity: number;
-      discount?:number
+      discount?: number;
     }
   ];
   total: number;

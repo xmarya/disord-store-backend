@@ -1,5 +1,5 @@
 export interface ColourTheme {
-  _id:string,
+  id: string;
   themes: [
     {
       primary: string;

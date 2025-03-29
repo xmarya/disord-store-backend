@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 export interface StoreAssistant {
-  _id: string;
+  id: string;
   assistant: Types.ObjectId;
   inStore: Types.ObjectId;
   permissions: AssistantPermissions;

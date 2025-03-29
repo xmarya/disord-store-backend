@@ -5,7 +5,7 @@ export interface Credentials {
   password: string;
   passwordConfirm?: string;
   passwordResetToken?: string;
-  passwordResetExpires: Date;
+  passwordResetExpires?: Date;
   passwordChangedAt?: Date;
 }
 
@@ -14,11 +14,11 @@ export interface Discord {
 }
 
 export interface UserBasic {
-  _id: string;
+  id: string;
   email: string;
   signMethod: "credentials" | "discord";
-  credentials?:Credentials,
-  discord?:Discord,
+  credentials?: Credentials;
+  discord?: Discord;
   username: string;
   userType: string;
   image: string;
@@ -52,7 +52,8 @@ export interface UserOptionals {
 }
 
 export interface UserMethods {
-  comparePasswords: (providedPassword:string, userPassword:string) => Promise<boolean>
+  comparePasswords: (providedPassword: string, userPassword: string) => Promise<boolean>;
+  generateRandomToken: () => Promise<string>
 }
 
 export type UserDocument = UserBasic & UserOptionals & UserPlan & UserMethods;

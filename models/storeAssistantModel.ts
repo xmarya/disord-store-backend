@@ -1,5 +1,5 @@
 import { StoreAssistantDocument } from "../_Types/StoreAssistant";
-import { Model, Schema, model, models } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 
 type StoreAssistantModel = Model<StoreAssistantDocument>;
 
@@ -61,7 +61,6 @@ const storeAssistantModel = new Schema<StoreAssistantDocument>(
 );
 
 const StoreAssistant =
-  models?.StorAssistant ||
   model<StoreAssistantDocument, StoreAssistantModel>(
     "StoreAssistant",
     storeAssistantModel

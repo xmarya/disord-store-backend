@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { CategoryDocument } from "./Category";
 
 export interface ProductBasic {
-  _id:string,
+  id: string;
   name: string;
   price: number;
   quantity: number;
@@ -17,7 +17,7 @@ export interface ProductOptionals {
   discount?: number;
   numberOfPurchases?: number;
   ranking?: number;
-  reviews?:string
+  reviews?: string;
 }
 
-export type ProductDocument =  ProductBasic & ProductOptionals;
+export type ProductDocument = ProductBasic & ProductOptionals;

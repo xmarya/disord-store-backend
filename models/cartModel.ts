@@ -1,5 +1,5 @@
 import { CartDocument } from "../_Types/Cart";
-import { Model, Schema, model, models } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 
 type CartModel = Model<CartDocument>;
 
@@ -62,6 +62,6 @@ cartSchema.virtual("total").get(function () {
   }, 0);
 });
 
-const Cart = models?.Cart || model<CartDocument, CartModel>("Cart", cartSchema);
+const Cart = model<CartDocument, CartModel>("Cart", cartSchema);
 
 export default Cart;

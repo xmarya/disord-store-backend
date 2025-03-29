@@ -1,5 +1,5 @@
 import { InvoiceDocument } from "../_Types/Invoice";
-import { Model, Schema, model, models } from "mongoose";
+import { Model, Schema, model} from "mongoose";
 
 type InvoiceModel = Model<InvoiceDocument>;
 const invoiceSchema = new Schema<InvoiceDocument>(
@@ -71,7 +71,6 @@ const invoiceSchema = new Schema<InvoiceDocument>(
 invoiceSchema.index({ user: 1 });
 
 const Invoice =
-  models?.Invoice ||
   model<InvoiceDocument, InvoiceModel>("Invoice", invoiceSchema);
 
 export default Invoice;

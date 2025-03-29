@@ -1,5 +1,5 @@
 import { ColourThemeDocument } from "../_Types/ColourTheme";
-import { Model, Schema, model, models } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 
 type ColourThemeModel = Model<ColourThemeDocument>;
 const colourTheme = new Schema<ColourThemeDocument>({
@@ -26,7 +26,6 @@ const colourTheme = new Schema<ColourThemeDocument>({
 });
 
 const ColourTheme =
-  models?.ColourTheme ||
   model<ColourThemeDocument, ColourThemeModel>("ColourTheme", colourTheme);
 
 export default ColourTheme;

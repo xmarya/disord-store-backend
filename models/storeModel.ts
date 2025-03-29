@@ -1,10 +1,10 @@
 import { ProductDocument } from "../_Types/Product";
 import { ReviewDocument } from "../_Types/Reviews";
 import { StoreDocument } from "../_Types/Store";
-import { Model, Schema, model, models } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 
 type StoreModel = Model<StoreDocument>;
-const StoreSchema = new Schema<StoreDocument>({
+const storeSchema = new Schema<StoreDocument>({
   storeName: {
     type: String,
     required: true,
@@ -72,25 +72,24 @@ const StoreSchema = new Schema<StoreDocument>({
   },
 });
 
-StoreSchema.virtual<ProductDocument[]>("products", {
+storeSchema.virtual<ProductDocument[]>("products", {
   ref: "Product",
   localField: "_id",
   foreignField: "store",
 });
 
-StoreSchema.virtual("stats", {
+storeSchema.virtual("stats", {
   ref: "StoreStat",
   localField: "_id",
   foreignField: "store",
 });
 
-StoreSchema.virtual<ReviewDocument[]>("reviews", {
+storeSchema.virtual<ReviewDocument[]>("reviews", {
   ref: "Review",
   localField: "_id",
   foreignField: "reviewedModel",
 });
 
-//TODO: post save to create categories if there any
-const Store = models?.Store || model<StoreDocument, StoreModel>("Store", StoreSchema);
+const Store = model<StoreDocument, StoreModel>("Store", storeSchema);
 
 export default Store;

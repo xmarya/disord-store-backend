@@ -1,4 +1,4 @@
-import { Model, Schema, model, models } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 import { ProductDocument } from "../_Types/Product";
 import Category from "./categoryModel";
 
@@ -62,7 +62,7 @@ const ProductSchema = new Schema<ProductDocument>(
 
 ProductSchema.virtual("reviews", {
   ref: "Review",
-  localField: "_id",
+  localField: "id",
   foreignField: "reviewedModel",
 });
 
@@ -70,7 +70,7 @@ ProductSchema.pre("save", async function (next) {
   console.log("ProductSchema.pre(save)");
   if (this.isModified("categories")) {
     // if a product has been associated with a category, assert its id to the category:
-    await Category.findByIdAndUpdate(this.categories, { $addToSet: { products: this._id } });
+    await Category.findByIdAndUpdate(this.categories, { $addToSet: { products: this.id } });
   }
   next();
 });
@@ -82,13 +82,13 @@ ProductSchema.pre("findOneAndDelete", async function (next) {
 
   if (!doc) return next();
 
-  await Category.updateMany({ _id: { $in: categories } }, { $pull: { products: doc._id } });
+  await Category.updateMany({ id: { $in: categories } }, { $pull: { products: doc.id } });
 
   next();
 });
 
 ProductSchema.index({ ranking: 1 });
 
-const Product = models?.Product || model<ProductDocument, ProductModel>("Product", ProductSchema);
+const Product = model<ProductDocument, ProductModel>("Product", ProductSchema);
 
 export default Product;

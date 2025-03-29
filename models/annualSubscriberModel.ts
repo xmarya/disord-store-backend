@@ -1,5 +1,5 @@
 import { AnnualSubscribersDocument } from "../_Types/AnnualSubscribers";
-import { Model, Schema, model, models } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 
 type AnnualSubscribersModel = Model<AnnualSubscribersDocument>;
 
@@ -21,7 +21,6 @@ const annualSubscriberSchema = new Schema<AnnualSubscribersDocument>({
 annualSubscriberSchema.index({ store: 1, year: 1 });
 
 const AnnualSubscriber =
-  models?.AnnualSubscribers ||
   model<AnnualSubscribersDocument, AnnualSubscribersModel>(
     "AnnualSubscriber",
     annualSubscriberSchema

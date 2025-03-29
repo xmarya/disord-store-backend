@@ -108,9 +108,13 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "target": "ES2022",
-    "module": "ES2022",
-    "moduleResolution": "Node",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "sourceMap": true,
     "resolveJsonModule": true,
-    "lib": ["ES2022"] // ES2020 in earlier versions
-  }
+    "lib": ["ES2022"], // ES2020 in earlier versions
+    "typeRoots": ["./node_modules/@types", "./_Types"],
+    "outDir": "dist"
+  },
+  "include": ["./**/*"]
 }

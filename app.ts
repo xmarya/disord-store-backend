@@ -4,6 +4,7 @@ import ratelimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
 import cors from "cors";
 import { router as storeRouter } from "./_routers/storeRoutes";
+import { router as authRouter } from "./_routers/authRoutes";
 
 
 const app = express();
@@ -23,6 +24,7 @@ app.use(mongoSanitize());
 app.use(cors());
 
 app.use("/api/v1/stores", storeRouter);
+app.use("/api/v1/auth", authRouter);
 
 
 

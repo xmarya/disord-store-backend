@@ -1,5 +1,5 @@
 import { PlanDocument } from "../_Types/Plan";
-import { Model, Schema, model, models } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 
 type PlanModel = Model<PlanDocument>;
 const planSchema = new Schema({
@@ -50,6 +50,6 @@ const planSchema = new Schema({
   },
 });
 
-const Plan = models?.Plan || model<PlanDocument, PlanModel>("Plan", planSchema);
+const Plan = model<PlanDocument, PlanModel>("Plan", planSchema);
 
 export default Plan;
