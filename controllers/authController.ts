@@ -98,6 +98,7 @@ export const changePassword = catchAsync(async (request, response, next) => {
   console.log("changePassword");
 
   sanitisedData(request.body, next);
+  const userId = request.params.id || request.body.userId;
   const { currentPassword, confirmCurrentPassword, newPassword } = request.body;
 
   //STEP 1) check no missing input:
@@ -105,7 +106,7 @@ export const changePassword = catchAsync(async (request, response, next) => {
   
   //STEP 2) do they match ?
   if (currentPassword !== confirmCurrentPassword) return next(new AppError(400, "كلمات المرور غير متطابقة"));
-  const user = await User.findById(request.params.id).select("credentials"); // for testing purposes
+  const user = await User.findById(userId).select("credentials"); // for testing purposes
   /* CHANGE LATER: 
     // const user = await User.findById(request.user.id).select("credentials");  this info is provided by protect() md
   */
@@ -121,7 +122,7 @@ export const changePassword = catchAsync(async (request, response, next) => {
   await user.save();
 
   // STEP 5) generate a new token:
-  const token = jwtSignature(user.id);
+  const token = jwtSignature(userId);
   tokenWithCookies(response,token);
 
   response.status(201).json({
