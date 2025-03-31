@@ -45,10 +45,10 @@ export const getUserStore = catchAsync(async (request, response, next) => {
 
 });
 
-export const updateUserProfile = (id?:string) => catchAsync(async (request, response, next) => {
+export const updateUserProfile = catchAsync(async (request, response, next) => {
   sanitisedData(request.body, next);
 
-  const userId = id ?? request.body.id
+  const userId = request.user.id ?? request.body.id
   const {email, username, image}:Partial<Pick<UserDocument, "email" | "username" | "image">> = request.body;
 
   if(email) {
