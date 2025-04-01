@@ -13,6 +13,8 @@ export interface Discord {
   id: string;
 }
 
+export type UserTypes = "user" | "storeOwner" | "storeAssistant" | "admin"
+
 export interface UserBasic {
   id: string;
   email: string;
@@ -20,7 +22,7 @@ export interface UserBasic {
   credentials?: Credentials;
   discord?: Discord;
   username: string;
-  userType: string;
+  userType: UserTypes;
   image: string;
   createdAt: Date;
 }
@@ -48,7 +50,7 @@ export interface UserOptionals {
       count: number;
     }
   ];
-  myStore?: Types.ObjectId;
+  myStore?: Types.ObjectId | string;
 }
 
 export interface UserMethods {
