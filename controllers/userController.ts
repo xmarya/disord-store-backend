@@ -64,12 +64,6 @@ export const credentialsSignup = catchAsync(async (request, response, next) => {
     username,
   });
 
-  //STEP 4) generate token:
-  const token = jwtSignature(newUser.id);
-
-  //STEP 5) add it to the token:
-  tokenWithCookies(response, token);
-
   //STEP 6) make sure the password is not included in the response:
   //   newUser.credentials = "";
   newUser.credentials!.password = "";
@@ -77,7 +71,6 @@ export const credentialsSignup = catchAsync(async (request, response, next) => {
   response.status(201).json({
     status: "success",
     newUser,
-    token,
   });
 });
 
@@ -85,16 +78,16 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   sanitisedData(request, next);
 
   // STEP 1) getting the provided email and password from the request body to check the email:
-  const { email, credentials }: Pick<UserBasic, "credentials" | "email"> = request.body;
+  const { email, password } = request.body;
 
-  if (!credentials) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
+  if (!password) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
   const user = await User.findOne({ email }).select("credentials");
 
   if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   // STEP 2) checking the password:
-  if (!(await user.comparePasswords(credentials?.password, user.credentials!.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
+  if (!(await user.comparePasswords(password, user.credentials!.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   //STEP 3) create the token:
   const token = jwtSignature(user.id);

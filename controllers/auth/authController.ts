@@ -17,7 +17,7 @@ const jwtVerify = async (token:string, salt:string):Promise<JwtPayload & {id:str
 }
 
 export const protect = catchAsync(async(request, response, next) =>{
-
+  console.log("protect");
   let token;
 
   //STEP 1) if there a token in the request headers or request.cookies, get it:
@@ -27,9 +27,7 @@ export const protect = catchAsync(async(request, response, next) =>{
   else if(request.cookies.jwt)
     token = request.cookies.jwt;
 
-  else { // there is no token ? redirect the user to the login page
-    response.redirect("/login"); 
-  }
+  else return next(new AppError(403, "الرجاء تسجيل الدخول"));
 
   // STEP 2) validate the token:
   const payload = await jwtVerify(token, process.env.JWT_SALT!);
@@ -44,6 +42,7 @@ export const protect = catchAsync(async(request, response, next) =>{
 });
 
 export const restrict = (...userTypes:Array<UserTypes>) => {
+  console.log("restrict");
   return (request:Request, response:Response, next:NextFunction) => {
     if(userTypes.includes(request.user.userType)) next();
 
@@ -52,6 +51,7 @@ export const restrict = (...userTypes:Array<UserTypes>) => {
 }
 
 export const checkPermissions = catchAsync(async (request, response, next) => {
+  console.log("checkPermissions");
     // STEP 1) check the path and the request method:
     console.log(request.path, request.method);
 

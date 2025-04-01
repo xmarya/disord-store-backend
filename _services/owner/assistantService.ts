@@ -12,6 +12,7 @@ import { AppError } from "../../_utils/AppError";
 */
 
 export async function createAssistant(request: Request) {
+  console.log("create Assistant service");
   const { email, password, username, permissions } = request.body;
   const session = await startSession();
   session.startTransaction();

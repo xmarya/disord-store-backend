@@ -53,8 +53,7 @@ export interface UserOptionals {
   myStore?: Types.ObjectId | string;
 }
 
-export interface UserMethods {
-  comparePasswords: (providedPassword: string, userPassword: string) => Promise<boolean>;
+export interface UserMethods {comparePasswords: (providedPassword: string, userPassword: string) => Promise<boolean>;
   generateRandomToken: () => Promise<string>
 }
 

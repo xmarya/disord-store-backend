@@ -6,6 +6,7 @@ import {router as userRouter} from "./auth/userAuthRoutes"
 import { protect } from "../controllers/auth/authController";
 export const router = Router();
 
+console.log("dashboard routes");
 router.use(protect);
 router.use("/store", storeRouter)
 router.use("/products", productRouter)

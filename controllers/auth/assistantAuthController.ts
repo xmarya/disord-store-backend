@@ -7,6 +7,7 @@ import validateNewUserData from "../../_utils/validateNewUserData";
 
 
 export const createAssistantController = catchAsync(async (request, response, next) => {
+  console.log("create Assistant Controller");
   sanitisedData(request, next);
   validateNewUserData(request, next);
 
