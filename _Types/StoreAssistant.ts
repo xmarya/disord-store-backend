@@ -17,7 +17,6 @@ export interface AssistantPermissions {
   deleteCategory: boolean;
   addDiscount: boolean;
   editDiscount: boolean;
-  changeStoreSettings: boolean;
   previewStoreStats: boolean;
 }
 
