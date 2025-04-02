@@ -96,9 +96,12 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   response.status(200).json({
     status: "success",
     token,
-    email,
-    id: user.id,
-    username: user.username,
+    /*
+      for security reasons, it is preferred to not including it in the response body
+      email,
+      id: user.id,
+    */
+    // username: user.username, no need for this since I'm only selecting the credentials in the query =>.select("credentials");
   });
 });
 
