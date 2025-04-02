@@ -6,7 +6,7 @@ import Store from "../../models/storeModel";
 import { AppError } from "../../_utils/AppError";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
-    tha reason is because tis is a service layer function, not the controller that always returns response,
+    tha reason is because this is a service layer function, not the controller that always returns response,
     here TypeScrypt inferred the return type of the function based on this line => return assistant;
     hovering it it indicates that it returns an array of document, and this is driven by Model.create() query.
 */
