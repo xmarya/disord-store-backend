@@ -7,6 +7,7 @@ export interface StoreBasic {
   id: string;
   storeName: string;
   owner: Types.ObjectId;
+  description:string;
   status: "inProgress" | "active" | "suspended" | "deleted";
   verified: boolean;
 }
