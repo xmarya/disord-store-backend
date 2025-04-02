@@ -4,6 +4,8 @@ import User from "../../models/userModel";
 import { AppError } from "../../_utils/AppError";
 import { UserDocument, UserTypes } from "../../_Types/User";
 import type { Request, Response, NextFunction } from "express";
+import { AssistantPermissions } from "../../_Types/StoreAssistant";
+import { getAssistantPermissions } from "../../_services/store/storeService";
 
 const jwtVerify = async (token:string, salt:string):Promise<JwtPayload & {id:string}> => {
   // https://stackoverflow.com/questions/75398503/error-when-trying-to-promisify-jwt-in-typescript
@@ -50,10 +52,25 @@ export const restrict = (...userTypes:Array<UserTypes>) => {
   }
 }
 
-export const checkPermissions = catchAsync(async (request, response, next) => {
+export const checkPermissions = (permissionKey : keyof AssistantPermissions) => {
   console.log("checkPermissions");
-    // STEP 1) check the path and the request method:
-    console.log(request.path, request.method);
+  return async (request:Request, response:Response, next:NextFunction) => {
+    try {
+      if(request.user.userType === "storeOwner") next();
+      
+      const storeId = request.user.myStore as string;
+      const assistantId = request.user.id;
+      if(!storeId || !assistantId) return next(new AppError(400, "معلومات المتجر أو المستخدم مفقودة"));
 
-    //STEP 2) check it against the defined permissions:
-});
+      const assistant = await getAssistantPermissions(storeId, assistantId);
+      if(!assistant) return next(new AppError(403, "هذا المستخدم غير موجود من ضمن المساعدين"));
+
+      if(!assistant.permissions[permissionKey]) return next(new AppError(403, "غير مصرح لك الوصول"));
+
+      next();
+    } catch (error) {
+      console.log((error as Error).message);
+      next(new AppError(500, "حدث خطأ أثناء معالجة الطلب. الرجاء المحاولة مجددًا"));
+    }
+  }
+};
