@@ -221,7 +221,7 @@ userSchema.pre("save", async function(next) {
 });
 
 userSchema.methods.comparePasswords = async function(providedPassword:string, userPassword:string) {
-     /* 
+  /* 
     instanced methods are available on the document, 
     so, `this` keyword points to the current document. then why we're not using this.password?
     actually in this case, since we have set the password to select false, 
