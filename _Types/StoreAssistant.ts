@@ -1,5 +1,14 @@
 import { Types } from "mongoose";
 
+
+export type AssistantRegisterData = {
+  email:string,
+  password:string,
+  username:string;
+  storeId: string,
+  permissions: AssistantPermissions
+}
+
 export interface StoreAssistant {
   id: string;
   assistant: Types.ObjectId;
