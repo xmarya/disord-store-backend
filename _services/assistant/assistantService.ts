@@ -4,6 +4,8 @@ import User from "../../models/userModel";
 import StoreAssistant from "../../models/storeAssistantModel";
 import Store from "../../models/storeModel";
 import { AppError } from "../../_utils/AppError";
+import { UserBasic } from "../../_Types/User";
+import { AssistantRegisterData } from "../../_Types/StoreAssistant";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
     tha reason is because this is a service layer function, not the controller that always returns response,
@@ -11,9 +13,9 @@ import { AppError } from "../../_utils/AppError";
     hovering it it indicates that it returns an array of document, and this is driven by Model.create() query.
 */
 
-export async function createAssistant(request: Request) {
+export async function createAssistant(data:AssistantRegisterData) {
   console.log("create Assistant service");
-  const { email, password, username, permissions } = request.body;
+  const { email, password, username, permissions, storeId } = data;
   const session = await startSession();
   session.startTransaction();
 
@@ -30,15 +32,16 @@ export async function createAssistant(request: Request) {
   //STEP 2: create a new assistant:
   const assistant = await StoreAssistant.create([{
     assistant: user[0].id,
-    inStore: request.user.myStore,
+    inStore: storeId,
     permissions,
   }], {session});
 
   await session.commitTransaction();
 
-  //STEP 3) insert assistant data in store without registering it to the session to reduce the number of operations
-  //  inside the critical section (since th transactions should be as short as possible):
-  await Store.findByIdAndUpdate(user[0].id, {$addToSet: {storeAssistants: assistant}});
+  //STEP 3) insert assistant data in store without registering it to the session to
+  //  reduce the number of operations inside the critical section 
+  // (since th transactions should be as short as possible):
+  await Store.findByIdAndUpdate(storeId, {$addToSet: {storeAssistants: assistant}});
 
   return assistant;
 

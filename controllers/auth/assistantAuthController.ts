@@ -12,10 +12,13 @@ export const createAssistantController = catchAsync(async (request, response, ne
   validateNewUserData(request, next);
 
   const {permissions} = request.body;
-
   if(!permissions) return next( new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
-  const assistant = await createAssistant(request);
+  const storeId = request.params.storeId;
+
+  const data = {...request.body, permissions, storeId}
+
+  const assistant = await createAssistant(data);
 
   response.status(201).json({
     status: "success",
