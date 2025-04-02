@@ -6,7 +6,7 @@ import { AppError } from "../_utils/AppError";
 import xss from "xss";
 import sanitisedData from "../_utils/sanitisedData";
 
-export const createOne = (Model: Exclude<Model, "User">) =>
+export const createOne = (Model: Exclude<Model, "User" | "Store">) =>
   catchAsync(async (request, response, next) => {
     // NOTE: this controller is not for creating users
     console.log("createOne");
