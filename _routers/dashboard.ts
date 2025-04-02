@@ -10,5 +10,5 @@ console.log("dashboard routes");
 router.use(protect);
 router.use("/store", storeRouter);
 router.use("/products", productRouter);
-router.use("/assistants", assistantRouter);
+router.use("/:storeId/assistants", assistantRouter);
 router.use("/me", userRouter);

@@ -5,7 +5,6 @@ import { router as assistantRouter } from "./assistantAuthRoutes";
 export const router = express.Router();
 
 
-router.use("/:storeId/assistants", assistantRouter);
 router.route("/").post(createStoreController);
 router.route("/:id").patch(restrict("storeOwner"), updateStoreController).delete(restrict("storeOwner"), deleteStoreController);
 
