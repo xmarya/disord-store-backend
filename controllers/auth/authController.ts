@@ -19,7 +19,7 @@ const jwtVerify = async (token:string, salt:string):Promise<JwtPayload & {id:str
 }
 
 export const protect = catchAsync(async(request, response, next) =>{
-  console.log("protect");
+  console.log("protect", request.path, request.method);
   let token;
 
   //STEP 1) if there a token in the request headers or request.cookies, get it:
@@ -46,9 +46,11 @@ export const protect = catchAsync(async(request, response, next) =>{
 
 export const restrict = (...userTypes:Array<UserTypes>) => {
   return async (request:Request, response:Response, next:NextFunction) => {
-    console.log("restrict", ...userTypes);
 
-    const hasAuthorization = await confirmAuthorization(request.user.id, request.params.id);
+    const userId = request.user.id;
+    const storeId = request.params.id || request.params.storeId;
+    
+    const hasAuthorization = await confirmAuthorization(userId, storeId);
     if(userTypes.includes(request.user.userType) && hasAuthorization) return next();
 
     return next(new AppError(403, "غير مصرح لك الوصول للصفحة"));
