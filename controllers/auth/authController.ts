@@ -5,7 +5,7 @@ import { AppError } from "../../_utils/AppError";
 import { UserDocument, UserTypes } from "../../_Types/User";
 import type { Request, Response, NextFunction } from "express";
 import { AssistantPermissions } from "../../_Types/StoreAssistant";
-import { getAssistantPermissions } from "../../_services/store/storeService";
+import { confirmAuthorization, getAssistantPermissions } from "../../_services/store/storeService";
 
 const jwtVerify = async (token:string, salt:string):Promise<JwtPayload & {id:string}> => {
   // https://stackoverflow.com/questions/75398503/error-when-trying-to-promisify-jwt-in-typescript
@@ -39,27 +39,31 @@ export const protect = catchAsync(async(request, response, next) =>{
 
   //STEP 3) adding the current user to the request:
   request.user = user as UserDocument;
+  console.log("inside protect", request.user.username);
 
   next();
 });
 
 export const restrict = (...userTypes:Array<UserTypes>) => {
-  console.log("restrict");
-  return (request:Request, response:Response, next:NextFunction) => {
-    if(userTypes.includes(request.user.userType)) next();
+  return async (request:Request, response:Response, next:NextFunction) => {
+    console.log("restrict", ...userTypes);
 
-    next(new AppError(403, "غير مصرح لك الوصول للصفحة"));
+    const hasAuthorization = await confirmAuthorization(request.user.id, request.params.id);
+    if(userTypes.includes(request.user.userType) && hasAuthorization) return next();
+
+    return next(new AppError(403, "غير مصرح لك الوصول للصفحة"));
   }
 }
 
 export const checkPermissions = (permissionKey : keyof AssistantPermissions) => {
-  console.log("checkPermissions");
   return async (request:Request, response:Response, next:NextFunction) => {
     try {
-      if(request.user.userType === "storeOwner") next();
+      if(request.user.userType === "storeOwner") return next();
+      console.log("checkPermissions", request.user.userType, permissionKey);
       
       const storeId = request.user.myStore as string;
       const assistantId = request.user.id;
+
       if(!storeId || !assistantId) return next(new AppError(400, "معلومات المتجر أو المستخدم مفقودة"));
 
       const assistant = await getAssistantPermissions(storeId, assistantId);
@@ -68,9 +72,10 @@ export const checkPermissions = (permissionKey : keyof AssistantPermissions) => 
       if(!assistant.permissions[permissionKey]) return next(new AppError(403, "غير مصرح لك الوصول"));
 
       next();
+      
     } catch (error) {
       console.log((error as Error).message);
-      next(new AppError(500, "حدث خطأ أثناء معالجة الطلب. الرجاء المحاولة مجددًا"));
+      return next(new AppError(500, "حدث خطأ أثناء معالجة الطلب. الرجاء المحاولة مجددًا"));
     }
   }
 };

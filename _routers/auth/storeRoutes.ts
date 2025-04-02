@@ -5,9 +5,8 @@ import { checkPermissions, restrict } from "../../controllers/auth/authControlle
 export const router = Router();
 
 router.route("/").post(createStoreController);
-router.use(restrict("storeOwner"));
-router.route("/:id").delete(deleteStoreController);
-router.route("/:id").post(updateStoreController);
+router.route("/:id").patch(restrict("storeOwner"),updateStoreController).delete(restrict("storeOwner"),deleteStoreController);
 
-router.use(restrict("storeOwner", "storeAssistant"), checkPermissions("previewStoreStats"));
-router.route("/:id").get(getMyStoreController);
+// router.use(restrict("storeOwner", "storeAssistant"), checkPermissions("previewStoreStats")); this doesn't have access to the /:id params
+router.route("/:id").get(restrict("storeOwner", "storeAssistant"), checkPermissions("previewStoreStats"),getMyStoreController);
+
