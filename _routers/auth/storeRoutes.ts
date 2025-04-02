@@ -5,6 +5,7 @@ import { checkPermissions, restrict } from "../../controllers/auth/authControlle
 export const router = Router();
 
 router.route("/").post(createStoreController);
+router.use(restrict("storeOwner"));
 router.route("/:id").delete(deleteStoreController);
 router.route("/:id").post(updateStoreController);
 
