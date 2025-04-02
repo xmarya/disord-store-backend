@@ -1,4 +1,4 @@
-import { createAssistant, deleteAssistant, getAllAssistants, getOneAssistant } from "../../_services/owner/assistantService";
+import { createAssistant, deleteAssistant, getAllAssistants, getOneAssistant } from "../../_services/assistant/assistantService";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import sanitisedData from "../../_utils/sanitisedData";
