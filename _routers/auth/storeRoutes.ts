@@ -1,7 +1,6 @@
 import express from "express";
 import { createStoreController, deleteStoreController, getMyStoreController, updateStoreController } from "../../controllers/auth/storeControllers";
 import { checkPermissions, restrict } from "../../controllers/auth/authController";
-import { router as assistantRouter } from "./assistantAuthRoutes";
 export const router = express.Router();
 
 
