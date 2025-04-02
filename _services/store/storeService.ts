@@ -1,25 +1,23 @@
-import type {NextFunction} from "express";
 import StoreAssistant from "../../models/storeAssistantModel";
 import { StoreDocument } from "../../_Types/Store";
 import Store from "../../models/storeModel";
-import { startSession } from "mongoose";
+import {startSession, Types } from "mongoose";
 import { AppError } from "../../_utils/AppError";
 import User from "../../models/userModel";
 
 
-
-export async function createStore(data:StoreDocument, next:NextFunction) {
+export async function createStore(data:StoreDocument) {
     const {storeName, owner, logo, description} = data;
     const session = await startSession();
     session.startTransaction();
 
     try {
-        const newStore = await Store.create({
+        const newStore = await Store.create([{
             storeName,
             owner,
             description,
             logo
-        }, {session});
+        }], {session});
 
         await User.findByIdAndUpdate(owner, {
             userType: "storeOwner",
@@ -32,7 +30,7 @@ export async function createStore(data:StoreDocument, next:NextFunction) {
     } catch (error) {
         await session.abortTransaction();
         console.log((error as Error).message);
-        next(new AppError(500, "حدث خطأ أثناء معالجة العملية. الرجاء المحاولة مجددًا"));
+        throw new AppError(500, "حدث خطأ أثناء معالجة العملية. الرجاء المحاولة مجددًا");
     } finally {
         await session.endSession();
     }
@@ -42,6 +40,20 @@ export async function getAssistantPermissions(storeId:string, assistantId:string
     const assistant = await StoreAssistant.findOne({assistant: assistantId, inStore:storeId});
 
     return assistant;
+}
+
+export async function confirmAuthorization( userId:string, storeId:string):Promise<boolean> {
+    console.log("confirmAuthorization", userId, storeId);
+    //STEP 1) check if this userId is an owner Id or is in storeAssistants array
+
+    const userIdExist = await Store.findOne({_id: storeId,
+        $or: [
+            {owner: userId},
+            {storeAssistants: userId} // it's { storeAssistants: { $in: [userId] } } under the hood. since MongoDB automatically checks if userId is an element of the array
+        ]
+    });
+    //STEP: return the value as boolean:
+    return !!userIdExist; 
 }
 
 export async function setStoreStatus(storeId:string, status: "active" | "suspended") {
