@@ -19,20 +19,20 @@ export async function createAssistant(request: Request) {
 
  try {
      //STEP 1: create a new user with userType = assistant:
-  const user = await User.create({
+  const user = await User.create([{
     signMethod: "credentials",
     userType: "storeAssistant",
     email,
     credentials: { password },
     username,
-  }, {session});
+  }], {session});
 
   //STEP 2: create a new assistant:
-  const assistant = await StoreAssistant.create({
+  const assistant = await StoreAssistant.create([{
     assistant: user[0].id,
     inStore: request.user.myStore,
     permissions,
-  }, {session});
+  }], {session});
 
   await session.commitTransaction();
 
