@@ -4,6 +4,6 @@ import { changePassword, updateUserProfile } from "../../controllers/auth/userAu
 export const router = Router();
 
 // these below are only for userType for all types EXCEPT store assistant
-router.route("/updateProfile").post(updateUserProfile);
-router.route("/changeMyPassword/:id").post(changePassword);
+router.route("/updateProfile").patch(updateUserProfile);
+router.route("/changeMyPassword/:id").patch(changePassword);
 

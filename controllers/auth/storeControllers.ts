@@ -10,10 +10,11 @@ export const createStoreController = catchAsync(async (request, response, next) 
     sanitisedData(request, next);
 
     const {storeName} = request.body;
-    const owner = request.body.owner || request.params.id;
-    if(!storeName || owner) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
+    const owner = request.user.id;
 
-    const newStore = await createStore(request.body, next);
+    if(!storeName || !owner) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
+    const data = {...request.body, owner}
+    const newStore = await createStore(data);
 
     response.status(201).json({
         status: "success",
