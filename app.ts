@@ -5,7 +5,9 @@ import mongoSanitize from "express-mongo-sanitize";
 import cors from "cors";
 import { router as storeRouter } from "./_routers/storeRoutes";
 import { router as authRouter } from "./_routers/authRoutes";
-
+import order from './_routers/OrderRoute'
+import product from './_routers/productRoutes'
+import coupon from './_routers/CouponRoute'
 
 const app = express();
 const limiter = ratelimit({
@@ -26,6 +28,9 @@ app.use(cors());
 app.use("/api/v1/stores", storeRouter);
 app.use("/api/v1/auth", authRouter);
 
+app.use("/api/orders", order)
+app.use("/api/products", product)
+app.use("/api", coupon)
 
 
 export default app;

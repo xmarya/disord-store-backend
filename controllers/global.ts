@@ -13,7 +13,7 @@ export const createOne = (Model: Exclude<Model, "User">) => catchAsync( async(re
     sanitisedData(request.body, next);
 
     const data = request.body
-    const newDoc = await model(Model).create({data});
+    const newDoc = await model(Model).create(data);
 
     response.status(201).json({
         status: "success",
