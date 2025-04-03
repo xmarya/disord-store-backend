@@ -4,7 +4,7 @@ import { checkPermissions, restrict } from "../../controllers/auth/authControlle
 export const router = express.Router();
 
 
-router.route("/").post(createStoreController);
+router.route("/").post(restrict("user"),createStoreController);
 router.route("/:id").patch(restrict("storeOwner"), updateStoreController).delete(restrict("storeOwner"), deleteStoreController);
 
 // router.use(restrict("storeOwner", "storeAssistant"), checkPermissions("previewStoreStats")); this doesn't have access to the /:id params
