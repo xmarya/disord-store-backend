@@ -3,23 +3,8 @@ import { catchAsync } from "../_utils/catchAsync";
 import { DOCS_PER_PAGE } from "../_data/constants";
 import { Model } from "../_Types/Model";
 import { AppError } from "../_utils/AppError";
-import xss from "xss";
 import sanitisedData from "../_utils/sanitisedData";
 
-export const createOne = (Model: Exclude<Model, "User" | "Store">) =>
-  catchAsync(async (request, response, next) => {
-    // NOTE: this controller is not for creating users
-    console.log("createOne");
-    sanitisedData(request, next);
-
-    const data = request.body;
-    const newDoc = await model(Model).create({ data });
-
-    response.status(201).json({
-      status: "success",
-      newDoc,
-    });
-  });
 
 export const getAll = (Model: Model) =>
   catchAsync(async (request, response, next) => {
