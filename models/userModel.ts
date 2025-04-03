@@ -191,32 +191,24 @@ userSchema.virtual("planExpiresInDays").get(function () {
     });
 */
 
-// this pre hook is for encrypting the pass before saving it
+// this pre hook is for encrypting the pass before saving it for NEW USERS:
 userSchema.pre("save", async function(next) {
   // STEP 1) check if the user isNew and the signMethod is credentials: (the condition this.credentials is for getting rid ot possibly undefined error)
   if(this.isNew && this.signMethod === "credentials" && this.credentials){
-    console.log("if(this.isNew && this.signMethod === credentials && this.credentials)");
-    this.credentials.password = await bcrypt.hash(this.credentials?.password, 13);
+    console.log("pre save hook for NEW USERS");
+    this.credentials.password = await bcrypt.hash(this.credentials.password, 13);
     next();
   }
 });
 
+// this pre hook if for forget/rest password, it encrypts the password and set the changeAt
 userSchema.pre("save", async function(next) {
-  if(this.isModified("credentials") && this.credentials) {
-    console.log(`this.isModified("credentials") && this.credentials`);
+  if(!this.isNew && this.credentials && this.isModified(this.credentials.password) ) {
+    console.log(`pre save hook if for forget/rest password`);
     this.credentials.password = await bcrypt.hash(this.credentials.password, 13);
     this.credentials.passwordChangedAt = new Date();
   }
   
-  next();
-});
-
-// this pre hook is to set the passwordChangedAt:
-userSchema.pre("save", async function(next) {
-  if(this.credentials && this.isModified(this.credentials.password)) {
-    console.log("this.credentials && this.isModified(this.credentials.password)");
-    this.credentials.passwordChangedAt = new Date();
-  }
   next();
 });
 
