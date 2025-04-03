@@ -59,10 +59,9 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
       if (isUsernameExist) return next(new AppError(400, "الرجاء اختيار اسم مستخدم آخر"));
     }
   
-    const updatedUser = await User.findByIdAndUpdate(userId, request.body);
+    await User.findByIdAndUpdate(userId, request.body);
   
     response.status(201).json({
       status: "success",
-      updatedUser,
     });
   });
