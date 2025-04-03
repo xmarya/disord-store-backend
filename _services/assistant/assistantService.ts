@@ -13,60 +13,71 @@ import { AssistantRegisterData } from "../../_Types/StoreAssistant";
     hovering it it indicates that it returns an array of document, and this is driven by Model.create() query.
 */
 
-export async function createAssistant(data:AssistantRegisterData) {
+export async function createAssistant(data: AssistantRegisterData) {
   console.log("create Assistant service");
   const { email, password, username, permissions, storeId } = data;
   const session = await startSession();
   session.startTransaction();
 
- try {
-     //STEP 1: create a new user with userType = assistant:
-  const user = await User.create([{
-    signMethod: "credentials",
-    userType: "storeAssistant",
-    email,
-    credentials: { password },
-    username,
-  }], {session});
+  try {
+    //STEP ) check if the store is exist:
+    const store = await Store.findById(storeId);
+    if (!store) throw new AppError(400, "لايوجد متجر  بهذا المعرف");
 
-  //STEP 2: create a new assistant:
-  const assistant = await StoreAssistant.create([{
-    assistant: user[0].id,
-    inStore: storeId,
-    permissions,
-  }], {session});
+    //STEP : create a new user with userType = assistant:
+    const user = await User.create(
+      [
+        {
+          signMethod: "credentials",
+          userType: "storeAssistant",
+          email,
+          credentials: { password },
+          username,
+        },
+      ],
+      { session }
+    );
 
-  await session.commitTransaction();
+    //STEP : create a new assistant:
+    const assistant = await StoreAssistant.create(
+      [
+        {
+          assistant: user[0].id,
+          inStore: storeId,
+          permissions,
+        },
+      ],
+      { session }
+    );
 
-  //STEP 3) insert assistant data in store without registering it to the session to
-  //  reduce the number of operations inside the critical section 
-  // (since th transactions should be as short as possible):
-  await Store.findByIdAndUpdate(storeId, {$addToSet: {storeAssistants: assistant}});
+    await session.commitTransaction();
 
-  return assistant;
+    //STEP 3) insert assistant data in store without registering it to the session to
+    //  reduce the number of operations inside the critical section
+    // (since th transactions should be as short as possible):
+    await Store.findByIdAndUpdate(storeId, { $addToSet: { storeAssistants: assistant[0].id } });
 
- } catch (error) {
+    return assistant;
+  } catch (error) {
     await session.abortTransaction();
-    throw new AppError(500, "لم تتم العملية بنجاح. حاول مجددًا");
-
- } finally {
+    const message = (error as AppError).message || "لم تتم العملية بنجاح. حاول مجددًا"
+    throw new AppError(500, message);
+  } finally {
     await session.endSession();
- }
-
+  }
 }
 
-export async function getAllAssistants(storeId:string) {
+export async function getAllAssistants(storeId: string) {
   const assistants = await Store.findById(storeId).select("storeAssistants");
 
   return assistants;
 }
-export async function getOneAssistant(assistantId:string) {
+export async function getOneAssistant(assistantId: string) {
   const assistants = await StoreAssistant.findById(assistantId);
 
   return assistants;
 }
 
-export async function deleteAssistant(id:string) {
+export async function deleteAssistant(id: string) {
   await StoreAssistant.findByIdAndDelete(id);
 }
-
