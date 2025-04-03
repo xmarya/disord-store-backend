@@ -1,4 +1,4 @@
-import { createOne, getAll, getOne } from "./global";
+import { createOne, getAll, getOne } from "../global";
 
 
 export const getAllProducts = getAll("Product"); // of a store
