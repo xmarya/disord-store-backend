@@ -36,14 +36,8 @@ export async function createStore(data:StoreDocument) {
     }
 } 
 
-export async function getAssistantPermissions(storeId:string, assistantId:string) {
-    const assistant = await StoreAssistant.findOne({assistant: assistantId, inStore:storeId});
-
-    return assistant;
-}
-
 export async function confirmAuthorization( userId:string, storeId:string):Promise<boolean> {
-    console.log("confirmAuthorization", userId, storeId);
+    console.log("confirmAuthorization", "user",userId, "store",storeId);
     //STEP 1) check if this userId is an owner Id or is in storeAssistants array
 
     const userIdExist = await Store.findOne({_id: storeId,

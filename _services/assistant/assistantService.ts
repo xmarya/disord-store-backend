@@ -55,7 +55,7 @@ export async function createAssistant(data: AssistantRegisterData) {
     //STEP 3) insert assistant data in store without registering it to the session to
     //  reduce the number of operations inside the critical section
     // (since th transactions should be as short as possible):
-    await Store.findByIdAndUpdate(storeId, { $addToSet: { storeAssistants: assistant[0].id } });
+    await Store.findByIdAndUpdate(storeId, { $addToSet: { storeAssistants: user[0].id } }); // it should have be linked to the user, not the assistant, it could have be also assistant[0].assistant
 
     return assistant;
   } catch (error) {
@@ -80,4 +80,10 @@ export async function getOneAssistant(assistantId: string) {
 
 export async function deleteAssistant(id: string) {
   await StoreAssistant.findByIdAndDelete(id);
+}
+
+export async function getAssistantPermissions(storeId:string, assistantId:string) {
+    const assistant = await StoreAssistant.findOne({assistant: assistantId, inStore:storeId});
+
+    return assistant;
 }
