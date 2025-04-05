@@ -1,4 +1,5 @@
 import { createCategory, getAllCategories } from "../../_services/category/categoryService";
+import { CategoryBasic } from "../../_Types/Category";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import sanitisedData from "../../_utils/sanitisedData";
@@ -48,7 +49,7 @@ export const createCategoryController = catchAsync(async (request, response, nex
   //TODO check the plan quota:
 
   sanitisedData(request.body, next);
-  const data = { ...request.body, store: request.params.storeId };
+  const data:CategoryBasic = { ...request.body, store: request.params.storeId, createdBy: {username: request.user.username, id:request.user.id} };
 
   const newCategory = await createCategory(data);
 

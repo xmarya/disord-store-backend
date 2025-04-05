@@ -9,11 +9,12 @@ export async function createCategory(data: CategoryBasic) {
   const store = await Store.findById(data.store);
   if (!store) return new AppError(400, "لا يوجد متجر بهذا المعرف");
 
+  console.log(data);
   const session = await startSession();
   session.startTransaction();
 
   try {
-    const newCategory = await Category.create(data, { session });
+    const newCategory = await Category.create([data], { session });
 
     await Store.findByIdAndUpdate(store, { $addToSet: { categories: newCategory[0].id } });
 
