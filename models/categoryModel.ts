@@ -33,18 +33,6 @@ categorySchema.pre("findOneAndDelete", async function (next) {
   next();
 });
 
-categorySchema.post("save", async function (doc, next) {
-  console.log("categorySchema.post(save)");
-
-  // STEP 1) getting the storeId from the saved doc:
-  const storeId = doc.store;
-
-  // STEP 2) getting the store and updating it with the new category/categories at one step:
-  await Store.findByIdAndUpdate(storeId, { $addToSet: { categories: doc.id } });
-
-  next();
-});
-
 const Category = model<CategoryDocument, CategoryModel>("Category", categorySchema);
 
 export default Category;
