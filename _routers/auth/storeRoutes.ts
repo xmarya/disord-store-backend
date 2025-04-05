@@ -4,7 +4,7 @@ import { checkAssistantPermissions, hasAuthorization, restrict } from "../../con
 export const router = express.Router();
 
 router.route("/").post(restrict("user"), createStoreController);
-router.route("/:id").patch(restrict("storeOwner"), hasAuthorization, updateStoreController).delete(restrict("storeOwner"), hasAuthorization, deleteStoreController);
+router.route("/:storeId").patch(restrict("storeOwner"), hasAuthorization, updateStoreController).delete(restrict("storeOwner"), hasAuthorization, deleteStoreController);
 
-// router.use(restrict("storeOwner", "storeAssistant"), checkAssistantPermissions("previewStoreStats")); this doesn't have access to the /:id params
-router.route("/:id").get(restrict("storeOwner", "storeAssistant"), hasAuthorization, checkAssistantPermissions("previewStoreStats"), getMyStoreController);
+// router.use(restrict("storeOwner", "storeAssistant"), checkAssistantPermissions("previewStoreStats")); this doesn't have access to the /:storeId params
+router.route("/:storeId").get(restrict("storeOwner", "storeAssistant"), hasAuthorization, checkAssistantPermissions("previewStoreStats"), getMyStoreController);
