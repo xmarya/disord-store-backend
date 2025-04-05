@@ -1,4 +1,5 @@
-import { createCategory } from "../../_services/category/categoryService";
+import { createCategory, getAllCategories } from "../../_services/category/categoryService";
+import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import sanitisedData from "../../_utils/sanitisedData";
 import { deleteOne, getOne, updateOne } from "../global";
@@ -43,25 +44,33 @@ export const updateCategory = catchAsync( async(request, response, next) => {
 */
 
 // protected
-export const createCategoryController = catchAsync( async(request, response, next) => {
+export const createCategoryController = catchAsync(async (request, response, next) => {
+  //TODO check the plan quota:
 
-    //TODO check the plan quota:
+  sanitisedData(request.body, next);
+  const data = { ...request.body, store: request.params.storeId };
 
-    sanitisedData(request.body, next);
-    const data = {...request.body, store: request.params.storeId};
+  const newCategory = await createCategory(data);
 
-    const newCategory = await createCategory(data);
-
-    response.status(201).json({
-        status: "success",
-        newCategory
-    });
-
+  response.status(201).json({
+    status: "success",
+    newCategory,
+  });
 });
 
-export const getAllCategoriesController = catchAsync( async(request, response, next) => {});
+export const getAllCategoriesController = catchAsync(async (request, response, next) => {
+  const storeId = request.user.myStore || request.params.storeId;
+  if (!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
+
+  const categories = await getAllCategories(storeId);
+  if (!categories) return next(new AppError(400, "لا يوجد فئات في هذا المتجر"));
+
+  response.status(200).json({
+    status: "success",
+    categories,
+  });
+});
 
 export const getCategoryController = getOne("Category");
 export const updateCategoryController = updateOne("Category");
 export const deleteCategoryController = deleteOne("Category");
-
