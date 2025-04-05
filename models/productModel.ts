@@ -9,7 +9,7 @@ const ProductSchema = new Schema<ProductDocument>(
     name: {
       type: String,
       required: [true, "the name field is required"],
-      unique: true,
+      // unique: true, shouldn't be, this is a schema for all stores not only one
     },
     price: {
       type: Number,
