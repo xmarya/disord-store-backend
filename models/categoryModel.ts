@@ -13,6 +13,16 @@ const categorySchema = new Schema<CategoryDocument>({
     type: String,
     required: [true, "the category colour is required"],
   },
+  createdBy: {
+    username:{
+      type: String,
+      required: [true, "the category createdBy username is required"],
+    },
+    id: {
+      type:Schema.Types.ObjectId,
+      required: [true, "the category createdBy id is required"],
+    }
+  },
   store: Schema.Types.ObjectId,
   products: [Schema.Types.ObjectId],
 });
