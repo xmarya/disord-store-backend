@@ -6,8 +6,7 @@ import { AppError } from "../_utils/AppError";
 import sanitisedData from "../_utils/sanitisedData";
 
 
-export const getAll = (Model: Model) =>
-  catchAsync(async (request, response, next) => {
+export const getAll = (Model: Model) => catchAsync(async (request, response, next) => {
     console.log("getAll");
     const docs = await model(Model).find().limit(DOCS_PER_PAGE);
 
@@ -18,11 +17,10 @@ export const getAll = (Model: Model) =>
     });
   });
 
-export const getOne = (Model: Model) =>
-  catchAsync(async (request, response, next) => {
+export const getOne = (Model: Model) => catchAsync(async (request, response, next) => {
     console.log("getOne");
 
-    const docId = request.params.id;
+    const docId = request.params.id || request.params.storeId;
     const doc = await model(Model).findById(docId);
 
     if (!doc) return next(new AppError(404, "No document is associated with this id"));
@@ -55,6 +53,7 @@ export const deleteOne = (Model: Exclude<Model, "User">) =>
   catchAsync(async (request, response, next) => {
     console.log("deleteOne");
     const docId = request.params.id;
+    console.log(docId);
     const doc = await model(Model).findByIdAndDelete(docId);
 
     if (!doc) return next(new AppError(404, "No document is associated with this id"));
