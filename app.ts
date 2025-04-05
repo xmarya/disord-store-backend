@@ -1,11 +1,13 @@
 import cookieParser from "cookie-parser";
-import cors from "cors";
 import express from "express";
-import mongoSanitize from "express-mongo-sanitize";
 import ratelimit from "express-rate-limit";
-import {router as userRouter} from "./_routers/userRoutes";
-import { router as dashboardRouter } from "./_routers/dashboard";
-
+import mongoSanitize from "express-mongo-sanitize";
+import cors from "cors";
+import { router as storeRouter } from "./_routers/userRoutes";
+import { router as authRouter } from "./_routers/dashboard";
+import order from './_routers/OrderRoute'
+import product from './_routers/productRoutes'
+import coupon from './_routers/CouponRoute'
 
 const app = express();
 const limiter = ratelimit({
@@ -23,10 +25,12 @@ app.use(cookieParser()); // the above line parsers the data from the body, this 
 app.use(mongoSanitize());
 app.use(cors());
 
-app.use("/api/v1/auth/", userRouter);
-app.use("/api/v1/dashboard", dashboardRouter);
+app.use("/api/v1/stores", storeRouter);
+app.use("/api/v1/auth", authRouter);
 
+app.use("/api/orders", order)
+app.use("/api/products", product)
+app.use("/api", coupon)
 
 
 export default app;
-

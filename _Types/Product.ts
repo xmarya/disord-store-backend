@@ -6,15 +6,15 @@ export interface ProductBasic {
   name: string;
   price: number;
   quantity: number;
-  image: Array<string>;
-  categories: Array<CategoryDocument>;
+  // image?: Array<string>;
+  // categories?: Array<CategoryDocument>;
   description: string;
-  status: "inStock" | "outOfStock";
-  store: Types.ObjectId;
+  stock: number;
+  // store?: Types.ObjectId;
+  discount: number;
 }
 
 export interface ProductOptionals {
-  discount?: number;
   numberOfPurchases?: number;
   ranking?: number;
   reviews?: string;

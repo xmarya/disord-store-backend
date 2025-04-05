@@ -5,6 +5,18 @@ import { Model } from "../_Types/Model";
 import { AppError } from "../_utils/AppError";
 import sanitisedData from "../_utils/sanitisedData";
 
+export const createOne = (Model: Model) => catchAsync( async(request, response, next) => {
+  console.log("createOne");
+  sanitisedData(request.body, next);
+
+  const data = request.body
+  const newDoc = await model(Model).create(data);
+
+  response.status(201).json({
+      status: "success",
+      newDoc
+  });
+});
 
 export const getAll = (Model: Model) => catchAsync(async (request, response, next) => {
     console.log("getAll");
