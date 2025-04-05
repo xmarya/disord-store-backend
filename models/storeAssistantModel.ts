@@ -47,7 +47,6 @@ const storeAssistantModel = new Schema<StoreAssistantDocument>(
       editCategory: { type: Boolean, default: false },
       deleteCategory: { type: Boolean, default: false },
       addDiscount: { type: Boolean, default: false },
-      changeStoreSettings: { type: Boolean, default: false }, // themeColours, storeName, bankAccount
       previewStoreStats: { type: Boolean, default: false },
     },
   },

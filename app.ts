@@ -1,10 +1,10 @@
 import cookieParser from "cookie-parser";
-import express from "express";
-import ratelimit from "express-rate-limit";
-import mongoSanitize from "express-mongo-sanitize";
 import cors from "cors";
-import { router as storeRouter } from "./_routers/storeRoutes";
-import { router as authRouter } from "./_routers/authRoutes";
+import express from "express";
+import mongoSanitize from "express-mongo-sanitize";
+import ratelimit from "express-rate-limit";
+import {router as userRouter} from "./_routers/userRoutes";
+import { router as dashboardRouter } from "./_routers/dashboard";
 
 
 const app = express();
@@ -23,8 +23,8 @@ app.use(cookieParser()); // the above line parsers the data from the body, this 
 app.use(mongoSanitize());
 app.use(cors());
 
-app.use("/api/v1/stores", storeRouter);
-app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/auth/", userRouter);
+app.use("/api/v1/dashboard", dashboardRouter);
 
 
 

@@ -33,6 +33,7 @@ const storeSchema = new Schema<StoreDocument>({
     ref: "User",
     required: true,
   },
+  description: String,
   logo: String,
   storeAssistants: [
     {

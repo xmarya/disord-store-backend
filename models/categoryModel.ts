@@ -13,6 +13,16 @@ const categorySchema = new Schema<CategoryDocument>({
     type: String,
     required: [true, "the category colour is required"],
   },
+  createdBy: {
+    username:{
+      type: String,
+      required: [true, "the category createdBy username is required"],
+    },
+    id: {
+      type:Schema.Types.ObjectId,
+      required: [true, "the category createdBy id is required"],
+    }
+  },
   store: Schema.Types.ObjectId,
   products: [Schema.Types.ObjectId],
 });
@@ -29,18 +39,6 @@ categorySchema.pre("findOneAndDelete", async function (next) {
 
   //STEP 2) getting the store/products and removing the deleted category form them concurrently:
   Promise.all([await Store.findByIdAndUpdate(storeId, { $pull: { categories: doc.id } }), await Product.updateMany({ id: { $in: products } }, { $pull: { categories: doc.id } })]);
-
-  next();
-});
-
-categorySchema.post("save", async function (doc, next) {
-  console.log("categorySchema.post(save)");
-
-  // STEP 1) getting the storeId from the saved doc:
-  const storeId = doc.store;
-
-  // STEP 2) getting the store and updating it with the new category/categories at one step:
-  await Store.findByIdAndUpdate(storeId, { $addToSet: { categories: doc.id } });
 
   next();
 });
