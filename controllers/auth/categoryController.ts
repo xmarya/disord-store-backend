@@ -1,4 +1,7 @@
-import { createOne, deleteOne, updateOne } from "./global";
+import { createCategory } from "../../_services/category/categoryService";
+import { catchAsync } from "../../_utils/catchAsync";
+import sanitisedData from "../../_utils/sanitisedData";
+import { deleteOne, getOne, updateOne } from "../global";
 
 /* OLD CODE (kept for reference): 
 export const createCategory = catchAsync( async(request, response, next) => {
@@ -40,7 +43,25 @@ export const updateCategory = catchAsync( async(request, response, next) => {
 */
 
 // protected
-export const createCategory = createOne("Category");
-export const updateCategory = updateOne("Category");
-export const deleteCategory = deleteOne("Category");
+export const createCategoryController = catchAsync( async(request, response, next) => {
+
+    //TODO check the plan quota:
+
+    sanitisedData(request.body, next);
+    const data = {...request.body, store: request.params.storeId};
+
+    const newCategory = await createCategory(data);
+
+    response.status(201).json({
+        status: "success",
+        newCategory
+    });
+
+});
+
+export const getAllCategoriesController = catchAsync( async(request, response, next) => {});
+
+export const getCategoryController = getOne("Category");
+export const updateCategoryController = updateOne("Category");
+export const deleteCategoryController = deleteOne("Category");
 
