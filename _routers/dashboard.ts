@@ -1,7 +1,7 @@
 import express from "express";
 import { router as storeRouter } from "./auth/storeRoutes";
-import { router as productRouter } from "./auth/productAuthRoutes";
-import { router as assistantRouter } from "./auth/assistantAuthRoutes";
+import { router as productRouter } from "./auth/productRoutes";
+import { router as assistantRouter } from "./auth/assistantRoutes";
 import { router as categoryRouter } from "./auth/categoryRoutes";
 import { router as userRouter } from "./auth/userAuthRoutes";
 import { protect } from "../controllers/auth/authController";
