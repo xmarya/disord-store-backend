@@ -1,10 +1,8 @@
-import type { Request } from "express";
-import { startSession } from "mongoose";
+import { startSession, Types } from "mongoose";
 import User from "../../models/userModel";
 import StoreAssistant from "../../models/storeAssistantModel";
 import Store from "../../models/storeModel";
 import { AppError } from "../../_utils/AppError";
-import { UserBasic } from "../../_Types/User";
 import { AssistantRegisterData } from "../../_Types/StoreAssistant";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
@@ -67,7 +65,7 @@ export async function createAssistant(data: AssistantRegisterData) {
   }
 }
 
-export async function getAllAssistants(storeId: string) {
+export async function getAllAssistants(storeId: string | Types.ObjectId) {
   const assistants = await Store.findById(storeId).select("storeAssistants");
 
   return assistants;
@@ -78,8 +76,24 @@ export async function getOneAssistant(assistantId: string) {
   return assistants;
 }
 
-export async function deleteAssistant(id: string) {
-  await StoreAssistant.findByIdAndDelete(id);
+export async function deleteAssistant(storeId: string | Types.ObjectId, assistantId: string) {
+  const session = await startSession();
+  session.startTransaction();
+  try {
+
+    await Store.findByIdAndUpdate(storeId, {$pull: { storeAssistants: assistantId}}, {session});
+    await User.findByIdAndDelete(assistantId, {session});
+    await StoreAssistant.deleteOne({assistant: assistantId}, {session})
+    
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    const message = (error as AppError).message || "لم تتم العملية بنجاح. حاول مجددًا"
+    throw new AppError(500, message);
+    
+  } finally {
+    await session.endSession();
+  }
 }
 
 export async function getAssistantPermissions(storeId:string, assistantId:string) {

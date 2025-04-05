@@ -43,7 +43,11 @@ export const getAllAssistantsController = catchAsync(async (request, response, n
 });
 
 export const getOneAssistantController = catchAsync(async (request, response, next) => {
+  const storeId = request.user.myStore;
+  if (!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
+
   const assistantId = request.params.id;
+  if (!assistantId) return next(new AppError(400, "لابد من توفير معرف المستخدم"));
 
   const assistant = await getOneAssistant(assistantId);
 
@@ -56,10 +60,15 @@ export const getOneAssistantController = catchAsync(async (request, response, ne
 });
 
 export const deleteAssistantController = catchAsync(async (request, response, next) => {
-  const assistant = await deleteAssistant(request.params.id);
+  const storeId = request.user.myStore;
+  if (!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
+
+  const assistantId = request.params.id;
+  if (!assistantId) return next(new AppError(400, "لابد من توفير معرف المستخدم"));
+
+  await deleteAssistant(storeId, assistantId);
 
   response.status(204).json({
     status: "success",
-    assistant
   })
 });
