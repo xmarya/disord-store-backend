@@ -1,13 +1,12 @@
 import { Types } from "mongoose";
 
-
 export type AssistantRegisterData = {
-  email:string,
-  password:string,
-  username:string;
-  storeId: string,
-  permissions: AssistantPermissions
-}
+  email: string;
+  password: string;
+  username: string;
+  storeId: string;
+  permissions: AssistantPermissions;
+};
 
 export interface StoreAssistant {
   id: string;
@@ -27,6 +26,8 @@ export interface AssistantPermissions {
   addDiscount: boolean;
   editDiscount: boolean;
   previewStoreStats: boolean;
+  addCoupon: boolean;
+  deleteCoupon: boolean;
 }
 
 export type StoreAssistantDocument = StoreAssistant;
