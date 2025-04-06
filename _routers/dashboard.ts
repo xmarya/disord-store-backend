@@ -16,6 +16,6 @@ router.use("/store", storeRouter);
 router.use("/:storeId/products", productRouter);
 router.use("/:storeId/categories", categoryRouter);
 router.use("/:storeId/assistants", assistantRouter);
-router.use("/:storeId/coupons", assistantRouter);
+router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
 router.use("/me", userRouter);
