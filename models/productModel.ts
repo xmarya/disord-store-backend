@@ -28,15 +28,17 @@ const ProductSchema = new Schema<ProductDocument>(
       type: String,
       required: [true, "the description field is required"],
     },
-    status: {
-      type: String,
-      enum: ["inStock", "outOfStock"],
-      required: [true, "the productStatus is required"],
-    },
-    discount: {
-      // NOTE: the user insert the number to be in %
-      type: Number,
-    },
+    // status: {
+    //   type: String,
+    //   enum: ["inStock", "outOfStock"],
+    //   required: [true, "the productStatus is required"],
+    // },
+    stock: { type: Number, required: true, default: 0 },
+    discount: { type: Number, default: 0, min: 0, max: 100 },
+    // discount: {
+    //   // NOTE: the user insert the number to be in %
+    //   type: Number,
+    // },
     store: {
       type: Schema.Types.ObjectId,
       ref: "Store",
