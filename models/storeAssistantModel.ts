@@ -48,6 +48,8 @@ const storeAssistantModel = new Schema<StoreAssistantDocument>(
       deleteCategory: { type: Boolean, default: false },
       addDiscount: { type: Boolean, default: false },
       previewStoreStats: { type: Boolean, default: false },
+      addCoupon: { type: Boolean, default: false },
+      deleteCoupon: { type: Boolean, default: false },
     },
   },
   {

@@ -9,7 +9,9 @@ export interface ProductBasic {
   image: Array<string>;
   categories: Array<CategoryDocument>;
   description: string;
-  status: "inStock" | "outOfStock";
+  // status: "inStock" | "outOfStock";
+  stock: number;
+  discount: number;
   store: Types.ObjectId;
 }
 
