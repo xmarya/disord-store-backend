@@ -4,6 +4,7 @@ import { IOrder } from "../_Types/Order";
 const OrderSchema = new Schema<IOrder>(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    orderNumber: { type: String, unique: true },
     items: [
       {
         productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
@@ -13,6 +14,14 @@ const OrderSchema = new Schema<IOrder>(
         quantity: { type: Number, required: true },
       },
     ],
+    shippingAddress: { 
+      street: { type: String, required: true },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      postalCode: { type: String, required: true },
+      country: { type: String, required: true },
+      phone: { type: String },
+    },
     subtotal: { type: Number, required: true },
     productDiscount: { type: Number, default: 0 },
     couponDiscount: { type: Number, default: 0 },

@@ -27,7 +27,7 @@ export interface AssistantPermissions {
   editDiscount: boolean;
   previewStoreStats: boolean;
   addCoupon: boolean;
-  deleteCoupon: boolean;
+  UpdateCoupon: boolean;
 }
 
 export type StoreAssistantDocument = StoreAssistant;

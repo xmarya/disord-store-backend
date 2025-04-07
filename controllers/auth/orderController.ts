@@ -1,33 +1,41 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { ApplyCoupon, CreateOrder, HandleErrorResponse, ProcessOrderItems,
-    UpdateProductStock, ValidateOrderItems, UpdateCouponUsage } from "../../_services/order/orderService";
+    UpdateProductStock, ValidateOrderItems, UpdateCouponUsage,ValidateShippingAddress } from "../../_services/order/orderService";
 import Order from "../../models/orderModel";
+import { generateOrderNumber } from "../../_utils/genrateOrderNumber";
+
 //new order
 export const AddOrder = async (req: Request, res: Response): Promise<any> => {
     const session = await mongoose.startSession();
     session.startTransaction();
     
     try {
-        const { userId, items, paymentMethod, couponCode } = req.body;
+        const { userId, items, paymentMethod, couponCode, shippingAddress  } = req.body;
 
         // Validate order items
         ValidateOrderItems(items)
+        // ValidateShippingAddress
+        ValidateShippingAddress(shippingAddress)
         // Process items and calculate pricing
         const { processedItems, subtotal, totalDiscount } = await ProcessOrderItems(items, session);
         // Apply coupon if provided
         const { couponDiscount, appliedCoupon } = await ApplyCoupon(couponCode, userId, subtotal, session);
         // Update product stock
         await UpdateProductStock(items, session);
+
+        const orderNumber = generateOrderNumber(); 
         // Create order
         const newOrder = CreateOrder(
         userId,
+        orderNumber,
         processedItems,
         subtotal,
         totalDiscount,
         couponDiscount,
         appliedCoupon,
-        paymentMethod
+        paymentMethod,
+        shippingAddress 
         );
 
         // Update coupon usage
@@ -43,42 +51,40 @@ export const AddOrder = async (req: Request, res: Response): Promise<any> => {
         return res.status(201).json({
         status: "success",
         message: "Order created successfully",
-        order: newOrder
+        order: newOrder,
         });
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
         return HandleErrorResponse(error, res);
     }
-  };
+    };
 
-  export const getAllOrders = async (req: Request, res: Response) => {
-    try {
-        const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 10;
-        const skip = (page - 1) * limit;
-        
-        const orders = await Order.find()
-            .populate("userId", "name")
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit);
+    // user's getOrder
+    export const GetUserOrders = async (req: Request, res: Response): Promise<any> => {
+        try {
+            const { userId } = req.params;
             
-        const total = await Order.countDocuments();
-        res.status(200).json({ 
-            status: "success",
-            orders,
-            pagination: {
-                total,
-                page,
-                pages: Math.ceil(total / limit)
+            const orders = await Order.find({ userId })
+            .select('totalPrice createdAt userId orderNumber paymentMethod status')  
+            .populate('items', 'name',) 
+            .sort({ createdAt: -1 }); 
+            
+            if (orders.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No orders found"
+            });
             }
-        });
-    } catch (error) {
-        console.error("Error fetching orders:", error);
-        res.status(500).json({ 
+                return res.status(200).json({
+            success: true,
+            orders
+            });
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+            return res.status(500).json({
             success: false,
-            message: "Internal Server Error" 
-        });
-    }
-};
+            message: "Failed to fetch orders"
+            });
+        }
+        };

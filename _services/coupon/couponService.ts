@@ -17,7 +17,7 @@ export const validateCoupon = async (
       throw new Error("Coupon usage limit reached");
     }
     if (coupon.minOrderAmount && subtotal < coupon.minOrderAmount) {
-      throw new Error(`Minimum order amount of ${coupon.minOrderAmount} required`);
+      throw new Error(`Coupon Used For Product Price Start From ${coupon.minOrderAmount} `);
     }
   
     let discountAmount = 0;

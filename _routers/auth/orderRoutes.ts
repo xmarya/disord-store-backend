@@ -1,13 +1,16 @@
 import express from "express";
-import { generateRevenuePDF, getTotalRevenue } from "../../controllers/auth/invoiceController";
-import { AddOrder, getAllOrders } from "../../controllers/auth/orderController";
+import { generateRevenuePDF } from "../../controllers/auth/invoiceController";
+import { getAllOrders, getTotalRevenue } from "../../controllers/auth/orderAdmin";
+import { AddOrder, GetUserOrders } from "../../controllers/auth/orderController";
 
 export const router = express.Router();
 
+//users
 router.post("/", AddOrder);
+router.get("/user/:userId", GetUserOrders);
 
+//Admins only
 router.get("/", getAllOrders);
-router.get("/invoice/pdf", generateRevenuePDF);
-
 router.get("/revenue", getTotalRevenue);
+router.get("/invoice/pdf", generateRevenuePDF);
 

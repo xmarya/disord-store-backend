@@ -1,28 +1,40 @@
 import mongoose from "mongoose";
 import Product from "../../models/productModel";
-import {Response} from "express"
+import { Response } from "express";
 import Order from "../../models/orderModel";
 import Coupon from "../../models/couponModel";
 import { validateCoupon } from "../coupon/couponService";
+import { RoundToTwo } from "../../_utils/numberUtils"; // Import the helper function
+import { IOrderItem, IOrderItemCheck, IShippingAddress } from "../../_Types/Order";
 
+// Validate order items
 export const ValidateOrderItems = (items: any[]): void => {
   if (!items || !Array.isArray(items) || items.length === 0) {
     throw new Error("Order must contain at least one item");
   }
 };
 
+export const ValidateShippingAddress = (address: IShippingAddress): void => {
+  const requiredFields = ['street', 'city', 'state', 'postalCode', 'country'];
+  const missingFields = requiredFields.filter(field => !address[field as keyof IShippingAddress]);
+
+  if (missingFields.length > 0) {
+    throw new Error(`Shipping address missing: ${missingFields.join(', ')}`);
+  }
+};
+
 // Process items and calculate pricing
 export const ProcessOrderItems = async (
-  items: any[],
+  items: IOrderItemCheck[],
   session: mongoose.ClientSession
 ): Promise<{
-  processedItems: any[];
+  processedItems: IOrderItem[];
   subtotal: number;
   totalDiscount: number;
 }> => {
   let subtotal = 0;
   let totalDiscount = 0;
-  const processedItems = [];
+  const processedItems: IOrderItem[] = [];
 
   for (const item of items) {
     const product = await Product.findById(item.productId).session(session);
@@ -41,15 +53,19 @@ export const ProcessOrderItems = async (
     totalDiscount += itemDiscount;
 
     processedItems.push({
-      productId: product._id,
+      productId:product._id,
       name: product.name,
       price: product.price,
-      discountedPrice: discountedPrice / item.quantity,
+      discountedPrice: RoundToTwo(discountedPrice / item.quantity), 
       quantity: item.quantity
     });
   }
 
-  return { processedItems, subtotal, totalDiscount };
+  return {
+    processedItems,
+    subtotal: RoundToTwo(subtotal), 
+    totalDiscount: RoundToTwo(totalDiscount) 
+  };
 };
 
 // Apply coupon if provided
@@ -67,7 +83,7 @@ export const ApplyCoupon = async (
 
   if (couponCode) {
     // Convert userId to ObjectId if it's a string
-    const userObjectId = typeof userId === 'string' 
+    const userObjectId = typeof userId === "string" 
       ? new mongoose.Types.ObjectId(userId) 
       : userId;
       
@@ -77,7 +93,7 @@ export const ApplyCoupon = async (
       subtotal,
       session
     );
-    couponDiscount = discountAmount;
+    couponDiscount = RoundToTwo(discountAmount); 
     appliedCoupon = coupon;
   }
 
@@ -101,23 +117,28 @@ export const UpdateProductStock = async (
 // Create order object
 export const CreateOrder = (
   userId: string,
+  orderNumber:string,
   processedItems: any[],
   subtotal: number,
   productDiscount: number,
   couponDiscount: number,
   appliedCoupon: any,
-  paymentMethod: string
+  paymentMethod: string,
+  shippingAddress: IShippingAddress 
 ): any => {
   return new Order({
     userId,
+    orderNumber, 
     items: processedItems,
-    subtotal,
-    productDiscount,
-    couponDiscount,
-    totalDiscount: productDiscount + couponDiscount,
-    totalPrice: subtotal - productDiscount - couponDiscount,
+    shippingAddress, 
+    subtotal: RoundToTwo(subtotal),
+    productDiscount: RoundToTwo(productDiscount),
+    couponDiscount: RoundToTwo(couponDiscount),
+    totalDiscount: RoundToTwo(productDiscount + couponDiscount),
+    totalPrice: RoundToTwo(subtotal - productDiscount - couponDiscount),
     couponCode: appliedCoupon?.code,
     paymentMethod,
+    status: "Pending", 
   });
 };
 
