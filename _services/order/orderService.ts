@@ -4,24 +4,9 @@ import { Response } from "express";
 import Order from "../../models/orderModel";
 import Coupon from "../../models/couponModel";
 import { validateCoupon } from "../coupon/couponService";
-import { RoundToTwo } from "../../_utils/numberUtils"; // Import the helper function
+import { RoundToTwo } from "../../_utils/numberUtils";
 import { IOrderItem, IOrderItemCheck, IShippingAddress } from "../../_Types/Order";
-
-// Validate order items
-export const ValidateOrderItems = (items: any[]): void => {
-  if (!items || !Array.isArray(items) || items.length === 0) {
-    throw new Error("Order must contain at least one item");
-  }
-};
-
-export const ValidateShippingAddress = (address: IShippingAddress): void => {
-  const requiredFields = ['street', 'city', 'state', 'postalCode', 'country'];
-  const missingFields = requiredFields.filter(field => !address[field as keyof IShippingAddress]);
-
-  if (missingFields.length > 0) {
-    throw new Error(`Shipping address missing: ${missingFields.join(', ')}`);
-  }
-};
+import { z } from "zod";
 
 // Process items and calculate pricing
 export const ProcessOrderItems = async (
@@ -31,18 +16,36 @@ export const ProcessOrderItems = async (
   processedItems: IOrderItem[];
   subtotal: number;
   totalDiscount: number;
+  hasDigitalProducts: boolean;
 }> => {
   let subtotal = 0;
   let totalDiscount = 0;
   const processedItems: IOrderItem[] = [];
+  let hasDigitalProducts = false;
 
+  const productIds = items.map(item => item.productId);
+  const products = await Product.find({ _id: { $in: productIds } }).session(session);
+  const productMap = new Map(products.map(p => [p._id.toString(), p]));
+
+  const bulkOps: any[] = [];
   for (const item of items) {
-    const product = await Product.findById(item.productId).session(session);
+    const product = productMap.get(item.productId.toString());
     if (!product) {
       throw new Error(`Product with ID ${item.productId} not found`);
     }
     if (product.stock < item.quantity) {
-      throw new Error(`Insufficient stock for product ${product.name}`);
+      throw new Error(`Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`);
+    }
+
+    bulkOps.push({
+      updateOne: {
+        filter: { _id: product._id, stock: { $gte: item.quantity } },
+        update: { $inc: { stock: -item.quantity } },
+      },
+    });
+
+    if (product.productType === "digital") {
+      hasDigitalProducts = true;
     }
 
     const itemPrice = product.price * item.quantity;
@@ -53,18 +56,27 @@ export const ProcessOrderItems = async (
     totalDiscount += itemDiscount;
 
     processedItems.push({
-      productId:product._id,
+      productId: product._id,
       name: product.name,
       price: product.price,
-      discountedPrice: RoundToTwo(discountedPrice / item.quantity), 
-      quantity: item.quantity
+      discountedPrice: RoundToTwo(discountedPrice / item.quantity),
+      quantity: item.quantity,
+      productType: product.productType,
     });
+  }
+
+  if (bulkOps.length > 0) {
+    const bulkResult = await Product.bulkWrite(bulkOps, { session });
+    if (bulkResult.modifiedCount !== bulkOps.length) {
+      throw new Error("Failed to update stock for some products");
+    }
   }
 
   return {
     processedItems,
-    subtotal: RoundToTwo(subtotal), 
-    totalDiscount: RoundToTwo(totalDiscount) 
+    subtotal: RoundToTwo(subtotal),
+    totalDiscount: RoundToTwo(totalDiscount),
+    hasDigitalProducts,
   };
 };
 
@@ -81,56 +93,46 @@ export const ApplyCoupon = async (
   let couponDiscount = 0;
   let appliedCoupon = null;
 
-  if (couponCode) {
-    // Convert userId to ObjectId if it's a string
+  if (couponCode !== undefined && couponCode.trim() !== "") {
     const userObjectId = typeof userId === "string" 
       ? new mongoose.Types.ObjectId(userId) 
       : userId;
-      
+    
     const { coupon, discountAmount } = await validateCoupon(
       couponCode,
       userObjectId,
       subtotal,
       session
     );
-    couponDiscount = RoundToTwo(discountAmount); 
+    couponDiscount = RoundToTwo(discountAmount);
     appliedCoupon = coupon;
+  } else if (couponCode === "") {
+    throw new Error("Coupon code cannot be empty if provided");
   }
 
   return { couponDiscount, appliedCoupon };
 };
 
-// Update product stock
-export const UpdateProductStock = async (
-  items: any[],
-  session: mongoose.ClientSession
-): Promise<void> => {
-  for (const item of items) {
-    await Product.findByIdAndUpdate(
-      item.productId,
-      { $inc: { stock: -item.quantity } },
-      { session, new: true }
-    );
-  }
-};
-
 // Create order object
 export const CreateOrder = (
   userId: string,
-  orderNumber:string,
+  orderNumber: string,
   processedItems: any[],
   subtotal: number,
   productDiscount: number,
   couponDiscount: number,
   appliedCoupon: any,
   paymentMethod: string,
-  shippingAddress: IShippingAddress 
+  shippingAddress: IShippingAddress | undefined,
+  hasDigitalProducts: boolean
 ): any => {
+  const status = hasDigitalProducts ? "Available" : "Pending";
+  
   return new Order({
     userId,
-    orderNumber, 
+    orderNumber,
     items: processedItems,
-    shippingAddress, 
+    shippingAddress: hasDigitalProducts ? undefined : shippingAddress,
     subtotal: RoundToTwo(subtotal),
     productDiscount: RoundToTwo(productDiscount),
     couponDiscount: RoundToTwo(couponDiscount),
@@ -138,7 +140,8 @@ export const CreateOrder = (
     totalPrice: RoundToTwo(subtotal - productDiscount - couponDiscount),
     couponCode: appliedCoupon?.code,
     paymentMethod,
-    status: "Pending", 
+    status,
+    isDigital: hasDigitalProducts
   });
 };
 
@@ -153,13 +156,21 @@ export const UpdateCouponUsage = async (appliedCoupon: any, session: mongoose.Cl
   }
 };
 
-// Handle error response
+// Handle error response (updated for Zod)
 export const HandleErrorResponse = (error: unknown, res: Response): Response => {
   console.error("Error creating order:", error);
+  if (error instanceof z.ZodError) {
+    return res.status(400).json({
+      success: false,
+      message: "Validation failed",
+      errors: error.errors.map(e => `${e.path.join(".")}: ${e.message}`),
+    });
+  }
   const errorMessage = (error instanceof Error) ? error.message : "Internal Server Error";
   const statusCode = errorMessage.includes("not found") ||
     errorMessage.includes("Insufficient stock") ||
-    errorMessage.includes("must contain")
+    errorMessage.includes("must contain") ||
+    errorMessage.includes("require online payment")
     ? 400 : 500;
   return res.status(statusCode).json({
     success: false,

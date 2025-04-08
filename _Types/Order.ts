@@ -13,12 +13,13 @@ export interface IOrderItem {
   price: number;
   discountedPrice: number;
   quantity: number;
+  productType: "physical" | "digital";
 }
 export interface IOrder extends Document {
   userId: mongoose.Types.ObjectId ;  
   orderNumber: string; 
   items: IOrderItem[];
-  shippingAddress: IShippingAddress;
+  shippingAddress?: IShippingAddress;
   totalPrice: number;
   productDiscount: number;
   couponDiscount: number;
@@ -26,8 +27,9 @@ export interface IOrder extends Document {
   subtotal: number;
   couponCode?: string;
   paymentMethod: "COD" | "Online";
-  status: "Pending" | "Paid" | "Shipped" | "Delivered" | "Cancelled";
+  status: "Pending" | "Paid" | "Shipped" | "Delivered" | "Cancelled" | "Available";
   createdAt: Date;
+  isDigital: boolean;
 }
 export interface IOrderItemCheck {
   productId: string;

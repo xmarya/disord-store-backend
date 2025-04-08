@@ -82,3 +82,18 @@ export const UpdateCoupon = async (req: Request, res: Response): Promise<any> =>
     res.status(500).json({ success: false, message: "Failed to update coupon" });
   }
 };
+
+// getc coupon by id
+export const GetCouponById = async (req: Request, res: Response): Promise<any> => {
+  const {id} = req.params;
+  try{
+    const coupon = await Coupon.findById(id)
+    if(!coupon){
+      return res.status(404).json({success: false, message:'Coupon not found'})
+    }
+    res.status(200).json({success:true, coupon})
+  }catch(error) {
+    console.error("Error Coupn Not Found", error)
+    res.status(500).json({success: false, message:"Failed To Find Coupon"})
+  }
+}

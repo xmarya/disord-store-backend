@@ -13,6 +13,7 @@ export interface ProductBasic {
   stock: number;
   discount: number;
   store: Types.ObjectId;
+  productType: "physical" | "digital";
 }
 
 export interface ProductOptionals {

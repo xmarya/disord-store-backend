@@ -1,6 +1,6 @@
 import express from "express";
 import { checkAssistantPermissions, hasAuthorization, restrict } from "../../controllers/auth/authController";
-import { createCoupon,UpdateCoupon } from "../../controllers/auth/couponController";
+import { createCoupon,UpdateCoupon,GetCouponById } from "../../controllers/auth/couponController";
 
 export const router = express.Router({mergeParams: true});
 
@@ -9,3 +9,5 @@ export const router = express.Router({mergeParams: true});
 router.post("/",checkAssistantPermissions("addCoupon"), createCoupon);
 
 router.put("/:id",checkAssistantPermissions("UpdateCoupon"), UpdateCoupon);
+
+router.get("/:id", GetCouponById);
