@@ -4,7 +4,7 @@ import { StoreDocument } from "../_Types/Store";
 import { Model, Schema, model } from "mongoose";
 
 type StoreModel = Model<StoreDocument>;
-const storeSchema = new Schema<StoreDocument>({
+export const storeSchema = new Schema<StoreDocument>({
   storeName: {
     type: String,
     required: true,

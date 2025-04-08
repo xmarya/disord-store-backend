@@ -1,12 +1,13 @@
+import lruCache  from "../_config/lruCache";
 import { ReviewDocument } from "../_Types/Reviews";
-import { Model, Schema, model } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
-type ReviewModel = Model<ReviewDocument>;
+type ReviewModel = mongoose.Model<ReviewDocument>;
 
-const reviewSchema = new Schema<ReviewDocument>(
+export const reviewSchema = new mongoose.Schema<ReviewDocument>(
   {
     user: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "the user filed is required"],
     },
@@ -20,23 +21,6 @@ const reviewSchema = new Schema<ReviewDocument>(
       default: Date.now,
     },
     updatedAt: Date,
-    reviewedModel: {
-      type: Schema.Types.ObjectId,
-      /* SOLILOQUY: I think I have to remove the required condition in order to insert reviews that belongs to the platform itself,
-            so, in this way I can insert a new doc without being associated to another id another schema.
-            and for searching I just have to select only any review with Platform type
-            // required: [true, "the reviewedModel filed is required"],
-            */
-
-      // Instead of a hardcoded model name in `ref`, `refPath` means Mongoose
-      // will look at the `docModel` property to find the right model.
-      refPath: "reviewType",
-    },
-    reviewType: {
-      type: String,
-      required: [true, "the review must have a model"],
-      enum: ["Product", "Store", "Platform"],
-    },
   },
   {
     timestamps: true,
@@ -46,7 +30,3 @@ const reviewSchema = new Schema<ReviewDocument>(
     toObject: { virtuals: true },
   }
 );
-
-const Review =model<ReviewDocument, ReviewModel>("Review", reviewSchema);
-
-export default Review;

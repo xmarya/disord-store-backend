@@ -4,12 +4,12 @@ import Category from "./categoryModel";
 
 type ProductModel = Model<ProductDocument>;
 
-const ProductSchema = new Schema<ProductDocument>(
+export const ProductSchema = new Schema<ProductDocument>(
   {
     name: {
       type: String,
       required: [true, "the name field is required"],
-      // unique: true, shouldn't be, this is a schema for all stores not only one
+      unique: true,
     },
     price: {
       type: Number,
