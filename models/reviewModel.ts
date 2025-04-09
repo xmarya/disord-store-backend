@@ -1,7 +1,5 @@
 import { ReviewDocument } from "../_Types/Reviews";
-import mongoose, { Document } from "mongoose";
-
-type ReviewModel = mongoose.Model<ReviewDocument>;
+import mongoose from "mongoose";
 
 export const reviewSchema = new mongoose.Schema<ReviewDocument>(
   {
