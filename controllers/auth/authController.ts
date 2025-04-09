@@ -7,6 +7,8 @@ import type { Request, Response, NextFunction } from "express";
 import { AssistantPermissions } from "../../_Types/StoreAssistant";
 import { confirmAuthorization } from "../../_services/store/storeService";
 import { getAssistantPermissions } from "../../_services/assistant/assistantService";
+import { confirmReviewAuthorisation } from "../../_services/review/reviewService";
+import { getDynamicModel, getModelId } from "../../_utils/dynamicMongoModel";
 
 const jwtVerify = async (token: string, salt: string): Promise<JwtPayload & { id: string }> => {
   // https://stackoverflow.com/questions/75398503/error-when-trying-to-promisify-jwt-in-typescript
@@ -35,7 +37,7 @@ export const protect = catchAsync(async (request, response, next) => {
 
   //STEP 3) adding the current user to the request:
   request.user = user as UserDocument;
-  console.log("inside protect", request.user);
+  console.log("inside protect", request.user.username);
 
   next();
 });
@@ -50,7 +52,6 @@ export const restrict = (...userTypes: Array<UserTypes>) => {
 
 export const hasAuthorization = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
-  // const storeId = request.params.id || request.params.storeId;
   const storeId = request.params.storeId;
 
   if (await confirmAuthorization(userId, storeId)) return next();
@@ -83,3 +84,22 @@ export const checkAssistantPermissions = (permissionKey: keyof AssistantPermissi
     // }
   };
 };
+
+export const isWriter = catchAsync(async (request, response, next) => {
+  const reviewId = request.params.id;
+  if (!reviewId) return next(new AppError(400, "رقم المعرف مفقود"));
+
+  // STEP 2) get the modelId which the reviewId belongs to:
+  const modelId = getModelId(request);
+  if (!modelId) return next(new AppError(400, "Please specify the model of the review (Store | Product | Platform)"));
+  
+  // STEP 3) get the model name:
+  const modelName = getDynamicModel("Review", modelId);
+
+  // STEP 3) get the last piece which is the userId and pass them to get checked:
+  const userId = request.user.id;
+  const authorised = await confirmReviewAuthorisation(modelName, reviewId, userId);
+  if(!authorised) return next(new AppError(403, "غير مصرح لك الوصول للصفحة"));
+
+  next();
+})

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import lruCache from "../_config/LRUCache";
+import type { Request } from "express";
 import { DynamicModel } from "../_Types/Model";
 import { reviewSchema } from "../models/reviewModel";
 import { storeSchema } from "../models/storeModel";
@@ -12,8 +13,6 @@ import { AppError } from "./AppError";
 
 type DynamicModelMap = Record<DynamicModel, mongoose.Schema>;
 
-type DynamicModels = keyof DynamicModelMap;
-
 const modelSchemas = {
   Review: reviewSchema,
   Store: storeSchema,
@@ -22,7 +21,9 @@ const modelSchemas = {
   StoreStat: storeStatSchema,
   AnnualProfit: annualProfitSchema,
   Invoice: invoiceSchema,
-} as const satisfies Record<DynamicModel, mongoose.Schema>;
+} as const satisfies DynamicModelMap;
+
+type DynamicModels = keyof DynamicModelMap;
 
 function getDynamicModelData<T extends DynamicModels>(model: T, modelId: string) {
   // const modelSchema:DynamicModelMap = {
@@ -76,4 +77,18 @@ export function getDynamicModel<T extends mongoose.Document>(model: DynamicModel
   const dynamicModel = lruCache.get(modelName) as mongoose.Model<T>;
   console.log("inside getDynamicModel", dynamicModel.modelName);
   return dynamicModel;
+}
+
+export function getModelId(request: Request): string {
+  console.log("getModelId");
+  let modelId;
+  console.log(request.originalUrl,request.originalUrl.includes("platform") );
+  // STEP 1) is it from /platform route?
+  if(request.originalUrl.includes("platform")) return modelId = "platform";
+
+  //STEP 2) if the request is not coming from /platform, then check the request.body:
+  modelId = request.body.modelId; // for stores and products
+
+  console.log("modelId = ",modelId);
+  return modelId;
 }
