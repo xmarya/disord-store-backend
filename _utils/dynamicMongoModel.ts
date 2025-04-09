@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import lruCache from "../_config/lruCache";
+import lruCache from "../_config/LRUCache";
 import { DynamicModel } from "../_Types/Model";
 import { reviewSchema } from "../models/reviewModel";
 import { storeSchema } from "../models/storeModel";
