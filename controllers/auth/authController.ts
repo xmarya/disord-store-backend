@@ -9,6 +9,7 @@ import { confirmAuthorization } from "../../_services/store/storeService";
 import { getAssistantPermissions } from "../../_services/assistant/assistantService";
 import { confirmReviewAuthorisation } from "../../_services/review/reviewService";
 import { getDynamicModel, getModelId } from "../../_utils/dynamicMongoModel";
+import Store from "../../models/storeModel";
 
 const jwtVerify = async (token: string, salt: string): Promise<JwtPayload & { id: string }> => {
   // https://stackoverflow.com/questions/75398503/error-when-trying-to-promisify-jwt-in-typescript
@@ -107,6 +108,8 @@ export const isWriter = catchAsync(async (request, response, next) => {
 export const isStoreIdExist = catchAsync(async (request, response, next) =>{
   const storeId = request.user.myStore || request.params.storeId;
   if(!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
+
+  if(!await Store.exists({_id: storeId}) ) return next(new AppError(400, "هذا المتجر غير موجود"));
 
   request.store = storeId;
 
