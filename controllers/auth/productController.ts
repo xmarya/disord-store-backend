@@ -8,7 +8,11 @@ import { deleteOne, getOne, updateOne } from "../global";
 // protected routes
 export const createProductController = catchAsync(async (request, response, next) => {
   sanitisedData(request, next);
-  const data = { ...request.body, store: request.params.storeId };
+
+  // const storeId = request.user.myStore || request.params.storeId;
+  // if(!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
+  // const data = { ...request.body, store: storeId };
+  const data = { ...request.body }; // the storeId now within the request.body (refer to isStoreIdExist middleware)
 
   const newProd = await createProduct(data);
   response.status(201).json({
@@ -18,10 +22,11 @@ export const createProductController = catchAsync(async (request, response, next
 });
 
 export const getAllProductsController = catchAsync(async (request, response, next) => {
-  const storeId = request.user.myStore || request.params.storeId;
-  if (!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
+  // const storeId = request.user.myStore || request.params.storeId;
+  // if (!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
 
-  const products = await getAllProducts(storeId);
+  // const products = await getAllProducts(storeId);
+  const products = await getAllProducts(request.store);
 
   if (!products) return next(new AppError(400, "لا يوجد منتجات في هذا المتجر"));
 
