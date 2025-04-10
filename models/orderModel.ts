@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { IOrder } from "../_Types/Order";
   
-export const OrderSchema = new Schema<IOrder>(
+const OrderSchema = new Schema<IOrder>(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     items: [
