@@ -68,12 +68,6 @@ export const ProductSchema = new Schema<ProductDocument>(
   }
 );
 
-ProductSchema.virtual("reviews", {
-  ref: "Review",
-  localField: "id",
-  foreignField: "reviewedModel",
-});
-
 ProductSchema.pre("save", async function (next) {
   console.log("ProductSchema.pre(save)");
   if (this.isModified("categories")) {
