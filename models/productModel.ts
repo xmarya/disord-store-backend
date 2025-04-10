@@ -58,6 +58,17 @@ export const ProductSchema = new Schema<ProductDocument>(
     ranking: {
       // NOTE: this filed will be used to presents the ranking of store's products, it's irrelevant to the storeStats model.
     },
+    ratingsAverage: {
+      type: Number,
+      default:null,
+      min: [1, "rating must be 1 to 5"],
+      max: [5, "rating must be 1 to 5"],
+      set: (rating:number) => Math.round(rating * 10) / 10
+    },
+    ratingsQuantity: {
+      type: Number,
+      default:0
+    }
   },
   {
     timestamps: true,

@@ -20,7 +20,8 @@ export interface ProductOptionals {
   discount?: number;
   numberOfPurchases?: number;
   ranking?: number;
-  reviews?: string;
+  ratingsAverage:number,
+  ratingsQuantity:number
 }
 
 export type ProductDocument = ProductBasic & ProductOptionals;
