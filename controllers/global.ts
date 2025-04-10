@@ -8,7 +8,9 @@ import sanitisedData from "../_utils/sanitisedData";
 
 export const getAll = (Model: Model) => catchAsync(async (request, response, next) => {
     console.log("getAll");
-    const docs = await model(Model).find().limit(DOCS_PER_PAGE);
+    const docs = await model(Model).find().limit(DOCS_PER_PAGE); //TODO: pages functionality
+
+    if(!docs) return next(new AppError(400, "No data found."));
 
     response.status(200).json({
       status: "success",
@@ -21,8 +23,9 @@ export const getOne = (Model: Model) => catchAsync(async (request, response, nex
     console.log("getOne");
 
     const docId = request.params.id || request.params.storeId;
-    const doc = await model(Model).findById(docId);
+    if(!docId) return next(new AppError(400, "document id is missing."));
 
+    const doc = await model(Model).findById(docId);
     if (!doc) return next(new AppError(404, "No document is associated with this id"));
 
     response.status(200).json({
@@ -31,13 +34,15 @@ export const getOne = (Model: Model) => catchAsync(async (request, response, nex
     });
   });
 
-export const updateOne = (Model: Model) =>
-  catchAsync(async (request, response, next) => {
+export const updateOne = (Model: Model) => catchAsync(async (request, response, next) => {
     console.log("updateOne");
     sanitisedData(request, next);
 
-    const docId = request.params.id;
+    const docId = request.params.id || request.params.storeId;
+    if(!docId) return next(new AppError(400, "document id is missing."));
+
     const updatedData = request.body;
+    if(!updatedData) return next(new AppError(400, "request.body is missing"));
 
     const doc = await model(Model).findByIdAndUpdate(docId, updatedData, { new: true, runValidators: true });
 
@@ -52,8 +57,9 @@ export const updateOne = (Model: Model) =>
 export const deleteOne = (Model: Exclude<Model, "User">) =>
   catchAsync(async (request, response, next) => {
     console.log("deleteOne");
-    const docId = request.params.id;
-    console.log(docId);
+    const docId = request.params.id || request.params.storeId;
+    if(!docId) return next(new AppError(400, "document id is missing."));
+
     const doc = await model(Model).findByIdAndDelete(docId);
 
     if (!doc) return next(new AppError(404, "No document is associated with this id"));

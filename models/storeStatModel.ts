@@ -4,7 +4,7 @@ import { Model, Schema, model } from "mongoose";
 type StoreStateModel = Model<StoreStateDocument>;
 
 /* SOLILOQUY: should this be a separate collection ? since I would definitely do different CRUD and quires and something like statistics are frequently read/updated so it's better to be separated */
-const storeStatSchema = new Schema<StoreStateDocument>({
+export const storeStatSchema = new Schema<StoreStateDocument>({
   store: {
     type: Schema.Types.ObjectId,
     ref: "Store",

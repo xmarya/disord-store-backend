@@ -2,7 +2,7 @@ import { InvoiceDocument } from "../_Types/Invoice";
 import { Model, Schema, model} from "mongoose";
 
 type InvoiceModel = Model<InvoiceDocument>;
-const invoiceSchema = new Schema<InvoiceDocument>(
+export const invoiceSchema = new Schema<InvoiceDocument>(
   {
     purchaseId: {
       type: String,

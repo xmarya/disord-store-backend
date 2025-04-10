@@ -1,10 +1,10 @@
 import { ProductDocument } from "../_Types/Product";
 import { ReviewDocument } from "../_Types/Reviews";
 import { StoreDocument } from "../_Types/Store";
-import { Model, Schema, model } from "mongoose";
+import { Model, Query, Schema, model } from "mongoose";
 
 type StoreModel = Model<StoreDocument>;
-const storeSchema = new Schema<StoreDocument>({
+export const storeSchema = new Schema<StoreDocument>({
   storeName: {
     type: String,
     required: true,
@@ -89,6 +89,11 @@ storeSchema.virtual<ReviewDocument[]>("reviews", {
   ref: "Review",
   localField: "_id",
   foreignField: "reviewedModel",
+});
+
+storeSchema.pre(/^find/, function(this:Query<any, any>, next) {
+  this.populate("products");
+  next();
 });
 
 const Store = model<StoreDocument, StoreModel>("Store", storeSchema);

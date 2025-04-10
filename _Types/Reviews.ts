@@ -1,13 +1,14 @@
 import { Types } from "mongoose";
 
-export interface Review {
-  id: string;
-  user: Types.ObjectId;
+
+export interface ReviewDataBody {
+  user: Types.ObjectId |string;
   reviewBody: string;
+}
+export interface Review extends ReviewDataBody {
+  id: Types.ObjectId;
   wroteAt: Date;
   updatedAt: Date;
-  reviewedModel: Types.ObjectId;
-  reviewType: "Product" | "Store" | "Platform";
 }
 
 export type ReviewDocument = Review;
