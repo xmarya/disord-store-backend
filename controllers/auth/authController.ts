@@ -102,4 +102,13 @@ export const isWriter = catchAsync(async (request, response, next) => {
   if(!authorised) return next(new AppError(403, "غير مصرح لك الوصول للصفحة"));
 
   next();
-})
+});
+
+export const isStoreIdExist = catchAsync(async (request, response, next) =>{
+  const storeId = request.user.myStore || request.params.storeId;
+  if(!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
+
+  request.store = storeId;
+
+  next();
+});
