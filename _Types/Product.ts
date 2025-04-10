@@ -20,7 +20,7 @@ export interface ProductOptionals {
   discount?: number;
   numberOfPurchases?: number;
   ranking?: number;
-  ratingsAverage:number,
+  ratingsAverage?:number,
   ratingsQuantity:number
 }
 
