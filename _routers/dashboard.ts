@@ -12,7 +12,7 @@ import { protect } from "../controllers/auth/authController";
 export const router = express.Router();
 
 console.log("dashboard routes");
-router.use(protect);
+// router.use(protect);
 router.use("/store", storeRouter);
 router.use("/:storeId/products", productRouter);
 router.use("/:storeId/categories", categoryRouter);

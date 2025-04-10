@@ -1,21 +1,25 @@
 import mongoose, { Document } from "mongoose";
-
-export interface IUserInvoice {
-  _id: mongoose.Types.ObjectId;
-  name: string;
+export interface IShippingAddress {
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phone?: string; // Optional, useful for delivery
 }
-
 export interface IOrderItem {
-  productId: mongoose.Schema.Types.ObjectId;
+  productId: mongoose.Types.ObjectId;
   name: string;
   price: number;
   discountedPrice: number;
   quantity: number;
+  productType: "physical" | "digital";
 }
-
 export interface IOrder extends Document {
-  userId: mongoose.Schema.Types.ObjectId | IUserInvoice;  
+  userId: mongoose.Types.ObjectId ;  
+  orderNumber: string; 
   items: IOrderItem[];
+  shippingAddress?: IShippingAddress;
   totalPrice: number;
   productDiscount: number;
   couponDiscount: number;
@@ -23,6 +27,11 @@ export interface IOrder extends Document {
   subtotal: number;
   couponCode?: string;
   paymentMethod: "COD" | "Online";
-  status: "Pending" | "Paid" | "Shipped" | "Delivered" | "Cancelled";
+  status: "Pending" | "Paid" | "Shipped" | "Delivered" | "Cancelled" | "Available";
   createdAt: Date;
+  isDigital: boolean;
+}
+export interface IOrderItemCheck {
+  productId: string;
+  quantity: number;
 }

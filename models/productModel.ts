@@ -35,6 +35,12 @@ export const ProductSchema = new Schema<ProductDocument>(
     // },
     stock: { type: Number, required: true, default: 0 },
     discount: { type: Number, default: 0, min: 0, max: 100 },
+    productType: {
+      type: String,
+      enum: ["physical", "digital"],
+      default: "physical",
+      required: true
+    },
     // discount: {
     //   // NOTE: the user insert the number to be in %
     //   type: Number,
