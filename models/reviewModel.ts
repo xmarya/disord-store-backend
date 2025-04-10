@@ -12,6 +12,12 @@ export const reviewSchema = new mongoose.Schema<ReviewDocument>(
       type: String,
       required: [true, "the reviewBody filed is required"],
     },
+    rating: {
+      type:Number,
+      required: [true, "you must rate with a number between 1 to 5"],
+      min:1,
+      max:5
+    },
     wroteAt: {
       type: Date,
       required: [true, "the wroteAt filed is required"],
