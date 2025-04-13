@@ -13,6 +13,10 @@ export const OrderSchema = new Schema<IOrder>(
         discountedPrice: { type: Number, required: true },
         quantity: { type: Number, required: true },
         productType: { type: String, enum: ["physical", "digital"], required: true },
+        image: {
+          type: [String],
+          required: [true, "the image field is required"],
+        },
       },
     ],
     isDigital: { type: Boolean, default: false },
@@ -36,6 +40,11 @@ export const OrderSchema = new Schema<IOrder>(
       enum: ["Pending", "Paid", "Shipped", "Delivered", "Cancelled", "Available"], 
       default: "Pending" 
     },
+    totalWeight: {type: Number, default:0},
+    shipmentCompany:{ type:String },
+    trackingNumber:{type: String},
+    storeId: { type: mongoose.Schema.Types.ObjectId, ref: "Store", required: true },
+    serviceType: { type: String, enum: ["Express", "Economy", null], default: null },
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
@@ -46,13 +55,13 @@ OrderSchema.pre('validate', function(next) {
   if (this.isDigital) {
     this.shippingAddress = undefined;
     this.status = 'Available';
+    this.totalWeight = 0
   }
   next();
 });
 
 // Indexes
 OrderSchema.index({ status: 1 });
-OrderSchema.index({ createdAt: 1 });
 OrderSchema.index({ userId: 1 });
 
 const Order = mongoose.model<IOrder>("Order", OrderSchema);

@@ -5,11 +5,13 @@ export const validateCoupon = async (
     couponCode: string,
     userId: mongoose.Types.ObjectId,
     subtotal: number,
-    session: mongoose.ClientSession
+    session: mongoose.ClientSession,
+    storeId: mongoose.Types.ObjectId
   ) => {
-    const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() }).session(session);
+    const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() }).session(session).lean();
     
     if (!coupon) throw new Error("Invalid coupon code");
+    if(coupon.storeId.toString() !== storeId.toString()) throw new Error("Coupon is not valid for this store");
     if (!coupon.isActive) throw new Error("Coupon is not active");
     if (coupon.validFrom > new Date()) throw new Error("Coupon not yet valid");
     if (coupon.validUntil < new Date()) throw new Error("Coupon expired");

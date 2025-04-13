@@ -28,7 +28,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Error fetching orders:", error);
         res.status(500).json({ 
-            success: false,
+            status: "failed",
             message: "Internal Server Error" 
         });
     }
@@ -40,12 +40,12 @@ export const GetOrderById = async (req: Request, res: Response): Promise<any> =>
   try{
     const order = await Order.findById(id)
     if(!order){
-      return res.status(404).json({success: false, message:'Order not found'})
+      return res.status(404).json({status: "failed", message:'Order not found'})
     }
     res.status(200).json({success:true, order})
   }catch(error) {
     console.error("Error Order Not Found", error)
-    res.status(500).json({success: false, message:"Failed To Find Order"})
+    res.status(500).json({status: "failed", message:"Failed To Find Order"})
   }
 }
 
@@ -104,7 +104,7 @@ export const getTotalRevenue = async (req: Request, res: Response): Promise<any>
     } catch (error) {
       console.error("Revenue error:", error);
       res.status(500).json({ 
-        success: false,
+        status: "failed",
         message: "Failed to calculate revenue"
       });
     }

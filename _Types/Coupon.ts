@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export interface ICoupon extends Document {
   code: string;
@@ -11,4 +11,5 @@ export interface ICoupon extends Document {
   maxUses?: number;
   usedCount: number;
   isActive: boolean;
+  storeId: mongoose.Types.ObjectId;
 }

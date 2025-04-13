@@ -71,6 +71,20 @@ export const storeSchema = new Schema<StoreDocument>({
     type: Boolean,
     default: false,
   },
+  shipmentCompanies: [
+    {
+      name: { type: String, required: true },
+      accountNumber: { type: String, required: true },
+    }
+  ],
+  address: { 
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
+    postalCode: { type: String },
+    country: { type: String },
+    phone: { type: String },
+  },
 });
 
 storeSchema.virtual<ProductDocument[]>("products", {

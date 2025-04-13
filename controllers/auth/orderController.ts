@@ -1,59 +1,90 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import { ApplyCoupon, CreateOrder, HandleErrorResponse, ProcessOrderItems,
+import { ApplyCoupon, CreateOrder, ProcessOrderItems,
         UpdateCouponUsage } from "../../_services/order/orderService";
 import Order from "../../models/orderModel";
 import { generateOrderNumber } from "../../_utils/genrateOrderNumber";
 import { CreateOrderInput, createOrderSchema } from "../../_services/order/zodSchemas/orderSchemas";
+import { CreateShipment } from "../../_services/shipment/shipmentService";
+import { HandleErrorResponse } from "../../_utils/common";
+
+// Middleware to validate order input
+export const validateOrderInput = async (req: Request, res: Response, next: NextFunction): Promise<void>=> {
+  try {
+    req.body = await createOrderSchema.parseAsync(req.body);
+    next();
+  } catch (error) {
+    HandleErrorResponse(error, res);
+  }
+};
 
 //new order
-export const AddOrder = async (req: Request, res: Response): Promise<any> => {
+export const AddOrder = async (req: Request, res: Response): Promise<void> => {
     const session = await mongoose.startSession();
     session.startTransaction();
     
     try {
         // Validate input with Zod
-        const { userId, items, paymentMethod, couponCode, shippingAddress } = createOrderSchema.parse(req.body);
+        const { userId, items, paymentMethod, couponCode, shippingAddress, shipmentCompany, serviceType } = req.body as CreateOrderInput
     
         // Process items and calculate pricing
-        const { processedItems, subtotal, totalDiscount, hasDigitalProducts } = await ProcessOrderItems(items, session);
+        const { processedItems, subtotal, totalDiscount, hasDigitalProducts, storeShipmentCompanies,
+          storeId, totalWeight, storeAddress } = await ProcessOrderItems(items, session);
     
         // Validate payment method (replacing ValidatePaymentMethod)
         if (hasDigitalProducts && paymentMethod !== "Online") {
             throw new Error("Digital products require online payment");
         }
-    
-        // Validate shipping address 
-        const hasPhysicalProducts = processedItems.some(item => item.productType === "physical");
-        if (hasPhysicalProducts && !shippingAddress) {
-            throw new Error("Shipping address is required for physical products");
-        }
-    
         // Apply coupon if provided
-        const { couponDiscount, appliedCoupon } = await ApplyCoupon(couponCode, userId, subtotal, session);
+        const { couponDiscount, appliedCoupon } = await ApplyCoupon(couponCode, userId, subtotal, session, storeId);
     
         const orderNumber = generateOrderNumber();
-        const newOrder = CreateOrder(
+        const newOrder = CreateOrder({
             userId,
             orderNumber,
             processedItems,
             subtotal,
-            totalDiscount,
+            productDiscount: totalDiscount,
             couponDiscount,
             appliedCoupon,
             paymentMethod,
             shippingAddress,
-            hasDigitalProducts
-        );
+            hasDigitalProducts,
+            totalWeight,
+            storeId,
+            shipmentCompany,
+    });
     
         await UpdateCouponUsage(appliedCoupon, session);
         await newOrder.save({ session });
+        
+        // Create shipment for physical orders
+        let trackingNumber = newOrder.trackingNumber;
+        const hasPhysicalProducts = processedItems.some((item) => item.productType === "physical");
+        if (hasPhysicalProducts && shipmentCompany && storeAddress && shippingAddress) {
+          const accountNumber =
+            storeShipmentCompanies.find((c) => c.name === shipmentCompany)?.accountNumber || "Unknown Account";
+          trackingNumber = await CreateShipment(
+            newOrder._id as mongoose.Types.ObjectId,
+            storeAddress,
+            shippingAddress,
+            totalWeight,
+            processedItems,
+            shipmentCompany,
+            accountNumber,
+            serviceType || "Express", // Default to Express
+            session
+          );
+          newOrder.trackingNumber = trackingNumber;
+          await newOrder.save({ session });
+        }
     
         await session.commitTransaction();
         session.endSession();
     
         const orderResponse = {
             _id: newOrder._id,
+            userId: newOrder.userId,
             orderNumber: newOrder.orderNumber,
             items: newOrder.items,
             subtotal: newOrder.subtotal,
@@ -64,9 +95,13 @@ export const AddOrder = async (req: Request, res: Response): Promise<any> => {
             status: newOrder.status,
             createdAt: newOrder.createdAt,
             isDigital: newOrder.isDigital,
+            shipmentCompany: newOrder.shipmentCompany,
+            trackingNumber: newOrder.trackingNumber || "Not yet assigned",
+            shippingAddress: newOrder.shippingAddress, 
+            warehouseAddress: hasPhysicalProducts ? storeAddress : undefined,
         };
     
-        return res.status(201).json({
+        res.status(201).json({
             status: "success",
             message: "Order created successfully",
             order: orderResponse,
@@ -84,25 +119,36 @@ export const AddOrder = async (req: Request, res: Response): Promise<any> => {
             const { userId } = req.params;
             
             const orders = await Order.find({ userId })
-            .select('totalPrice createdAt userId orderNumber paymentMethod status')  
-            .populate('items', 'name',) 
+            .select('orderNumber totalPrice status createdAt shipmentCompany trackingNumber isDigital serviceType')  
+            .populate('items', 'name', 'image') 
             .sort({ createdAt: -1 }); 
             
             if (orders.length === 0) {
             return res.status(404).json({
-                success: false,
+                status: "failed",
                 message: "No orders found"
             });
             }
-                return res.status(200).json({
-            success: true,
-            orders
+            const formattedOrders = orders.map((order) => ({
+              orderNumber: order.orderNumber,
+              totalPrice: order.totalPrice,
+              status: order.status,
+              createdAt: order.createdAt,
+              items: order.items.map((item) => ({ name: item.name, image: item.image }) ),
+              ...(order.isDigital
+                ? {}
+                : {
+                    shipmentCompany: order.shipmentCompany || "Not specified",
+                    trackingNumber: order.trackingNumber || "Not yet assigned",
+                    serviceType: order.serviceType || "Not specified",
+                  }),
+            }));
+
+              return res.status(200).json({
+                status: "success",
+                orders: formattedOrders
             });
-        } catch (error) {
-            console.error("Error fetching orders:", error);
-            return res.status(500).json({
-            success: false,
-            message: "Failed to fetch orders"
-            });
+            } catch (error) {
+              HandleErrorResponse(error, res)
         }
         };

@@ -14,6 +14,7 @@ export interface IOrderItem {
   discountedPrice: number;
   quantity: number;
   productType: "physical" | "digital";
+  image: Array<string>
 }
 export interface IOrder extends Document {
   userId: mongoose.Types.ObjectId ;  
@@ -30,8 +31,30 @@ export interface IOrder extends Document {
   status: "Pending" | "Paid" | "Shipped" | "Delivered" | "Cancelled" | "Available";
   createdAt: Date;
   isDigital: boolean;
+  totalWeight: number,
+  shipmentCompany?: string;
+  trackingNumber?: string;
+  storeId: mongoose.Types.ObjectId;
+  serviceType: string;
 }
 export interface IOrderItemCheck {
   productId: string;
   quantity: number;
+}
+
+export interface CreateOrderParams {
+  userId: string;
+  orderNumber: string;
+  processedItems: IOrderItem[];
+  subtotal: number;
+  productDiscount: number;
+  couponDiscount: number;
+  appliedCoupon: any;
+  paymentMethod: string;
+  shippingAddress: IShippingAddress | undefined;
+  hasDigitalProducts: boolean;
+  totalWeight: number;
+  storeId: mongoose.Types.ObjectId;
+  shipmentCompany?: string;
+  serviceType?: string;
 }

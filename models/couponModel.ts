@@ -11,8 +11,14 @@ const CouponSchema = new Schema<ICoupon>({
   validUntil: { type: Date, required: true },
   maxUses: { type: Number, min: 1 },
   usedCount: { type: Number, default: 0, min: 0 },
-  isActive: { type: Boolean, default: true }
+  isActive: { type: Boolean, default: true },
+  storeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Store",
+    required: true,
+  },
 }, { timestamps: true });
+CouponSchema.index({ storeId: 1 })
 
 const Coupon = mongoose.model<ICoupon>("Coupon", CouponSchema);
 export default Coupon;
