@@ -40,7 +40,7 @@ export const generateRevenuePDF = async (req: Request, res: Response) => {
       console.error('PDF stream error:', err);
       if (!res.headersSent) {
         res.status(500).json({ 
-          success: false,
+          status: "failed",
           message: "PDF generation failed"
         });
       }
@@ -108,7 +108,7 @@ export const generateRevenuePDF = async (req: Request, res: Response) => {
     console.error("PDF generation error:", error);
     if (!res.headersSent) {
       res.status(500).json({ 
-        success: false,
+        status: "failed",
         message: "Failed to generate PDF report"
       });
     }

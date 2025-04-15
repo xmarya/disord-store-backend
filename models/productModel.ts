@@ -58,6 +58,7 @@ export const ProductSchema = new Schema<ProductDocument>(
     ranking: {
       // NOTE: this filed will be used to presents the ranking of store's products, it's irrelevant to the storeStats model.
     },
+    weight:{type: Number, required: true, default: 0}
   },
   {
     timestamps: true,

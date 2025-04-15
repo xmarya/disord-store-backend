@@ -7,7 +7,7 @@ export type FormSuccessResponse = {
 };
 
 export type FormErrorResponse = {
-  success: false;
+  status: "failed";
   code: "error";
   errors:ZodError;
   // errors: {

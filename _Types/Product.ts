@@ -14,6 +14,7 @@ export interface ProductBasic {
   discount: number;
   store: Types.ObjectId;
   productType: "physical" | "digital";
+  weight: number;
 }
 
 export interface ProductOptionals {

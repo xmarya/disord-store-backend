@@ -4,12 +4,14 @@ import { ProductDocument } from "./Product";
 import { ReviewDocument } from "./Reviews";
 
 export interface StoreBasic {
-  id: string;
+  [x: string]: any;
   storeName: string;
   owner: Types.ObjectId;
   description:string;
   status: "inProgress" | "active" | "suspended" | "deleted";
   verified: boolean;
+  address: IStoreAddress;
+  shipmentCompanies?: IShipmentCompany[];
 }
 
 export interface StoreOptionals {
@@ -21,5 +23,15 @@ export interface StoreOptionals {
   state?: Array<string>;
   reviews?: Array<ReviewDocument>;
 }
-
+export interface IStoreAddress {
+  street: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  phone?: string;
+}
+export interface IShipmentCompany {
+  name: string;
+  accountNumber: string;
+}
 export type StoreDocument = StoreBasic & StoreOptionals;

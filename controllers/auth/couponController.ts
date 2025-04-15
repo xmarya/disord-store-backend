@@ -1,7 +1,10 @@
-import { request, Request, Response } from "express";
+import { Request, Response } from "express";
 import Coupon from "../../models/couponModel";
+import Store from "../../models/storeModel";
+import { couponSchema } from "../../_services/coupon/zodSchemas/couponSchemas";
+import { HandleErrorResponse } from "../../_utils/common";
 
-export const createCoupon = async (req: Request, res: Response): Promise<any> => {
+export const createCoupon = async (req: Request, res: Response): Promise<void> => {
   try {
     const {
       code,
@@ -10,16 +13,20 @@ export const createCoupon = async (req: Request, res: Response): Promise<any> =>
       minOrderAmount,
       maxDiscountAmount,
       validUntil,
-      maxUses
-    } = req.body;
+      maxUses,
+      storeId,
+      isActive
+    } = couponSchema.parse(req.body);
 
-    if (!code || !discountType || !discountValue || !validUntil) {
-      return res.status(400).json({ 
-        success: false,
-        message: "Missing required fields" 
+    const store = await Store.findById(storeId);
+    if (!store) {
+        res.status(404).json({
+        status: "failed",
+        message: "Store not found",
       });
+      return
     }
-
+    
     const newCoupon = await Coupon.create({
       code: code.toUpperCase().trim(),
       discountType,
@@ -29,26 +36,24 @@ export const createCoupon = async (req: Request, res: Response): Promise<any> =>
       validFrom: new Date(),
       validUntil: new Date(validUntil),
       maxUses,
-      isActive: true
+      isActive: true,
+      storeId,
     });
 
     res.status(201).json({
-      success: true,
+      status: "success",
       coupon: newCoupon
     });
   } catch (error) {
-    console.error("Error creating coupon:", error);
-    res.status(500).json({ 
-      success: false,
-      message: "Failed to create coupon" 
-    });
+    HandleErrorResponse(error, res);
   }
 };
 
 // Update coupon 
-export const UpdateCoupon = async (req: Request, res: Response): Promise<any> => {
+export const UpdateCoupon = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const data = couponSchema.partial().parse(req.body);
     const {
       code,
       discountType,
@@ -58,12 +63,10 @@ export const UpdateCoupon = async (req: Request, res: Response): Promise<any> =>
       validUntil,
       maxUses,
       isActive
-    } = req.body;
+    } = data;
 
     const coupon = await Coupon.findById(id);
-    if (!coupon) {
-      return res.status(404).json({ success: false, message: "Coupon not found" });
-    }
+    if (!coupon) throw new Error("Coupon not found");
 
     if (code) coupon.code = code.toUpperCase().trim();
     if (discountType) coupon.discountType = discountType;
@@ -76,24 +79,19 @@ export const UpdateCoupon = async (req: Request, res: Response): Promise<any> =>
 
     await coupon.save();
 
-    res.status(200).json({ success: true, coupon });
+    res.status(200).json({ status: "success", coupon });
   } catch (error) {
-    console.error("Error updating coupon:", error);
-    res.status(500).json({ success: false, message: "Failed to update coupon" });
+    HandleErrorResponse(error, res);
   }
 };
-
 // getc coupon by id
-export const GetCouponById = async (req: Request, res: Response): Promise<any> => {
+export const GetCouponById = async (req: Request, res: Response): Promise<void> => {
   const {id} = req.params;
   try{
     const coupon = await Coupon.findById(id)
-    if(!coupon){
-      return res.status(404).json({success: false, message:'Coupon not found'})
-    }
-    res.status(200).json({success:true, coupon})
+    if (!coupon) throw new Error("Coupon not found");
+    res.status(200).json({ status: "success", coupon });
   }catch(error) {
-    console.error("Error Coupn Not Found", error)
-    res.status(500).json({success: false, message:"Failed To Find Coupon"})
+    HandleErrorResponse(error, res);
   }
 }
