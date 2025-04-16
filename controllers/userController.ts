@@ -18,7 +18,7 @@ export const getUserByEmail = (email: string) =>
     if (!user) return next(new AppError(404, "الرجاء التحقق من البريد الإلكتروني"));
 
     response.status(200).json({
-      status: "success",
+      success: true,
       user,
     });
   });
@@ -32,7 +32,7 @@ export const getUserById = (id?: string) =>
     if (!user) return next(new AppError(404, "لايوجد مستخدم بهذا المعرف"));
 
     response.status(200).json({
-      status: "success",
+      success: true,
       user,
     });
   });
@@ -46,14 +46,15 @@ export const getUserStore = catchAsync(async (request, response, next) => {
   if (!userStore) return next(new AppError(404, "هذا المستخدم لا يملك متجرًا"));
 
   response.status(200).json({
-    status: "success",
+    success: true,
     userStore,
   });
 });
 
 export const credentialsSignup = catchAsync(async (request, response, next) => {
   sanitisedData(request, next);
-  validateNewUserData(request, next);
+  const isValid = await validateNewUserData(request, next);
+  if(!isValid) return;
 
   const { email, password, username } = request.body;
 
@@ -67,9 +68,9 @@ export const credentialsSignup = catchAsync(async (request, response, next) => {
   //STEP 6) make sure the password is not included in the response:
   //   newUser.credentials = "";
   newUser.credentials!.password = "";
-
+  console.log("new user created", newUser.email);
   response.status(201).json({
-    status: "success",
+    success: true,
     newUser,
   });
 });
@@ -94,7 +95,7 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   tokenWithCookies(response, token);
 
   response.status(200).json({
-    status: "success",
+    success: true,
     token,
     /*
       for security reasons, it is preferred to not including it in the response body
@@ -115,11 +116,10 @@ export const createDiscordUser = catchAsync(async (request, response, next) => {
   });
 
   response.status(201).json({
-    status: "success",
+    success: true,
     newDiscordUser,
   });
 });
-
 
 export const forgetPassword = catchAsync(async (request, response, next) => {
   console.log("forgetPassword");
@@ -137,7 +137,7 @@ export const forgetPassword = catchAsync(async (request, response, next) => {
 
   //STEP 3) return the GRT to the front-end to send it vie email using Resend:
   response.status(200).json({
-    status: "success",
+    success: true,
     randomToken,
     resetURL,
   });
@@ -169,16 +169,13 @@ export const resetPassword = catchAsync(async (request, response, next) => {
   await user.save(); // still validating the new password against the schema
 
   response.status(200).json({
-    status: "success",
+    success: true,
   });
 
   //STEP 3) redirect the user to the login page (handled by front-end)
 });
 
-
 export const logout = (request: Request, response: Response) => {
   response.clearCookie("jwt");
-  response.status(200).json({ status: "success" });
+  response.status(200).json({ success: true });
 };
-
-
