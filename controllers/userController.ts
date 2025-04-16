@@ -8,7 +8,7 @@ import tokenWithCookies from "../_utils/tokenWithCookies";
 import type { Request, Response } from "express";
 import { UserBasic } from "../_Types/User";
 import crypto from "crypto";
-import validateNewUserData from "../_utils/validateNewUserData";
+import validateNewUserData from "../_utils/validators/validateNewUserData";
 
 export const getUserByEmail = (email: string) =>
   catchAsync(async (request, response, next) => {
@@ -54,7 +54,7 @@ export const getUserStore = catchAsync(async (request, response, next) => {
 export const credentialsSignup = catchAsync(async (request, response, next) => {
   sanitisedData(request, next);
   const isValid = await validateNewUserData(request, next);
-  if(!isValid) return;
+  if (!isValid) return;
 
   const { email, password, username } = request.body;
 
