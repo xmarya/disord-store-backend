@@ -1,9 +1,11 @@
 import StoreAssistant from "../../models/storeAssistantModel";
 import { StoreDocument } from "../../_Types/Store";
 import Store from "../../models/storeModel";
-import {startSession, Types } from "mongoose";
+import mongoose, {startSession, Types } from "mongoose";
 import { AppError } from "../../_utils/AppError";
 import User from "../../models/userModel";
+import { DynamicModel } from "../../_Types/Model";
+import { ProductDocument } from "../../_Types/Product";
 
 
 export async function createStore(data:StoreDocument) {
@@ -36,6 +38,13 @@ export async function createStore(data:StoreDocument) {
     }
 } 
 
+export async function getStoreWithProducts(storeId: string, ProductsModel:mongoose.Model<ProductDocument>) {
+    const store = await Store.findById(storeId);
+    const products = await ProductsModel.find();
+
+    return {store, products};
+}
+
 export async function confirmAuthorization( userId:string, storeId:string):Promise<boolean> {
     console.log("confirmAuthorization", "user",userId, "store",storeId);
     //STEP 1) check if this userId is an owner Id or is in storeAssistants array
@@ -52,4 +61,6 @@ export async function confirmAuthorization( userId:string, storeId:string):Promi
 
 export async function setStoreStatus(storeId:string, status: "active" | "suspended") {
     await Store.findByIdAndUpdate(storeId, { status });
-}
+} // NOTE: this service has no controller yet
+
+// TODO: crete a utility function that handles the request quires (filtering) for getAll
