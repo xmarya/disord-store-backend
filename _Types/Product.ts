@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { CategoryDocument } from "./Category";
 
 export interface ProductBasic {
@@ -24,4 +24,4 @@ export interface ProductOptionals {
   ratingsQuantity:number
 }
 
-export type ProductDocument = ProductBasic & ProductOptionals;
+export type ProductDocument = ProductBasic & ProductOptionals & mongoose.Document;
