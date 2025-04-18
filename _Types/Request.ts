@@ -7,6 +7,7 @@ declare global {
       user: UserDocument,
       store: Types.ObjectId | string,
       Model: mongoose.Model<mongoose.Document>;
+      validatedModelId: string
     }
   }
 }
