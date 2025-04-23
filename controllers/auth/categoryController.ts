@@ -20,7 +20,7 @@ export const createCategory = catchAsync( async(request, response, next) => {
     });
     
     response.status(201).json({
-        status: "success",
+        success: true,
         newCategory
     });
 });
@@ -38,7 +38,7 @@ export const updateCategory = catchAsync( async(request, response, next) => {
     });
 
     response.status(201).json({
-        status: "success",
+        success: true,
         updatedCategory
     });
 });
@@ -54,7 +54,7 @@ export const createCategoryController = catchAsync(async (request, response, nex
   const newCategory = await createCategory(data);
 
   response.status(201).json({
-    status: "success",
+    success: true,
     newCategory,
   });
 });
@@ -67,7 +67,7 @@ export const getAllCategoriesController = catchAsync(async (request, response, n
   if (!categories) return next(new AppError(400, "لا يوجد فئات في هذا المتجر"));
 
   response.status(200).json({
-    status: "success",
+    success: true,
     categories,
   });
 });
