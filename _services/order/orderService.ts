@@ -4,59 +4,38 @@ import Order from "../../models/orderModel";
 import Coupon from "../../models/couponModel";
 import { validateCoupon } from "../coupon/couponService";
 import { RoundToTwo } from "../../_utils/common";
-import { IOrder, IOrderItem, IOrderItemCheck, IShippingAddress } from "../../_Types/Order";
-import { IStoreAddress, StoreBasic } from "../../_Types/Store";
+import { CreateOrderParams, IOrder, IOrderItem, IOrderItemCheck, Address } from "../../_Types/Order";
 
 export const ProcessOrderItems = async (
   items: IOrderItemCheck[],
-  session: mongoose.ClientSession
+  session: mongoose.ClientSession,
+  shippingAddress?: Address 
 ): Promise<{
   processedItems: IOrderItem[];
   subtotal: number;
   totalDiscount: number;
   hasDigitalProducts: boolean;
   totalWeight: number;
-  storeId: mongoose.Types.ObjectId;
-  storeShipmentCompanies: { name: string; accountNumber: string }[];
-  storeAddress?: IStoreAddress;
 }> => {
   let totalWeight = 0;
   let subtotal = 0;
   let totalDiscount = 0;
   const processedItems: IOrderItem[] = [];
   let hasDigitalProducts = false;
-  let allDigital = true;
 
   const productIds = items.map((item) => item.productId);
   const products = await Product.find({ _id: { $in: productIds } })
     .session(session)
     .populate<{
-      store: StoreBasic & { address?: IStoreAddress };
+      store: { _id: mongoose.Types.ObjectId };
     }>({
       path: "store",
-      select: "shipmentCompanies address",
+      select: "_id",
     });
 
   const productMap = new Map(products.map((p) => [p._id.toString(), p]));
 
   if (products.length === 0) throw new Error("No products found");
-
-  const firstProduct = products[0];
-  if (!firstProduct.store || !("_id" in firstProduct.store)) {
-    throw new Error("Store not found for product");
-  }
-  const storeId = firstProduct.store._id;
-  const storeShipmentCompanies = firstProduct.store.shipmentCompanies || [];
-  const storeAddress = firstProduct.store.address;
-
-  for (const product of products) {
-    if (!product.store || product.store._id.toString() !== storeId.toString()) {
-      throw new Error("All items in an order must come from the same store");
-    }
-    if (product.productType === "physical") {
-      allDigital = false;
-    }
-  }
 
   const bulkOps: any[] = [];
   for (const item of items) {
@@ -64,18 +43,22 @@ export const ProcessOrderItems = async (
     if (!product) {
       throw new Error(`Product with ID ${item.productId} not found`);
     }
-    if (product.stock < item.quantity) {
+    // Check stock only if stock is not null (i.e., not unlimited)
+    if (product.stock !== null && product.stock < item.quantity) {
       throw new Error(
         `Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`
       );
     }
 
-    bulkOps.push({
-      updateOne: {
-        filter: { _id: product._id, stock: { $gte: item.quantity } },
-        update: { $inc: { stock: -item.quantity } },
-      },
-    });
+    // Update stock only if stock is not null (i.e., not unlimited)
+    if (product.stock !== null) {
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: product._id, stock: { $gte: item.quantity } },
+          update: { $inc: { stock: -item.quantity } },
+        },
+      });
+    }
 
     if (product.productType === "digital") {
       hasDigitalProducts = true;
@@ -94,12 +77,14 @@ export const ProcessOrderItems = async (
 
     processedItems.push({
       productId: product._id,
+      storeId: product.store._id,
       name: product.name,
       price: product.price,
       discountedPrice: RoundToTwo(discountedPrice / item.quantity),
       quantity: item.quantity,
       productType: product.productType,
       image: product.image,
+      description: product.description || ""
     });
   }
 
@@ -116,61 +101,43 @@ export const ProcessOrderItems = async (
     totalDiscount: RoundToTwo(totalDiscount),
     hasDigitalProducts,
     totalWeight,
-    storeId,
-    storeShipmentCompanies,
-    storeAddress: allDigital ? undefined : storeAddress,
   };
 };
 
 export const ApplyCoupon = async (
   couponCode: string | undefined,
   userId: string | mongoose.Types.ObjectId,
+  items: IOrderItem[],
   subtotal: number,
-  session: mongoose.ClientSession,
-  storeId: mongoose.Types.ObjectId
+  session: mongoose.ClientSession
 ): Promise<{
   couponDiscount: number;
   appliedCoupon: any;
+  eligibleSubtotal: number;
 }> => {
   let couponDiscount = 0;
   let appliedCoupon = null;
+  let eligibleSubtotal = 0;
 
   if (couponCode !== undefined && couponCode.trim() !== "") {
     const userObjectId =
       typeof userId === "string" ? new mongoose.Types.ObjectId(userId) : userId;
 
-    const { coupon, discountAmount } = await validateCoupon(
+    const { coupon, discountAmount, eligibleSubtotal: calculatedEligibleSubtotal } = await validateCoupon(
       couponCode,
       userObjectId,
-      subtotal,
-      session,
-      storeId
+      items,
+      session
     );
     couponDiscount = RoundToTwo(discountAmount);
     appliedCoupon = coupon;
+    eligibleSubtotal = calculatedEligibleSubtotal;
   } else if (couponCode === "") {
     throw new Error("Coupon code cannot be empty if provided");
   }
 
-  return { couponDiscount, appliedCoupon };
+  return { couponDiscount, appliedCoupon, eligibleSubtotal };
 };
-
-export interface CreateOrderParams {
-  userId: string;
-  orderNumber: string;
-  processedItems: IOrderItem[];
-  subtotal: number;
-  productDiscount: number;
-  couponDiscount: number;
-  appliedCoupon: any;
-  paymentMethod: string;
-  shippingAddress: IShippingAddress | undefined;
-  hasDigitalProducts: boolean;
-  totalWeight: number;
-  storeId: mongoose.Types.ObjectId;
-  shipmentCompany?: string;
-  serviceType?: string;
-}
 
 export const CreateOrder = (params: CreateOrderParams): IOrder => {
   const {
@@ -183,35 +150,38 @@ export const CreateOrder = (params: CreateOrderParams): IOrder => {
     appliedCoupon,
     paymentMethod,
     shippingAddress,
+    billingAddress,
     hasDigitalProducts,
     totalWeight,
-    storeId,
-    shipmentCompany,
-    serviceType,
   } = params;
-
   const status = hasDigitalProducts ? "Available" : "Pending";
+  const calculatedTotalPrice = RoundToTwo(subtotal - productDiscount - couponDiscount);
+  const calculatedTotalDiscount = RoundToTwo(productDiscount + couponDiscount);
 
-  return new Order({
+  const newOrder = new Order({
     userId,
     orderNumber,
     items: processedItems,
     shippingAddress: hasDigitalProducts ? undefined : shippingAddress,
+    billingAddress, 
     subtotal: RoundToTwo(subtotal),
     productDiscount: RoundToTwo(productDiscount),
     couponDiscount: RoundToTwo(couponDiscount),
-    totalDiscount: RoundToTwo(productDiscount + couponDiscount),
-    totalPrice: RoundToTwo(subtotal - productDiscount - couponDiscount),
+    totalDiscount: calculatedTotalDiscount,
+    totalPrice: calculatedTotalPrice,
     couponCode: appliedCoupon?.code,
     paymentMethod,
     status,
     isDigital: hasDigitalProducts,
     totalWeight,
-    storeId,
-    shipmentCompany: hasDigitalProducts ? undefined : shipmentCompany,
-    serviceType: hasDigitalProducts ? undefined : serviceType,
-    trackingNumber: undefined,
   });
+
+  // Validate consistency
+  if (newOrder.totalPrice !== calculatedTotalPrice || newOrder.totalDiscount !== calculatedTotalDiscount) {
+    throw new Error("Inconsistent order pricing detected");
+  }
+
+  return newOrder;
 };
 
 export const UpdateCouponUsage = async (

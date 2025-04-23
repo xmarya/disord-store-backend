@@ -1,40 +1,51 @@
 import mongoose from "mongoose";
 import Coupon from "../../models/couponModel";
+import { IOrderItem } from "../../_Types/Order";
 
 export const validateCoupon = async (
-    couponCode: string,
-    userId: mongoose.Types.ObjectId,
-    subtotal: number,
-    session: mongoose.ClientSession,
-    storeId: mongoose.Types.ObjectId
-  ) => {
-    const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() }).session(session).lean();
-    
-    if (!coupon) throw new Error("Invalid coupon code");
-    if(coupon.storeId.toString() !== storeId.toString()) throw new Error("Coupon is not valid for this store");
-    if (!coupon.isActive) throw new Error("Coupon is not active");
-    if (coupon.validFrom > new Date()) throw new Error("Coupon not yet valid");
-    if (coupon.validUntil < new Date()) throw new Error("Coupon expired");
-    if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
-      throw new Error("Coupon usage limit reached");
-    }
-    if (coupon.minOrderAmount && subtotal < coupon.minOrderAmount) {
-      throw new Error(`Coupon Used For Product Price Start From ${coupon.minOrderAmount} `);
-    }
+  couponCode: string,
+  userId: mongoose.Types.ObjectId,
+  items: IOrderItem[], // Pass items instead of subtotal
+  session: mongoose.ClientSession
+): Promise<{
+  coupon: any;
+  discountAmount: number;
+  eligibleSubtotal: number;
+}> => {
+  const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() }).session(session).lean();
   
-    let discountAmount = 0;
-    
-    if (coupon.discountType === "percentage") {
-      discountAmount = subtotal * (coupon.discountValue / 100);
-      if (coupon.maxDiscountAmount) {
-        discountAmount = Math.min(discountAmount, coupon.maxDiscountAmount);
-      }
-    } else {
-      discountAmount = coupon.discountValue;
+  if (!coupon) throw new Error("Invalid coupon code");
+  if (!coupon.isActive) throw new Error("Coupon is not active");
+  if (coupon.validFrom > new Date()) throw new Error("Coupon not yet valid");
+  if (coupon.validUntil < new Date()) throw new Error("Coupon expired");
+  if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
+    throw new Error("Coupon usage limit reached");
+  }
+
+  const eligibleItems = items.filter(item => item.storeId.toString() === coupon.storeId.toString());
+  if (eligibleItems.length === 0) {
+    throw new Error("Coupon is not applicable to any items in this order");
+  }
+
+  const eligibleSubtotal = eligibleItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  let discountAmount = 0;
+  if (coupon.discountType === "percentage") {
+    discountAmount = eligibleSubtotal * (coupon.discountValue / 100);
+    if (coupon.maxDiscountAmount) {
+      discountAmount = Math.min(discountAmount, coupon.maxDiscountAmount);
     }
-  
-    return {
-      coupon,
-      discountAmount
-    };
+  } else if (coupon.discountType === "fixed") {
+    discountAmount = coupon.discountValue;
+  }
+
+  if (discountAmount > eligibleSubtotal) {
+    discountAmount = eligibleSubtotal;
+  }
+
+  return {
+    coupon,
+    discountAmount,
+    eligibleSubtotal,
   };
+};
