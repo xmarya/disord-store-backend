@@ -6,7 +6,6 @@ import sanitisedData from "../../_utils/sanitisedData";
 import tokenWithCookies from "../../_utils/tokenWithCookies";
 import User from "../../models/userModel";
 
-
 export const changePassword = catchAsync(async (request, response, next) => {
   console.log("changePassword");
 
@@ -38,30 +37,30 @@ export const changePassword = catchAsync(async (request, response, next) => {
   tokenWithCookies(response, token);
 
   response.status(201).json({
-    status: "success",
+    success: true,
   });
 });
 
 export const updateUserProfile = catchAsync(async (request, response, next) => {
-    sanitisedData(request, next);
-  
-    //TODO: image with multer:
-    const userId = request.user.id ?? request.body.id;
-    const { email, username, image }: Partial<Pick<UserDocument, "email" | "username" | "image">> = request.body;
-  
-    if (email) {
-      const isEmailExist = await User.findOne({ email });
-      if (isEmailExist) return next(new AppError(400, "لا يمكن استخدام هذا البريد الإلكتروني  للتسجيل"));
-    }
-  
-    if (username) {
-      const isUsernameExist = await User.findOne({ username });
-      if (isUsernameExist) return next(new AppError(400, "الرجاء اختيار اسم مستخدم آخر"));
-    }
-  
-    await User.findByIdAndUpdate(userId, request.body);
-  
-    response.status(201).json({
-      status: "success",
-    });
+  sanitisedData(request, next);
+
+  //TODO: image with multer:
+  const userId = request.user.id ?? request.body.id;
+  const { email, username, image }: Partial<Pick<UserDocument, "email" | "username" | "image">> = request.body;
+
+  if (email) {
+    const isEmailExist = await User.findOne({ email });
+    if (isEmailExist) return next(new AppError(400, "لا يمكن استخدام هذا البريد الإلكتروني  للتسجيل"));
+  }
+
+  if (username) {
+    const isUsernameExist = await User.findOne({ username });
+    if (isUsernameExist) return next(new AppError(400, "الرجاء اختيار اسم مستخدم آخر"));
+  }
+
+  await User.findByIdAndUpdate(userId, request.body);
+
+  response.status(201).json({
+    success: true,
   });
+});
