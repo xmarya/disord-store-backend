@@ -7,9 +7,9 @@ import { DynamicModel } from "../../_Types/Model";
 
 
 export const validateModelId = (modelName: DynamicModel) => async(request:Request, response:Response, next:NextFunction) => {
-    console.log("inside validateModelId");
-    let modelId = request.body.modelId?.trim();
-      const {productId} = request.params;
+  let modelId = request.body.modelId?.trim();
+  console.log("inside validateModelId", modelId);
+  const {productId} = request.params;
       /*
         the modelId is:
         a) a storeId in case of:
@@ -20,8 +20,9 @@ export const validateModelId = (modelName: DynamicModel) => async(request:Reques
         b) a productId in case of:
           Review-product DyMo => Review-product-${productId}
       */
-      if (!modelId?.trim() || !productId) return next(new AppError(400, "the modelId is missing"));
-      if (!mongoose.Types.ObjectId.isValid(modelId) || !mongoose.Types.ObjectId.isValid(productId)) return next(new AppError(400, `the ${modelId} is invalid id`));
+      if (!modelId && !productId) return next(new AppError(400, "the modelId is missing"));
+      if (modelId && !mongoose.Types.ObjectId.isValid(modelId)) return next(new AppError(400, `the ${modelId} is invalid id`));
+      if (productId && !mongoose.Types.ObjectId.isValid(productId)) return next(new AppError(400, `the ${productId} is invalid id`));
     
       // check the modelId is not wrong/non-exist:
       let isExist;
@@ -61,19 +62,4 @@ export const validateModelId = (modelName: DynamicModel) => async(request:Reques
         2- from that, I can driven the dynamic model name like this => Product-{storeId}.exist({_id: productId});
    
    */
-  // let isExist
-  // switch (modelName) {
-  //   case "Product":
-  //     isExist = await Store.exists({_id: modelId});
-  //     break;
-  //   case "Review-store":
-  //     isExist = await Store.exists({_id: modelId});
-  //     break;
-  //   case "Review-product":
-  //     isExist = mongoose.model(`Product-${request.params.storeId}`)
-  //     break;
-  //   default:
-  //     return false;
-  // }
-  // return !!isExist
 }
