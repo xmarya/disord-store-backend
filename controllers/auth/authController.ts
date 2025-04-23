@@ -62,6 +62,15 @@ export const hasAuthorization = catchAsync(async (request, response, next) => {
   return next(new AppError(403, "غير مصرح لك الوصول للصفحة"));
 });
 
+export const canWriteReview = catchAsync(async (request, response, next) => {
+  console.log("canWriteReview");
+  const {id:userId, userType} = request.user;
+  const storeId = request.body.modelId || request.user.myStore; /*✅*/
+
+  if(!await confirmAuthorization(userId, storeId) && userType !== "admin") return next();
+  return next(new AppError(403, "store owner or store assistant can't write a review on their store"));
+});
+
 export const checkAssistantPermissions = (permissionKey: keyof AssistantPermissions) => {
   return async (request: Request, response: Response, next: NextFunction) => {
     if (request.user.userType === "storeOwner") return next();
