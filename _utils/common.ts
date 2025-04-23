@@ -12,6 +12,7 @@ export const RoundToTwo = (value: number): number => {
         message: "Validation failed",
         errors: error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
       });
+      return
     }
 
     if (error instanceof Error && error.name === "MongoServerError") {
@@ -25,10 +26,16 @@ export const RoundToTwo = (value: number): number => {
     }
     
     const errorMessage = error instanceof Error ? error.message : "Internal Server Error";
-    const statusCode = errorMessage === "Store not found" ? 404 : 400;
+    let statusCode = 400;
+  
+    if (errorMessage === "Store not found" || errorMessage === "Order not found") {
+      statusCode = 404;
+    } else if (errorMessage === "Internal server error") {
+      statusCode = 500;
+    }
   
     res.status(statusCode).json({
-      status: "failed",
+      status: statusCode === 500 ? "error" : "failed",
       message: errorMessage,
     });
   };

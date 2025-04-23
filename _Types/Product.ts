@@ -10,7 +10,7 @@ export interface ProductBasic {
   categories: Array<CategoryDocument>;
   description: string;
   // status: "inStock" | "outOfStock";
-  stock: number;
+  stock: number | null;
   discount: number;
   store: Types.ObjectId;
   productType: "physical" | "digital";
