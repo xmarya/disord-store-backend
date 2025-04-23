@@ -16,7 +16,7 @@ export const createProductController = catchAsync(async (request, response, next
 
   const newProd = await createProduct(data);
   response.status(201).json({
-    status: "success",
+    success: true,
     newProd,
   });
 });
@@ -31,7 +31,7 @@ export const getAllProductsController = catchAsync(async (request, response, nex
   if (!products) return next(new AppError(400, "لا يوجد منتجات في هذا المتجر"));
 
   response.status(200).json({
-    status: "success",
+    success: true,
     products,
   });
 });
