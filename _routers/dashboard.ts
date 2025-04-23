@@ -6,18 +6,16 @@ import { router as categoryRouter } from "./auth/categoryRoutes";
 import { router as userRouter } from "./auth/userAuthRoutes";
 import { router as orderRouter } from "./auth/orderRoutes";
 import { router as couponsRouter } from "./auth/couponRoutes";
-import { router as reviewsRouter } from "./auth/reviewRoutes";
 import { protect } from "../controllers/auth/authController";
 
 export const router = express.Router();
 
-console.log("dashboard routes");
-// router.use(protect);
+// console.log("dashboard routes");
+router.use(protect);
 router.use("/store", storeRouter);
 router.use("/:storeId/products", productRouter);
 router.use("/:storeId/categories", categoryRouter);
 router.use("/:storeId/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
-router.use("/reviews", reviewsRouter);
 router.use("/me", userRouter);
