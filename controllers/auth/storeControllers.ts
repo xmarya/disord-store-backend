@@ -6,7 +6,7 @@ import sanitisedData from "../../_utils/sanitisedData";
 import { deleteOne, getOne, updateOne } from "../global";
 import { deleteDoc, getOneDoc, updateDoc } from '../../_services/global';
 import Store from '../../models/storeModel';
-import { getDynamicModel, isDynamicModelExist } from '../../_utils/dynamicMongoModel';
+import { getDynamicModel } from '../../_utils/dynamicMongoModel';
 import { ProductDocument } from '../../_Types/Product';
 
 export const createStoreController = catchAsync(async (request, response, next) => {
@@ -45,7 +45,7 @@ export const getMyStoreNewController = catchAsync( async(request, response, next
 export const getStoreWithProductsController = catchAsync( async(request, response, next) => {
   //STEP 1) first, check if the store has any products:
   const {storeId} = request.params;
-  const ProductModel = await getDynamicModel<ProductDocument>("Product", storeId, false); // false = don't create a new DyMo it it doesn't exist
+  const ProductModel = await getDynamicModel<ProductDocument>("Product", storeId); // false = don't create a new DyMo it it doesn't exist
   console.log("getStoreWithProductsController'sProductModel =", ProductModel);
   if(!ProductModel) return next(new AppError(404, "no products were found related to this storeId"));
 
@@ -87,7 +87,7 @@ export const deleteStoreNewController = catchAsync( async(request, response, nex
   });
 });
 
-// NOTE: OLD CODE. DELETE THEM LATER.
+// TODO: OLD CODE. DELETE THEM LATER.
 export const getMyStoreController = getOne("Store");
 export const updateStoreController = updateOne("Store");
 export const deleteStoreController = deleteOne("Store");
