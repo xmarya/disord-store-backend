@@ -45,11 +45,11 @@ export const ProductSchema = new Schema<ProductDocument>(
     //   // NOTE: the user insert the number to be in %
     //   type: Number,
     // },
-    store: {
-      type: Schema.Types.ObjectId,
-      ref: "Store",
-      required: [true, "each product must belong to a store"],
-    },
+    // store: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: "Store",
+    //   required: [true, "each product must belong to a store"],
+    // },
     numberOfPurchases: {
       //TODO: this counter should be increased once the users completed their payment process
       type: Number,
@@ -82,8 +82,8 @@ export const ProductSchema = new Schema<ProductDocument>(
 );
 
 ProductSchema.pre("save", async function (next) {
-  console.log("ProductSchema.pre(save)");
   if (this.isModified("categories")) {
+    console.log("ProductSchema.pre(save)");
     // if a product has been associated with a category, assert its id to the category:
     await Category.findByIdAndUpdate(this.categories, { $addToSet: { products: this.id } });
   }
@@ -104,6 +104,8 @@ ProductSchema.pre("findOneAndDelete", async function (next) {
 
 ProductSchema.index({ ranking: 1 });
 
+
+//TODO: delete these after fully refactoring everything
 const Product = model<ProductDocument, ProductModel>("Product", ProductSchema);
 
 export default Product;
