@@ -1,5 +1,5 @@
 import express from "express";
-import { isWriter } from "../../controllers/auth/authController";
+import { canWriteReview, isWriter } from "../../controllers/auth/authController";
 import { createReviewOnModelController, deleteReviewController, getAllReviewsController, getOneReviewController, updateReviewController } from "../../controllers/auth/reviewController";
 import { AppError } from "../../_utils/AppError";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
@@ -8,7 +8,8 @@ export const router = express.Router();
 
 
 //TODO: prevent the storeOwner, storeAssistant and the admin
-// router.use(restrictReviews);
+router.use(canWriteReview);
+
 // NOTE: this fallback middleware is necessary to not fallback to the store route /store/:storeId
 // and produces CastError: Cast to ObjectId failed for value "reviews" (type string) at path "_id" for model "Store"
 //  because the code proceeded hasAuthorization middleware.
