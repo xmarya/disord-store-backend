@@ -1,14 +1,44 @@
 import express from "express";
-import {createReviewController, deleteReviewController, getAllReviewsController, getOneReviewController, updateReviewController } from "../../controllers/auth/reviewController";
 import { isWriter } from "../../controllers/auth/authController";
+import { createReviewOnModelController, deleteReviewController, getAllReviewsController, getOneReviewController, updateReviewController } from "../../controllers/auth/reviewController";
+import { AppError } from "../../_utils/AppError";
+import validateRequestParams from "../../_utils/validators/validateRequestParams";
 
-export const router = express.Router({mergeParams: true});
+export const router = express.Router();
 
-// for stores and products:
-router.route("/",).post(createReviewController).get(getAllReviewsController);
-// router.route("/platform",).post(createPlatformReview).get(getAllPlatformReviews);
-router.route("/:id").get(getOneReviewController).patch(isWriter, updateReviewController).delete(isWriter, deleteReviewController);
 
-// for platform:
-router.route("/platform").post(createReviewController).get(getAllReviewsController);
-router.route("/platform/:id").get(getOneReviewController).patch(isWriter, updateReviewController).delete(isWriter, deleteReviewController);
+//TODO: prevent the storeOwner, storeAssistant and the admin
+// router.use(restrictReviews);
+// NOTE: this fallback middleware is necessary to not fallback to the store route /store/:storeId
+// and produces CastError: Cast to ObjectId failed for value "reviews" (type string) at path "_id" for model "Store"
+//  because the code proceeded hasAuthorization middleware.
+router.all("/", (request, response, next) => {
+  if (!["GET", "POST"].includes(request.method)) return next(new AppError(405, `${request.method} not allowed on /store/reviews. please provide a /:reviewId`));
+  next();
+});
+router.route("/").post(createReviewOnModelController).get(getAllReviewsController);
+router
+  .route("/:reviewId")
+  .get(validateRequestParams("reviewId"), getOneReviewController)
+  .patch(validateRequestParams("reviewId"), isWriter, updateReviewController)
+  .delete(validateRequestParams("reviewId"), isWriter, deleteReviewController);
+
+/*
+case 1)
+    request full route => /product/reviews || /store/reviews
+    request.body => {
+        modelId: that specific product/store id
+        reviewBody: "",
+        rating: 
+    }
+
+case 2)
+    request full route => /product/reviews/:reviewId || /store/reviews/:reviewId
+    request.body => {
+        modelId: that specific product/store id
+        reviewBody: "",
+        rating: 
+    }
+    Review-product-${request.body.modelId}.findById(request.params.reviewId);
+    Review-store-${request.body.modelId}.findById(request.params.reviewId);
+*/
