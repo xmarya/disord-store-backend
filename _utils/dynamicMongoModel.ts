@@ -9,6 +9,7 @@ import { storeStatSchema } from "../models/storeStatModel";
 import { annualProfitSchema } from "../models/annualProfitModel";
 import { invoiceSchema } from "../models/invoiceModel";
 import { AppError } from "./AppError";
+import { rankingSchema } from "../models/rankingModel";
 
 // NOTE: consider converting this to a class
 
@@ -19,6 +20,7 @@ const modelSchemas = {
   "Review-product": reviewSchema,
   Store: storeSchema,
   Product: ProductSchema,
+  "Ranking-product":rankingSchema,
   Order: OrderSchema,
   StoreStat: storeStatSchema,
   AnnualProfit: annualProfitSchema,
@@ -44,18 +46,17 @@ function getDynamicModelData<T extends DynamicModels>(model: T, modelId: string)
   return { modelName, schema, collection };
 }
 async function createDynamicModel<T extends mongoose.Document>(modelName: string, schema: mongoose.Schema, collection: string):Promise<mongoose.Model<T>> {
+  console.log("createDynamicModel");
   try {
 
     let dynamicModel;
 
-    const isExist = await isDynamicModelExist(modelName); 
-    if(!isExist) dynamicModel = mongoose.connection.model<T, mongoose.Model<T>>(modelName, schema, collection);
-    else dynamicModel = mongoose.connection.models[modelName] as mongoose.Model<T>; /*REQUIRES TESTING*/
-
+    if(!mongoose.connection.models[modelName]) {
+      dynamicModel = mongoose.connection.model<T, mongoose.Model<T>>(modelName, schema, collection);
+    }
+    else dynamicModel = mongoose.connection.models[modelName] as mongoose.Model<T>;
     // STEP 2)Always make sure the cache is up-to-date
     lruCache.set(modelName, dynamicModel);
-    console.log("created DynamicModel ", dynamicModel);
-    console.log("the result of lruCache.set(modelName, dynamicModel) = ", lruCache.get(modelName));
     
     return dynamicModel;
   } catch (error) {
@@ -64,7 +65,7 @@ async function createDynamicModel<T extends mongoose.Document>(modelName: string
   }
 }
 
-export async function getDynamicModel<T extends mongoose.Document>(model: DynamicModel, modelId: string, createNew = true): Promise<mongoose.Model<T>> {
+export async function getDynamicModel<T extends mongoose.Document>(model: DynamicModel, modelId: string): Promise<mongoose.Model<T>> {
   console.log("inside getDynamicModel");
   
   // STEP 1) get necessary data for dynamic model:
