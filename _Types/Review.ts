@@ -2,6 +2,7 @@ import mongoose, { Types } from "mongoose";
 
 
 export interface ReviewDataBody {
+  modelId:string,
   user: Types.ObjectId |string;
   reviewBody: string;
   rating:number,
@@ -25,7 +26,7 @@ export interface ReviewDocument extends ReviewDataBody, mongoose.Document {
 }
 
 export interface ReviewModel extends mongoose.Model<ReviewDocument> {
-  calculateRatingsAverage:(isDelete?:boolean) => Promise<void>
+  calculateRatingsAverage:(modelId:string, isDelete?:boolean) => Promise<void>
 }
 
 

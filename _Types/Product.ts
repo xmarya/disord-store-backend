@@ -14,14 +14,17 @@ export interface ProductBasic {
   discount: number;
   store: Types.ObjectId;
   productType: "physical" | "digital";
+  ranking: number;
+  ratingsAverage:number,
+  ratingsQuantity:number
 }
 
 export interface ProductOptionals {
   discount?: number;
   numberOfPurchases?: number;
-  ranking?: number;
-  ratingsAverage?:number,
-  ratingsQuantity:number
+  // ranking?: number;
+  // ratingsAverage?:number,
+  // ratingsQuantity:number
 }
 
 export type ProductDocument = ProductBasic & ProductOptionals & mongoose.Document;
