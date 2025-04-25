@@ -5,7 +5,7 @@ export interface ProductBasic {
   id: string;
   name: string;
   price: number;
-  quantity: number;
+  // quantity: number;
   image: Array<string>;
   categories: Array<CategoryDocument>;
   description: string;

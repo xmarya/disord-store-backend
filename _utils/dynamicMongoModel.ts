@@ -92,6 +92,7 @@ export async function getDynamicModel<T extends mongoose.Document>(model: Dynami
 }
 
 export async function isDynamicModelExist(modelName: string) {
+  console.log("get cache", lruCache.get(modelName));
   // this function ONLY purpose is to let know whether the model is exist or not, it doesn't matter where too.
   // it also being used inside getDynamicModel function, to make 100% sure that the model is not exist anywhere before crating it
   const inCache = lruCache.has(modelName);
@@ -104,8 +105,7 @@ export async function isDynamicModelExist(modelName: string) {
 
   const collections = await mongoose.connection.db?.listCollections().toArray();
   const inDb = collections?.some(coll => coll.name === collectionName);
-  console.log("inDB ",inDb);
 
 
-  return inDb;
+  return !!inDb;
 }
