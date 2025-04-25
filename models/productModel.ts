@@ -33,7 +33,12 @@ export const ProductSchema = new Schema<ProductDocument>(
     //   enum: ["inStock", "outOfStock"],
     //   required: [true, "the productStatus is required"],
     // },
-    stock: { type: Number, required: true, default: 0 },
+    stock: { 
+      type: Number, 
+      required: false, 
+      default: null, 
+      min: [0, "Stock cannot be negative"], 
+    },
     discount: { type: Number, default: 0, min: 0, max: 100 },
     productType: {
       type: String,
@@ -70,7 +75,8 @@ export const ProductSchema = new Schema<ProductDocument>(
     ratingsQuantity: {
       type: Number,
       default:0
-    }
+    },
+    weight:{type: Number, required: true, default: 0}
   },
   {
     timestamps: true,

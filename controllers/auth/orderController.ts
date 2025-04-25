@@ -1,38 +1,73 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import { ApplyCoupon, CreateOrder, HandleErrorResponse, ProcessOrderItems, UpdateCouponUsage } from "../../_services/order/orderService";
+import { ApplyCoupon, CreateOrder, ProcessOrderItems, UpdateCouponUsage } from "../../_services/order/orderService";
 import Order from "../../models/orderModel";
 import { generateOrderNumber } from "../../_utils/genrateOrderNumber";
 import { CreateOrderInput, createOrderSchema } from "../../_services/order/zodSchemas/orderSchemas";
+import { HandleErrorResponse } from "../../_utils/common";
+import { ProcessPaymobPayment } from "../../_services/payment/paymobService";
+import { AxiosError } from "axios";
+import { processPaymobWebhook, getPaymentSuccessHtml } from "../../_services/payment/paymnetServices";
 
-//new order
-export const AddOrder = async (req: Request, res: Response): Promise<any> => {
+export const validateOrderInput = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    req.body = await createOrderSchema.parseAsync(req.body);
+    next();
+  } catch (error) {
+    HandleErrorResponse(error, res);
+  }
+};
+
+export const AddOrder = async (req: Request, res: Response): Promise<void> => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    // Validate input with Zod
-    const { userId, items, paymentMethod, couponCode, shippingAddress } = createOrderSchema.parse(req.body);
+    const { userId, items, paymentMethod, couponCode, shippingAddress, billingAddress, paymentType } = req.body as CreateOrderInput;
+    const { processedItems, subtotal, totalDiscount, hasDigitalProducts, totalWeight } = await ProcessOrderItems(items, session, shippingAddress);
 
-    // Process items and calculate pricing
-    const { processedItems, subtotal, totalDiscount, hasDigitalProducts } = await ProcessOrderItems(items, session);
-
-    // Validate payment method (replacing ValidatePaymentMethod)
-    if (hasDigitalProducts && paymentMethod !== "Online") {
-      throw new Error("Digital products require online payment");
+    if (hasDigitalProducts && !["Paymob"].includes(paymentMethod)) {
+      throw new Error("Digital products require Paymob payment");
     }
 
-    // Validate shipping address
-    const hasPhysicalProducts = processedItems.some((item) => item.productType === "physical");
-    if (hasPhysicalProducts && !shippingAddress) {
-      throw new Error("Shipping address is required for physical products");
-    }
-
-    // Apply coupon if provided
-    const { couponDiscount, appliedCoupon } = await ApplyCoupon(couponCode, userId, subtotal, session);
+    const { couponDiscount, appliedCoupon, eligibleSubtotal } = await ApplyCoupon(couponCode, userId, processedItems, subtotal, session);
 
     const orderNumber = generateOrderNumber();
-    const newOrder = CreateOrder(userId, orderNumber, processedItems, subtotal, totalDiscount, couponDiscount, appliedCoupon, paymentMethod, shippingAddress, hasDigitalProducts);
+    const newOrder = CreateOrder({
+      userId,
+      orderNumber,
+      processedItems,
+      subtotal,
+      productDiscount: totalDiscount,
+      couponDiscount,
+      appliedCoupon,
+      paymentMethod,
+      shippingAddress,
+      billingAddress,
+      hasDigitalProducts,
+      totalWeight,
+    });
+
+    let checkoutUrl = null;
+    let paymobOrderId = null;
+    if (paymentMethod === "Paymob") {
+      try {
+        const paymentResult = await ProcessPaymobPayment(
+          orderNumber,
+          newOrder.totalPrice,
+          processedItems,
+          billingAddress,
+          paymentType || "card"
+        );
+        checkoutUrl = paymentResult.checkoutUrl;
+        paymobOrderId = paymentResult.paymobOrderId;
+        newOrder.paymentIntentionId = paymobOrderId;
+        newOrder.transaction_id = "PENDING";
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        throw new Error(`Paymob payment failed: ${axiosError.response?.status} - ${JSON.stringify(axiosError.response?.data)}`);
+      }
+    }
 
     await UpdateCouponUsage(appliedCoupon, session);
     await newOrder.save({ session });
@@ -42,6 +77,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<any> => {
 
     const orderResponse = {
       _id: newOrder._id,
+      userId: newOrder.userId,
       orderNumber: newOrder.orderNumber,
       items: newOrder.items,
       subtotal: newOrder.subtotal,
@@ -52,42 +88,110 @@ export const AddOrder = async (req: Request, res: Response): Promise<any> => {
       status: newOrder.status,
       createdAt: newOrder.createdAt,
       isDigital: newOrder.isDigital,
+      shippingAddress: newOrder.shippingAddress,
+      billingAddress: newOrder.billingAddress,
+      transaction_id: newOrder.transaction_id || "Not applicable",
+      paymentIntentionId: newOrder.paymentIntentionId || "Not applicable",
+      checkoutUrl: checkoutUrl || undefined,
+      couponAppliedToSubtotal: eligibleSubtotal || undefined,
     };
 
-    return res.status(201).json({
-      success: true,
+    res.status(201).json({
+      status: "success",
       message: "Order created successfully",
       order: orderResponse,
     });
   } catch (error) {
+    console.error("Transaction failed:", error);
     await session.abortTransaction();
     session.endSession();
     return HandleErrorResponse(error, res);
   }
 };
 
-// user's getOrder
 export const GetUserOrders = async (req: Request, res: Response): Promise<any> => {
   try {
     const { userId } = req.params;
 
-    const orders = await Order.find({ userId }).select("totalPrice createdAt userId orderNumber paymentMethod status").populate("items", "name").sort({ createdAt: -1 });
+    const orders = await Order.find({ userId })
+      .select('orderNumber totalPrice status createdAt isDigital')
+      .populate('items', 'name image')
+      .sort({ createdAt: -1 });
 
     if (orders.length === 0) {
       return res.status(404).json({
-        success: false,
+        status: "failed",
         message: "No orders found",
       });
     }
+
+    const formattedOrders = orders.map((order) => ({
+      orderNumber: order.orderNumber,
+      totalPrice: order.totalPrice,
+      status: order.status,
+      createdAt: order.createdAt,
+      items: order.items.map((item) => ({
+        name: item.name,
+        image: item.image,
+      })),
+    }));
+
     return res.status(200).json({
-      success: true,
-      orders,
+      status: "success",
+      orders: formattedOrders,
     });
   } catch (error) {
-    console.error("Error fetching orders:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch orders",
-    });
+    HandleErrorResponse(error, res);
   }
+};
+
+export const handlePaymobWebhook = async (req: Request, res: Response) => {
+  try {
+    const result = await processPaymobWebhook(
+      req.body,
+      req.query.hmac as string
+    );
+
+    res.status(200).json({
+      status: "success",
+      order: result.orderNumber,
+      transaction: result.transaction_id
+    });
+  } catch (error) {
+    HandleErrorResponse(error, res);
+  }
+};
+
+export const PaymentSuccess = async (req: Request, res: Response): Promise<void> => {
+  const error = req.query.error as string | undefined;
+  const success = req.query.success as string | undefined;
+  const intention = req.query.intention as string | undefined;
+
+  let paymentStatus: "success" | "error" = "error";
+  let errorMessage = "Payment status unknown";
+
+  if (error) {
+    paymentStatus = "error";
+    errorMessage = error;
+  } else if (success === "true") {
+    paymentStatus = "success";
+  } else if (intention) {
+    // Fallback: Check order status using paymentIntentionId
+    const order = await Order.findOne({ paymentIntentionId: intention });
+    if (order) {
+      if (order.status === "Paid") {
+        paymentStatus = "success";
+      } else if (order.status === "Cancelled") {
+        paymentStatus = "error";
+        errorMessage = "Payment was cancelled";
+      } else {
+        paymentStatus = "error";
+        errorMessage = "Payment status not yet updated";
+      }
+    } else {
+      paymentStatus = "error";
+      errorMessage = "Order not found for payment intention";
+    }
+  }
+  res.status(200).send(getPaymentSuccessHtml(paymentStatus, errorMessage));
 };
