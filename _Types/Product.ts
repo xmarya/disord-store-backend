@@ -1,11 +1,11 @@
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { CategoryDocument } from "./Category";
 
 export interface ProductBasic {
   id: string;
   name: string;
   price: number;
-  quantity: number;
+  // quantity: number;
   image: Array<string>;
   categories: Array<CategoryDocument>;
   description: string;
@@ -14,14 +14,18 @@ export interface ProductBasic {
   discount: number;
   store: Types.ObjectId;
   productType: "physical" | "digital";
+  ranking: number;
+  ratingsAverage:number,
+  ratingsQuantity:number
   weight: number;
 }
 
 export interface ProductOptionals {
   discount?: number;
   numberOfPurchases?: number;
-  ranking?: number;
-  reviews?: string;
+  // ranking?: number;
+  // ratingsAverage?:number,
+  // ratingsQuantity:number
 }
 
-export type ProductDocument = ProductBasic & ProductOptionals;
+export type ProductDocument = ProductBasic & ProductOptionals & mongoose.Document;

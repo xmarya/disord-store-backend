@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import lruCache from "../_config/LRUCache";
-import type { Request } from "express";
 import { DynamicModel } from "../_Types/Model";
 import { reviewSchema } from "../models/reviewModel";
 import { storeSchema } from "../models/storeModel";
@@ -10,13 +9,18 @@ import { storeStatSchema } from "../models/storeStatModel";
 import { annualProfitSchema } from "../models/annualProfitModel";
 import { invoiceSchema } from "../models/invoiceModel";
 import { AppError } from "./AppError";
+import { rankingSchema } from "../models/rankingModel";
+
+// NOTE: consider converting this to a class
 
 type DynamicModelMap = Record<DynamicModel, mongoose.Schema>;
 
 const modelSchemas = {
-  Review: reviewSchema,
+  "Review-store": reviewSchema,
+  "Review-product": reviewSchema,
   Store: storeSchema,
   Product: ProductSchema,
+  "Ranking-product":rankingSchema,
   Order: OrderSchema,
   StoreStat: storeStatSchema,
   AnnualProfit: annualProfitSchema,
@@ -41,17 +45,18 @@ function getDynamicModelData<T extends DynamicModels>(model: T, modelId: string)
 
   return { modelName, schema, collection };
 }
-function createDynamicModel<T extends mongoose.Document>(modelName: string, schema: mongoose.Schema, collection: string): mongoose.Model<T> {
+async function createDynamicModel<T extends mongoose.Document>(modelName: string, schema: mongoose.Schema, collection: string):Promise<mongoose.Model<T>> {
+  console.log("createDynamicModel");
   try {
 
     let dynamicModel;
-    // STEP 1) Double guard — Prevents actual Mongoose runtime error if the previous guard fall out of sync
-    if (mongoose.connection.models[modelName]) dynamicModel = mongoose.connection.models[modelName] as mongoose.Model<T>;
-    else dynamicModel = mongoose.connection.model<T, mongoose.Model<T>>(modelName, schema, collection);
 
+    if(!mongoose.connection.models[modelName]) {
+      dynamicModel = mongoose.connection.model<T, mongoose.Model<T>>(modelName, schema, collection);
+    }
+    else dynamicModel = mongoose.connection.models[modelName] as mongoose.Model<T>;
     // STEP 2)Always make sure the cache is up-to-date
     lruCache.set(modelName, dynamicModel);
-    console.log("inside createDynamicModel", dynamicModel);
     
     return dynamicModel;
   } catch (error) {
@@ -60,35 +65,47 @@ function createDynamicModel<T extends mongoose.Document>(modelName: string, sche
   }
 }
 
-export function getDynamicModel<T extends mongoose.Document>(model: DynamicModel, modelId: string): mongoose.Model<T> {
-  // only for getting reviews that are related to stores and products
-
+export async function getDynamicModel<T extends mongoose.Document>(model: DynamicModel, modelId: string): Promise<mongoose.Model<T>> {
+  console.log("inside getDynamicModel");
+  
   // STEP 1) get necessary data for dynamic model:
   const { modelName, schema, collection } = getDynamicModelData(model, modelId);
-
   if (!schema) throw new AppError(500, `Schema for model ${model} not found.`);
 
-  // STEP 2) create a new modelName if it doesn't exist in the cache or in the mongoose.model:
-  if (!lruCache.has(modelName) || !mongoose.connection.modelNames().includes(modelName)) createDynamicModel(modelName, schema, collection);
-
-  // console.log("mongoose.connection.models[modelName]", mongoose.connection.models[modelName]);
-  // console.log("mongoose.connection.modelNames()", mongoose.connection.modelNames());
-
+  /* OLD CODE (kept for reference): 
+    //  2) check if it does exist :
+    const isExist = await isDynamicModelExist(modelName); 
+    SOLILOQUY:  in case this was true, 
+    how to know where the model does actually exist?
+    at the end of the function, I'm getting it from the lruCache,
+    however, that was because I was calling createDynamicModel
+    without any condition!
+    I think it's better to move the condition to be inside the createModel,
+    making it the responsible about the whole logic of creation&checking-returning-if-exist is clearer
+    
+    if(!isExist && createNew) createDynamicModel(modelName, schema, collection);
+ */
+  await createDynamicModel(modelName, schema, collection);
+  console.log("lruCache.get(modelName) after creating a DyMo", lruCache.get(modelName));
   const dynamicModel = lruCache.get(modelName) as mongoose.Model<T>;
-  console.log("inside getDynamicModel", dynamicModel.modelName);
   return dynamicModel;
 }
 
-export function getModelId(request: Request): string {
-  console.log("getModelId");
-  let modelId;
-  console.log(request.originalUrl,request.originalUrl.includes("platform") );
-  // STEP 1) is it from /platform route?
-  if(request.originalUrl.includes("platform")) return modelId = "platform";
+export async function isDynamicModelExist(modelName: string) {
+  console.log("get cache", lruCache.get(modelName));
+  // this function ONLY purpose is to let know whether the model is exist or not, it doesn't matter where too.
+  // it also being used inside getDynamicModel function, to make 100% sure that the model is not exist anywhere before crating it
+  const inCache = lruCache.has(modelName);
+  const inModelNames = mongoose.connection.modelNames().includes(modelName);
 
-  //STEP 2) if the request is not coming from /platform, then check the request.body:
-  modelId = request.body.modelId; // for stores and products
+  if(inCache || inModelNames) return true;
+  
+  let [collectionName, modelId] = modelName.split("-");
+  collectionName = collectionName.toLowerCase().concat(`s-${modelId}`);
 
-  console.log("modelId = ",modelId);
-  return modelId;
+  const collections = await mongoose.connection.db?.listCollections().toArray();
+  const inDb = collections?.some(coll => coll.name === collectionName);
+
+
+  return !!inDb;
 }

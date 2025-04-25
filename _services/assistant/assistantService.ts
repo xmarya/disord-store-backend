@@ -1,4 +1,4 @@
-import { startSession, Types } from "mongoose";
+import mongoose, { startSession } from "mongoose";
 import User from "../../models/userModel";
 import StoreAssistant from "../../models/storeAssistantModel";
 import Store from "../../models/storeModel";
@@ -65,7 +65,7 @@ export async function createAssistant(data: AssistantRegisterData) {
   }
 }
 
-export async function getAllAssistants(storeId: string | Types.ObjectId) {
+export async function getAllAssistants(storeId: string | mongoose.Types.ObjectId) {
   const assistants = await Store.findById(storeId).select("storeAssistants");
 
   return assistants;
@@ -76,7 +76,7 @@ export async function getOneAssistant(assistantId: string) {
   return assistants;
 }
 
-export async function deleteAssistant(storeId: string | Types.ObjectId, assistantId: string) {
+export async function deleteAssistant(storeId: string | mongoose.Types.ObjectId, assistantId: string) {
   const session = await startSession();
   session.startTransaction();
   try {
@@ -100,4 +100,17 @@ export async function getAssistantPermissions(storeId:string, assistantId:string
     const assistant = await StoreAssistant.findOne({assistant: assistantId, inStore:storeId});
 
     return assistant;
+}
+
+export async function deleteAllAssistants(storeId: string | mongoose.Types.ObjectId, session:mongoose.ClientSession) {
+  console.log("deleteAllAssistants");
+  //STEP 1) get all the assistants ids based on the storeId to delete them from assistants collection:
+  const assistantsId = await StoreAssistant.find({inStore: storeId}).select("assistant"); // this is going to have the mongodb default _id and the assistant field
+  if(!assistantsId) return;
+  
+  await StoreAssistant.deleteMany({inStore: storeId}).session(session);
+
+  //STEP 2) delete them using the same assistants ids from users collection:
+  const userIds = assistantsId.map(a => a.assistant); // to only extract the assistant filed that holds a reference to the User
+  await User.deleteMany({ _id: { $in: userIds }, userType: "storeAssistant" }).session(session);
 }

@@ -15,10 +15,10 @@ export const ProductSchema = new Schema<ProductDocument>(
       type: Number,
       required: [true, "the price field is required"],
     },
-    quantity: {
-      type: Number,
-      required: [true, "the quantity field is required"],
-    },
+    // quantity: {
+    //   type: Number,
+    //   required: [true, "the quantity field is required"],
+    // },
     image: {
       type: [String],
       required: [true, "the image field is required"],
@@ -50,18 +50,31 @@ export const ProductSchema = new Schema<ProductDocument>(
     //   // NOTE: the user insert the number to be in %
     //   type: Number,
     // },
-    store: {
-      type: Schema.Types.ObjectId,
-      ref: "Store",
-      required: [true, "each product must belong to a store"],
-    },
+    // store: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: "Store",
+    //   required: [true, "each product must belong to a store"],
+    // },
     numberOfPurchases: {
       //TODO: this counter should be increased once the users completed their payment process
       type: Number,
       default: 0,
     },
     ranking: {
+      type: Number,
+      default: null
       // NOTE: this filed will be used to presents the ranking of store's products, it's irrelevant to the storeStats model.
+    },
+    ratingsAverage: {
+      type: Number,
+      default:null,
+      min: [1, "rating must be 1 to 5"],
+      max: [5, "rating must be 1 to 5"],
+      set: (rating:number) => Math.round(rating * 10) / 10
+    },
+    ratingsQuantity: {
+      type: Number,
+      default:0
     },
     weight:{type: Number, required: true, default: 0}
   },
@@ -74,15 +87,9 @@ export const ProductSchema = new Schema<ProductDocument>(
   }
 );
 
-ProductSchema.virtual("reviews", {
-  ref: "Review",
-  localField: "id",
-  foreignField: "reviewedModel",
-});
-
 ProductSchema.pre("save", async function (next) {
-  console.log("ProductSchema.pre(save)");
   if (this.isModified("categories")) {
+    console.log("ProductSchema.pre(save)");
     // if a product has been associated with a category, assert its id to the category:
     await Category.findByIdAndUpdate(this.categories, { $addToSet: { products: this.id } });
   }
@@ -103,6 +110,8 @@ ProductSchema.pre("findOneAndDelete", async function (next) {
 
 ProductSchema.index({ ranking: 1 });
 
+
+//TODO: delete these after fully refactoring everything
 const Product = model<ProductDocument, ProductModel>("Product", ProductSchema);
 
 export default Product;

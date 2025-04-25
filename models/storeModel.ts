@@ -1,5 +1,4 @@
 import { ProductDocument } from "../_Types/Product";
-import { ReviewDocument } from "../_Types/Reviews";
 import { StoreDocument } from "../_Types/Store";
 import { Model, Query, Schema, model } from "mongoose";
 
@@ -87,6 +86,7 @@ export const storeSchema = new Schema<StoreDocument>({
   },
 });
 
+// NOTE: delete this later
 storeSchema.virtual<ProductDocument[]>("products", {
   ref: "Product",
   localField: "_id",
@@ -99,12 +99,8 @@ storeSchema.virtual("stats", {
   foreignField: "store",
 });
 
-storeSchema.virtual<ReviewDocument[]>("reviews", {
-  ref: "Review",
-  localField: "_id",
-  foreignField: "reviewedModel",
-});
 
+// NOTE: delete this later
 storeSchema.pre(/^find/, function(this:Query<any, any>, next) {
   this.populate("products");
   next();
