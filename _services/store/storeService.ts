@@ -1,11 +1,9 @@
-import StoreAssistant from "../../models/storeAssistantModel";
-import { StoreDocument } from "../../_Types/Store";
-import Store from "../../models/storeModel";
-import mongoose, {startSession, Types } from "mongoose";
-import { AppError } from "../../_utils/AppError";
-import User from "../../models/userModel";
-import { DynamicModel } from "../../_Types/Model";
+import mongoose, { startSession } from "mongoose";
 import { ProductDocument } from "../../_Types/Product";
+import { StoreDocument } from "../../_Types/Store";
+import { AppError } from "../../_utils/AppError";
+import Store from "../../models/storeModel";
+import User from "../../models/userModel";
 
 
 export async function createStore(data:StoreDocument) {
@@ -64,3 +62,9 @@ export async function setStoreStatus(storeId:string, status: "active" | "suspend
 } // NOTE: this service has no controller yet
 
 // TODO: crete a utility function that handles the request quires (filtering) for getAll
+
+export async function deleteStore(storeId:string | mongoose.Types.ObjectId, session:mongoose.ClientSession){
+    const deletedStore = await Store.findByIdAndDelete(storeId, {session});
+
+    return deletedStore;
+}
