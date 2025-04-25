@@ -18,12 +18,12 @@ router.use("/:productId/reviews",
   validateModelId("Review-product"), 
   assignModelToRequest("Review-product"), reviewsRouter);
 
-router.use(assignModelToRequest("Product"));
+router.use(validateModelId("Product"),assignModelToRequest("Product"));
 
 router.use(restrict("storeOwner", "storeAssistant"), hasAuthorization);
 router
   .route("/")
-  .post(checkAssistantPermissions("addProduct"), createProductNewController) /* REQUIRES TESTING */
+  .post(checkAssistantPermissions("addProduct"), createProductNewController)
   .get(getAllProductsNewController); /* REQUIRES TESTING */
 router
   .route("/:productId")
