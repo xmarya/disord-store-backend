@@ -15,10 +15,10 @@ export const ProductSchema = new Schema<ProductDocument>(
       type: Number,
       required: [true, "the price field is required"],
     },
-    quantity: {
-      type: Number,
-      required: [true, "the quantity field is required"],
-    },
+    // quantity: {
+    //   type: Number,
+    //   required: [true, "the quantity field is required"],
+    // },
     image: {
       type: [String],
       required: [true, "the image field is required"],
