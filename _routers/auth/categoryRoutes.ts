@@ -1,6 +1,6 @@
 import express from "express";
 import { assignModelToRequest, checkAssistantPermissions, hasAuthorization, isStoreIdExist, restrict } from "../../controllers/auth/authController";
-import { createCategoryController, deleteCategoryController, getAllCategoriesController, getCategoryController, updateCategoryController } from "../../controllers/auth/categoryController";
+import { createCategoryController, deleteCategoryNewController, getAllCategoriesController, getCategoryController, updateCategoryNewController } from "../../controllers/auth/categoryController";
 import { validateModelId } from "../../_utils/validators/validateModelId";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
 
@@ -15,5 +15,5 @@ router.route("/")
 .get(getAllCategoriesController);
 router.route("/:categoryId")
 .get(validateRequestParams("categoryId"),getCategoryController)
-.patch(validateRequestParams("categoryId"),checkAssistantPermissions("editCategory"), updateCategoryController)
-.delete(validateRequestParams("categoryId"),checkAssistantPermissions("deleteCategory"), deleteCategoryController);
+.patch(validateRequestParams("categoryId"),checkAssistantPermissions("editCategory"), updateCategoryNewController)
+.delete(validateRequestParams("categoryId"),checkAssistantPermissions("deleteCategory"), deleteCategoryNewController);
