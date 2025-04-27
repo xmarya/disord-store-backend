@@ -13,18 +13,12 @@ import { validateModelId } from "../../_utils/validators/validateModelId";
 
 export const router = express.Router();
 
-router.use("/:productId/reviews", 
-  validateRequestParams("productId"), 
-  validateModelId("Review-product"), 
-  assignModelToRequest("Review-product"), reviewsRouter);
+router.use("/:productId/reviews", validateRequestParams("productId"), validateModelId("Review-product"), assignModelToRequest("Review-product"), reviewsRouter);
 
-router.use(validateModelId("Product"),assignModelToRequest("Product"));
+router.use(restrict("storeOwner", "storeAssistant"), hasAuthorization); // this should be at the top of the stack; so the new model will be created only if the user passed both conditional middlewares 
+router.use(validateModelId("Product"), assignModelToRequest("Product"));
 
-router.use(restrict("storeOwner", "storeAssistant"), hasAuthorization);
-router
-  .route("/")
-  .post(checkAssistantPermissions("addProduct"), createProductNewController)
-  .get(getAllProductsNewController); /* REQUIRES TESTING */
+router.route("/").post(checkAssistantPermissions("addProduct"), createProductNewController).get(getAllProductsNewController); /* REQUIRES TESTING */
 router
   .route("/:productId")
   .get(validateRequestParams("productId"), getOneProductNewController) /* REQUIRES TESTING */

@@ -5,7 +5,7 @@ import { validateModelId } from "../../_utils/validators/validateModelId";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
 
 export const router = express.Router({mergeParams: true});
-router.use(isStoreIdExist); // this middleware is used to ensure the storeId is exist before proceeding.
+// router.use(isStoreIdExist); // this middleware is used to ensure the storeId is exist before proceeding.
 
 router.use(validateModelId("Category"), assignModelToRequest("Category"));
 
