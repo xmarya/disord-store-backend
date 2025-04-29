@@ -8,6 +8,7 @@ import { HandleErrorResponse } from "../../_utils/common";
 import { ProcessPaymobPayment } from "../../_services/payment/paymobService";
 import { AxiosError } from "axios";
 import { processPaymobWebhook, getPaymentSuccessHtml } from "../../_services/payment/paymnetServices";
+import Product from "../../models/productModel";
 
 export const validateOrderInput = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -24,10 +25,28 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
 
   try {
     const { userId, items, paymentMethod, couponCode, shippingAddress, billingAddress, paymentType } = req.body as CreateOrderInput;
-    const { processedItems, subtotal, totalDiscount, hasDigitalProducts, totalWeight } = await ProcessOrderItems(items, session, shippingAddress);
+    const { processedItems, subtotal, totalDiscount, hasDigitalProducts, totalWeight, hasMixedProducts } =
+    await ProcessOrderItems(items, session);
 
+    if (hasMixedProducts) {
+      throw new Error("Orders cannot contain both digital and physical products");
+    }
+    if (!hasDigitalProducts && !shippingAddress) {
+      throw new Error("Shipping address is required for physical products");
+    }
     if (hasDigitalProducts && !["Paymob"].includes(paymentMethod)) {
       throw new Error("Digital products require Paymob payment");
+    }
+    if (paymentMethod === "COD" && !hasDigitalProducts && !shippingAddress) {
+      throw new Error("Shipping address is required for Cash on Delivery (COD) orders with physical products");
+    }
+    if (paymentMethod === "Paymob") {
+      if (!billingAddress) {
+        throw new Error("Billing address is required for Paymob payments");
+      }
+      if (!hasDigitalProducts && !shippingAddress) {
+        throw new Error("Shipping address is required for Paymob payments with physical products");
+      }
     }
 
     const { couponDiscount, appliedCoupon, eligibleSubtotal } = await ApplyCoupon(couponCode, userId, processedItems, subtotal, session);
@@ -45,6 +64,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       shippingAddress,
       billingAddress,
       hasDigitalProducts,
+      hasMixedProducts, 
       totalWeight,
     });
 
@@ -56,7 +76,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
           orderNumber,
           newOrder.totalPrice,
           processedItems,
-          billingAddress,
+          billingAddress!,
           paymentType || "card"
         );
         checkoutUrl = paymentResult.checkoutUrl;
@@ -67,6 +87,15 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
         const axiosError = error as AxiosError;
         throw new Error(`Paymob payment failed: ${axiosError.response?.status} - ${JSON.stringify(axiosError.response?.data)}`);
       }
+    } else if(paymentMethod === "COD"){
+      newOrder.status = 'Pending';
+      newOrder.transaction_id = "COD-" + newOrder.orderNumber;
+      const productIds = processedItems.map(item => item.productId);
+      await Product.updateMany(
+        { _id: { $in: productIds } },
+        { $inc: { numberOfPurchases: 1 } },
+        { session }
+      );
     }
 
     await UpdateCouponUsage(appliedCoupon, session);
@@ -89,7 +118,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       createdAt: newOrder.createdAt,
       isDigital: newOrder.isDigital,
       shippingAddress: newOrder.shippingAddress,
-      billingAddress: newOrder.billingAddress,
+      billingAddress: newOrder.billingAddress || undefined,
       transaction_id: newOrder.transaction_id || "Not applicable",
       paymentIntentionId: newOrder.paymentIntentionId || "Not applicable",
       checkoutUrl: checkoutUrl || undefined,

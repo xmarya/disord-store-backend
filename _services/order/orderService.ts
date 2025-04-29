@@ -9,12 +9,12 @@ import { CreateOrderParams, IOrder, IOrderItem, IOrderItemCheck, Address } from 
 export const ProcessOrderItems = async (
   items: IOrderItemCheck[],
   session: mongoose.ClientSession,
-  shippingAddress?: Address 
 ): Promise<{
   processedItems: IOrderItem[];
   subtotal: number;
   totalDiscount: number;
   hasDigitalProducts: boolean;
+  hasMixedProducts: boolean;
   totalWeight: number;
 }> => {
   let totalWeight = 0;
@@ -22,6 +22,7 @@ export const ProcessOrderItems = async (
   let totalDiscount = 0;
   const processedItems: IOrderItem[] = [];
   let hasDigitalProducts = false;
+  let hasPhysicalProduct = false; // Temporary flag during processing
 
   const productIds = items.map((item) => item.productId);
   const products = await Product.find({ _id: { $in: productIds } })
@@ -43,14 +44,12 @@ export const ProcessOrderItems = async (
     if (!product) {
       throw new Error(`Product with ID ${item.productId} not found`);
     }
-    // Check stock only if stock is not null (i.e., not unlimited)
     if (product.stock !== null && product.stock < item.quantity) {
       throw new Error(
         `Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`
       );
     }
 
-    // Update stock only if stock is not null (i.e., not unlimited)
     if (product.stock !== null) {
       bulkOps.push({
         updateOne: {
@@ -62,6 +61,8 @@ export const ProcessOrderItems = async (
 
     if (product.productType === "digital") {
       hasDigitalProducts = true;
+    } else if (product.productType === "physical") {
+      hasPhysicalProduct = true;
     }
 
     const itemPrice = product.price * item.quantity;
@@ -95,11 +96,13 @@ export const ProcessOrderItems = async (
     }
   }
 
+  const hasMixedProducts = hasDigitalProducts && hasPhysicalProduct;
   return {
     processedItems,
     subtotal: RoundToTwo(subtotal),
     totalDiscount: RoundToTwo(totalDiscount),
     hasDigitalProducts,
+    hasMixedProducts,
     totalWeight,
   };
 };
@@ -139,7 +142,7 @@ export const ApplyCoupon = async (
   return { couponDiscount, appliedCoupon, eligibleSubtotal };
 };
 
-export const CreateOrder = (params: CreateOrderParams): IOrder => {
+export const CreateOrder = (params: CreateOrderParams & { hasMixedProducts: boolean }): IOrder => {
   const {
     userId,
     orderNumber,
@@ -154,7 +157,12 @@ export const CreateOrder = (params: CreateOrderParams): IOrder => {
     hasDigitalProducts,
     totalWeight,
   } = params;
-  const status = hasDigitalProducts ? "Available" : "Pending";
+  let status = "Pending";
+  if (hasDigitalProducts) {
+    status = "Available";
+  } else if (paymentMethod === "COD") {
+    status = "Pending";
+  }
   const calculatedTotalPrice = RoundToTwo(subtotal - productDiscount - couponDiscount);
   const calculatedTotalDiscount = RoundToTwo(productDiscount + couponDiscount);
 

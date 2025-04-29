@@ -31,7 +31,7 @@ export interface IOrder extends Document {
   orderNumber: string; 
   items: IOrderItem[];
   shippingAddress?: Address; // Optional for digital products
-  billingAddress: Address; // Required for Paymob payments
+  billingAddress?: Address; // Required for Paymob payments
   totalPrice: number;
   productDiscount: number;
   couponDiscount: number;
@@ -62,7 +62,7 @@ export interface CreateOrderParams {
   appliedCoupon: any;
   paymentMethod: string;
   shippingAddress?: Address; 
-  billingAddress: Address; 
+  billingAddress?: Address; 
   hasDigitalProducts: boolean;
   totalWeight: number;
 }

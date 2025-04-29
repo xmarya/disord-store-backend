@@ -1,5 +1,6 @@
 import { verifyPaymobHmac, validatePaymobWebhook } from "../../_utils/paymobWebHookUtils";
 import Order from "../../models/orderModel";
+import Product from "../../models/productModel";
 
 export const getPaymentSuccessHtml = (status: "success" | "error", errorMessage: string = ""): string => {
   return `
@@ -82,6 +83,7 @@ export const processPaymobWebhook = async (body: any, hmac?: string) => {
     order.status = "Paid";
     order.transaction_id = String(obj.id);
     await order.save();
+    await updateProductPurchases(order.items);
   }
   return order;
 };
@@ -98,4 +100,12 @@ const findOrderByIdentifier = async (identifier?: string) => {
 
   if (!order) throw new Error(`Order not found: ${identifier}`);
   return order;
+};
+
+const updateProductPurchases = async (items: any[]) => {
+  const productIds = items.map(item => item.productId);
+  await Product.updateMany(
+    { _id: { $in: productIds } },
+    { $inc: { numberOfPurchases: 1 } }
+  );
 };
