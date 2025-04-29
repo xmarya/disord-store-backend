@@ -18,9 +18,9 @@ router.use("/:productId/reviews", validateRequestParams("productId"), validateMo
 router.use(restrict("storeOwner", "storeAssistant"), hasAuthorization); // this should be at the top of the stack; so the new model will be created only if the user passed both conditional middlewares 
 router.use(validateModelId("Product"), assignModelToRequest("Product"));
 
-router.route("/").post(checkAssistantPermissions("addProduct"), createProductNewController).get(getAllProductsNewController); /* REQUIRES TESTING */
+router.route("/").post(checkAssistantPermissions("addProduct"), createProductNewController).get(getAllProductsNewController);
 router
   .route("/:productId")
-  .get(validateRequestParams("productId"), getOneProductNewController) /* REQUIRES TESTING */
-  .patch(validateRequestParams("productId"), checkAssistantPermissions("editProduct"), updateProductNewController) /* REQUIRES TESTING */
-  .delete(validateRequestParams("productId"), checkAssistantPermissions("deleteProduct"), deleteProductNewController); /* REQUIRES TESTING */
+  .get(validateRequestParams("productId"), getOneProductNewController)
+  .patch(validateRequestParams("productId"), checkAssistantPermissions("editProduct"), updateProductNewController)
+  .delete(validateRequestParams("productId"), checkAssistantPermissions("deleteProduct"), deleteProductNewController);

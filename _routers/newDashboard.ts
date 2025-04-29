@@ -15,8 +15,8 @@ export const router = express.Router();
 router.use(protect);
 router.use("/store", storeRouter);
 router.use("/products", productNewRouter);
-router.use("/categories", categoryRouter); // TODO: convert into DyMo. -or maybe not, I'm already checking the duplication in the front-end-
-router.use("/:storeId/assistants", assistantRouter);
+router.use("/categories", categoryRouter);
+router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter); // TODO: convert into DyMo.
 router.use("/orders", orderRouter); // TODO: convert into DyMo.
 router.use("/platform/reviews", platformReviewsRouter);
