@@ -31,7 +31,7 @@ export const getAllAssistantsController = catchAsync(async (request, response, n
 
   const assistants = await getAllAssistants(storeId);
 
-  if (!assistants) return next(new AppError(400, "لا يوجد مساعدين في هذا المتجر"));
+  if (!assistants) return next(new AppError(404, "لا يوجد مساعدين في هذا المتجر"));
 
   response.status(200).json({
     success: true,
@@ -48,7 +48,7 @@ export const getOneAssistantController = catchAsync(async (request, response, ne
 
   const assistant = await getOneAssistant(assistantId);
 
-  if (!assistant) return next(new AppError(400, "لا يوجد مستخدم بهذا المعرف"));
+  if (!assistant) return next(new AppError(404, "لا يوجد مستخدم بهذا المعرف"));
 
   response.status(200).json({
     success: true,

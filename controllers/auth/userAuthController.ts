@@ -63,3 +63,5 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
     success: true,
   });
 });
+
+// TODO: bank account controller, it's separate because it needs card data validation
