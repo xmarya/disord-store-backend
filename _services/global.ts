@@ -29,7 +29,7 @@ export async function updateDoc<T extends mongoose.Document>(Model: mongoose.Mod
   /* OLD CODE (kept for reference): 
   const updatedDoc = await Model.findByIdAndUpdate(id, data).setOptions(locals);
   */
-  const query = Model.findByIdAndUpdate(id, data, { runValidators: true });
+  const query = Model.findByIdAndUpdate(id, data, { runValidators: true, new:true });
   if (locals) query.setOptions(locals); /*REQUIRES TESTING*/
   const updatedDoc = await query;
   return updatedDoc;
