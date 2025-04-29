@@ -52,7 +52,7 @@ export const storeSchema = new Schema<StoreDocument>({
       }],
       */
 
-  categories: [Schema.Types.ObjectId],
+  // categories: [Schema.Types.ObjectId], it's dynamic model now 
   colourTheme: {
     /* SOLILOQUY: this should be one object not an array, 
       of course the plus users can views many theme but eventually they are going to select only one*/

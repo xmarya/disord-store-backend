@@ -29,6 +29,7 @@ export const validateModelId = (modelName: DynamicModel) => async(request:Reques
 
       switch (modelName) {
         case "Product":
+        case "Category":
         case "Review-store":
           console.log("product and Review-store case");
           isExist = await Store.exists({ _id: modelId });
