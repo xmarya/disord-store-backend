@@ -1,6 +1,6 @@
-import { Model, Schema, model } from "mongoose";
+import mongoose, { Model, Schema, model } from "mongoose";
 import { ProductDocument } from "../_Types/Product";
-import Category from "./categoryModel";
+import { getDynamicModel } from "../_utils/dynamicMongoModel";
 
 type ProductModel = Model<ProductDocument>;
 
@@ -86,27 +86,98 @@ export const ProductSchema = new Schema<ProductDocument>(
     toObject: { virtuals: true },
   }
 );
+/* OLD CODE (kept for reference): 
+ProductSchema.pre("save", async function (this:ProductDocument, next) {
+if (this.isModified("categories")) {
+  console.log("ProductSchema.pre(save)");
+  const modelName = (this.constructor as Model<ProductDocument>).modelName;
+  const [_, modelId] = modelName.split("-");
+  // if a product has been associated with a category, assert its id to the category:
+  console.log("this.constructor.modelName", modelId);
+  await mongoose.model(`Category-${modelId}`).findByIdAndUpdate(this.categories, { $addToSet: { products: this.id } });
+}
+next();
+});
+*/
 
-ProductSchema.pre("save", async function (next) {
-  if (this.isModified("categories")) {
-    console.log("ProductSchema.pre(save)");
-    // if a product has been associated with a category, assert its id to the category:
-    await Category.findByIdAndUpdate(this.categories, { $addToSet: { products: this.id } });
+/* OLD CODE (kept for reference): 
+ProductSchema.pre("findOneAndDelete", async function (next) { 
+  console.log("ProductSchema.pre(findOneAndDelete)");
+  const doc = await this.model.findOne(this.getQuery()).select("categories");
+  const categories = doc.categories;
+  
+  if (!doc) return next();
+  const [_, modelId] = this.model.name.split("-");
+  await mongoose.model(`Category-${modelId}`).updateMany({ id: { $in: categories } }, { $pull: { products: doc.id } });
+  
+  next();
+});
+*/
+
+// the below hooks teach the Product model how to manage its own category relationships automatically
+ProductSchema.pre("save", async function(this:ProductDocument, next) {
+  if(!this.isModified("categories")) return next();
+  console.log("ProductSchema.pre(save)");
+
+  const product = this;
+  const newCategory = product.categories;
+  if (newCategory.length) {
+    const [_, modelId] = (product.constructor as Model<ProductDocument>).modelName.split("-");
+    const CategoryModel = await getDynamicModel("Category", modelId);
+
+    await CategoryModel.updateMany(
+      { _id: { $in: newCategory } },
+      { $addToSet: { products: product._id } }
+    );
   }
   next();
 });
 
-ProductSchema.pre("findOneAndDelete", async function (next) {
-  console.log("ProductSchema.pre(findOneAndDelete)");
-  const doc = await this.model.findOne(this.getQuery()).select("categories");
-  const categories = doc.categories;
+/* OLD CODE (kept for reference): 
+ProductSchema.pre("findOneAndUpdate", async function(next) {
+  console.log("ProductSchema.pre(findOneAndUpdate)");
 
-  if (!doc) return next();
+  const updatedFields = this.getUpdate();
+  if(!updatedFields?.categories) return next();
 
-  await Category.updateMany({ id: { $in: categories } }, { $pull: { products: doc.id } });
+  const productId = this.getQuery()._id;
+  const productDoc = await this.model.findById(productId).select('categories');
+  if (!productDoc) return next(); // new document, no merging needed
 
-  next();
-});
+  // const existingCategories = productDoc.categories.map(id => id.toString());
+  // console.log("existingCategories", existingCategories);
+  // const incomingCategories = (updatedFields?.categories || []).map(id => id.toString());
+  // console.log("incomingCategories", incomingCategories);
+  
+  // // Merge without duplicates
+  // const mergedCategories = Array.from(new Set([...existingCategories, ...incomingCategories]));
+  
+  // // Assign back merged array
+  // productDoc.categories = mergedCategories;
+  
+  // productDoc.markModified('categories');
+  
+  console.log("productDoc.categories = mergedCategories;", productDoc);
+  const [_, modelId] = this.model.modelName.split("-");
+  const CategoryModel = await getDynamicModel('Category', modelId);
+  // Add the category reference to the product
+  // if (existingProduct?.categories.length) {
+    //   await CategoryModel.updateMany(
+      //     { _id: { $in: existingProduct.categories } },
+      //     { $pull: { products: productId } }
+      //   );
+      // }
+      
+      // Add the product reference to the categories
+      if (updatedFields?.categories.length) {
+        await CategoryModel.updateMany(
+          { _id: { $in: updatedFields?.categories } },
+          { $addToSet: { products: productId } }
+        );
+      }
+      next();
+    });
+    */
 
 ProductSchema.index({ ranking: 1 });
 

@@ -10,16 +10,18 @@ import { annualProfitSchema } from "../models/annualProfitModel";
 import { invoiceSchema } from "../models/invoiceModel";
 import { AppError } from "./AppError";
 import { rankingSchema } from "../models/rankingModel";
+import { categorySchema } from "../models/categoryModel";
 
 // NOTE: consider converting this to a class
 
 type DynamicModelMap = Record<DynamicModel, mongoose.Schema>;
 
 const modelSchemas = {
-  "Review-store": reviewSchema,
-  "Review-product": reviewSchema,
   Store: storeSchema,
   Product: ProductSchema,
+  Category: categorySchema,
+  "Review-store": reviewSchema,
+  "Review-product": reviewSchema,
   "Ranking-product":rankingSchema,
   Order: OrderSchema,
   StoreStat: storeStatSchema,
@@ -41,10 +43,12 @@ function getDynamicModelData<T extends DynamicModels>(model: T, modelId: string)
   // }
   const modelName = `${model}-${modelId}`;
   const schema = modelSchemas[model];
-  const collection = `${model.toLowerCase().concat("s")}-${modelId}`;
+  // const collection = `${model.toLowerCase().concat("s")}-${modelId}`;
+  const collection = `${model.toLowerCase()}-${modelId}`;
 
   return { modelName, schema, collection };
 }
+
 async function createDynamicModel<T extends mongoose.Document>(modelName: string, schema: mongoose.Schema, collection: string):Promise<mongoose.Model<T>> {
   console.log("createDynamicModel");
   try {
@@ -101,7 +105,8 @@ export async function isDynamicModelExist(modelName: string) {
   if(inCache || inModelNames) return true;
   
   let [collectionName, modelId] = modelName.split("-");
-  collectionName = collectionName.toLowerCase().concat(`s-${modelId}`);
+  // collectionName = collectionName.toLowerCase().concat(`s-${modelId}`);
+  collectionName = collectionName.toLowerCase().concat(`-${modelId}`);
 
   const collections = await mongoose.connection.db?.listCollections().toArray();
   const inDb = collections?.some(coll => coll.name === collectionName);

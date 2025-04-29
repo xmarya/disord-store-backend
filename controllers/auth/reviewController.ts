@@ -34,7 +34,7 @@ export const createReviewOnModelController = catchAsync(async (request, response
 });
 
 export const getAllReviewsController = catchAsync(async (request, response, next) => {
-  const reviews = await getAllDocs(request.Model);
+  const reviews = await getAllDocs(request.Model, request);
   if (!reviews.length) return next(new AppError(404, "لا يوجد بيانات لعرضها"));
 
   response.status(200).json({
@@ -99,7 +99,7 @@ export const createPlatformReviewController = catchAsync(async (request, respons
 });
 
 export const getAllPlatformReviewsController = catchAsync(async (request, response, next) => {
-  const reviews = await getAllDocs(PlatformReview);
+  const reviews = await getAllDocs(PlatformReview, request);
   if (!reviews.length) return next(new AppError(404, "لا يوجد بيانات لعرضها"));
 
   response.status(200).json({
@@ -133,7 +133,7 @@ export const updatePlatformReviewController = catchAsync(async (request, respons
 });
 
 export const deletePlatformReviewController = catchAsync(async (request, response, next) => {
-  const deletedReview = await deleteDoc(request.Model, request.params.reviewId);
+  const deletedReview = await deleteDoc(PlatformReview, request.params.reviewId);
 
   console.log(deletedReview);
 

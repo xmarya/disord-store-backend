@@ -12,6 +12,7 @@ import { StoreDataBody, StoreDocument } from "./../../_Types/Store";
 import { deleteProductsCollectionController } from "./productNewController";
 import { resetStoreOwnerToDefault } from "../../_services/user/userService";
 import { deleteAllAssistants } from "../../_services/assistant/assistantService";
+import { deleteCategoriesCollectionController } from "./categoryController";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   sanitisedData(request, next);
@@ -104,6 +105,7 @@ export const deleteStoreNewController = catchAsync(async (request, response, nex
 
   // if the deletion of the store went successfully, drop the collection (this functionality doesn't fully support session and transaction)
   await deleteProductsCollectionController(storeId);
+  await deleteCategoriesCollectionController(storeId);
 
   response.status(204).json({
     success: true,
