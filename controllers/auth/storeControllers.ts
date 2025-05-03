@@ -1,4 +1,4 @@
-import { startSession } from "mongoose";
+import mongoose, { startSession } from "mongoose";
 import { getOneDoc, updateDoc } from "../../_services/global";
 import { createStore, deleteStore, getStoreWithProducts } from "../../_services/store/storeService";
 import { ProductDocument } from "../../_Types/Product";
@@ -7,7 +7,6 @@ import { catchAsync } from "../../_utils/catchAsync";
 import { getDynamicModel } from "../../_utils/dynamicMongoModel";
 import sanitisedData from "../../_utils/sanitisedData";
 import Store from "../../models/storeModel";
-import { deleteOne, getOne, updateOne } from "../global";
 import { StoreDataBody, StoreDocument } from "./../../_Types/Store";
 import { deleteProductsCollectionController } from "./productNewController";
 import { resetStoreOwnerToDefault } from "../../_services/user/userService";
@@ -24,7 +23,7 @@ export const createStoreController = catchAsync(async (request, response, next) 
   if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
 
   //TODO: handling logo and uploading it to cloudflare
-  const data = { ...request.body, owner };
+  const data = { ...request.body, owner, inPlan: request.user.planName };
   const newStore = await createStore(data);
 
   response.status(201).json({
@@ -62,7 +61,7 @@ export const getStoreWithProductsController = catchAsync(async (request, respons
   });
 });
 
-export const updateStoreNewController = catchAsync(async (request, response, next) => {
+export const updateMyStoreNewController = catchAsync(async (request, response, next) => {
   // only allow storeName, description, logo
   const { storeName, description, logo }: StoreDataBody = request.body;
   if (!storeName?.trim() && !description?.trim() && logo) return next(new AppError(400, "request.body has no data to update"));
@@ -79,15 +78,42 @@ export const updateStoreNewController = catchAsync(async (request, response, nex
   });
 });
 
-export const deleteStoreNewController = catchAsync(async (request, response, next) => {
+export const updateMyStoreStatus = catchAsync(async (request, response, next) => {
   const storeId = request.user.myStore;
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
+
+  const {status} = request.body;
+  if(!status?.trim()) return next(new AppError(400, "please provide a status"));
+  
+  const allowedStatuses = ["active", "maintenance", "suspended"];
+  if(!allowedStatuses.includes(status)) return next(new AppError(400, "the status must be one of active or maintenance or suspended"));
+
+  const updatedStore = await updateDoc<StoreDocument>(Store, storeId, {status});
+
+  response.status(201).json({
+    success: true,
+    updatedStore
+  });
+
+});
+
+export const deleteMyStoreNewController = catchAsync(async (request, response, next) => {
+  const storeId = request.user.myStore;
+  if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
+  await deleteStorePermanently(storeId);
+
+  response.status(204).json({
+    success: true,
+  });
+});
+
+export async function deleteStorePermanently(storeId:string | mongoose.Types.ObjectId) {
   const session = await startSession();
 
   try {
     session.startTransaction();
     //STEP 1) change userType and remove myStore:
-    await resetStoreOwnerToDefault(request.user.id, session);
+    await resetStoreOwnerToDefault(storeId, session);
     //STEP 2) delete corresponding storeAssistant:
     await deleteAllAssistants(storeId, session);
     //STEP 3) delete the store:
@@ -106,13 +132,4 @@ export const deleteStoreNewController = catchAsync(async (request, response, nex
   // if the deletion of the store went successfully, drop the collection (this functionality doesn't fully support session and transaction)
   await deleteProductsCollectionController(storeId);
   await deleteCategoriesCollectionController(storeId);
-
-  response.status(204).json({
-    success: true,
-  });
-});
-
-// TODO: OLD CODE. DELETE THEM LATER.
-export const getMyStoreController = getOne("Store");
-export const updateStoreController = updateOne("Store");
-export const deleteStoreController = deleteOne("Store");
+}

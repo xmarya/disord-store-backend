@@ -20,7 +20,7 @@ export async function createStore(data:StoreDocument) {
         }], {session});
 
         await User.findByIdAndUpdate(owner, {
-            userType: "storeOwner",
+            // userType: "storeOwner",
             myStore: newStore[0].id
         }, {session});
 
@@ -56,12 +56,6 @@ export async function confirmAuthorization( userId:string, storeId:string):Promi
     //STEP: return the value as boolean:
     return !!userIdExist; 
 }
-
-export async function setStoreStatus(storeId:string, status: "active" | "suspended") {
-    await Store.findByIdAndUpdate(storeId, { status });
-} // NOTE: this service has no controller yet
-
-// TODO: crete a utility function that handles the request quires (filtering) for getAll
 
 export async function deleteStore(storeId:string | mongoose.Types.ObjectId, session:mongoose.ClientSession){
     const deletedStore = await Store.findByIdAndDelete(storeId, {session});
