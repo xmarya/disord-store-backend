@@ -1,14 +1,13 @@
-import { UserDocument } from "../_Types/User";
+import crypto from "crypto";
+import type { Request, Response } from "express";
 import { AppError } from "../_utils/AppError";
 import { catchAsync } from "../_utils/catchAsync";
-import sanitisedData from "../_utils/sanitisedData";
-import User from "../models/userModel";
 import jwtSignature from "../_utils/generateSignature";
+import sanitisedData from "../_utils/sanitisedData";
 import tokenWithCookies from "../_utils/tokenWithCookies";
-import type { Request, Response } from "express";
-import { UserBasic } from "../_Types/User";
-import crypto from "crypto";
 import validateNewUserData from "../_utils/validators/validateNewUserData";
+import User from "../models/userModel";
+import { createNewUser } from "../_services/user/userService";
 
 export const getUserByEmail = (email: string) =>
   catchAsync(async (request, response, next) => {
@@ -37,43 +36,58 @@ export const getUserById = (id?: string) =>
     });
   });
 
-export const getUserStore = catchAsync(async (request, response, next) => {
-  console.log("getUserStore");
-
-  const userId = request.params.id;
-  const userStore = await User.findById(userId).select("store");
-  console.log("check if the condition in getUserStore is right", userStore);
-  if (!userStore) return next(new AppError(404, "هذا المستخدم لا يملك متجرًا"));
-
-  response.status(200).json({
-    success: true,
-    userStore,
-  });
-});
-
-export const credentialsSignup = catchAsync(async (request, response, next) => {
+export const createNewUserController = catchAsync(async (request, response, next) => {
   sanitisedData(request, next);
   const isValid = await validateNewUserData(request, next);
   if (!isValid) return;
 
-  const { email, password, username } = request.body;
+  let data;
+  switch (request.body.userType) {
+    case "storeOwner":
+      const { subscribeToPlan } = request.body;
+      if (!subscribeToPlan?.trim()) return next(new AppError(400, "the plan data is missing from the request.body"));
+      data = { ...request.body, userType: "storeOwner", credentials: { ...request.body.password } };
+      break;
 
-  const newUser = await User.create({
-    signMethod: "credentials",
-    email,
-    credentials: { password },
-    username,
-  });
+    case "user":
+      data = { ...request.body, userType: "user", credentials: { ...request.body.password } };
+      break;
+    default:
+      return next(new AppError(400, "userType is missing from request.body"));
+  }
 
-  //STEP 6) make sure the password is not included in the response:
-  //   newUser.credentials = "";
+  const newUser = await createNewUser({ signMethod: "credentials", ...data });
   newUser.credentials!.password = "";
-  console.log("new user created", newUser.email);
+
   response.status(201).json({
     success: true,
     newUser,
   });
 });
+
+// export const credentialsSignup = catchAsync(async (request, response, next) => {
+//   sanitisedData(request, next);
+//   const isValid = await validateNewUserData(request, next);
+//   if (!isValid) return;
+
+//   const { email, password, username } = request.body;
+
+//   const newUser = await User.create({
+//     signMethod: "credentials",
+//     email,
+//     credentials: { password },
+//     username,
+//   });
+
+//   //STEP 6) make sure the password is not included in the response:
+//   //   newUser.credentials = "";
+//   newUser.credentials!.password = "";
+//   console.log("new user created", newUser.email);
+//   response.status(201).json({
+//     success: true,
+//     newUser,
+//   });
+// });
 
 export const credentialsLogin = catchAsync(async (request, response, next) => {
   sanitisedData(request, next);
@@ -107,14 +121,14 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
 });
 
 export const createDiscordUser = catchAsync(async (request, response, next) => {
-  const newDiscordUser = await User.create({
+  const newDiscordUser = await createNewUser({
     email: request.body.email,
     username: request.body.name,
     image: request.body.image,
     signMethod: "discord",
     discord: { id: request.body.id },
   });
-
+  
   response.status(201).json({
     success: true,
     newDiscordUser,
@@ -175,7 +189,7 @@ export const resetPassword = catchAsync(async (request, response, next) => {
   //STEP 3) redirect the user to the login page (handled by front-end)
 });
 
-export const logout = (request: Request, response: Response) => {
+export function logout(request: Request, response: Response) {
   response.clearCookie("jwt");
   response.status(200).json({ success: true });
-};
+}
