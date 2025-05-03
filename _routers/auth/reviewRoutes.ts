@@ -7,7 +7,6 @@ import validateRequestParams from "../../_utils/validators/validateRequestParams
 export const router = express.Router();
 
 
-//TODO: prevent the storeOwner, storeAssistant and the admin
 router.use(canWriteReview);
 
 // NOTE: this fallback middleware is necessary to not fallback to the store route /store/:storeId

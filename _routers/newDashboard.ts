@@ -1,4 +1,5 @@
 import express from "express";
+import { router as adminRouter } from "./auth/adminRoutes";
 import { router as storeRouter } from "./auth/storeNewRoutes";
 import { router as assistantRouter } from "./auth/assistantRoutes";
 import { router as categoryRouter } from "./auth/categoryRoutes";
@@ -13,6 +14,7 @@ export const router = express.Router();
 
 // console.log("dashboard routes");
 router.use(protect);
+router.use("/admin", adminRouter);
 router.use("/store", storeRouter);
 router.use("/products", productNewRouter);
 router.use("/categories", categoryRouter);
