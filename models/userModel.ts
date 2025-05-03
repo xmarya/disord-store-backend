@@ -26,6 +26,10 @@ const userSchema = new Schema<UserDocument>(
         type: String,
         minLength: [8, "your password must be at least 8 characters"],
       },
+      emailConfirmed: {
+        type:Boolean,
+        default: false
+      },
       // passwordConfirm: String, // NOTE: zod will be use to validate this filed
       // on the front-end + the field itself won't be saved in the db.
       // it's only use inside the pre hook to check the password
@@ -99,6 +103,10 @@ const userSchema = new Schema<UserDocument>(
         type: Number,
         required: [true, "the registeredPlan field is required"],
         default: 0,
+      },
+      paid: {
+        type:Boolean,
+        default: false
       },
       subscribeStarts: {
         // TODO: pre("save") hook to set the start time

@@ -46,17 +46,17 @@ export const createNewUserController = catchAsync(async (request, response, next
     case "storeOwner":
       const { subscribeToPlan } = request.body;
       if (!subscribeToPlan?.trim()) return next(new AppError(400, "the plan data is missing from the request.body"));
-      data = { ...request.body, userType: "storeOwner", credentials: { ...request.body.password } };
+      data = { ...request.body, userType: "storeOwner"};
       break;
 
     case "user":
-      data = { ...request.body, userType: "user", credentials: { ...request.body.password } };
+      data = { ...request.body, userType: "user" };
       break;
     default:
       return next(new AppError(400, "userType is missing from request.body"));
   }
 
-  const newUser = await createNewUser({ signMethod: "credentials", ...data });
+  const newUser = await createNewUser({ signMethod: "credentials", credentials: { ...request.body.password } , ...data });
   newUser.credentials!.password = "";
 
   response.status(201).json({

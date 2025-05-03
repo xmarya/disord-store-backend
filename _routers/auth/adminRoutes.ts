@@ -2,6 +2,7 @@ import express from "express";
 import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
 import { restrict } from "../../controllers/auth/authController";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
+import { createUnlimitedUser } from "../../controllers/auth/admin/adminUsersController";
 
 export const router = express.Router();
 
@@ -18,7 +19,12 @@ router.route("/:storeId")
 
 /* USERS 
     1- get route for all users / one user
+    2- create unlimited plan user
+    3- delete user
 */
+
+router.route("/users/unlimited-user").post(createUnlimitedUser);
+
 /* PLANS 
     1- post route for creating unlimited plan users
     2- get route for plans stats
