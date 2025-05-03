@@ -62,7 +62,7 @@ export const storeSchema = new Schema<StoreDocument>({
   },
   status: {
     type: String,
-    enum: ["inProgress", "active", "suspended", "deleted"],
+    enum: ["inProgress", "active", "maintenance", "suspended", "deleted"],
     required: [true, "the storeState is required"],
     default: "inProgress",
   },
@@ -83,6 +83,18 @@ export const storeSchema = new Schema<StoreDocument>({
     postalCode: { type: String },
     country: { type: String },
     phone: { type: String },
+  },
+  inPlan: {
+    type:String,
+    required:true,
+    enum:["basic","plus", "unlimited"]
+  },
+  socialMedia: {
+    instagram: String,
+    tiktok: String,
+    twitter: String,
+    whatsapp: [String],
+    email: String,
   },
 });
 

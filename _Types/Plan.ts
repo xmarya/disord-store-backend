@@ -1,6 +1,7 @@
+export type PlansNames = "basic"| "plus"| "unlimited";
 export interface Plan {
   id: string;
-  planName: string;
+  planName: PlansNames;
   price: {
     riyal: number;
     dollar: number;

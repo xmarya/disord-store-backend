@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { Plan } from "./Plan";
 
 export interface Credentials {
@@ -15,15 +15,18 @@ export interface Discord {
 
 export type UserTypes = "user" | "storeOwner" | "storeAssistant" | "admin"
 
-export interface UserBasic {
-  id: string;
+export interface UserDataBody {
   email: string;
-  signMethod: "credentials" | "discord";
   credentials?: Credentials;
   discord?: Discord;
   username: string;
-  userType: UserTypes;
   image: string;
+}
+
+export interface UserBasic extends UserDataBody {
+  id: string;
+  signMethod: "credentials" | "discord";
+  userType: UserTypes;
   createdAt: Date;
 }
 
@@ -33,7 +36,7 @@ export interface UserPlan extends Plan {
 }
 
 export interface UserOptionals {
-  bankAccount?: [
+  bankAccount?:
     {
       cardName: string;
       cardNumber: string;
@@ -41,15 +44,13 @@ export interface UserOptionals {
         month: string;
         year: string;
       };
-    }
-  ];
+    }[];
   subscribedPlanDetails?: UserPlan;
-  pastSubscriptions?: [
+  pastSubscriptions?: 
     {
       plan: string;
       count: number;
-    }
-  ];
+    }[];
   myStore?: Types.ObjectId | string;
 }
 
@@ -57,4 +58,4 @@ export interface UserMethods {comparePasswords: (providedPassword: string, userP
   generateRandomToken: () => Promise<string>
 }
 
-export type UserDocument = UserBasic & UserOptionals & UserPlan & UserMethods;
+export type UserDocument = UserBasic & UserOptionals & UserPlan & UserMethods & mongoose.Document;

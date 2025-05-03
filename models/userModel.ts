@@ -51,7 +51,7 @@ const userSchema = new Schema<UserDocument>(
         "user",
       ] /* SOLILOQUY: what if the user can be both an owner and an assistant? in this case the type should be [String] */,
       required: [true, "the userType field is required"],
-      default: "user",
+      // default: "user",
     },
     image: String,
     /* SOLILOQUY: 
