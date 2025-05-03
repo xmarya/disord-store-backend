@@ -33,7 +33,7 @@ export const createOrderSchema = z
     couponCode: z.string().optional(),
     paymentType: z.enum(["card", "wallet"]).optional(), // Keep it optional, no enforcement
     shippingAddress: addressSchema.optional(), // Optional for digital products
-    billingAddress: addressSchema, // Required for Paymob payments
+    billingAddress: addressSchema.optional(),
   })
   .strict()
   .refine(
@@ -46,6 +46,18 @@ export const createOrderSchema = z
     {
       message: "Billing address is required for Paymob payments",
       path: ["billingAddress"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.paymentMethod === "COD" && !data.shippingAddress) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Shipping address is required for COD payments",
+      path: ["shippingAddress"],
     }
   );
 

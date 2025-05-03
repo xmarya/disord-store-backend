@@ -90,7 +90,7 @@ export async function ProcessPaymobPayment(
     amount: Math.round((item.price * 100) * priceRatio),
     quantity: item.quantity,
     productType: item.productType,
-    description: item.description || `High-quality ${item.name.toLowerCase()} earbuds`, // Add custom description
+    description: item.description || ``, 
   }));
 
   let sumOfItemsCents = adjustedItems.reduce(
