@@ -38,7 +38,7 @@ export const protect = catchAsync(async (request, response, next) => {
 
   //STEP 3) adding the current user to the request:
   request.user = user as UserDocument;
-  console.log("inside protect", request.user.username);
+  console.log("inside protect", request.user);
 
   next();
 });

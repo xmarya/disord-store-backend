@@ -7,5 +7,5 @@ export const router = express.Router();
 // these below are only for userType for all types EXCEPT store assistant
 router.use(restrict("admin", "storeOwner", "user"));
 router.route("/updateProfile").patch(updateUserProfile);
-router.route("/changeMyPassword/:id").patch(changePassword);
+router.route("/changeMyPassword").patch(changePassword);
 
