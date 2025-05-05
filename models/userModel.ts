@@ -1,11 +1,11 @@
 import "./storeModel"; // ✅ Make sure Store is registered before User
 import "./userAddressModel"; // ✅ Make sure Address is registered before User
-import "./userBankAccount"; // ✅ Make sure BankAccount is registered before User
+import "./userBankAccountModel"; // ✅ Make sure BankAccount is registered before User
 import { UserDocument } from "../_Types/User";
 import { Model, Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import UserBankAccount from "./userBankAccount";
+import UserBankAccount from "./userBankAccountModel";
 import UserAddress from "./userAddressModel";
 
 // UserModel is only used when creating the Mongoose model at the last of the file (after creating the Schema).
