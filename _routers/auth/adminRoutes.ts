@@ -3,6 +3,8 @@ import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "..
 import { restrict } from "../../controllers/auth/authController";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
 import { createUnlimitedUser } from "../../controllers/auth/admin/adminUsersController";
+import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviewController";
+import { displayReviewInHomePage } from "../../controllers/auth/admin/adminReviewsController";
 
 export const router = express.Router();
 
@@ -23,9 +25,18 @@ router.route("/:storeId")
     3- delete user
 */
 
-router.route("/users/unlimited-user").post(createUnlimitedUser);
+router.route("/users/unlimited-user").post(createUnlimitedUser).get();
 
 /* PLANS 
-    1- post route for creating unlimited plan users
-    2- get route for plans stats
+    1- get route for plans stats
 */
+
+/* REVIEWS 
+    1- get all reviews
+    2- select reviews to display in the home page
+*/
+
+router.get("/platform/reviews", getAllPlatformReviewsController);
+router.route("/platform/reviews/:reviewId")
+.patch(validateRequestParams("reviewId"), displayReviewInHomePage)
+.delete(validateRequestParams("reviewId"), deletePlatformReviewController);

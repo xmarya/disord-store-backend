@@ -5,11 +5,11 @@ import { createPlatformReviewController, deletePlatformReviewController, getAllP
 
 export const router = express.Router();
 
+// This route is for all users -except admin- to write their reviews about the platform
 router.use(restrict("storeOwner", "storeAssistant", "user"));
 //for platform:
 router.route("/")
-.post(createPlatformReviewController)
-.get(getAllPlatformReviewsController);
+.post(createPlatformReviewController);
 
 router.route("/:reviewId")
 .get(validateRequestParams("reviewId"),getOnePlatformReviewController)
