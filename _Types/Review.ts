@@ -15,6 +15,7 @@ export interface PlatformReviewDataBody {
 
 interface PlatformReview extends PlatformReviewDataBody{
   id: Types.ObjectId;
+  displayInHomePage: boolean,
   wroteAt: Date;
   updatedAt: Date;
 }
