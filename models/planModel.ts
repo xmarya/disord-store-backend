@@ -48,6 +48,10 @@ const planSchema = new Schema({
     type: Number,
     default: 0,
   },
+  unlimitedUser: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  }
 });
 
 const Plan = model<PlanDocument, PlanModel>("Plan", planSchema);

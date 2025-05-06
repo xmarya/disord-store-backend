@@ -1,21 +1,8 @@
+import mongoose from "mongoose";
+
 export type PlansNames = "basic"| "plus"| "unlimited";
-export interface Plan {
-  id: string;
-  planName: PlansNames;
-  price: {
-    riyal: number;
-    dollar: number;
-  };
-}
 
-export interface PlanDetails extends Plan {
-  features: Array<string>;
-  thisMonthSubscribers?: number;
-  lastMonthSubscribers?: number;
-  discount?: number;
-}
-
-export interface PlanQuota extends Plan {
+type PlanQuota= {
   quota: {
     ofProducts: number;
     ofCategories: number;
@@ -25,4 +12,31 @@ export interface PlanQuota extends Plan {
   };
 }
 
-export type PlanDocument = Plan & PlanDetails & PlanQuota;
+export interface Plan {
+  planName: PlansNames;
+  price: {
+    riyal: number;
+    dollar: number;
+  };
+}
+
+export interface PlanDetails extends Plan {
+  unlimitedUser?: mongoose.Types.ObjectId | string,
+  features: Array<string>;
+  thisMonthSubscribers: number;
+  lastMonthSubscribers: number;
+  discount?: number;
+  quota: PlanQuota
+}
+
+export type UnlimitedPlanDataBody = {
+  planName: Extract<PlansNames, "unlimited">;
+  price: {
+    riyal: number;
+    dollar: number;
+  };
+  discount?: number;
+  quota: PlanQuota
+}
+
+export type PlanDocument = Plan & PlanDetails & mongoose.Document;

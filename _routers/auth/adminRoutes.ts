@@ -2,7 +2,7 @@ import express from "express";
 import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
 import { restrict } from "../../controllers/auth/authController";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import { createUnlimitedUser } from "../../controllers/auth/admin/adminUsersController";
+import { createUnlimitedUserController, deleteUsersController, getAllUsersController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
 import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviewController";
 import { displayReviewInHomePage } from "../../controllers/auth/admin/adminReviewsController";
 
@@ -25,13 +25,15 @@ router.route("/:storeId")
     3- delete user
 */
 
-router.route("/users/unlimited-user").post(createUnlimitedUser).get();
+router.get("/users",getAllUsersController);
+router.route("/users/:userId").get(validateRequestParams("userId"), getOneUserController).delete(validateRequestParams("userId"), deleteUsersController);
+router.post("/users/unlimited-user",createUnlimitedUserController);
 
 /* PLANS 
     1- get route for plans stats
 */
 
-/* REVIEWS 
+/* REVIEWS ✅
     1- get all reviews
     2- select reviews to display in the home page
 */

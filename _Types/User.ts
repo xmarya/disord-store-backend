@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Address } from "./UserAddress";
 import { BankAccount } from "./UserBankAccount";
+import { PlansNames } from "./Plan";
 
 type Credentials = {
   firstName:string,
@@ -42,7 +43,8 @@ export interface RegularUser extends UserDataBody {
 }
 
 type UserPlan = {
-  currentPlan: mongoose.Types.ObjectId | string,
+  planId: mongoose.Types.ObjectId | string,
+  planName: PlansNames
   paid:boolean,
   subscribeStarts: Date;
   subscribeEnds: Date;
