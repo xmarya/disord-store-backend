@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { Plan } from "./Plan";
 import { Address } from "./UserAddress";
 import { BankAccount } from "./UserBankAccount";
 
@@ -42,7 +41,9 @@ export interface RegularUser extends UserDataBody {
   createdAt: Date;
 }
 
-interface UserPlan extends Plan {
+type UserPlan = {
+  currentPlan: mongoose.Types.ObjectId | string,
+  paid:boolean,
   subscribeStarts: Date;
   subscribeEnds: Date;
 }
@@ -52,20 +53,10 @@ export interface StoreOwner extends RegularUser {
   subscribedPlanDetails: UserPlan;
   pastSubscriptions?: 
     {
-      plan: string;
+      plan: mongoose.Types.ObjectId | string;
       count: number;
     }[];
 }
-
-// export interface UserOptionals {
-//   subscribedPlanDetails?: UserPlan;
-//   pastSubscriptions?: 
-//     {
-//       plan: string;
-//       count: number;
-//     }[];
-//   myStore?: Types.ObjectId | string;
-// }
 
 export interface UserMethods {comparePasswords: (providedPassword: string, userPassword: string) => Promise<boolean>;
   generateRandomToken: () => Promise<string>

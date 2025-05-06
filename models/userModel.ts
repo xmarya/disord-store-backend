@@ -92,17 +92,9 @@ const userSchema = new Schema<UserDocument>(
       ref: "UserBankAccount"
     },
     subscribedPlanDetails: {
-      planName: {
-        type: String,
-        enum: ["basic", "plus", "unlimited", "none"],
-        required: [true, "the registeredPlan field is required"],
-        // NOTE: I highly recommending this to be embeded document 1-1 relationship
-        default: "none", // since the user first will signin using discord, the info of this field won't be available, so we'll set it to 'none' temporarily
-      },
-      price: {
-        type: Number,
-        required: [true, "the registeredPlan field is required"],
-        default: 0,
+      currentPlan: {
+        type: Schema.Types.ObjectId,
+        ref: "Plan"
       },
       paid: {
         type: Boolean,
@@ -162,6 +154,8 @@ const userSchema = new Schema<UserDocument>(
     toObject: { virtuals: true },
   }
 );
+
+// TODO: pre /^find/ to populate plan if the userType is storeOwner
 
 // I decided to make this a virtual field, so it will be created and recalculated each time
 // the data is retrieved which maintains the accuracy of how many days exactly are left.
