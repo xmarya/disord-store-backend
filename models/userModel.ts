@@ -117,8 +117,8 @@ const userSchema = new Schema<UserDocument>(
         // it should be only updated by checking the plan name and making the count + 1
         //  once the subscribeStarts property updated
         plan: {
-          type: String,
-          enum: ["basic", "plus", "unlimited"],
+          type: Schema.Types.ObjectId,
+          ref: "Plan",
           required: true,
         },
         count: {
