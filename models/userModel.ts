@@ -2,11 +2,12 @@ import "./storeModel"; // ✅ Make sure Store is registered before User
 import "./userAddressModel"; // ✅ Make sure Address is registered before User
 import "./userBankAccountModel"; // ✅ Make sure BankAccount is registered before User
 import { UserDocument } from "../_Types/User";
-import { Model, Schema, model } from "mongoose";
+import { Model, Query, Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import UserBankAccount from "./userBankAccountModel";
 import UserAddress from "./userAddressModel";
+import Plan from "./planModel";
 
 // UserModel is only used when creating the Mongoose model at the last of the file (after creating the Schema).
 type UserModel = Model<UserDocument>;
@@ -92,9 +93,15 @@ const userSchema = new Schema<UserDocument>(
       ref: "UserBankAccount"
     },
     subscribedPlanDetails: {
-      currentPlan: {
+      planId: {
         type: Schema.Types.ObjectId,
-        ref: "Plan"
+        ref: "Plan",
+        required: [true, "the planId field is required"],
+      },
+      planName: {
+        type:String,
+        enum: ["basic", "plus", "unlimited"],
+        required: [true, "the planName field is required"],
       },
       paid: {
         type: Boolean,
@@ -124,7 +131,7 @@ const userSchema = new Schema<UserDocument>(
         count: {
           type: Number,
           required: true,
-          default: 1,
+          default: 0,
         },
         // select: false
       },
@@ -155,13 +162,27 @@ const userSchema = new Schema<UserDocument>(
   }
 );
 
-// TODO: pre /^find/ to populate plan if the userType is storeOwner
+userSchema.pre(/^find/, function(this:Query<any, any>, next) {
+  this.populate("subscribedPlanDetails.planId");
+  next();
+});
+
+// TODO: post("save") to register the storeOwner Id in the unlimited plan ONLY since it's customisable by the storeOwner needs
+userSchema.post("save", async function() {
+  if(this.userType !== "storeOwner" && this.subscribedPlanDetails.planName !== "unlimited") return;
+  const reSubscribed = this.isModified("subscribeStarts");
+  if(this.isNew  || reSubscribed) await Plan.findByIdAndUpdate(this.subscribedPlanDetails.planId, {
+    unlimitedUser: this._id
+  });
+})
 
 // I decided to make this a virtual field, so it will be created and recalculated each time
 // the data is retrieved which maintains the accuracy of how many days exactly are left.
 userSchema.virtual("planExpiresInDays").get(function () { /*REQUIRES TESTING*/
-  if (!this.subscribeEnds || !this.subscribeStarts) return 0;
+  // if (!this.subscribeEnds || !this.subscribeStarts) return 0;
+  if (!this.subscribeStarts) return 0;
 
+  // TODO: corn job to reset subscribeStarts when the subscription ends
   const ms = this.subscribeEnds?.getTime() - this.subscribeStarts?.getTime();
   return Math.floor(ms / (1000 * 60 * 60 * 24));
   /* CHANGE LATER: this must be changed to pre("save") hook since 
