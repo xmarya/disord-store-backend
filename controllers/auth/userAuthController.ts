@@ -1,4 +1,5 @@
 import { updateDoc } from "../../_services/global";
+import { getUserByEmail } from "../../_services/user/userService";
 import { UserDocument } from "../../_Types/User";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
@@ -45,11 +46,11 @@ export const changePassword = catchAsync(async (request, response, next) => {
 export const updateUserProfile = catchAsync(async (request, response, next) => {
   sanitisedData(request, next);
 
-  const userId = request.user.id ?? request.body.id;
+  const userId = request.user.id;
   const { email, firstName, lastName }: Partial<Pick<UserDocument, "email" | "firstName" | "lastName">> = request.body;
 
   if (email) {
-    const isEmailExist = await User.findOne({ email });
+    const isEmailExist = await getUserByEmail(email);
     if (isEmailExist) return next(new AppError(400, "لا يمكن استخدام هذا البريد الإلكتروني  للتسجيل"));
   }
 
@@ -60,7 +61,7 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
   //   if (isUsernameExist) return next(new AppError(400, "الرجاء اختيار اسم مستخدم آخر"));
   // }
 
-  await User.findByIdAndUpdate(userId, request.body);
+  // await User.findByIdAndUpdate(userId, request.body);
   const updatedUser = await updateDoc(User, userId, request.body);
 
   response.status(201).json({
