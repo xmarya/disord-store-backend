@@ -15,7 +15,7 @@ router.use(restrict("admin"));
     1- patch route for suspend store
 */
 router.route("/stores").get(getAllStoresInfo);
-router.route("/:storeId")
+router.route("/stores/:storeId")
 .get(validateRequestParams("storeId"), getOneStoreInfo)
 .patch(validateRequestParams("storeId"), suspendStore)
 .delete(validateRequestParams("storeId"), deleteStore);
