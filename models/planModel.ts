@@ -22,31 +22,36 @@ const planSchema = new Schema({
   quota: {
     ofProducts: {
       type: Number,
+      required: [true, "the quota ofProducts is required"],
     },
     ofCategories: {
       type: Number,
+      required: [true, "the quota ofCategories is required"],
     },
     ofStoreAssistants: {
       type: Number,
+      required: [true, "the quota ofStoreAssistants is required"],
     },
     ofColourThemes: {
       type: Number,
+      required: [true, "the quota ofColourThemes is required"],
     },
     ofCommission: {
       type: Number, // in riyals
+      required: [true, "the quota ofCommission is required"],
+    },
+    ofShipmentCompanies: {
+      type: Number,
+      required: [true, "the quota ofShipmentCompanies is required"],
     },
   },
   discount: {
     type: Number,
     default: 0.0,
   },
-  thisMonthSubscribers: {
-    type: Number,
-    default: 0,
-  },
-  lastMonthSubscribers: {
-    type: Number,
-    default: 0,
+  unlimitedUser: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
   },
 });
 

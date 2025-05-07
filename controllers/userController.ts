@@ -7,34 +7,9 @@ import sanitisedData from "../_utils/sanitisedData";
 import tokenWithCookies from "../_utils/tokenWithCookies";
 import validateNewUserData from "../_utils/validators/validateNewUserData";
 import User from "../models/userModel";
-import { createNewUser } from "../_services/user/userService";
+import { createDoc } from "../_services/global";
+import { UserDocument } from "../_Types/User";
 
-export const getUserByEmail = (email: string) =>
-  catchAsync(async (request, response, next) => {
-    console.log("getUserByEmail");
-
-    const user = await User.findOne({ email });
-    if (!user) return next(new AppError(404, "الرجاء التحقق من البريد الإلكتروني"));
-
-    response.status(200).json({
-      success: true,
-      user,
-    });
-  });
-
-export const getUserById = (id?: string) =>
-  catchAsync(async (request, response, next) => {
-    console.log("getUserById");
-    const userId = id ?? request.params.id;
-
-    const user = await User.findById(userId);
-    if (!user) return next(new AppError(404, "لايوجد مستخدم بهذا المعرف"));
-
-    response.status(200).json({
-      success: true,
-      user,
-    });
-  });
 
 export const createNewUserController = catchAsync(async (request, response, next) => {
   sanitisedData(request, next);
@@ -46,7 +21,7 @@ export const createNewUserController = catchAsync(async (request, response, next
     case "storeOwner":
       const { subscribeToPlan } = request.body;
       if (!subscribeToPlan?.trim()) return next(new AppError(400, "the plan data is missing from the request.body"));
-      data = { ...request.body, userType: "storeOwner"};
+      data = { ...request.body, userType: "storeOwner" };
       break;
 
     case "user":
@@ -56,7 +31,7 @@ export const createNewUserController = catchAsync(async (request, response, next
       return next(new AppError(400, "userType is missing from request.body"));
   }
 
-  const newUser = await createNewUser({ signMethod: "credentials", credentials: { ...request.body.password } , ...data });
+  const newUser = await createDoc<UserDocument>(User,{ signMethod: "credentials", credentials: { ...request.body.password }, ...data });
   newUser.credentials!.password = "";
 
   response.status(201).json({
@@ -121,14 +96,17 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
 });
 
 export const createDiscordUser = catchAsync(async (request, response, next) => {
-  const newDiscordUser = await createNewUser({
-    email: request.body.email,
-    username: request.body.name,
-    image: request.body.image,
+  const newDiscordUser = await createDoc(User,{
     signMethod: "discord",
-    discord: { id: request.body.id },
+    email: request.body.email,
+    image: request.body.image,
+    discord: {
+      discordId: request.body.id,
+      name: request.body.name,
+      username: request.body.name,
+    },
   });
-  
+
   response.status(201).json({
     success: true,
     newDiscordUser,
@@ -142,7 +120,7 @@ export const forgetPassword = catchAsync(async (request, response, next) => {
   if (!email) return next(new AppError(400, "الرجاء ادخال البريد الإلكتروني"));
 
   const user = await User.findOne({ email });
-  console.log("userwithemail", email);
+
   if (!user) return next(new AppError(404, "الرجاء التحقق من صحة البريد الإلكتروني"));
 
   //STEP 2) generate random token and the reset URL:
@@ -168,7 +146,6 @@ export const resetPassword = catchAsync(async (request, response, next) => {
     "credentials.passwordResetExpires": { $gt: new Date() },
   }).select("credentials");
 
-  /* CHANGE LATER: correct the condition to test the passwordResetExpires */
   if (!user) return next(new AppError(400, "انتهت المدة المسموحة للرابط"));
 
   //STEP 2) get the new password since the link is still valid:
@@ -178,7 +155,7 @@ export const resetPassword = catchAsync(async (request, response, next) => {
   if (newPassword !== newPasswordConfirm) return next(new AppError(400, "كلمات المرور غير متطابقة"));
 
   user.credentials!.password = newPassword;
-  user.credentials!.passwordResetToken = undefined;
+  user.credentials!.passwordResetToken = "";
 
   await user.save(); // still validating the new password against the schema
 
