@@ -21,9 +21,10 @@ export const createUnlimitedUserController = catchAsync(async (request, response
     const planData: UnlimitedPlanDataBody = {
       planName: "unlimited",
       price: { riyal: request.body.priceRiyal, dollar: request.body.priceDollar },
-      discount: request.body?.discount,
+      features: request.body.features,
       quota: request.body.quota,
     };
+    
     const newPlan = await createUnlimitedPlan(planData, session);
 
     const data: UserDocument = {

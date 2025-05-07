@@ -7,3 +7,9 @@ export async function createUnlimitedPlan(data:UnlimitedPlanDataBody, session:mo
 
     return newPlan[0];
 }
+
+export async function checkPlanName(id:string):Promise<boolean> {
+    const isUnlimited = await Plan.exists({_id:id, planName: "unlimited"});
+    
+    return !!isUnlimited;
+}
