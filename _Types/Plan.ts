@@ -1,42 +1,59 @@
 import mongoose from "mongoose";
 
-export type PlansNames = "basic"| "plus"| "unlimited";
+export type PlansNames = "basic" | "plus" | "unlimited";
 
-type PlanQuota= {
+type Price = {
+  riyal: number;
+  dollar: number;
+};
+
+type PlanQuota = {
   quota: {
     ofProducts: number;
     ofCategories: number;
     ofStoreAssistants: number;
     ofColourThemes: number;
     ofCommission: number;
+    ofShipmentCompanies: number;
+    [x: string]: number;
   };
-}
+};
 
-export interface Plan {
+
+
+interface Plan {
   planName: PlansNames;
-  price: {
-    riyal: number;
-    dollar: number;
-  };
+  price: Price;
+  features: Array<string>;
+  discount?: number;
+  quota: PlanQuota;
 }
 
 export interface PlanDetails extends Plan {
-  unlimitedUser?: mongoose.Types.ObjectId | string,
-  features: Array<string>;
-  thisMonthSubscribers: number;
-  lastMonthSubscribers: number;
-  discount?: number;
-  quota: PlanQuota
+  unlimitedUser?: mongoose.Types.ObjectId | string;
 }
 
-export type UnlimitedPlanDataBody = {
+export type UnlimitedPlanDataBody = Omit<Plan, "discount"> & {
   planName: Extract<PlansNames, "unlimited">;
-  price: {
-    riyal: number;
-    dollar: number;
-  };
-  discount?: number;
-  quota: PlanQuota
+};
+
+export interface PlanDataBody extends Plan {
+  planName: Exclude<PlansNames, "unlimited">;
 }
 
-export type PlanDocument = Plan & PlanDetails & mongoose.Document;
+type StatsData = {
+  subscribers: number;
+  profits: number;
+};
+
+type PlanStats = {
+  planName: PlansNames;
+  date:Date,
+  monthly: StatsData,
+  annual: StatsData,
+  totalSubscribers: number;
+  totalProfits: number;
+}
+
+export type PlanDocument = PlanDetails & mongoose.Document;
+export type PlanStatsDocument = PlanStats & mongoose.Document;
