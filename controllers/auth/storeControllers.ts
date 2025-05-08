@@ -32,7 +32,7 @@ export const createStoreController = catchAsync(async (request, response, next) 
   });
 });
 
-export const getMyStoreNewController = catchAsync(async (request, response, next) => {
+export const getStoreStatsNewController = catchAsync(async (request, response, next) => {
   // const {storeId}:StoreDataBody = request.body;
   // if(!storeId) return next(new AppError(400, "storeId is missing from the request.body"));
 
