@@ -1,6 +1,8 @@
 import { StoreStateDocument } from "../_Types/StoreStat";
 import { Model, Schema, model } from "mongoose";
 
+
+// TODO: make it dynamic
 type StoreStateModel = Model<StoreStateDocument>;
 
 /* SOLILOQUY: should this be a separate collection ? since I would definitely do different CRUD and quires and something like statistics are frequently read/updated so it's better to be separated */
@@ -17,19 +19,12 @@ export const storeStatSchema = new Schema<StoreStateDocument>({
     /* OLD CODE (kept for reference): 
       type:Date.now(), is incorrect because Date.now() returns a timestamp immediately when the schema is loaded.
       Fix: Use default: Date.now without parentheses
-      */
+    */
     type: Date,
     required: true,
     default: Date.now,
   },
   daily: {
-    type: Number,
-    default: 0.0,
-  },
-  weekly: {
-    /* SOLILOQUY: not sure about this property, when should the week start and when should end? 
-                I'll set it so start on Sunday 00:00AM and ends on Saturday 11:59PM
-    */
     type: Number,
     default: 0.0,
   },
@@ -68,7 +63,6 @@ export default StoreStat;
 
   2- Make a cron task to: 
     a) start a new day.
-    b) start a new week.
     c) start a new month.
     d) start a new year.
     e) transfer/insert the totalProfits field to annualProfit Model (acts like an archive).

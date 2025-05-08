@@ -5,7 +5,6 @@ export interface StoreState {
   store: Types.ObjectId;
   date: Date;
   daily: number;
-  weekly: number;
   monthly: number;
   annual: number;
   totalProfit: number;
