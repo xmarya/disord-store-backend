@@ -1,29 +1,27 @@
-import mongoose, { startSession } from "mongoose";
-import { getOneDoc, updateDoc } from "../../_services/global";
+import { startSession } from "mongoose";
+import { deleteAllAssistants } from "../../_services/assistant/assistantService";
+import { updateDoc } from "../../_services/global";
 import { createStore, deleteStore, getStoreWithProducts } from "../../_services/store/storeService";
+import { getOneStoreStats } from "../../_services/store/storeStatsService";
+import { resetStoreOwnerToDefault } from "../../_services/user/userService";
+import { MongoId } from "../../_Types/MongoId";
 import { ProductDocument } from "../../_Types/Product";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import { getDynamicModel } from "../../_utils/dynamicMongoModel";
-import sanitisedData from "../../_utils/sanitisedData";
 import Store from "../../models/storeModel";
 import { StoreDataBody, StoreDocument } from "./../../_Types/Store";
-import { deleteProductsCollectionController } from "./productNewController";
-import { resetStoreOwnerToDefault } from "../../_services/user/userService";
-import { deleteAllAssistants } from "../../_services/assistant/assistantService";
 import { deleteCategoriesCollectionController } from "./categoryController";
+import { deleteProductsCollectionController } from "./productNewController";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
-  sanitisedData(request, next);
 
-  const owner = request.user.id;
-  if (!owner) return next(new AppError(400, "Couldn't find the request.user.id"));
-
+  // TODO: complete the store data
   const { storeName, description, logo }: StoreDataBody = request.body;
   if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
 
   //TODO: handling logo and uploading it to cloudflare
-  const data = { ...request.body, owner, inPlan: request.user.planName };
+  const data:StoreDataBody = { storeName, description, logo, owner:request.user.id, inPlan: request.plan };
   const newStore = await createStore(data);
 
   response.status(201).json({
@@ -32,27 +30,34 @@ export const createStoreController = catchAsync(async (request, response, next) 
   });
 });
 
-export const getStoreStatsNewController = catchAsync(async (request, response, next) => {
-  // const {storeId}:StoreDataBody = request.body;
-  // if(!storeId) return next(new AppError(400, "storeId is missing from the request.body"));
+export const getStoreStatsController = catchAsync(async (request, response, next) => {
+  /* BUG: 
+  const { dates } = request.body;
+    this condition WOULD NEVER be wrong, the .length property doesn't assure that the dates is an ARRAY,
+    there is a possibility for it be a string and it has .length property too.
+    if(!dates.length) return next(new AppError(400, "specify the dates inside an array"));
+  */
+  
+  const { dateFilter, sortBy, sortOrder } = request.dateQuery;
+  const storeId = request.store;
 
-  const myStore = await getOneDoc<StoreDocument>(Store, request.user.myStore!);
-  if (!myStore) return next(new AppError(500, "Something went wrong while fetching the data. Please try again."));
+  const stats = await getOneStoreStats(storeId, dateFilter, sortBy, sortOrder);
+  if (!stats) return next(new AppError(400, "no stats were found for this store"));
 
   response.status(200).json({
     success: true,
-    myStore,
+    stats,
   });
 });
 
 export const getStoreWithProductsController = catchAsync(async (request, response, next) => {
+  console.log("GETSTOREWITHPRODUCTS");
   //STEP 1) first, check if the store has any products:
   const { storeId } = request.params;
   const ProductModel = await getDynamicModel<ProductDocument>("Product", storeId); // false = don't create a new DyMo it it doesn't exist
-  console.log("getStoreWithProductsController'sProductModel =", ProductModel);
-  // if(!ProductModel) return next(new AppError(404, "no products were found related to this storeId"));
 
   const { store, products } = await getStoreWithProducts(storeId, ProductModel);
+  if (!products.length) return next(new AppError(404, "no products were found related to this storeId"));
 
   response.status(200).json({
     success: true,
@@ -67,7 +72,7 @@ export const updateMyStoreNewController = catchAsync(async (request, response, n
   if (!storeName?.trim() && !description?.trim() && logo) return next(new AppError(400, "request.body has no data to update"));
 
   // (this validation was done on the front-end already) validate the storeName -if it is there- using getField utility function
-  const storeId = request.user.myStore;
+  const storeId = request.store;
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
   const data = { storeName, description, logo };
   const updatedStore = await updateDoc(Store, storeId, data);
@@ -79,26 +84,25 @@ export const updateMyStoreNewController = catchAsync(async (request, response, n
 });
 
 export const updateMyStoreStatus = catchAsync(async (request, response, next) => {
-  const storeId = request.user.myStore;
+  const storeId = request.store;
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
 
-  const {status} = request.body;
-  if(!status?.trim()) return next(new AppError(400, "please provide a status"));
-  
-  const allowedStatuses = ["active", "maintenance", "suspended"];
-  if(!allowedStatuses.includes(status)) return next(new AppError(400, "the status must be one of active or maintenance or suspended"));
+  const { status } = request.body;
+  if (!status?.trim()) return next(new AppError(400, "please provide a status"));
 
-  const updatedStore = await updateDoc<StoreDocument>(Store, storeId, {status});
+  const allowedStatuses = ["active", "maintenance"];
+  if (!allowedStatuses.includes(status)) return next(new AppError(400, "the status must be one of active or maintenance"));
+
+  const updatedStore = await updateDoc<StoreDocument>(Store, storeId, { status });
 
   response.status(201).json({
     success: true,
-    updatedStore
+    updatedStore,
   });
-
 });
 
 export const deleteMyStoreNewController = catchAsync(async (request, response, next) => {
-  const storeId = request.user.myStore;
+  const storeId = request.store;
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
   await deleteStorePermanently(storeId);
 
@@ -107,7 +111,7 @@ export const deleteMyStoreNewController = catchAsync(async (request, response, n
   });
 });
 
-export async function deleteStorePermanently(storeId:string | mongoose.Types.ObjectId) {
+export async function deleteStorePermanently(storeId: MongoId) {
   const session = await startSession();
 
   try {
@@ -132,4 +136,6 @@ export async function deleteStorePermanently(storeId:string | mongoose.Types.Obj
   // if the deletion of the store went successfully, drop the collection (this functionality doesn't fully support session and transaction)
   await deleteProductsCollectionController(storeId);
   await deleteCategoriesCollectionController(storeId);
+
+  //TODO: add the deleted data to the AdminLog
 }

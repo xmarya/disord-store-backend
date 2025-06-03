@@ -1,12 +1,11 @@
 import { startSession } from "mongoose";
-import { createDoc, deleteDoc, getAllDocs, getOneDoc, updateDoc } from "../../_services/global";
+import { createDoc, deleteDoc, getAllDocs, getOneDocById, updateDoc } from "../../_services/global";
 import { createPlatformReview, updateModelRating } from "../../_services/review/reviewService";
 import { DynamicModel } from "../../_Types/Model";
 import { PlatformReviewDataBody, ReviewDataBody } from "../../_Types/Review";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import { getDynamicModel } from "../../_utils/dynamicMongoModel";
-import sanitisedData from "../../_utils/sanitisedData";
 import { ProductDocument } from "../../_Types/Product";
 import { setRanking } from "../../_services/ranking/rankingService";
 import PlatformReview from "../../models/platformReviewModel";
@@ -16,8 +15,6 @@ import PlatformReview from "../../models/platformReviewModel";
 // the review then is going to be considered as a platform review which leads to storing the data in the wrong collection.
 
 export const createReviewOnModelController = catchAsync(async (request, response, next) => {
-  sanitisedData(request, next);
-
   // STEP 1) validate the data of the coming request.body:
   const { reviewBody, rating, modelId }: ReviewDataBody = request.body;
   if (!reviewBody?.trim() || !rating) return next(new AppError(400, "الرجاء التأكد من كتابة جميع البيانات قبل الإرسال"));
@@ -46,7 +43,7 @@ export const getAllReviewsController = catchAsync(async (request, response, next
 export const getOneReviewController = catchAsync(async (request, response, next) => {
   console.log("getOneReviewController", request.Model);
 
-  const review = await getOneDoc(request.Model, request.params.reviewId);
+  const review = await getOneDocById(request.Model, request.params.reviewId);
 
   if (!review) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
 
@@ -58,13 +55,11 @@ export const getOneReviewController = catchAsync(async (request, response, next)
 
 export const updateReviewController = catchAsync(async (request, response, next) => {
   console.log("updateReviewController");
-  sanitisedData(request, next);
-
   //NOTE: only allow the updating of the rating and the body, the userId and the reviewedResource can't be changed
   const { reviewBody, rating, modelId }: ReviewDataBody = request.body;
   if (!reviewBody?.trim() && !rating) return next(new AppError(400, "الرجاء إضافة تعليق وتقييم قبل الإرسال")); // the condition checks only if the request.body is empty, because in platform review case there is a reviewBody but no rating
 
-  const updatedReview = await updateDoc(request.Model, request.params.reviewId, request.body, modelId);
+  const updatedReview = await updateDoc(request.Model, request.params.reviewId, request.body, {locals: modelId});
 
   if (!updatedReview) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
 
@@ -110,7 +105,7 @@ export const getAllPlatformReviewsController = catchAsync(async (request, respon
 
 export const getOnePlatformReviewController = catchAsync(async (request, response, next) => {
 
-  const review = await getOneDoc(PlatformReview, request.params.reviewId);
+  const review = await getOneDocById(PlatformReview, request.params.reviewId);
 
   if (!review) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
 
