@@ -1,19 +1,13 @@
-import { StoreStateDocument } from "../_Types/StoreStat";
-import { Model, Schema, model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import { StoreStatsDocument } from "../_Types/StoreStats";
 
+type StoreStatsModel = mongoose.Model<StoreStatsDocument>;
 
-// TODO: make it dynamic
-type StoreStateModel = Model<StoreStateDocument>;
-
-/* SOLILOQUY: should this be a separate collection ? since I would definitely do different CRUD and quires and something like statistics are frequently read/updated so it's better to be separated */
-export const storeStatSchema = new Schema<StoreStateDocument>({
+export const storeStatsSchema = new Schema<StoreStatsDocument>({
   store: {
     type: Schema.Types.ObjectId,
     ref: "Store",
-    // unique: true // prevent any redundancy
-    /* SOLILOQUY: after rethinking, trying to avoid the redundancy will make all the 
-                  data to be in on doc which is a real danger that causes the doc to hit the 16MB limit!
-                  so, I decided to remove the uniqueness + array of stored data */
+    required: [true, "the store id is required"]
   },
   date: {
     /* OLD CODE (kept for reference): 
@@ -24,48 +18,32 @@ export const storeStatSchema = new Schema<StoreStateDocument>({
     required: true,
     default: Date.now,
   },
-  daily: {
-    type: Number,
-    default: 0.0,
+  profits: Number,
+  soldProducts:{
+    type: Map,
+    of: Number
   },
-  monthly: {
-    type: Number,
-    default: 0.0,
-  },
-  annual: {
-    type: Number,
-    default: 0.0,
-  },
-  totalProfit: {
-    //NOTE: total profits THIS POINT OF THE YEAR SO FAR
-    type: Number,
-    default: 0.0,
-  },
-  // lastUpdated: {
-  //   // Track last modification time
-  //   type: Date,
-  //   default: Date.now,
-  // },
+  numOfPurchases:Number,
+  numOfCancellations:Number,
+}, {
+  timestamps: true,
+  strict:true,
+  strictQuery:true,
+  toObject: {virtuals: true},
+  toJSON: {virtuals: true}
 });
 
-storeStatSchema.index({ store: 1, date: 1 });
+storeStatsSchema.index({ store: 1, date: 1 });
 
-const StoreStat =
-  model<StoreStateDocument, StoreStateModel>("StoreStat", storeStatSchema);
 
-export default StoreStat;
+storeStatsSchema.pre(/^find/, function(this:mongoose.Query<any, StoreStatsDocument>, next){
+  // this.populate("store").select("storeName logo inPlan owner verified"); /*REQUIRES TESTING*/
+  this.populate({
+    path: "store", 
+    options: {select: "storeName logo inPlan owner verified"} });
+  next();
+});
 
-/*TODO:
-  1- the logic to handle the stores' profit is going to be inside invoiceModels's post middleware.
-  so it will be automatic operation without the need
-  to create middleware and a route to handle it after handling the invoice.
-  also and the most important thing is TO BATCH the profits.
+const StoreStats = mongoose.model<StoreStatsDocument, StoreStatsModel>("StoreStats", storeStatsSchema);
 
-  2- Make a cron task to: 
-    a) start a new day.
-    c) start a new month.
-    d) start a new year.
-    e) transfer/insert the totalProfits field to annualProfit Model (acts like an archive).
-    f) reset/delete the whole records in storeState Model.
-
-*/
+export default StoreStats;
