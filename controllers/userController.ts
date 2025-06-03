@@ -1,37 +1,28 @@
 import crypto from "crypto";
-import type { Request, Response } from "express";
-import { AppError } from "../_utils/AppError";
-import { catchAsync } from "../_utils/catchAsync";
-import jwtSignature from "../_utils/generateSignature";
-import sanitisedData from "../_utils/sanitisedData";
-import tokenWithCookies from "../_utils/tokenWithCookies";
-import validateNewUserData from "../_utils/validators/validateNewUserData";
-import User from "../models/userModel";
-import { createDoc } from "../_services/global";
+import { createDoc, getOneDocByFindOne } from "../_services/global";
 import { UserDocument } from "../_Types/User";
+import { AppError } from "../_utils/AppError";
+import { comparePasswords, generateRandomToken } from "../_utils/authUtils";
+import { catchAsync } from "../_utils/catchAsync";
+import jwtSignature from "../_utils/jwtToken/generateSignature";
+import tokenWithCookies from "../_utils/jwtToken/tokenWithCookies";
+import User from "../models/userModel";
 
+export const createNewStoreOwnerController = catchAsync(async (request, response, next) => { /*✅*/
+  const { firstName, lastName, email, password } = request.body;
+  const data = { firstName, lastName, email, signMethod: "credentials", userType: "storeOwner", credentials: { password } };
+  const newOwner = await createDoc<UserDocument>(User, data);
+  newOwner.credentials!.password = "";
+  response.status(201).json({
+    success: true,
+    newOwner,
+  });
+});
 
-export const createNewUserController = catchAsync(async (request, response, next) => {
-  sanitisedData(request, next);
-  const isValid = await validateNewUserData(request, next);
-  if (!isValid) return;
-
-  let data;
-  switch (request.body.userType) {
-    case "storeOwner":
-      const { subscribeToPlan } = request.body;
-      if (!subscribeToPlan?.trim()) return next(new AppError(400, "the plan data is missing from the request.body"));
-      data = { ...request.body, userType: "storeOwner" };
-      break;
-
-    case "user":
-      data = { ...request.body, userType: "user" };
-      break;
-    default:
-      return next(new AppError(400, "userType is missing from request.body"));
-  }
-
-  const newUser = await createDoc<UserDocument>(User,{ signMethod: "credentials", credentials: { ...request.body.password }, ...data });
+export const createNewUserController = catchAsync(async (request, response, next) => { /*✅*/
+  const { firstName, lastName, email, password } = request.body;
+  const data = { firstName, lastName, email, signMethod: "credentials", userType: "user", credentials: { password } };
+  const newUser = await createDoc<UserDocument>(User, data);
   newUser.credentials!.password = "";
 
   response.status(201).json({
@@ -40,47 +31,20 @@ export const createNewUserController = catchAsync(async (request, response, next
   });
 });
 
-// export const credentialsSignup = catchAsync(async (request, response, next) => {
-//   sanitisedData(request, next);
-//   const isValid = await validateNewUserData(request, next);
-//   if (!isValid) return;
-
-//   const { email, password, username } = request.body;
-
-//   const newUser = await User.create({
-//     signMethod: "credentials",
-//     email,
-//     credentials: { password },
-//     username,
-//   });
-
-//   //STEP 6) make sure the password is not included in the response:
-//   //   newUser.credentials = "";
-//   newUser.credentials!.password = "";
-//   console.log("new user created", newUser.email);
-//   response.status(201).json({
-//     success: true,
-//     newUser,
-//   });
-// });
-
-export const credentialsLogin = catchAsync(async (request, response, next) => {
-  sanitisedData(request, next);
-
+export const credentialsLogin = catchAsync(async (request, response, next) => {  /*✅*/
   // STEP 1) getting the provided email and password from the request body to check the email:
   const { email, password } = request.body;
+  console.log("credentialsLogin", email, password);
+  if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
-  if (!password) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
-
-  const user = await User.findOne({ email }).select("credentials");
-
+  const user = await getOneDocByFindOne(User, { condition: { email }, select: ["credentials"] });
   if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   // STEP 2) checking the password:
-  if (!(await user.comparePasswords(password, user.credentials!.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
+  if (!(await comparePasswords(password, user.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   //STEP 3) create the token:
-  const token = jwtSignature(user.id);
+  const token = jwtSignature(user.id, "1h");
   tokenWithCookies(response, token);
 
   response.status(200).json({
@@ -95,14 +59,14 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   });
 });
 
-export const createDiscordUser = catchAsync(async (request, response, next) => {
-  const newDiscordUser = await createDoc(User,{
+export const createNewDiscordUser = catchAsync(async (request, response, next) => {
+  const newDiscordUser = await createDoc(User, {
     signMethod: "discord",
     email: request.body.email,
     image: request.body.image,
+    firstName:  request.body.name,
     discord: {
       discordId: request.body.id,
-      name: request.body.name,
       username: request.body.name,
     },
   });
@@ -124,7 +88,7 @@ export const forgetPassword = catchAsync(async (request, response, next) => {
   if (!user) return next(new AppError(404, "الرجاء التحقق من صحة البريد الإلكتروني"));
 
   //STEP 2) generate random token and the reset URL:
-  const randomToken = await user.generateRandomToken();
+  const randomToken = await generateRandomToken(user);
   const resetURL = `${request.protocol}://${request.get("host")}/api/v1/auth/resetPassword/${randomToken}`;
 
   //STEP 3) return the GRT to the front-end to send it vie email using Resend:
@@ -165,8 +129,3 @@ export const resetPassword = catchAsync(async (request, response, next) => {
 
   //STEP 3) redirect the user to the login page (handled by front-end)
 });
-
-export function logout(request: Request, response: Response) {
-  response.clearCookie("jwt");
-  response.status(200).json({ success: true });
-}
