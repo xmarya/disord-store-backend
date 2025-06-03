@@ -3,7 +3,8 @@ import User from "../../models/userModel";
 import StoreAssistant from "../../models/storeAssistantModel";
 import Store from "../../models/storeModel";
 import { AppError } from "../../_utils/AppError";
-import { AssistantRegisterData } from "../../_Types/StoreAssistant";
+import { AssistantRegisterData, StoreAssistantDocument } from "../../_Types/StoreAssistant";
+import { MongoId } from "../../_Types/MongoId";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
     tha reason is because this is a service layer function, not the controller that always returns response,
@@ -65,18 +66,19 @@ export async function createAssistant(data: AssistantRegisterData) {
   }
 }
 
-export async function getAllAssistants(storeId: string | mongoose.Types.ObjectId) {
-  const assistants = await Store.findById(storeId).select("storeAssistants");
-
-  return assistants;
+/* OLD CODE (kept for reference):  
+export async function getOneAssistant(assistantId: string):Promise<StoreAssistantDocument | null> {
+  // NOTE: the assistantId here is not the document unique _id. it's the id from the User Model. 
+  // so, in this case the quey should findOne({assistantId}) since the findById() only looking for the identical _id 
+  
+  // const assistants = await StoreAssistant.findById(assistantId);
+  // const assistants = await StoreAssistant.findOne({assistantId});
+  
+  // return assistants;
 }
-export async function getOneAssistant(assistantId: string) {
-  const assistants = await StoreAssistant.findById(assistantId);
+*/
 
-  return assistants;
-}
-
-export async function deleteAssistant(storeId: string | mongoose.Types.ObjectId, assistantId: string) {
+export async function deleteAssistant(storeId: MongoId, assistantId: string) {
   const session = await startSession();
   session.startTransaction();
   try {
@@ -96,13 +98,13 @@ export async function deleteAssistant(storeId: string | mongoose.Types.ObjectId,
   }
 }
 
-export async function getAssistantPermissions(storeId:string, assistantId:string) {
+export async function getAssistantPermissions(storeId:MongoId, assistantId:string) {
     const assistant = await StoreAssistant.findOne({assistant: assistantId, inStore:storeId});
 
     return assistant;
 }
 
-export async function deleteAllAssistants(storeId: string | mongoose.Types.ObjectId, session:mongoose.ClientSession) {
+export async function deleteAllAssistants(storeId: MongoId, session:mongoose.ClientSession) {
   console.log("deleteAllAssistants");
   //STEP 1) get all the assistants ids based on the storeId to delete them from assistants collection:
   const assistantsId = await StoreAssistant.find({inStore: storeId}).select("assistant"); // this is going to have the mongodb default _id and the assistant field
