@@ -1,10 +1,14 @@
 import express from "express";
-import { createStoreController, deleteStoreController, getMyStoreController, updateStoreController } from "../../controllers/auth/storeControllers";
-import { checkAssistantPermissions, hasAuthorization, restrict } from "../../controllers/auth/authController";
+import { createStoreController, deleteMyStoreNewController, getStoreStatsController, updateMyStoreNewController, } from "../../controllers/auth/storeControllers";
+import checkAssistantPermissions from "../../_utils/validators/validateAssistantPermissions";
+import restrict from "../../_utils/protectors/restrict";
+import hasAuthorization from "../../_utils/protectors/hasAuthorization";
 export const router = express.Router();
 
+
+// TODO: this router is old. delete it later
 router.route("/").post(restrict("user"), createStoreController);
-router.route("/:storeId").patch(restrict("storeOwner"), hasAuthorization, updateStoreController).delete(restrict("storeOwner"), hasAuthorization, deleteStoreController);
+router.route("/:storeId").patch(restrict("storeOwner"), hasAuthorization, updateMyStoreNewController).delete(restrict("storeOwner"), hasAuthorization, deleteMyStoreNewController);
 
 // router.use(restrict("storeOwner", "storeAssistant"), checkAssistantPermissions("previewStoreStats")); this doesn't have access to the /:storeId params
-router.route("/:storeId").get(restrict("storeOwner", "storeAssistant"), hasAuthorization, checkAssistantPermissions("previewStoreStats"), getMyStoreController);
+router.route("/:storeId").get(restrict("storeOwner", "storeAssistant"), hasAuthorization, checkAssistantPermissions("previewStoreStats"), getStoreStatsController);

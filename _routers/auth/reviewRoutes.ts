@@ -1,8 +1,9 @@
 import express from "express";
-import { canWriteReview, isWriter } from "../../controllers/auth/authController";
 import { createReviewOnModelController, deleteReviewController, getAllReviewsController, getOneReviewController, updateReviewController } from "../../controllers/auth/reviewController";
 import { AppError } from "../../_utils/AppError";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
+import canWriteReview from "../../_utils/protectors/canWriteReview";
+import isWriter from "../../_utils/protectors/isWriter";
 
 export const router = express.Router();
 
