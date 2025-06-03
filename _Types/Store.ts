@@ -1,7 +1,7 @@
 import mongoose, { Types } from "mongoose";
 import { CategoryDocument } from "./Category";
 import { ProductDocument } from "./Product";
-import { PlansNames } from "./Plan";
+import { MongoId } from "./MongoId";
 
 export interface IStoreAddress {
   street: string;
@@ -16,17 +16,15 @@ export interface IShipmentCompany {
 }
 
 export interface StoreDataBody {
-  storeId: string;
   [x: string]: any;
   storeName: string;
   description: string;
   logo?: string;
-  inPlan: PlansNames
+  inPlan: MongoId
 }
 
 export interface StoreBasic extends StoreDataBody {
-  id: string;
-  owner: Types.ObjectId;
+  owner: MongoId;
   status: "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
   verified: boolean;
   address: IStoreAddress;
@@ -34,11 +32,10 @@ export interface StoreBasic extends StoreDataBody {
 }
 
 export interface StoreOptionals {
-  storeAssistants?: Array<Types.ObjectId>;
+  storeAssistants?: Array<MongoId>;
   categories?: Array<CategoryDocument>;
-  colourTheme?: Types.ObjectId; // reference to one of the themes that defined inside ColourTheme Model, the user is going to select one theme
-  products?: Array<ProductDocument>; // NOTE: delete this later
-  state?: Array<string>;
+  colourTheme?: MongoId; // reference to one of the themes that defined inside ColourTheme Model, the user is going to select one theme
+  products?: Array<ProductDocument>; // NOTE: delete this later since it's dynamic now
   socialMedia?: {
     instagram?: string;
     tiktok?: string;

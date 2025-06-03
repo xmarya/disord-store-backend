@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 export type AssistantRegisterData = {
   email: string;
@@ -30,4 +30,4 @@ export interface AssistantPermissions {
   UpdateCoupon: boolean;
 }
 
-export type StoreAssistantDocument = StoreAssistant;
+export type StoreAssistantDocument = StoreAssistant & mongoose.Document;

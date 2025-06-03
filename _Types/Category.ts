@@ -6,10 +6,9 @@ export interface CategoryBasic {
   name: string;
   colour: string;
   createdBy: {
-    username:string,
+    name:string,
     id:Types.ObjectId | string
   }
-  // store:Types.ObjectId | string, // Types.ObjectId for the back-end operations. string for front-end operations
   products?:Array<Types.ObjectId> | Array<string>
 };
 

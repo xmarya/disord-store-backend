@@ -2,25 +2,25 @@ import mongoose from "mongoose";
 import { Address } from "./UserAddress";
 import { BankAccount } from "./UserBankAccount";
 import { PlansNames } from "./Plan";
+import { MongoId } from "./MongoId";
 
 type Credentials = {
-  firstName:string,
-  lastName:string,
   password: string;
   passwordConfirm: string;
+  emailConfirmed: boolean;
   passwordResetToken: string;
   passwordResetExpires: Date;
   passwordChangedAt: Date;
-}
+};
 
 type Discord = {
   discordId: string;
-  name:string,
+  name: string;
   username: string;
   image: string;
-}
+};
 
-export type UserTypes = "user" | "storeOwner" | "storeAssistant" | "admin"
+export type UserTypes = "user" | "storeOwner" | "storeAssistant" | "admin";
 
 export interface UserDataBody {
   email: string;
@@ -31,37 +31,40 @@ export interface UserDataBody {
 export interface RegularUser extends UserDataBody {
   signMethod: "credentials" | "discord";
   userType: UserTypes;
-  firstName:string,
-  lastName:string,
-  phoneNumber:string,
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
   image: string;
-  addresses: Array<Address>,
-  bankAccounts: Array<BankAccount>,
-  defaultAddressId: mongoose.Types.ObjectId,
-  defaultBankAccountId: mongoose.Types.ObjectId,
+  addresses: Array<Address>;
+  bankAccounts: Array<BankAccount>;
+  defaultAddressId: mongoose.Types.ObjectId;
+  defaultBankAccountId: mongoose.Types.ObjectId;
   createdAt: Date;
 }
 
-type UserPlan = {
-  planId: mongoose.Types.ObjectId | string,
-  planName: PlansNames
-  paid:boolean,
+export type UserPlan = {
+  planId: MongoId;
+  planName: PlansNames;
+  subscriptionType: "new" | "renewal" | "upgrade";
+  // originalPrice: number;
+  paidPrice: number;
+  paid: boolean;
   subscribeStarts: Date;
   subscribeEnds: Date;
-}
+};
 
 export interface StoreOwner extends RegularUser {
-  myStore: mongoose.Types.ObjectId | string;
+  myStore: MongoId;
   subscribedPlanDetails: UserPlan;
-  pastSubscriptions?: 
-    {
-      plan: mongoose.Types.ObjectId | string;
-      count: number;
-    }[];
+  subscriptionsLog: Map<string, { planName: string; price: number }>;
 }
 
-export interface UserMethods {comparePasswords: (providedPassword: string, userPassword: string) => Promise<boolean>;
-  generateRandomToken: () => Promise<string>
+/* OLD CODE (kept for reference): 
+  export interface UserMethods {
+    comparePasswords: (providedPassword: string, userPassword: string) => Promise<boolean>;
+    generateRandomToken: () => Promise<string>;
 }
+*/
 
-export type UserDocument = RegularUser & StoreOwner & UserPlan & UserMethods & mongoose.Document;
+// export type UserDocument = RegularUser & StoreOwner & UserPlan & UserMethods & mongoose.Document;
+export type UserDocument = RegularUser & StoreOwner & UserPlan & mongoose.Document;
