@@ -1,6 +1,8 @@
 import { PlanDocument } from "../_Types/Plan";
 import { Model, Schema, model } from "mongoose";
 
+// This schema is ONLY for storing the plans and the users for the unlimited plan
+
 type PlanModel = Model<PlanDocument>;
 const planSchema = new Schema({
   planName: {
@@ -53,6 +55,12 @@ const planSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User",
   },
+},{
+  timestamps:true,
+  strict:true,
+  strictQuery:true,
+  toObject: {virtuals: true},
+  toJSON: {virtuals: true}
 });
 
 const Plan = model<PlanDocument, PlanModel>("Plan", planSchema);
