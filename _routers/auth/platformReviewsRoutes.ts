@@ -1,7 +1,9 @@
 import express from "express";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import { isWriter, restrict } from "../../controllers/auth/authController";
 import { createPlatformReviewController, deletePlatformReviewController, getAllPlatformReviewsController, getOnePlatformReviewController, updatePlatformReviewController } from "../../controllers/auth/reviewController";
+import restrict from "../../_utils/protectors/restrict";
+import isWriter from "../../_utils/protectors/isWriter";
+import sanitisedData from "../../_utils/validators/sanitisedData";
 
 export const router = express.Router();
 
@@ -9,9 +11,9 @@ export const router = express.Router();
 router.use(restrict("storeOwner", "storeAssistant", "user"));
 //for platform:
 router.route("/")
-.post(createPlatformReviewController);
+.post(sanitisedData,createPlatformReviewController);
 
 router.route("/:reviewId")
 .get(validateRequestParams("reviewId"),getOnePlatformReviewController)
-.patch(validateRequestParams("reviewId"),isWriter, updatePlatformReviewController)
+.patch(validateRequestParams("reviewId"),isWriter, sanitisedData, updatePlatformReviewController)
 .delete(validateRequestParams("reviewId"),isWriter, deletePlatformReviewController);

@@ -5,8 +5,6 @@ import { reviewSchema } from "../models/reviewModel";
 import { storeSchema } from "../models/storeModel";
 import { ProductSchema } from "../models/productModel";
 import { OrderSchema } from "../models/orderModel";
-import { storeStatSchema } from "../models/storeStatModel";
-import { annualProfitSchema } from "../models/annualProfitModel";
 import { invoiceSchema } from "../models/invoiceModel";
 import { AppError } from "./AppError";
 import { rankingSchema } from "../models/rankingModel";
@@ -24,8 +22,6 @@ const modelSchemas = {
   "Review-product": reviewSchema,
   "Ranking-product":rankingSchema,
   Order: OrderSchema,
-  StoreStat: storeStatSchema,
-  AnnualProfit: annualProfitSchema,
   Invoice: invoiceSchema,
 } as const satisfies DynamicModelMap;
 

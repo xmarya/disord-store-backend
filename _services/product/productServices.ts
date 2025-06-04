@@ -34,4 +34,4 @@ export async function updateProduct<T extends mongoose.Document>(Model: mongoose
 
   return updatedProduct;
 }
-export async function getProductsByCategory() {}
+export async function getProductsByCategory() {} // TODO

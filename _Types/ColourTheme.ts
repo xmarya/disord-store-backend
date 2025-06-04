@@ -1,13 +1,11 @@
+import mongoose from "mongoose";
+
 export interface ColourTheme {
-  id: string;
-  themes: [
-    {
       primary: string;
       secondary: string;
       accent: string;
       fontColour: string;
-    }
-  ];
+      themeType: "default" | "custom"
 }
 
-export type ColourThemeDocument = ColourTheme;
+export type ColourThemeDocument = ColourTheme & mongoose.Document;

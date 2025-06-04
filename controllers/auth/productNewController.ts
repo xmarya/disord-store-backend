@@ -1,17 +1,14 @@
-import mongoose from "mongoose";
 import lruCache from "../../_config/LRUCache";
-import { createDoc, deleteDoc, deleteMongoCollection, getAllDocs, getOneDoc, updateDoc } from "../../_services/global";
+import { createDoc, deleteDoc, deleteMongoCollection, getAllDocs, getOneDocById, updateDoc } from "../../_services/global";
+import { updateProduct } from "../../_services/product/productServices";
 import { ProductBasic, ProductDocument } from "../../_Types/Product";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import { isDynamicModelExist } from "../../_utils/dynamicMongoModel";
-import sanitisedData from "../../_utils/sanitisedData";
 import { updateProductInCategoryController } from "./categoryController";
-import { updateProduct } from "../../_services/product/productServices";
+import { MongoId } from "../../_Types/MongoId";
 
 export const createProductNewController = catchAsync(async (request, response, next) => {
-  sanitisedData(request, next);
-
   const { name, description, price, image, stock }: ProductBasic = request.body;
   if (!name?.trim() || !price || !description?.trim() || !stock) return next(new AppError(400, "Please add all the product's necessary data"));
 
@@ -36,7 +33,7 @@ export const getAllProductsNewController = catchAsync(async (request, response, 
 });
 
 export const getOneProductNewController = catchAsync(async (request, response, next) => {
-  const product = await getOneDoc(request.Model, request.params.productId);
+  const product = await getOneDocById(request.Model, request.params.productId);
   if (!product) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
 
   response.status(200).json({
@@ -55,7 +52,7 @@ export const updateProductNewController = catchAsync(async (request, response, n
   if (categories && categories.length !== 0) {
     const [_, modelId] = request.Model.modelName.split("-");
     await updateProductInCategoryController(modelId, categories, productId, "assign");
-    updatedProduct = await updateProduct(request.Model, productId, request.body); /*REQUIRES TESTING ✅*/
+    updatedProduct = await updateProduct(request.Model, productId, request.body); /*✅*/
   }
   else updatedProduct = await updateDoc(request.Model, productId, request.body);
 
@@ -82,7 +79,7 @@ export const deleteProductNewController = catchAsync(async (request, response, n
   });
 });
 
-export async function deleteProductsCollectionController(storeId: string | mongoose.Types.ObjectId) {
+export async function deleteProductsCollectionController(storeId:MongoId) {
   console.log("storeId for delete", storeId);
   // STEP 1) stringify the Object.id:
   const stringifiedId = JSON.parse(JSON.stringify(storeId));

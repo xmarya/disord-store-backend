@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { MongoId } from "./MongoId";
 
 export type PlansNames = "basic" | "plus" | "unlimited";
 
@@ -7,19 +8,14 @@ type Price = {
   dollar: number;
 };
 
-type PlanQuota = {
-  quota: {
+export type PlanQuota = {
     ofProducts: number;
     ofCategories: number;
     ofStoreAssistants: number;
     ofColourThemes: number;
     ofCommission: number;
     ofShipmentCompanies: number;
-    [x: string]: number;
-  };
 };
-
-
 
 interface Plan {
   planName: PlansNames;
@@ -30,7 +26,7 @@ interface Plan {
 }
 
 export interface PlanDetails extends Plan {
-  unlimitedUser?: mongoose.Types.ObjectId | string;
+  unlimitedUser?: MongoId;
 }
 
 export type UnlimitedPlanDataBody = Omit<Plan, "discount"> & {
@@ -44,15 +40,20 @@ export interface PlanDataBody extends Plan {
 type StatsData = {
   subscribers: number;
   profits: number;
+  newSubscribers: number;
+  renewals: number;
 };
 
 type PlanStats = {
   planName: PlansNames;
-  date:Date,
-  monthly: StatsData,
-  annual: StatsData,
-  totalSubscribers: number;
-  totalProfits: number;
+  subscriptionType: "new" | "renewal";
+  date: Date;
+  monthly: StatsData;
+};
+
+export interface PlanStatsModel extends mongoose.Model<PlanStatsDocument> {
+  getAnnualStatsReport: (sortBy: "year" | "profits" | "subscribers", sortOrder: "desc" | "asc", specificYear?: number) => Promise<any>;
+  getPlansTotalsReport: () => Promise<any>;
 }
 
 export type PlanDocument = PlanDetails & mongoose.Document;

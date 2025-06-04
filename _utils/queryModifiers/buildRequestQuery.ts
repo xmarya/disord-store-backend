@@ -1,6 +1,6 @@
 import type { Request } from "express";
 import mongoose from "mongoose";
-import { DOCS_PER_PAGE } from "../_data/constants";
+import { DOCS_PER_PAGE } from "../../_data/constants";
 
 type QueryParams = {
   sort?: string;

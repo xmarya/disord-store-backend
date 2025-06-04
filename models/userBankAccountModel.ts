@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { BankAccountDocument } from "../_Types/UserBankAccount";
 
 type BankAccountModel = mongoose.Model<BankAccountDocument>;
-const bankAccountSchema = new mongoose.Schema<BankAccountDocument>(
+export const bankAccountSchema = new mongoose.Schema<BankAccountDocument>(
   {
     cardName: {type:String, required: [true, "the cardName field is required"]},
     cardNumber: {type:String, required: [true, "the cardNumber field is required"]},

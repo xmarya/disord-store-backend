@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
-import type {Request} from "express";
-import { buildQuery } from "../_utils/buildRequestQuery";
+import type { Request } from "express";
+import { KnownKeys } from "../_Types/TypeKeys";
+import { QueryOptions } from "../_Types/QueryOptions";
+import { MongoId } from "../_Types/MongoId";
+import { buildQuery } from "../_utils/queryModifiers/buildRequestQuery";
 
 export async function createDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, data: any, locals?: any): Promise<T> {
   console.log("inside createDoc");
@@ -16,25 +19,43 @@ export async function createDoc<T extends mongoose.Document>(Model: mongoose.Mod
   return newDoc;
 }
 
-export async function getAllDocs<T extends mongoose.Document>(Model: mongoose.Model<T>, request:Request): Promise<T[]> {
-  const query = buildQuery(request, Model); /*REQUIRES TESTING: ✅*/
-  const docs = await query.find();
+export async function getAllDocs<T extends mongoose.Document>(Model: mongoose.Model<T>, request: Request, options?:QueryOptions<T>): Promise<T[]> {
+  const query = buildQuery(request, Model); /*✅*/
+
+  const fields = options?.select ? options.select.join(" ") : ""; /*✅*/
+  const filter = options?.condition ?? {};
+
+  const docs = await query.find(filter).select(fields);
   return docs;
 }
-export async function getOneDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: string | mongoose.Types.ObjectId): Promise<T | null> {
-  const doc = await Model.findById(id);
+export async function getOneDocById<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, options?:QueryOptions<T>): Promise<T | null> {
+  const fields = options?.select ? options.select.join(" ") : "";/*✅*/
+  const doc = await Model.findById(id).select(fields);
   return doc;
 }
-export async function updateDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: string | mongoose.Types.ObjectId, data: any, locals?: any): Promise<T | null> {
+
+export async function getOneDocByFindOne<T extends mongoose.Document>(Model:mongoose.Model<T>, options?:QueryOptions<T>):Promise<T | null> {
+  const fields = options?.select ? options.select.join(" ") : ""; /*✅*/
+  console.log("options?.condition!", options?.condition!);
+  const doc = await Model.findOne(options?.condition!, fields);
+  return doc;
+}
+export async function updateDoc<T extends mongoose.Document>(
+  Model: mongoose.Model<T>,
+  id: MongoId,
+  data: any,
+  updateOptions: { locals?: any; session?: mongoose.ClientSession } = {}
+): Promise<T | null> {
   /* OLD CODE (kept for reference): 
   const updatedDoc = await Model.findByIdAndUpdate(id, data).setOptions(locals);
   */
-  const query = Model.findByIdAndUpdate(id, data, { runValidators: true, new:true });
+  const { locals, session } = updateOptions;
+  const query = Model.findByIdAndUpdate(id, data, { runValidators: true, new: true, session });
   if (locals) query.setOptions(locals); /*REQUIRES TESTING*/
   const updatedDoc = await query;
   return updatedDoc;
 }
-export async function deleteDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: string | mongoose.Types.ObjectId, locals?: any): Promise<T | null> {
+export async function deleteDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, locals?: any): Promise<T | null> {
   const query = Model.findByIdAndDelete(id);
   if (locals) query.setOptions(locals);
   const deletedDoc = await query;

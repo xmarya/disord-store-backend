@@ -1,29 +1,20 @@
-import type { Request, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { AppError } from "../AppError";
 import User from "../../models/userModel";
+import { getOneDocByFindOne } from "../../_services/global";
 
-export default async function validateNewUserData(request: Request, next: NextFunction): Promise<boolean | void> {
-  let valid = false;
+export default async function validateNewUserData(request: Request, response:Response, next: NextFunction) {
   const { email, password, passwordConfirm, firstName, lastName } = request.body;
 
-  if (!email || !firstName || !lastName || !password || !passwordConfirm) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
+  if (!email?.trim() || !firstName?.trim() || !lastName?.trim() || !password?.trim() || !passwordConfirm?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
   // STEP 1) check if the email exist or not:
-  const isEmailExist = await User.findOne({ email });
+  const isEmailExist = await getOneDocByFindOne(User, { condition: { email } });
   if (isEmailExist) return next(new AppError(400, "لا يمكن استخدام هذا البريد الإلكتروني  للتسجيل"));
 
-  console.log("isEmailExist", !!isEmailExist);
-
-  // // STEP 1) check if the username exist or not:
-  // const isUsernameExist = await User.findOne({ username });
-  // if (isUsernameExist) return next(new AppError(400, "الرجاء اختيار اسم مستخدم آخر"));
-  // console.log("isUsernameExist", !!isUsernameExist);
-  
   //STEP 3) check both passwords:
   const isMatching = password === passwordConfirm;
   if (!isMatching) return next(new AppError(400, "كلمات المرور غير متطابقة"));
-  console.log("isMatching", !!isMatching);
 
-  valid = true;
-  return valid;
+  next();
 }

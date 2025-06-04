@@ -3,7 +3,7 @@ import { Model, Schema, model } from "mongoose";
 
 type StoreAssistantModel = Model<StoreAssistantDocument>;
 
-const storeAssistantModel = new Schema<StoreAssistantDocument>(
+const storeAssistantSchema = new Schema<StoreAssistantDocument>(
   {
     assistant: {
       type: Schema.Types.ObjectId,
@@ -64,7 +64,7 @@ const storeAssistantModel = new Schema<StoreAssistantDocument>(
 const StoreAssistant =
   model<StoreAssistantDocument, StoreAssistantModel>(
     "StoreAssistant",
-    storeAssistantModel
+    storeAssistantSchema
   );
 
 export default StoreAssistant;

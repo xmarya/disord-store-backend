@@ -1,12 +1,13 @@
 import mongoose, { startSession } from "mongoose";
+import { MongoId } from "../../_Types/MongoId";
 import { ProductDocument } from "../../_Types/Product";
-import { StoreDocument } from "../../_Types/Store";
+import { StoreDataBody } from "../../_Types/Store";
 import { AppError } from "../../_utils/AppError";
 import Store from "../../models/storeModel";
 import User from "../../models/userModel";
 
 
-export async function createStore(data:StoreDocument) {
+export async function createStore(data:StoreDataBody) {
     const {storeName, owner, logo, description} = data;
     const session = await startSession();
     session.startTransaction();
@@ -20,7 +21,6 @@ export async function createStore(data:StoreDocument) {
         }], {session});
 
         await User.findByIdAndUpdate(owner, {
-            // userType: "storeOwner",
             myStore: newStore[0].id
         }, {session});
 
@@ -57,7 +57,7 @@ export async function confirmAuthorization( userId:string, storeId:string):Promi
     return !!userIdExist; 
 }
 
-export async function deleteStore(storeId:string | mongoose.Types.ObjectId, session:mongoose.ClientSession){
+export async function deleteStore(storeId:MongoId, session:mongoose.ClientSession){
     const deletedStore = await Store.findByIdAndDelete(storeId, {session});
 
     return deletedStore;

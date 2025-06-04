@@ -1,5 +1,5 @@
 import { CategoryDocument } from "../_Types/Category";
-import mongoose, { Schema } from "mongoose";
+import { Schema } from "mongoose";
 
 // type CategoryModel = Model<CategoryDocument>;
 export const categorySchema = new Schema<CategoryDocument>({
@@ -13,7 +13,7 @@ export const categorySchema = new Schema<CategoryDocument>({
     required: [true, "the category colour is required"],
   },
   createdBy: {
-    username:{
+    name:{
       type: String,
       required: [true, "the category createdBy username is required"],
     },

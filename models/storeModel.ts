@@ -3,14 +3,15 @@ import { StoreDocument } from "../_Types/Store";
 import { Model, Query, Schema, model } from "mongoose";
 
 type StoreModel = Model<StoreDocument>;
-export const storeSchema = new Schema<StoreDocument>({
-  storeName: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-  },
-  /* OLD CODE (kept for reference): 
+export const storeSchema = new Schema<StoreDocument>(
+  {
+    storeName: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    /* OLD CODE (kept for reference): 
   slug: {
     type: String,
     required: true,
@@ -27,24 +28,27 @@ export const storeSchema = new Schema<StoreDocument>({
     I could've made it a virtual field but I don't think it's necessary.
     
   */
-  owner: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  description: String,
-  logo: String,
-  storeAssistants: [
-    {
-      // relationship (child referencing) because it's 1-few relationship
-      /* SOLILOQUY: not all stores will have an assistant right? so I'll make it a separate collection so the store docs won't get so large for nothing
-                  also for scalability and future-proof that's better */
+    owner: {
       type: Schema.Types.ObjectId,
-      ref: "StoreAssistant",
-      default: [], //is more intuitive than null.
+      ref: "User",
+      required: true,
     },
-  ],
-  /* OLD CODE (kept for reference): unique in an array doesn't enforce uniqueness across documents!!!
+    description: {
+      type: String,
+      required: [true, "the description field is required"],
+    },
+    logo: String,
+    storeAssistants: [
+      {
+        // relationship (child referencing) because it's 1-few relationship
+        /* SOLILOQUY: not all stores will have an assistant right? so I'll make it a separate collection so the store docs won't get so large for nothing
+                  also for scalability and future-proof that's better */
+        type: Schema.Types.ObjectId,
+        ref: "StoreAssistant",
+        default: [], //is more intuitive than null.
+      },
+    ],
+    /* OLD CODE (kept for reference): unique in an array doesn't enforce uniqueness across documents!!!
     categories: [{
       type: String,
       unique: true,
@@ -52,68 +56,82 @@ export const storeSchema = new Schema<StoreDocument>({
       }],
       */
 
-  // categories: [Schema.Types.ObjectId], it's dynamic model now 
-  colourTheme: {
-    /* SOLILOQUY: this should be one object not an array, 
+    // categories: [Schema.Types.ObjectId], it's dynamic model now
+    colourTheme: {
+      /* SOLILOQUY: this should be one object not an array, 
       of course the plus users can views many theme but eventually they are going to select only one*/
-    type: Schema.Types.ObjectId,
-    ref: "ColourTheme",
-    // default:"default-theme" //TODO: will be defined later
+      type: Schema.Types.ObjectId,
+      ref: "ColourTheme",
+      // default:"default-theme" //TODO: will be defined later
+    },
+    status: {
+      type: String,
+      enum: ["inProgress", "active", "maintenance", "suspended", "deleted"],
+      required: [true, "the storeState is required"],
+      default: "inProgress",
+    },
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+    shipmentCompanies: [
+      {
+        name: { type: String, required: true },
+        accountNumber: { type: String, required: true },
+      },
+    ],
+    address: {
+      street: { type: String },
+      city: { type: String },
+      state: { type: String },
+      postalCode: { type: String },
+      country: { type: String },
+      phone: { type: String },
+    },
+    inPlan: {
+      type: String,
+      required: true,
+      enum: ["basic", "plus", "unlimited"],
+    },
+    socialMedia: {
+      instagram: String,
+      tiktok: String,
+      twitter: String,
+      whatsapp: [String],
+      email: String,
+    },
   },
-  status: {
-    type: String,
-    enum: ["inProgress", "active", "maintenance", "suspended", "deleted"],
-    required: [true, "the storeState is required"],
-    default: "inProgress",
-  },
-  verified: {
-    type: Boolean,
-    default: false,
-  },
-  shipmentCompanies: [
-    {
-      name: { type: String, required: true },
-      accountNumber: { type: String, required: true },
-    }
-  ],
-  address: { 
-    street: { type: String },
-    city: { type: String },
-    state: { type: String },
-    postalCode: { type: String },
-    country: { type: String },
-    phone: { type: String },
-  },
-  inPlan: {
-    type:String,
-    required:true,
-    enum:["basic","plus", "unlimited"]
-  },
-  socialMedia: {
-    instagram: String,
-    tiktok: String,
-    twitter: String,
-    whatsapp: [String],
-    email: String,
-  },
+  {
+    timestamps: true,
+    strictQuery: true,
+    strict: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
+
+/* SOLILOQUY: I'm not sure about this virtual, since I can got all the store itself and its stats 
+from the StoreStats Model, also using the virtual won't allow to do date filtering process */
+// storeSchema.virtual<StoreStatsDocument[]>("stats", {
+//   ref: "StoreStats",
+//   localField: "_id",
+//   foreignField: "store",
+// });
+
+storeSchema.pre(/^find/, function (this: Query<any, StoreDocument>, next) {
+  this.populate("owner");
+  next();
 });
 
-// NOTE: delete this later
+// TODO: comment out this later
 storeSchema.virtual<ProductDocument[]>("products", {
   ref: "Product",
   localField: "_id",
   foreignField: "store",
 });
 
-storeSchema.virtual("stats", {
-  ref: "StoreStat",
-  localField: "_id",
-  foreignField: "store",
-});
-
-
-// NOTE: delete this later
-storeSchema.pre(/^find/, function(this:Query<any, any>, next) {
+// TODO: delete this later
+storeSchema.pre(/^find/, function (this: Query<any, any>, next) {
   this.populate("products");
   next();
 });

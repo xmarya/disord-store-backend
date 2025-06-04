@@ -27,15 +27,16 @@ export async function createCategory(data: CategoryBasic) {
 
 import mongoose from "mongoose";
 import { CategoryDocument } from "../../_Types/Category";
+import { MongoId } from "../../_Types/MongoId";
 
 
-export async function assignProductToCategory<T extends CategoryDocument>(Model:mongoose.Model<T>,categories:Array<T>, productId:string | mongoose.Types.ObjectId) {
+export async function assignProductToCategory<T extends CategoryDocument>(Model:mongoose.Model<T>,categories:Array<T>, productId:MongoId) {
   console.log("assignProductToCategory");
   await Model.updateMany({_id: {$in: categories}}, {$addToSet: { products: productId }});
 }
 
 // NOTE: this is going to be called in two scenarios: 1) removing a category from the product. 2) deleting the product permanently.
-export async function deleteProductFromCategory<T extends CategoryDocument>(Model:mongoose.Model<T>,categories:Array<T>, productId:string | mongoose.Types.ObjectId) {
+export async function deleteProductFromCategory<T extends CategoryDocument>(Model:mongoose.Model<T>,categories:Array<T>, productId:MongoId) {
   console.log("deleteProductFromCategory");
   await Model.updateMany({_id: {$in: categories}}, {$pull: { products: productId }});
 }

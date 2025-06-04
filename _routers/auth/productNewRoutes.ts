@@ -1,15 +1,20 @@
 import express from "express";
-import { router as reviewsRouter } from "./reviewRoutes";
-import { assignModelToRequest, checkAssistantPermissions, hasAuthorization, restrict } from "../../controllers/auth/authController";
+import assignModelToRequest from "../../_utils/requestModifiers/assignModelToRequest";
+import checkAssistantPermissions from "../../_utils/validators/validateAssistantPermissions";
+import { validateModelId } from "../../_utils/validators/validateModelId";
+import validateRequestParams from "../../_utils/validators/validateRequestParams";
+import verifyUsedQuota from "../../_utils/validators/verifyUsedQuota";
 import {
   createProductNewController,
   deleteProductNewController,
   getAllProductsNewController,
   getOneProductNewController,
-  updateProductNewController,
+  updateProductNewController
 } from "../../controllers/auth/productNewController";
-import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import { validateModelId } from "../../_utils/validators/validateModelId";
+import { router as reviewsRouter } from "./reviewRoutes";
+import restrict from "../../_utils/protectors/restrict";
+import hasAuthorization from "../../_utils/protectors/hasAuthorization";
+import sanitisedData from "../../_utils/validators/sanitisedData";
 
 export const router = express.Router();
 
@@ -18,9 +23,12 @@ router.use("/:productId/reviews", validateRequestParams("productId"), validateMo
 router.use(restrict("storeOwner", "storeAssistant"), hasAuthorization); // this should be at the top of the stack; so the new model will be created only if the user passed both conditional middlewares 
 router.use(validateModelId("Product"), assignModelToRequest("Product"));
 
-router.route("/").post(checkAssistantPermissions("addProduct"), createProductNewController).get(getAllProductsNewController);
+router.route("/")
+.post(verifyUsedQuota("ofProducts"), checkAssistantPermissions("addProduct"),sanitisedData, createProductNewController)
+.get(getAllProductsNewController);
+
 router
   .route("/:productId")
   .get(validateRequestParams("productId"), getOneProductNewController)
-  .patch(validateRequestParams("productId"), checkAssistantPermissions("editProduct"), updateProductNewController)
+  .patch(validateRequestParams("productId"), checkAssistantPermissions("editProduct"), sanitisedData, updateProductNewController)
   .delete(validateRequestParams("productId"), checkAssistantPermissions("deleteProduct"), deleteProductNewController);
