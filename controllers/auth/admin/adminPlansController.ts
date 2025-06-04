@@ -44,10 +44,8 @@ export const updatePlanController = catchAsync(async (request, response, next) =
 });
 
 export const getMonthlyPlansStatsController = catchAsync(async (request, response, next) => {
-  /*REQUIRES TESTING*/
-
   const { dateFilter } = request.dateQuery;
-console.log("built dateFilter", dateFilter);
+  console.log("built dateFilter", dateFilter);
   const allPlansStats = await getMonthlyPlansStats(dateFilter);
   if (!allPlansStats.length) return next(new AppError(400, "couldn't find data for the specific date"));
 

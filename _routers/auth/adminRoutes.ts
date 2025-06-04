@@ -1,7 +1,7 @@
 import express from "express";
 import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import { createAdminController, createUnlimitedUserController, deleteUsersController, getAllUsersController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
+import { createAdminController, createUnlimitedUserController, getAllUsersController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
 import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviewController";
 import { displayReviewInHomePage } from "../../controllers/auth/admin/adminReviewsController";
 import { getAllPlanController, getPlanController, getMonthlyPlansStatsController, updatePlanController, getPlansStatsReportController } from "../../controllers/auth/admin/adminPlansController";
@@ -36,7 +36,7 @@ router.get("/users", getAllUsersController); /*✅*/
 router
   .route("/users/:userId")
   .get(validateRequestParams("userId"), getOneUserController) /*✅*/
-  .delete(validateRequestParams("userId"), deleteUsersController);
+  // .delete(validateRequestParams("userId"), deleteUsersController);
 
 router.post("/users/unlimited-user", sanitisedData, validateUnlimitedUserData, createUnlimitedUserController);/*✅*/
 
@@ -52,7 +52,7 @@ router.get("/plans/plans-reports", getPlansStatsReportController); /*✅*/
 
 router
   .route("/plans/:planId")
-  .get(validateRequestParams("planId"), getPlanController) // NOTE: then what? it's useful for getting a customisable plan -I mean the unlimited-
+  .get(validateRequestParams("planId"), getPlanController) // NOTE: it's useful for getting a customisable plan -I mean the unlimited-
   .patch(validateRequestParams("planId"), sanitisedData, updatePlanController);
 
 

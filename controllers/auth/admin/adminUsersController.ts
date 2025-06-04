@@ -126,9 +126,9 @@ export const getOneUserController = catchAsync(async (request, response, next) =
   });
 });
 
-export const deleteUsersController = catchAsync(async (request, response, next) => {
-  //TODO; if the userType is storeOwner, then call the deleteStore before then delete the user
-  response.status(204).json({
-    success: true,
-  });
-});
+// export const deleteUsersController = catchAsync(async (request, response, next) => {
+//   //TODO; if the userType is storeOwner, then call the deleteStore before then delete the user
+//   response.status(204).json({
+//     success: true,
+//   });
+// });
