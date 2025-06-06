@@ -1,28 +1,22 @@
 import mongoose from "mongoose";
 import lruCache from "../_config/LRUCache";
 import { DynamicModel } from "../_Types/Model";
-import { reviewSchema } from "../models/reviewModel";
-import { storeSchema } from "../models/storeModel";
-import { ProductSchema } from "../models/productModel";
-import { OrderSchema } from "../models/orderModel";
-import { invoiceSchema } from "../models/invoiceModel";
-import { AppError } from "./AppError";
-import { rankingSchema } from "../models/rankingModel";
 import { categorySchema } from "../models/categoryModel";
+import { ProductSchema } from "../models/productModel";
+import { rankingSchema } from "../models/rankingModel";
+import { reviewSchema } from "../models/reviewModel";
+import { AppError } from "./AppError";
 
 // NOTE: consider converting this to a class
 
 type DynamicModelMap = Record<DynamicModel, mongoose.Schema>;
 
 const modelSchemas = {
-  Store: storeSchema,
   Product: ProductSchema,
   Category: categorySchema,
   "Review-store": reviewSchema,
   "Review-product": reviewSchema,
   "Ranking-product":rankingSchema,
-  Order: OrderSchema,
-  Invoice: invoiceSchema,
 } as const satisfies DynamicModelMap;
 
 type DynamicModels = keyof DynamicModelMap;
