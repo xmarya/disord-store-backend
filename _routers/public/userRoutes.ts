@@ -1,8 +1,8 @@
 import express from "express";
-import { credentialsLogin, createNewUserController, forgetPassword, resetPassword, createNewStoreOwnerController, createNewDiscordUser } from "../controllers/public/userController";
-import { adminLoginController } from "../controllers/auth/admin/adminUsersController";
-import sanitisedData from "../_utils/validators/sanitisedData";
-import validateNewUserData from "../_utils/validators/validateNewUserData";
+import sanitisedData from "../../_utils/validators/sanitisedData";
+import validateNewUserData from "../../_utils/validators/validateNewUserData";
+import { createNewDiscordUser, createNewStoreOwnerController, createNewUserController, credentialsLogin, forgetPassword, resetPassword } from "../../controllers/public/userController";
+import { adminLoginController } from "../../controllers/auth/admin/adminUsersController";
 
 export const router = express.Router();
 console.log("user routes");
