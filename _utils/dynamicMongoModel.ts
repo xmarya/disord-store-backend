@@ -14,9 +14,12 @@ type DynamicModelMap = Record<DynamicModel, mongoose.Schema>;
 const modelSchemas = {
   Product: ProductSchema,
   Category: categorySchema,
+  /* SOLILOQUY: let's make the review a static model, whilst keeping the ranking a DyMo, it' be easier to query the user's review this way
+  Also, it's important ONLY to allow the user to write reviews about the products that are purchased by them*/
   "Review-store": reviewSchema,
   "Review-product": reviewSchema,
   "Ranking-product":rankingSchema,
+  "Ranking-store":rankingSchema,
 } as const satisfies DynamicModelMap;
 
 type DynamicModels = keyof DynamicModelMap;
