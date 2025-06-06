@@ -50,6 +50,7 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
       previewStoreStats: { type: Boolean, default: false },
       addCoupon: { type: Boolean, default: false },
       deleteCoupon: { type: Boolean, default: false },
+      replyToCustomers: { type: Boolean, default: false },
     },
   },
   {
