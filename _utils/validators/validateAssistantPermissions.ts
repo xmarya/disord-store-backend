@@ -20,9 +20,6 @@ const checkAssistantPermissions = (permissionKey: keyof AssistantPermissions) =>
     if (request.user.userType === "storeOwner") return next();
     // console.log("checkAssistantPermissions", request.user.userType, permissionKey);
 
-    // const storeId = request.user.myStore as string; // BUG: the assistant won't have myStore property
-    // const storeId = request.params.storeId; /* CHANGE LATER: the storeId doesn't exist in the request.params anymore, it's the modelId right now */
-    // const storeId = request.body.modelId; /* REQUIRES TESTING*/
     const storeId = request.store; /* REQUIRES TESTING*/
     const assistantId = request.user.id;
     

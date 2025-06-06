@@ -5,7 +5,6 @@ import {
   createStoreController,
   deleteMyStoreNewController,
   getStoreStatsController,
-  getStoreWithProductsController,
   updateMyStoreNewController,
   updateMyStoreStatus,
 } from "../../controllers/auth/storeControllers";
@@ -23,10 +22,6 @@ export const router = express.Router();
 
 router.use("/reviews", validateModelId("Review-store"), assignModelToRequest("Review-store"), reviewsRouter);
 
-// general route with a storeId as params for the users, the store and its products are retrieved:
-router.route("/:storeId").get(validateRequestParams("storeId"), getStoreWithProductsController);
-
-// router.route("/").post(restrict("user"), createStoreController); /* CHANGE LATER: this should be deleted since I changed the logic of creating users */
 router.route("/").post(restrict("storeOwner"), sanitisedData, createStoreController);
 router.route("/").patch(restrict("storeOwner"), hasAuthorization, sanitisedData, updateMyStoreNewController)
 .delete(restrict("storeOwner"), hasAuthorization, deleteMyStoreNewController);

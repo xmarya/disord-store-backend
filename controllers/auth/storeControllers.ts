@@ -50,21 +50,6 @@ export const getStoreStatsController = catchAsync(async (request, response, next
   });
 });
 
-export const getStoreWithProductsController = catchAsync(async (request, response, next) => {
-  console.log("GETSTOREWITHPRODUCTS");
-  //STEP 1) first, check if the store has any products:
-  const { storeId } = request.params;
-  const ProductModel = await getDynamicModel<ProductDocument>("Product", storeId); // false = don't create a new DyMo it it doesn't exist
-
-  const { store, products } = await getStoreWithProducts(storeId, ProductModel);
-  if (!products.length) return next(new AppError(404, "no products were found related to this storeId"));
-
-  response.status(200).json({
-    success: true,
-    store,
-    products,
-  });
-});
 
 export const updateMyStoreNewController = catchAsync(async (request, response, next) => {
   // only allow storeName, description, logo

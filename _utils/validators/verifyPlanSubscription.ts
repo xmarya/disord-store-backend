@@ -5,8 +5,8 @@ import { AppError } from "../AppError";
 export async function verifyPlanSubscription(request: Request, response: Response, next: NextFunction) {
    console.log("verifyPlanSubscription");
 
-  // if(request.user.userType !== "storeOwner" || request.user.userType === "storeAssistant") return next();
-  if(request.user.userType !== "storeOwner") return next();
+   if(request.user.userType !== "storeOwner") return next();
+  if(request.user.userType !== "storeOwner" && request.user.userType === "storeAssistant") return next();
 
   if(!request.user.subscribedPlanDetails.paid) return next(new AppError(401, "you are not subscribed to any plan. Please subscribe then try again."));
   // has the subscription end?
