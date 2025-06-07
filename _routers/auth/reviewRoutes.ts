@@ -17,7 +17,7 @@ router.all("/", (request, response, next) => {
   if (!["GET", "POST"].includes(request.method)) return next(new AppError(405, `${request.method} not allowed on /store/reviews. please provide a /:reviewId`));
   next();
 });
-router.route("/").post(createReviewOnModelController).get(getAllReviewsController);
+router.route("/").post(createReviewOnModelController).get(getAllReviewsController); // FIX: what king of reviews should getAllReviewsController returns ???
 router
   .route("/:reviewId")
   .get(validateRequestParams("reviewId"), getOneReviewController)

@@ -3,7 +3,6 @@ import { catchAsync } from "../_utils/catchAsync";
 import { DOCS_PER_PAGE } from "../_data/constants";
 import { Model } from "../_Types/Model";
 import { AppError } from "../_utils/AppError";
-import sanitisedData from "../_utils/sanitisedData";
 
 export const getAll = (Model: Model) =>
   catchAsync(async (request, response, next) => {
@@ -38,7 +37,6 @@ export const getOne = (Model: Model) =>
 export const updateOne = (Model: Model) =>
   catchAsync(async (request, response, next) => {
     console.log("updateOne");
-    sanitisedData(request, next);
 
     const docId = request.params.id || request.params.storeId;
     if (!docId) return next(new AppError(400, "document id is missing."));

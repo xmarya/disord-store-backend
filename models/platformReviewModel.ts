@@ -13,16 +13,10 @@ const platformReviewSchema = new mongoose.Schema<PlatformReviewDocument>(
       type: String,
       required: [true, "the reviewBody filed is required"],
     },
-    wroteAt: {
-      type: Date,
-      required: [true, "the wroteAt filed is required"],
-      default: Date.now,
-    },
     displayInHomePage: {
       type:Boolean,
       default: false
     },
-    updatedAt: Date,
   },
   {
     timestamps: true,

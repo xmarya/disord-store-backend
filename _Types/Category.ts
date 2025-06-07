@@ -1,15 +1,16 @@
 import mongoose, { Types } from "mongoose";
+import { MongoId } from "./MongoId";
 
 
 export interface CategoryBasic {
-  // id:string,
   name: string;
   colour: string;
   createdBy: {
     name:string,
-    id:Types.ObjectId | string
+    id:MongoId
   }
-  products?:Array<Types.ObjectId> | Array<string>
+  store:MongoId,
+  products?:Array<MongoId>
 };
 
 export type CategoryDocument = CategoryBasic & mongoose.Document;

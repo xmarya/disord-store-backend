@@ -1,7 +1,7 @@
 import { CategoryDocument } from "../_Types/Category";
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-// type CategoryModel = Model<CategoryDocument>;
+type CategoryModel = mongoose.Model<CategoryDocument>;
 export const categorySchema = new Schema<CategoryDocument>({
   name: {
     type: String,
@@ -22,7 +22,7 @@ export const categorySchema = new Schema<CategoryDocument>({
       required: [true, "the category createdBy id is required"],
     }
   },
-  // store: Schema.Types.ObjectId,
+  store: Schema.Types.ObjectId,
   products: [Schema.Types.ObjectId],
 });
 
@@ -45,3 +45,9 @@ categorySchema.pre("findOneAndDelete", async function (next) {
   next();
 });
 */
+categorySchema.index({name:1, store:1}, {unique:true});
+categorySchema.index({name:1, products:1}, {unique:true}); /*REQUIRES TESTING: does't it work with arrays? */ 
+
+const Category = mongoose.model<CategoryDocument, CategoryModel>("Category", categorySchema);
+
+export default Category

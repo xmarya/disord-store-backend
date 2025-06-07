@@ -1,4 +1,4 @@
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 import { CategoryDocument } from "./Category";
 import { ProductDocument } from "./Product";
 import { MongoId } from "./MongoId";
@@ -20,13 +20,16 @@ export interface StoreDataBody {
   storeName: string;
   description: string;
   logo?: string;
-  inPlan: MongoId
+  inPlan: MongoId;
 }
 
 export interface StoreBasic extends StoreDataBody {
   owner: MongoId;
   status: "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
   verified: boolean;
+  ratingsAverage: number;
+  ratingsQuantity: number;
+  ranking:number;
   address: IStoreAddress;
   shipmentCompanies?: IShipmentCompany[];
 }
@@ -35,8 +38,8 @@ export interface StoreOptionals {
   storeAssistants?: Array<MongoId>;
   categories?: Array<CategoryDocument>;
   colourTheme?: MongoId; // reference to one of the themes that defined inside ColourTheme Model, the user is going to select one theme
-  products?: Array<ProductDocument>; // NOTE: delete this later since it's dynamic now
-  socialMedia?: {
+  products: Array<ProductDocument>;
+  socialMedia: {
     instagram?: string;
     tiktok?: string;
     twitter?: string;

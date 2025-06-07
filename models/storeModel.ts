@@ -1,4 +1,5 @@
 import { ProductDocument } from "../_Types/Product";
+import { ReviewDocument } from "../_Types/Review";
 import { StoreDocument } from "../_Types/Store";
 import { Model, Query, Schema, model } from "mongoose";
 
@@ -56,7 +57,7 @@ export const storeSchema = new Schema<StoreDocument>(
       }],
       */
 
-    // categories: [Schema.Types.ObjectId], it's dynamic model now
+    categories: [Schema.Types.ObjectId],
     colourTheme: {
       /* SOLILOQUY: this should be one object not an array, 
       of course the plus users can views many theme but eventually they are going to select only one*/
@@ -100,6 +101,22 @@ export const storeSchema = new Schema<StoreDocument>(
       whatsapp: [String],
       email: String,
     },
+    ranking: {
+      type: Number,
+      default: null,
+      // NOTE: this filed will be used to presents the ranking of store's products, it's irrelevant to the storeStats model.
+    },
+    ratingsAverage: {
+      type:Number,
+      default:null,
+      min: [1, "rating must be 1 to 5"],
+      max: [5, "rating must be 1 to 5"],
+      set: (rating:number) => Math.round(rating * 10) / 10
+    },
+    ratingsQuantity: {
+      type:Number,
+      default:0
+    }
   },
   {
     timestamps: true,
@@ -123,18 +140,17 @@ storeSchema.pre(/^find/, function (this: Query<any, StoreDocument>, next) {
   next();
 });
 
-// TODO: comment out this later
 storeSchema.virtual<ProductDocument[]>("products", {
   ref: "Product",
   localField: "_id",
   foreignField: "store",
 });
 
-// TODO: delete this later
-storeSchema.pre(/^find/, function (this: Query<any, any>, next) {
-  this.populate("products");
-  next();
-});
+storeSchema.virtual<ReviewDocument[]>("reviews", {
+  ref:"Review",
+  localField:"_id",
+  foreignField: "reviewedResourceId"
+})
 
 const Store = model<StoreDocument, StoreModel>("Store", storeSchema);
 

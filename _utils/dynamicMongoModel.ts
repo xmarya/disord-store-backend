@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import lruCache from "../_config/LRUCache";
 import { DynamicModel } from "../_Types/Model";
 import { categorySchema } from "../models/categoryModel";
-import { ProductSchema } from "../models/productModel";
+import { productSchema } from "../models/productModel";
 import { rankingSchema } from "../models/rankingModel";
 import { reviewSchema } from "../models/reviewModel";
 import { AppError } from "./AppError";
@@ -12,14 +12,14 @@ import { AppError } from "./AppError";
 type DynamicModelMap = Record<DynamicModel, mongoose.Schema>;
 
 const modelSchemas = {
-  Product: ProductSchema,
+  Product: productSchema,
   Category: categorySchema,
   /* SOLILOQUY: let's make the review a static model, whilst keeping the ranking a DyMo, it' be easier to query the user's review this way
   Also, it's important ONLY to allow the user to write reviews about the products that are purchased by them*/
   "Review-store": reviewSchema,
   "Review-product": reviewSchema,
-  "Ranking-product":rankingSchema,
-  "Ranking-store":rankingSchema,
+  "Ranking-product": rankingSchema,
+  "Ranking-store": rankingSchema,
 } as const satisfies DynamicModelMap;
 
 type DynamicModels = keyof DynamicModelMap;
@@ -28,7 +28,7 @@ function getDynamicModelData<T extends DynamicModels>(model: T, modelId: string)
   // const modelSchema:DynamicModelMap = {
   //     Review: reviewSchema,
   //     Store: storeSchema,
-  //     Product: ProductSchema,
+  //     Product: productSchema,
   //     Order: OrderSchema,
   //     StoreStat: storeStatSchema,
   //     AnnualProfit: annualProfitSchema,
@@ -42,19 +42,17 @@ function getDynamicModelData<T extends DynamicModels>(model: T, modelId: string)
   return { modelName, schema, collection };
 }
 
-async function createDynamicModel<T extends mongoose.Document>(modelName: string, schema: mongoose.Schema, collection: string):Promise<mongoose.Model<T>> {
+async function createDynamicModel<T extends mongoose.Document>(modelName: string, schema: mongoose.Schema, collection: string): Promise<mongoose.Model<T>> {
   console.log("createDynamicModel");
   try {
-
     let dynamicModel;
 
-    if(!mongoose.connection.models[modelName]) {
+    if (!mongoose.connection.models[modelName]) {
       dynamicModel = mongoose.connection.model<T, mongoose.Model<T>>(modelName, schema, collection);
-    }
-    else dynamicModel = mongoose.connection.models[modelName] as mongoose.Model<T>;
+    } else dynamicModel = mongoose.connection.models[modelName] as mongoose.Model<T>;
     // STEP 2)Always make sure the cache is up-to-date
     lruCache.set(modelName, dynamicModel);
-    
+
     return dynamicModel;
   } catch (error) {
     console.log((error as AppError).message);
@@ -64,7 +62,7 @@ async function createDynamicModel<T extends mongoose.Document>(modelName: string
 
 export async function getDynamicModel<T extends mongoose.Document>(model: DynamicModel, modelId: string): Promise<mongoose.Model<T>> {
   console.log("inside getDynamicModel");
-  
+
   // STEP 1) get necessary data for dynamic model:
   const { modelName, schema, collection } = getDynamicModelData(model, modelId);
   if (!schema) throw new AppError(500, `Schema for model ${model} not found.`);
@@ -95,15 +93,14 @@ export async function isDynamicModelExist(modelName: string) {
   const inCache = lruCache.has(modelName);
   const inModelNames = mongoose.connection.modelNames().includes(modelName);
 
-  if(inCache || inModelNames) return true;
-  
+  if (inCache || inModelNames) return true;
+
   let [collectionName, modelId] = modelName.split("-");
   // collectionName = collectionName.toLowerCase().concat(`s-${modelId}`);
   collectionName = collectionName.toLowerCase().concat(`-${modelId}`);
 
   const collections = await mongoose.connection.db?.listCollections().toArray();
-  const inDb = collections?.some(coll => coll.name === collectionName);
-
+  const inDb = collections?.some((coll) => coll.name === collectionName);
 
   return !!inDb;
 }

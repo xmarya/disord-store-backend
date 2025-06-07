@@ -5,17 +5,16 @@ import { QueryOptions } from "../_Types/QueryOptions";
 import { MongoId } from "../_Types/MongoId";
 import { buildQuery } from "../_utils/queryModifiers/buildRequestQuery";
 
-export async function createDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, data: any, locals?: any): Promise<T> {
+export async function createDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, data: any, /*locals?: any*/): Promise<T> {
   console.log("inside createDoc");
+  const newDoc = await Model.create(data);
+  
   /* OLD CODE (kept for reference): 
-    const newDoc = await Model.create(data);
-    // newDoc.calculateRatingsAverage(Model); it'll be called from a post("save") hook
-  */
-
-  const newDoc = new Model(data);
-  if (locals) newDoc.$locals.modelId = locals;
-
-  await newDoc.save();
+    const newDoc = new Model(data);
+    if (locals) newDoc.$locals.modelId = locals;
+    
+    await newDoc.save();
+    */
   return newDoc;
 }
 
@@ -55,10 +54,10 @@ export async function updateDoc<T extends mongoose.Document>(
   const updatedDoc = await query;
   return updatedDoc;
 }
-export async function deleteDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, locals?: any): Promise<T | null> {
-  const query = Model.findByIdAndDelete(id);
-  if (locals) query.setOptions(locals);
-  const deletedDoc = await query;
+export async function deleteDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, /*locals?: any*/): Promise<T | null> {
+  const deletedDoc = Model.findByIdAndDelete(id);
+  // if (locals) query.setOptions(locals);
+  // const deletedDoc = await query;
   return deletedDoc;
 }
 

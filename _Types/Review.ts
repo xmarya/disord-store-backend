@@ -1,35 +1,33 @@
-import mongoose, { Types } from "mongoose";
-
+import mongoose from "mongoose";
+import { Model } from "./Model";
+import { MongoId } from "./MongoId";
 
 export interface ReviewDataBody {
-  modelId:string,
-  user: Types.ObjectId |string;
-  reviewBody: string;
-  rating:number,
-  // reviewedResource: Extract<DynamicModel, "Store" | "Product">;
+  writer: MongoId,
+  storeOrProduct: Extract<Model, "Store" | "Product">,
+  reviewedResourceId: MongoId,
+  reviewBody:string,
+  rating:number
+} 
+
+export interface ReviewDocument extends ReviewDataBody, mongoose.Document{
+  displayInStorePage: boolean,
+  storeReply:string,
 }
+
+/* OLD CODE (kept for reference): 
+export interface ReviewModel extends mongoose.Model<ReviewDocument> {
+  calculateRatingsAverage:(modelId:string, isDelete?:boolean) => Promise<void>
+}
+*/
+
 export interface PlatformReviewDataBody {
-  user: Types.ObjectId |string;
+  user: MongoId;
   reviewBody: string;
 }
 
 interface PlatformReview extends PlatformReviewDataBody{
-  id: Types.ObjectId;
   displayInHomePage: boolean,
-  wroteAt: Date;
-  updatedAt: Date;
 }
 
-export interface ReviewDocument extends ReviewDataBody, mongoose.Document {
-  id: Types.ObjectId;
-  wroteAt: Date;
-  updatedAt: Date;
-}
-
-export interface ReviewModel extends mongoose.Model<ReviewDocument> {
-  calculateRatingsAverage:(modelId:string, isDelete?:boolean) => Promise<void>
-}
-
-
-// export type ReviewDocument = Review & mongoose.Document;
 export type PlatformReviewDocument = PlatformReview & mongoose.Document;

@@ -1,29 +1,45 @@
 import mongoose from "mongoose";
+import Review from "../../models/reviewModel";
+import { MongoId } from "../../_Types/MongoId";
+import { Model } from "../../_Types/Model";
 import { ProductDocument } from "../../_Types/Product";
-import { PlatformReviewDocument } from "../../_Types/Review";
-import PlatformReview from "../../models/platformReviewModel";
+import { StoreDocument } from "../../_Types/Store";
 
-export async function createPlatformReview(data: any): Promise<PlatformReviewDocument> {
-  console.log("createPlatformReview service");
-  const newDoc = await PlatformReview.create(data);
-  return newDoc;
-}
 
-export async function confirmReviewAuthorisation<T extends mongoose.Document>(Model: mongoose.Model<T>, reviewId: string, userId: string): Promise<boolean> {
-  console.log("confirmReviewAuthorisation", Model, reviewId);
-  const authorised = await Model.exists({ _id: reviewId, user: userId });
+export async function confirmReviewAuthorisation(reviewId: string, userId: string): Promise<boolean> {
+  console.log("confirmReviewAuthorisation", reviewId);
+  const authorised = await Review.exists({ _id: reviewId, writer: userId });
 
   return !!authorised;
 }
 
-export async function updateModelRating<T extends ProductDocument>(Model:mongoose.Model<T>, resourceId: string, stats: Array<any>, session:mongoose.ClientSession) {
-  console.log("insid e updateModelRating");
-  const doc = await Model.findById(resourceId);
+export async function calculateRatingsAverage(Model:Extract<Model, "Store" | "Product">, docId: MongoId, rating:number, isDelete: boolean = false, session:mongoose.ClientSession) {
+  console.log("inside updateModelRating", Model);
 
-  // const collection = resourceName.concat(`s-${modelId}`);
-  // const doc = await mongoose.connection.collection(collection).findOne({_id: new mongoose.Types.ObjectId(resourceId)}) as ProductDocument; // this is what I want, it asks the db directly about the existing collections
+  const quantity = isDelete ? -1 : 1;
+  const average = isDelete ? -rating : rating;
 
-  // STEP 1) update the resource ratingsAverage and ratingsQuantity: (whether an update or delete)
+  const doc = await mongoose.model(Model).findById(docId) as ProductDocument | StoreDocument;
+
+  /* OLD CODE (kept for reference):  
+    const collection = resourceName.concat(`s-${modelId}`);
+    const doc = await mongoose.connection.collection(collection).findOne({_id: new mongoose.Types.ObjectId(modelId)}) as ProductDocument; // this is what I want, it asks the db directly about the existing collections
+  */
+   
+    const stats = await mongoose.model(Model).aggregate([
+    {
+      $match: {resourceId: docId}
+    },
+    {
+      $group: {
+        _id: null,
+        ratingsQuantity: { $sum: 1 },
+        ratingsAverage: { $avg: "$rating" },
+      }
+    }
+  ]);
+
+  // STEP 2) update the resource ratingsAverage and ratingsQuantity: (whether an update or delete)
   doc!.ratingsAverage = stats[0].ratingsAverage;
   doc!.ratingsQuantity = stats[0].ratingsQuantity;
 
