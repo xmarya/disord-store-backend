@@ -5,7 +5,7 @@ import validateRequestParams from "../../_utils/validators/validateRequestParams
 import canWriteReview from "../../_utils/protectors/canWriteReview";
 import isWriter from "../../_utils/protectors/isWriter";
 
-export const router = express.Router();
+export const router = express.Router({mergeParams: true});
 
 
 router.use(canWriteReview);

@@ -30,7 +30,7 @@ router.use("/store", storeRouter);
 router.use("/products", productNewRouter);
 router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
-router.use("/:storeId/coupons", couponsRouter); // TODO: convert into DyMo.
-router.use("/orders", orderRouter); // TODO: convert into DyMo.
+router.use("/:storeId/coupons", couponsRouter);
+router.use("/orders", orderRouter);
 
 // new router for dynamic model

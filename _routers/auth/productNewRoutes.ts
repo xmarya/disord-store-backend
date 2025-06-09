@@ -1,5 +1,9 @@
 import express from "express";
+import {router as reviewRouter} from "./reviewRoutes"
+import hasAuthorization from "../../_utils/protectors/hasAuthorization";
+import restrict from "../../_utils/protectors/restrict";
 import assignModelToRequest from "../../_utils/requestModifiers/assignModelToRequest";
+import sanitisedData from "../../_utils/validators/sanitisedData";
 import checkAssistantPermissions from "../../_utils/validators/validateAssistantPermissions";
 import { validateModelId } from "../../_utils/validators/validateModelId";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
@@ -11,14 +15,11 @@ import {
   getOneProductNewController,
   updateProductNewController
 } from "../../controllers/auth/productNewController";
-import { router as reviewsRouter } from "./reviewRoutes";
-import restrict from "../../_utils/protectors/restrict";
-import hasAuthorization from "../../_utils/protectors/hasAuthorization";
-import sanitisedData from "../../_utils/validators/sanitisedData";
 
 export const router = express.Router();
 
-router.use("/:productId/reviews", validateRequestParams("productId"), validateModelId("Review-product"), assignModelToRequest("Review-product"), reviewsRouter);
+// router.use("/:productId/reviews", validateRequestParams("productId"), validateModelId("Review-product"), assignModelToRequest("Review-product"), reviewsRouter);
+router.use("/:productId", validateRequestParams("productId"), reviewRouter);
 
 router.use(restrict("storeOwner", "storeAssistant"), hasAuthorization); // this should be at the top of the stack; so the new model will be created only if the user passed both conditional middlewares 
 router.use(validateModelId("Product"), assignModelToRequest("Product"));
