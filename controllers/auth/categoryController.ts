@@ -1,21 +1,24 @@
-import lruCache from "../../_config/LRUCache";
-import { createDoc, deleteMongoCollection, getAllDocs, getOneDocById } from "../../_services/global";
-import { CategoryBasic, CategoryDocument } from "../../_Types/Category";
+import { assignProductToCategory, deleteProductFromCategory } from "../../_services/category/categoryService";
+import { createDoc, deleteDoc, getAllDocs, getOneDocById, updateDoc } from "../../_services/global";
+import { CategoryBasic } from "../../_Types/Category";
+import { MongoId } from "../../_Types/MongoId";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import { getDynamicModel, isDynamicModelExist } from "../../_utils/dynamicMongoModel";
-import { assignProductToCategory, deleteProductFromCategory } from "../../_services/category/categoryService";
-import { MongoId } from "../../_Types/MongoId";
+import Category from "../../models/categoryModel";
 
 // protected
 export const createCategoryController = catchAsync(async (request, response, next) => {
   //TODO check the plan quota: the assistant doesn't have any plan info, it's stored in the storeOwner. to make it easy let's add a reference tot he storeOwner plan in the store itself.
 
-  const {name, colour}:CategoryBasic = request.body;
-  if(!name?.trim()) return next(new AppError(400, "Please add a name to the category"));
+  const { name, colour } = request.body;
+  if (!name?.trim()) return next(new AppError(400, "Please add a name to the category"));
 
-  const data = { name, colour, createdBy: {name: `${request.user.firstName} ${request.user.lastName}`, id:request.user.id} };
-  const newCategory = await createDoc(request.Model, data);
+  const userName = `${request.user.firstName} ${request.user.lastName}`;
+  const userId = request.user.id;
+  const storeId = request.store;
+
+  const data: CategoryBasic = { name, colour, createdBy: { name: userName, id: userId }, store: storeId };
+  const newCategory = await createDoc(Category, data);
 
   response.status(201).json({
     success: true,
@@ -24,8 +27,7 @@ export const createCategoryController = catchAsync(async (request, response, nex
 });
 
 export const getAllCategoriesController = catchAsync(async (request, response, next) => {
-
-  const categories = await getAllDocs(request.Model, request);
+  const categories = await getAllDocs(Category, request);
   if (!categories) return next(new AppError(404, "لا يوجد فئات في هذا المتجر"));
 
   response.status(200).json({
@@ -35,8 +37,7 @@ export const getAllCategoriesController = catchAsync(async (request, response, n
 });
 
 export const getCategoryController = catchAsync(async (request, response, next) => {
-
-  const category = await getOneDocById(request.Model, request.params.categoryId);
+  const category = await getOneDocById(Category, request.params.categoryId);
   if (!category) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
 
   response.status(200).json({
@@ -45,9 +46,32 @@ export const getCategoryController = catchAsync(async (request, response, next) 
   });
 });
 
-export const updateCategoryNewController = catchAsync(async (request, response, next) => {});
-export const deleteCategoryNewController = catchAsync(async (request, response, next) => {});
+export const updateCategoryNewController = catchAsync(async (request, response, next) => {
+  // NOTE: only allow the category's colour to be editable:
+  const { colour } = request.body;
+  const { categoryId } = request.params;
+  const updatedCategory = await updateDoc(Category, categoryId, colour);
 
+  response.status(201).json({
+    success: true,
+    updatedCategory,
+  });
+});
+export const deleteCategoryNewController = catchAsync(async (request, response, next) => {
+  const { categoryId } = request.params;
+  await deleteDoc(Category, categoryId);
+  response.status(204).json({
+    success: true,
+  });
+});
+
+
+export async function updateProductInCategoryController(categories: Array<CategoryBasic>, productId: MongoId, operationType: "assign" | "delete") {
+  if (operationType === "assign") await assignProductToCategory(categories, productId);
+  else deleteProductFromCategory(categories, productId);
+}
+
+/* OLD CODE (kept for reference): 
 export async function updateProductInCategoryController(modelId:string, categories:Array<CategoryDocument>,  productId:MongoId, operationType: "assign" | "delete") {
   console.log("updateProductInCategoryController", operationType);
   const Model = await getDynamicModel<CategoryDocument>("Category", modelId);
@@ -67,3 +91,4 @@ export async function deleteCategoriesCollectionController (storeId:MongoId) {
   lruCache.delete(`Product-${stringifiedId}`);
   console.log("test lru", lruCache.get(`Category-${stringifiedId}`));
 }
+*/

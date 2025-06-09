@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 import { ProductDocument } from "../_Types/Product";
-import { getDynamicModel } from "../_utils/dynamicMongoModel";
 
 type ProductModel = mongoose.Model<ProductDocument>;
 
@@ -23,7 +22,10 @@ export const productSchema = new Schema<ProductDocument>(
       type: [String],
       required: [true, "the image field is required"],
     },
-    categories: [Schema.Types.ObjectId],
+    categories: [{
+      type: Schema.Types.ObjectId,
+      ref:"Category"
+    }],
     description: {
       type: String,
       required: [true, "the description field is required"],
@@ -115,21 +117,23 @@ productSchema.pre("findOneAndDelete", async function (next) {
 */
 
 // the below hooks teach the Product model how to manage its own category relationships automatically
+/* OLD CODE (kept for reference): 
 productSchema.pre("save", async function (this: ProductDocument, next) {
   if (!this.isModified("categories")) return next();
   console.log("productSchema.pre(save)");
-
+  
   const product = this;
   const newCategory = product.categories;
   if (newCategory.length) {
     const [_, modelId] = (product.constructor as mongoose.Model<ProductDocument>).modelName.split("-");
     const CategoryModel = await getDynamicModel("Category", modelId);
-
+    
     await CategoryModel.updateMany({ _id: { $in: newCategory } }, { $addToSet: { products: product._id } });
   }
   next();
 });
 
+*/
 /* OLD CODE (kept for reference): 
 productSchema.pre("findOneAndUpdate", async function(next) {
   console.log("productSchema.pre(findOneAndUpdate)");

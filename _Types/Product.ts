@@ -2,22 +2,25 @@ import mongoose from "mongoose";
 import { CategoryDocument } from "./Category";
 import { MongoId } from "./MongoId";
 
-export interface ProductBasic {
+export interface ProductDataBody {
   name: string;
   price: number;
-  // quantity: number;
   image: Array<string>;
-  categories: Array<CategoryDocument>;
   description: string;
-  // status: "inStock" | "outOfStock";
   stock: number | null;
+  productType: "physical" | "digital";
+  weight: number;
+}
+
+export interface ProductBasic extends ProductDataBody {
+  // quantity: number;
+  categories: Array<CategoryDocument>;
+  // status: "inStock" | "outOfStock";
   discount: number;
   store: MongoId;
-  productType: "physical" | "digital";
   ranking: number;
-  ratingsAverage:number,
-  ratingsQuantity:number
-  weight: number;
+  ratingsAverage: number;
+  ratingsQuantity: number;
 }
 
 export interface ProductOptionals {

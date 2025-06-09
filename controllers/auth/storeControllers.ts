@@ -9,8 +9,6 @@ import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import Store from "../../models/storeModel";
 import { StoreDataBody, StoreDocument } from "./../../_Types/Store";
-import { deleteCategoriesCollectionController } from "./categoryController";
-import { deleteProductsCollectionController } from "./productNewController";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   // TODO: complete the store data
@@ -52,7 +50,6 @@ export const updateMyStoreNewController = catchAsync(async (request, response, n
   const { storeName, description, logo }: StoreDataBody = request.body;
   if (!storeName?.trim() && !description?.trim() && logo) return next(new AppError(400, "request.body has no data to update"));
 
-  // (this validation was done on the front-end already) validate the storeName -if it is there- using getField utility function
   const storeId = request.store;
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
   const data = { storeName, description, logo };
@@ -106,7 +103,9 @@ export async function deleteStorePermanently(storeId: MongoId) {
     await resetStoreOwnerToDefault(storeId, session);
     //STEP 2) delete corresponding storeAssistant:
     await deleteAllAssistants(storeId, session);
-    //STEP 3) delete the store:
+    //TODO:3) delete products:
+    //TODO:4) delete categories:
+    //STEP 5) delete the store:
     await deleteStore(storeId, session);
     console.log("test request.user.myStore before deletion the store", storeId);
 
@@ -119,9 +118,11 @@ export async function deleteStorePermanently(storeId: MongoId) {
     await session.endSession();
   }
 
+  /* OLD CODE (kept for reference): 
   // if the deletion of the store went successfully, drop the collection (this functionality doesn't fully support session and transaction)
   await deleteProductsCollectionController(storeId);
   await deleteCategoriesCollectionController(storeId);
+  */
 
   //TODO: add the deleted data to the AdminLog
 }

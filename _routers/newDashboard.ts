@@ -7,7 +7,7 @@ import { router as userRouter } from "./auth/userAuthRoutes";
 import { router as orderRouter } from "./auth/orderRoutes";
 import { router as couponsRouter } from "./auth/couponRoutes";
 import { router as platformReviewsRouter } from "./auth/platformReviewsRoutes";
-import { router as productNewRouter } from "./auth/productNewRoutes";
+import { router as productRouter } from "./auth/productRoutes";
 import { verifyPlanSubscription } from "../_utils/validators/verifyPlanSubscription";
 import validateJwtToken from "../_utils/validators/validateJwtToken";
 import getUserFromPayload from "../_utils/protectors/getUserFromPayload";
@@ -27,7 +27,7 @@ router.use("/platform/reviews", platformReviewsRouter);
 
 router.use(verifyPlanSubscription, assignPlanIdToRequest);
 router.use("/store", storeRouter);
-router.use("/products", productNewRouter);
+router.use("/products", productRouter);
 router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);

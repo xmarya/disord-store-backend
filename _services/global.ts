@@ -61,7 +61,10 @@ export async function deleteDoc<T extends mongoose.Document>(Model: mongoose.Mod
   return deletedDoc;
 }
 
+/* OLD CODE (kept for reference): 
 export async function deleteMongoCollection(collection: string) {
   console.log("deleteProductsCollection", collection);
   await mongoose.connection.db?.dropCollection(collection);
 }
+   */
+

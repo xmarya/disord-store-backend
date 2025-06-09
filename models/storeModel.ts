@@ -57,7 +57,10 @@ export const storeSchema = new Schema<StoreDocument>(
       }],
       */
 
-    categories: [Schema.Types.ObjectId],
+    categories: [{
+      type:Schema.Types.ObjectId,
+      ref:"Category"
+    }],
     colourTheme: {
       /* SOLILOQUY: this should be one object not an array, 
       of course the plus users can views many theme but eventually they are going to select only one*/
@@ -136,7 +139,7 @@ from the StoreStats Model, also using the virtual won't allow to do date filteri
 // });
 
 storeSchema.pre(/^find/, function (this: Query<any, StoreDocument>, next) {
-  this.populate("owner");
+  this.populate("owner categories");
   next();
 });
 
