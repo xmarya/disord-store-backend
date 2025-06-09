@@ -23,7 +23,6 @@ export interface ProductBasic {
 export interface ProductOptionals {
   discount?: number;
   numberOfPurchases?: number;
-  ranking?: number;
 }
 
 export type ProductDocument = ProductBasic & ProductOptionals & mongoose.Document;

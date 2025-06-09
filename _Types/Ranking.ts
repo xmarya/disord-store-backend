@@ -1,8 +1,7 @@
 import mongoose, { Types } from "mongoose";
 
 export interface Ranking {
-  id: string;
-  modelId: Types.ObjectId;
+  resourceId: Types.ObjectId;
   rank: number;
 }
 
