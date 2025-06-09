@@ -1,27 +1,24 @@
 import { startSession } from "mongoose";
 import { deleteAllAssistants } from "../../_services/assistant/assistantService";
 import { updateDoc } from "../../_services/global";
-import { createStore, deleteStore, getStoreWithProducts } from "../../_services/store/storeService";
+import { createStore, deleteStore } from "../../_services/store/storeService";
 import { getOneStoreStats } from "../../_services/store/storeStatsService";
 import { resetStoreOwnerToDefault } from "../../_services/user/userService";
 import { MongoId } from "../../_Types/MongoId";
-import { ProductDocument } from "../../_Types/Product";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import { getDynamicModel } from "../../_utils/dynamicMongoModel";
 import Store from "../../models/storeModel";
 import { StoreDataBody, StoreDocument } from "./../../_Types/Store";
 import { deleteCategoriesCollectionController } from "./categoryController";
 import { deleteProductsCollectionController } from "./productNewController";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
-
   // TODO: complete the store data
   const { storeName, description, logo }: StoreDataBody = request.body;
   if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
 
   //TODO: handling logo and uploading it to cloudflare
-  const data:StoreDataBody = { storeName, description, logo, owner:request.user.id, inPlan: request.plan };
+  const data: StoreDataBody = { storeName, description, logo, owner: request.user.id, inPlan: request.plan };
   const newStore = await createStore(data);
 
   response.status(201).json({
@@ -37,7 +34,7 @@ export const getStoreStatsController = catchAsync(async (request, response, next
     there is a possibility for it be a string and it has .length property too.
     if(!dates.length) return next(new AppError(400, "specify the dates inside an array"));
   */
-  
+
   const { dateFilter, sortBy, sortOrder } = request.dateQuery;
   const storeId = request.store;
 
@@ -49,7 +46,6 @@ export const getStoreStatsController = catchAsync(async (request, response, next
     stats,
   });
 });
-
 
 export const updateMyStoreNewController = catchAsync(async (request, response, next) => {
   // only allow storeName, description, logo
@@ -91,6 +87,11 @@ export const deleteMyStoreNewController = catchAsync(async (request, response, n
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
   await deleteStorePermanently(storeId);
 
+  /*TODO:
+  await Ranking.deleteOne(deletedDoc.id);
+  console.log("now check Ranking after delete");
+  await Review.deleteMany({ reviewedModel: deletedDoc.id})
+  */
   response.status(204).json({
     success: true,
   });
