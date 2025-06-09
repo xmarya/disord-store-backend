@@ -10,12 +10,12 @@ import PlatformReview from "../../models/platformReviewModel";
 import Review from "../../models/reviewModel";
 import { MongoId } from "../../_Types/MongoId";
 
-async function updateResourceRatingController(Model: Extract<Model, "Store" | "Product">, resourceId: MongoId, rating: number, isDelete: boolean = false) {
+async function updateResourceRatingController(Model: Extract<Model, "Store" | "Product">, resourceId: MongoId) {
   const session = await startSession();
 
   try {
     session.startTransaction();
-    await calculateRatingsAverage(Model, resourceId, rating, isDelete, session);
+    await calculateRatingsAverage(Model, resourceId, session);
     await setRanking(Model, session);
     await session.commitTransaction();
   } catch (error) {
@@ -31,16 +31,17 @@ async function updateResourceRatingController(Model: Extract<Model, "Store" | "P
 // since the modelId and the request.params.resource are crucial pieces of data, in case the front-end developer didn't provide it,
 // the review then is going to be considered as a platform review which leads to storing the data in the wrong collection.
 
-export const createReviewOnModelController = catchAsync(async (request, response, next) => {
+export const createReviewController = catchAsync(async (request, response, next) => {
+  console.log("includes(product)",request.baseUrl.includes("product"));
   // STEP 1) validate the data of the coming request.body:
   const { reviewedResourceId, storeOrProduct, reviewBody, rating }: ReviewDataBody = request.body;
   if (!reviewBody?.trim() || !rating || (reviewedResourceId as string)?.trim() || storeOrProduct?.trim()) return next(new AppError(400, "الرجاء التأكد من كتابة جميع البيانات قبل الإرسال"));
   if (isNaN(rating)) return next(new AppError(400, "the rating must be of type number"));
 
   const data = { reviewedResourceId, storeOrProduct, reviewBody, user: request.user.id, rating };
-  const newReview = await createDoc(request.Model, data);
+  const newReview = await createDoc(Review, data);
 
-  await updateResourceRatingController(storeOrProduct, reviewedResourceId, rating);
+  await updateResourceRatingController(storeOrProduct, reviewedResourceId);
 
   response.status(201).json({
     success: true,
@@ -50,7 +51,7 @@ export const createReviewOnModelController = catchAsync(async (request, response
 
 export const getAllReviewsController = catchAsync(async (request, response, next) => {
   // ENHANCE: make it specific! what resource's reviews should it return? for whom?
-  const reviews = await getAllDocs(request.Model, request);
+  const reviews = await getAllDocs(Review, request);
   if (!reviews.length) return next(new AppError(404, "لا يوجد بيانات لعرضها"));
 
   response.status(200).json({
@@ -83,7 +84,7 @@ export const updateReviewController = catchAsync(async (request, response, next)
   const updatedReview = await updateDoc(Review, request.params.reviewId, request.body);
   if (!updatedReview) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
 
-  await updateResourceRatingController(updatedReview.storeOrProduct, updatedReview.reviewedResourceId, rating);
+  await updateResourceRatingController(updatedReview.storeOrProduct, updatedReview.reviewedResourceId);
 
   response.status(200).json({
     success: true,
@@ -95,8 +96,7 @@ export const deleteReviewController = catchAsync(async (request, response, next)
   if (!deletedReview) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
 
   console.log(deletedReview);
-  const isDelete = true;
-  await updateResourceRatingController(deletedReview.storeOrProduct, deletedReview.reviewedResourceId, deletedReview.rating, isDelete);
+  await updateResourceRatingController(deletedReview.storeOrProduct, deletedReview.reviewedResourceId);
 
   response.status(204).json({
     success: true,

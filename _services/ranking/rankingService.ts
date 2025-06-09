@@ -22,7 +22,7 @@ export async function setRanking(Model: Extract<Model, "Store" | "Product">, ses
   await Promise.all(
     sortedDocs.map(async (doc, index) => {
       console.log("doc.Id", doc._id);
-      Ranking.findOneAndUpdate({ modelId: doc._id }, { $set: { rank: index + 1 } }, { upsert: true, session });
+      Ranking.findOneAndUpdate({ resourceId: doc._id }, { $set: { rank: index + 1 } }, { upsert: true, session });
     })
   );
 

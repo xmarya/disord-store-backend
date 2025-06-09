@@ -1,5 +1,5 @@
 import express from "express";
-import { createReviewOnModelController, deleteReviewController, getAllReviewsController, getOneReviewController, updateReviewController } from "../../controllers/auth/reviewController";
+import { createReviewController, deleteReviewController, getAllReviewsController, getOneReviewController, updateReviewController } from "../../controllers/auth/reviewController";
 import { AppError } from "../../_utils/AppError";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
 import canWriteReview from "../../_utils/protectors/canWriteReview";
@@ -17,7 +17,7 @@ router.all("/", (request, response, next) => {
   if (!["GET", "POST"].includes(request.method)) return next(new AppError(405, `${request.method} not allowed on /store/reviews. please provide a /:reviewId`));
   next();
 });
-router.route("/").post(createReviewOnModelController).get(getAllReviewsController); // FIX: what king of reviews should getAllReviewsController returns ???
+router.route("/").post(createReviewController).get(getAllReviewsController); // FIX: what king of reviews should getAllReviewsController returns ???
 router
   .route("/:reviewId")
   .get(validateRequestParams("reviewId"), getOneReviewController)

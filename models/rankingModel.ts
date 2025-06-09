@@ -7,8 +7,8 @@ type RankingModel = mongoose.Model<RankingDocument>;
 
 const rankingSchema = new Schema<RankingDocument>(
   {
-    // ranking for the store and the products
-    modelId: {
+    // ranking for the stores and the products
+    resourceId: {
       // which is going to be either storeId or productId
       type: Schema.Types.ObjectId,
       required: [true, "the modelId field is required"],
@@ -29,14 +29,13 @@ const rankingSchema = new Schema<RankingDocument>(
 );
 
 interface PopulateRanking {
-  // modelId: StoreBasic | ProductBasic;
-  modelId: StoreDocument | ProductDocument;
+  resourceId: StoreDocument | ProductDocument;
 }
 
 rankingSchema.index({ rank: -1, modelId: 1 });
 
 rankingSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
-  this.populate<{ modelId: PopulateRanking }>("modelId");
+  this.populate<{ modelId: PopulateRanking }>("resourceId");
   next();
 });
 
