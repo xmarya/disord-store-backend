@@ -9,6 +9,8 @@ declare global {
       user: UserDocument | AdminDocument; // NOTE: this might cause a type narrowing errors
       store: MongoId;
       plan: MongoId;
+      isPlanPaid:boolean;
+      planExpiryDate:Date,
       /* OLD CODE (kept for reference): 
       Model: mongoose.Model<mongoose.Document>;
       validatedModelId: string,

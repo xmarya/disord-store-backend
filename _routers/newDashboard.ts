@@ -1,6 +1,6 @@
 import express from "express";
 import { router as adminRouter } from "./auth/adminRoutes";
-import { router as storeRouter } from "./auth/storeNewRoutes";
+import { router as storeRouter } from "./auth/storeRoutes";
 import { router as assistantRouter } from "./auth/assistantRoutes";
 import { router as categoryRouter } from "./auth/categoryRoutes";
 import { router as userRouter } from "./auth/userAuthRoutes";
@@ -13,6 +13,7 @@ import validateJwtToken from "../_utils/validators/validateJwtToken";
 import getUserFromPayload from "../_utils/protectors/getUserFromPayload";
 import assignPlanIdToRequest from "../_utils/requestModifiers/assignPlanIdToRequest";
 import { logout } from "../controllers/auth/userAuthController";
+import { assignStoreIdToRequest } from "../_utils/requestModifiers/assignStoreIdToRequest";
 
 
 export const router = express.Router();
@@ -25,7 +26,7 @@ router.use("/me", userRouter);
 router.use("/admin", adminRouter);
 router.use("/platform/reviews", platformReviewsRouter);
 
-router.use(verifyPlanSubscription, assignPlanIdToRequest);
+router.use(assignStoreIdToRequest, assignPlanIdToRequest, verifyPlanSubscription);
 router.use("/store", storeRouter);
 router.use("/products", productRouter);
 router.use("/categories", categoryRouter);
