@@ -20,5 +20,7 @@ router.get("/", getAllOrders);
 router.get("/:id", GetOrderById);
 router.get("/revenue", getTotalRevenue);
 router.get("/invoice/pdf", generateRevenuePDF);
-router.get("/shipment/:orderId", GetShipmentData)
+router.get("/shipment/:orderId", GetShipmentData);
+
+//TODO: please use checkAssistantPermissions("manageOrders") for preventing any unauthorised assistant from changing the orders' state 
 

@@ -20,7 +20,7 @@ const checkAssistantPermissions = (permissionKey: keyof AssistantPermissions) =>
     if (request.user.userType === "storeOwner") return next();
     // console.log("checkAssistantPermissions", request.user.userType, permissionKey);
 
-    const storeId = request.store; /* REQUIRES TESTING*/
+    const storeId = request.store;
     const assistantId = request.user.id;
     
 

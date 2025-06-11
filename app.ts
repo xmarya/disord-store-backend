@@ -6,7 +6,6 @@ import ratelimit from "express-rate-limit";
 import {router as userRouter} from "./_routers/public/userRoutes";
 import {router as storeRouter} from "./_routers/public/storeRoutes";
 import { router as dashboardRouter } from "./_routers/dashboard";
-import { router as newDashboardRouter } from "./_routers/newDashboard";
 
 
 const app = express();
@@ -35,7 +34,6 @@ app.use(cors());
 app.use("/api/v1/stores", storeRouter);
 app.use("/api/v1/auth", userRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
-app.use("/api/v1/new-dashboard", newDashboardRouter);
 
 
 
