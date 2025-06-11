@@ -16,6 +16,7 @@ export interface StoreAssistant {
 }
 
 export interface AssistantPermissions {
+  updateStoreStatus:boolean
   changePrice: boolean;
   addProduct: boolean;
   editProduct: boolean;
@@ -28,6 +29,8 @@ export interface AssistantPermissions {
   previewStoreStats: boolean;
   addCoupon: boolean;
   UpdateCoupon: boolean;
+  replyToCustomers:boolean,
+  manageOrders:boolean
 }
 
 export type StoreAssistantDocument = StoreAssistant & mongoose.Document;

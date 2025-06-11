@@ -1,10 +1,9 @@
-import mongoose, { Model, Schema, model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { ProductDocument } from "../_Types/Product";
-import { getDynamicModel } from "../_utils/dynamicMongoModel";
 
-type ProductModel = Model<ProductDocument>;
+type ProductModel = mongoose.Model<ProductDocument>;
 
-export const ProductSchema = new Schema<ProductDocument>(
+export const productSchema = new Schema<ProductDocument>(
   {
     name: {
       type: String,
@@ -23,7 +22,10 @@ export const ProductSchema = new Schema<ProductDocument>(
       type: [String],
       required: [true, "the image field is required"],
     },
-    categories: [Schema.Types.ObjectId],
+    categories: [{
+      type: Schema.Types.ObjectId,
+      ref:"Category"
+    }],
     description: {
       type: String,
       required: [true, "the description field is required"],
@@ -33,28 +35,28 @@ export const ProductSchema = new Schema<ProductDocument>(
     //   enum: ["inStock", "outOfStock"],
     //   required: [true, "the productStatus is required"],
     // },
-    stock: { 
-      type: Number, 
-      required: false, 
-      default: null, 
-      min: [0, "Stock cannot be negative"], 
+    stock: {
+      type: Number,
+      required: false,
+      default: null,
+      min: [0, "Stock cannot be negative"],
     },
     discount: { type: Number, default: 0, min: 0, max: 100 },
     productType: {
       type: String,
       enum: ["physical", "digital"],
       default: "physical",
-      required: true
+      required: true,
     },
     // discount: {
     //   // NOTE: the user insert the number to be in %
     //   type: Number,
     // },
-    // store: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: "Store",
-    //   required: [true, "each product must belong to a store"],
-    // },
+    store: {
+      type: Schema.Types.ObjectId,
+      ref: "Store",
+      required: [true, "each product must belong to a store"],
+    },
     numberOfPurchases: {
       //TODO: this counter should be increased once the users completed their payment process
       type: Number,
@@ -62,21 +64,21 @@ export const ProductSchema = new Schema<ProductDocument>(
     },
     ranking: {
       type: Number,
-      default: null
+      default: null,
       // NOTE: this filed will be used to presents the ranking of store's products, it's irrelevant to the storeStats model.
     },
     ratingsAverage: {
       type: Number,
-      default:null,
+      default: null,
       min: [1, "rating must be 1 to 5"],
       max: [5, "rating must be 1 to 5"],
-      set: (rating:number) => Math.round(rating * 10) / 10
+      set: (rating: number) => Math.round(rating * 10) / 10,
     },
     ratingsQuantity: {
       type: Number,
-      default:0
+      default: 0,
     },
-    weight:{type: Number, required: true, default: 0}
+    weight: { type: Number, required: true, default: 0 },
   },
   {
     timestamps: true,
@@ -87,9 +89,9 @@ export const ProductSchema = new Schema<ProductDocument>(
   }
 );
 /* OLD CODE (kept for reference): 
-ProductSchema.pre("save", async function (this:ProductDocument, next) {
+productSchema.pre("save", async function (this:ProductDocument, next) {
 if (this.isModified("categories")) {
-  console.log("ProductSchema.pre(save)");
+  console.log("productSchema.pre(save)");
   const modelName = (this.constructor as Model<ProductDocument>).modelName;
   const [_, modelId] = modelName.split("-");
   // if a product has been associated with a category, assert its id to the category:
@@ -101,8 +103,8 @@ next();
 */
 
 /* OLD CODE (kept for reference): 
-ProductSchema.pre("findOneAndDelete", async function (next) { 
-  console.log("ProductSchema.pre(findOneAndDelete)");
+productSchema.pre("findOneAndDelete", async function (next) { 
+  console.log("productSchema.pre(findOneAndDelete)");
   const doc = await this.model.findOne(this.getQuery()).select("categories");
   const categories = doc.categories;
   
@@ -115,27 +117,26 @@ ProductSchema.pre("findOneAndDelete", async function (next) {
 */
 
 // the below hooks teach the Product model how to manage its own category relationships automatically
-ProductSchema.pre("save", async function(this:ProductDocument, next) {
-  if(!this.isModified("categories")) return next();
-  console.log("ProductSchema.pre(save)");
-
+/* OLD CODE (kept for reference): 
+productSchema.pre("save", async function (this: ProductDocument, next) {
+  if (!this.isModified("categories")) return next();
+  console.log("productSchema.pre(save)");
+  
   const product = this;
   const newCategory = product.categories;
   if (newCategory.length) {
-    const [_, modelId] = (product.constructor as Model<ProductDocument>).modelName.split("-");
+    const [_, modelId] = (product.constructor as mongoose.Model<ProductDocument>).modelName.split("-");
     const CategoryModel = await getDynamicModel("Category", modelId);
-
-    await CategoryModel.updateMany(
-      { _id: { $in: newCategory } },
-      { $addToSet: { products: product._id } }
-    );
+    
+    await CategoryModel.updateMany({ _id: { $in: newCategory } }, { $addToSet: { products: product._id } });
   }
   next();
 });
 
+*/
 /* OLD CODE (kept for reference): 
-ProductSchema.pre("findOneAndUpdate", async function(next) {
-  console.log("ProductSchema.pre(findOneAndUpdate)");
+productSchema.pre("findOneAndUpdate", async function(next) {
+  console.log("productSchema.pre(findOneAndUpdate)");
 
   const updatedFields = this.getUpdate();
   if(!updatedFields?.categories) return next();
@@ -179,10 +180,10 @@ ProductSchema.pre("findOneAndUpdate", async function(next) {
     });
     */
 
-ProductSchema.index({ ranking: 1 });
-
+productSchema.index({name: 1, store:1}, {unique:true}); // ensure uniqueness for the products' names in each store
+productSchema.index({ ranking: 1 });
 
 //TODO: delete these after fully refactoring everything
-const Product = model<ProductDocument, ProductModel>("Product", ProductSchema);
+const Product = mongoose.model<ProductDocument, ProductModel>("Product", productSchema);
 
 export default Product;

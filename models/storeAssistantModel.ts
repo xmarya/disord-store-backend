@@ -39,6 +39,7 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
     */
 
     permissions: {
+      updateStoreStatus: { type: Boolean, default: false },
       changePrice: { type: Boolean, default: false },
       addProduct: { type: Boolean, default: false },
       editProduct: { type: Boolean, default: false },
@@ -50,6 +51,8 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
       previewStoreStats: { type: Boolean, default: false },
       addCoupon: { type: Boolean, default: false },
       deleteCoupon: { type: Boolean, default: false },
+      replyToCustomers: { type: Boolean, default: false },
+      manageOrders: { type: Boolean, default: false },
     },
   },
   {

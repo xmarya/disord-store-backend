@@ -1,27 +1,22 @@
 import { startSession } from "mongoose";
 import { deleteAllAssistants } from "../../_services/assistant/assistantService";
 import { updateDoc } from "../../_services/global";
-import { createStore, deleteStore, getStoreWithProducts } from "../../_services/store/storeService";
+import { createStore, deleteStore } from "../../_services/store/storeService";
 import { getOneStoreStats } from "../../_services/store/storeStatsService";
 import { resetStoreOwnerToDefault } from "../../_services/user/userService";
 import { MongoId } from "../../_Types/MongoId";
-import { ProductDocument } from "../../_Types/Product";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import { getDynamicModel } from "../../_utils/dynamicMongoModel";
 import Store from "../../models/storeModel";
 import { StoreDataBody, StoreDocument } from "./../../_Types/Store";
-import { deleteCategoriesCollectionController } from "./categoryController";
-import { deleteProductsCollectionController } from "./productNewController";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
-
   // TODO: complete the store data
   const { storeName, description, logo }: StoreDataBody = request.body;
   if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
 
   //TODO: handling logo and uploading it to cloudflare
-  const data:StoreDataBody = { storeName, description, logo, owner:request.user.id, inPlan: request.plan };
+  const data: StoreDataBody = { storeName, description, logo, owner: request.user.id, inPlan: request.plan };
   const newStore = await createStore(data);
 
   response.status(201).json({
@@ -37,7 +32,7 @@ export const getStoreStatsController = catchAsync(async (request, response, next
     there is a possibility for it be a string and it has .length property too.
     if(!dates.length) return next(new AppError(400, "specify the dates inside an array"));
   */
-  
+
   const { dateFilter, sortBy, sortOrder } = request.dateQuery;
   const storeId = request.store;
 
@@ -50,28 +45,11 @@ export const getStoreStatsController = catchAsync(async (request, response, next
   });
 });
 
-export const getStoreWithProductsController = catchAsync(async (request, response, next) => {
-  console.log("GETSTOREWITHPRODUCTS");
-  //STEP 1) first, check if the store has any products:
-  const { storeId } = request.params;
-  const ProductModel = await getDynamicModel<ProductDocument>("Product", storeId); // false = don't create a new DyMo it it doesn't exist
-
-  const { store, products } = await getStoreWithProducts(storeId, ProductModel);
-  if (!products.length) return next(new AppError(404, "no products were found related to this storeId"));
-
-  response.status(200).json({
-    success: true,
-    store,
-    products,
-  });
-});
-
 export const updateMyStoreNewController = catchAsync(async (request, response, next) => {
   // only allow storeName, description, logo
   const { storeName, description, logo }: StoreDataBody = request.body;
   if (!storeName?.trim() && !description?.trim() && logo) return next(new AppError(400, "request.body has no data to update"));
 
-  // (this validation was done on the front-end already) validate the storeName -if it is there- using getField utility function
   const storeId = request.store;
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
   const data = { storeName, description, logo };
@@ -106,6 +84,11 @@ export const deleteMyStoreNewController = catchAsync(async (request, response, n
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
   await deleteStorePermanently(storeId);
 
+  /*TODO:
+  await Ranking.deleteOne(deletedDoc.id);
+  console.log("now check Ranking after delete");
+  await Review.deleteMany({ reviewedModel: deletedDoc.id})
+  */
   response.status(204).json({
     success: true,
   });
@@ -120,7 +103,9 @@ export async function deleteStorePermanently(storeId: MongoId) {
     await resetStoreOwnerToDefault(storeId, session);
     //STEP 2) delete corresponding storeAssistant:
     await deleteAllAssistants(storeId, session);
-    //STEP 3) delete the store:
+    //TODO:3) delete products:
+    //TODO:4) delete categories:
+    //STEP 5) delete the store:
     await deleteStore(storeId, session);
     console.log("test request.user.myStore before deletion the store", storeId);
 
@@ -133,9 +118,11 @@ export async function deleteStorePermanently(storeId: MongoId) {
     await session.endSession();
   }
 
+  /* OLD CODE (kept for reference): 
   // if the deletion of the store went successfully, drop the collection (this functionality doesn't fully support session and transaction)
   await deleteProductsCollectionController(storeId);
   await deleteCategoriesCollectionController(storeId);
+  */
 
   //TODO: add the deleted data to the AdminLog
 }

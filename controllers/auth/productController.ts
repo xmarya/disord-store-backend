@@ -1,20 +1,21 @@
-import { createProduct, getAllProducts } from "../../_services/product/productServices";
+import { createDoc, deleteDoc, getAllDocs, getOneDocById, updateDoc } from "../../_services/global";
+import { updateProduct } from "../../_services/product/productServices";
+import { ProductDataBody } from "../../_Types/Product";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import sanitisedData from "../../_utils/sanitisedData";
 import Product from "../../models/productModel";
-import { deleteOne, getOne, updateOne } from "../global";
+import { updateProductInCategoryController } from "./categoryController";
 
-// protected routes
 export const createProductController = catchAsync(async (request, response, next) => {
-  sanitisedData(request, next);
+  const { name, description, price, image, stock, productType, weight }: ProductDataBody = request.body;
+  if (!name?.trim() || !price || !description?.trim() || !weight || !productType?.trim()) return next(new AppError(400, "Please add all the product's necessary data"));
 
-  // const storeId = request.user.myStore || request.params.storeId;
-  // if(!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
-  // const data = { ...request.body, store: storeId };
-  const data = { ...request.body }; // the storeId now within the request.body (refer to isStoreIdExist middleware)
+  if (isNaN(price) || isNaN(weight)) return next(new AppError(400, "product's weight and price must be of type number"));
 
-  const newProd = await createProduct(data);
+  const storeId = request.store;
+  const data = { store: storeId, name, description, price, image, stock, productType, weight };
+  const newProd = await createDoc(Product, data);
+
   response.status(201).json({
     success: true,
     newProd,
@@ -22,13 +23,8 @@ export const createProductController = catchAsync(async (request, response, next
 });
 
 export const getAllProductsController = catchAsync(async (request, response, next) => {
-  // const storeId = request.user.myStore || request.params.storeId;
-  // if (!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
-
-  // const products = await getAllProducts(storeId);
-  const products = await getAllProducts(request.store);
-
-  if (!products) return next(new AppError(400, "لا يوجد منتجات في هذا المتجر"));
+  const products = await getAllDocs(Product, request);
+  if (!products) return next(new AppError(404, "لم يتم العثور على منتجات"));
 
   response.status(200).json({
     success: true,
@@ -36,6 +32,79 @@ export const getAllProductsController = catchAsync(async (request, response, nex
   });
 });
 
-export const getProductController = getOne("Product");
-export const updateProductController = updateOne("Product");
-export const deleteProductController = deleteOne("Product");
+export const getOneProductController = catchAsync(async (request, response, next) => {
+  const product = await getOneDocById(Product, request.params.productId);
+  if (!product) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
+
+  response.status(200).json({
+    success: true,
+    product,
+  });
+});
+
+export const updateProductController = catchAsync(async (request, response, next) => {
+  if (!request.body || Object.keys(request.body).length === 0) return next(new AppError(400, "no data was provided in the request.body"));
+
+  const { categories } = request.body;
+  if (categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array"));
+
+  const productId = request.params.productId;
+
+  /* OLD CODE (kept for reference): 
+    if (categories && categories.length !== 0) {
+      const [_, modelId] = request.Model.modelName.split("-");
+      await updateProductInCategoryController(modelId, categories, productId, "assign");
+      updatedProduct = await updateProduct(request.Model, productId, request.body); 
+      }
+      else updatedProduct = await updateDoc(request.Model, productId, request.body);
+  */
+  await updateProductInCategoryController(categories, productId, "assign"); /*REQUIRES TESTING */
+  const updatedProduct = await updateProduct(productId, request.body);
+
+  if (!updatedProduct) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
+
+  response.status(201).json({
+    success: true,
+    updatedProduct,
+  });
+});
+
+export const deleteProductController = catchAsync(async (request, response, next) => {
+  const productId = request.params.productId;
+
+  const deletedProduct = await deleteDoc(Product, productId);
+  if (!deletedProduct) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
+
+  /* OLD CODE (kept for reference): 
+  const {categories} = deletedProduct as ProductDocument
+  const [_, modelId] = request.Model.modelName.split("-");
+  */
+  await updateProductInCategoryController(deletedProduct.categories, productId, "delete"); /*REQUIRES TESTING */
+  /*TODO:
+  await Ranking.deleteOne(deletedDoc.id);
+  console.log("now check Ranking after delete");
+  await Review.deleteMany({ reviewedModel: deletedDoc.id})
+  */
+
+  response.status(204).json({
+    success: true,
+    deletedProduct,
+  });
+});
+
+/* OLD CODE (kept for reference): 
+export async function deleteProductsCollectionController(storeId:MongoId) {
+  console.log("storeId for delete", storeId);
+  // 1) stringify the Object.id:
+  const stringifiedId = JSON.parse(JSON.stringify(storeId));
+  
+  // 2) check if the DyMo is existing before deletion:
+  const isExist = await isDynamicModelExist(`Product-${stringifiedId}`);
+  
+  if (!isExist) return;
+  console.log("did it return??");
+  await deleteMongoCollection(`product-${stringifiedId}`);
+  lruCache.delete(`Product-${stringifiedId}`);
+  console.log("test lru", lruCache.get(`Product-${stringifiedId}`));
+}
+*/

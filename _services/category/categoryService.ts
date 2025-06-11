@@ -1,6 +1,6 @@
 /* OLD CODE (kept for reference): 
 export async function createCategory(data: CategoryBasic) {
-  //STEP 1) check if the store exists:
+  // 1) check if the store exists:
   const store = await Store.findById(data.store);
   if (!store) return new AppError(400, "لا يوجد متجر بهذا المعرف");
   
@@ -25,18 +25,18 @@ export async function createCategory(data: CategoryBasic) {
 }
 */
 
-import mongoose from "mongoose";
-import { CategoryDocument } from "../../_Types/Category";
+import { CategoryBasic } from "../../_Types/Category";
 import { MongoId } from "../../_Types/MongoId";
+import Category from "../../models/categoryModel";
 
 
-export async function assignProductToCategory<T extends CategoryDocument>(Model:mongoose.Model<T>,categories:Array<T>, productId:MongoId) {
+export async function assignProductToCategory(categories:Array<CategoryBasic>, productId:MongoId) {
   console.log("assignProductToCategory");
-  await Model.updateMany({_id: {$in: categories}}, {$addToSet: { products: productId }});
+  await Category.updateMany({_id: {$in: categories}}, {$addToSet: { products: productId }});
 }
 
 // NOTE: this is going to be called in two scenarios: 1) removing a category from the product. 2) deleting the product permanently.
-export async function deleteProductFromCategory<T extends CategoryDocument>(Model:mongoose.Model<T>,categories:Array<T>, productId:MongoId) {
+export async function deleteProductFromCategory(categories:Array<CategoryBasic>, productId:MongoId) {
   console.log("deleteProductFromCategory");
-  await Model.updateMany({_id: {$in: categories}}, {$pull: { products: productId }});
+  await Category.updateMany({_id: {$in: categories}}, {$pull: { products: productId }});
 }

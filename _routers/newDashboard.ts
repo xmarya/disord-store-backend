@@ -1,18 +1,19 @@
 import express from "express";
 import { router as adminRouter } from "./auth/adminRoutes";
-import { router as storeRouter } from "./auth/storeNewRoutes";
+import { router as storeRouter } from "./auth/storeRoutes";
 import { router as assistantRouter } from "./auth/assistantRoutes";
 import { router as categoryRouter } from "./auth/categoryRoutes";
 import { router as userRouter } from "./auth/userAuthRoutes";
 import { router as orderRouter } from "./auth/orderRoutes";
 import { router as couponsRouter } from "./auth/couponRoutes";
 import { router as platformReviewsRouter } from "./auth/platformReviewsRoutes";
-import { router as productNewRouter } from "./auth/productNewRoutes";
+import { router as productRouter } from "./auth/productRoutes";
 import { verifyPlanSubscription } from "../_utils/validators/verifyPlanSubscription";
 import validateJwtToken from "../_utils/validators/validateJwtToken";
 import getUserFromPayload from "../_utils/protectors/getUserFromPayload";
 import assignPlanIdToRequest from "../_utils/requestModifiers/assignPlanIdToRequest";
 import { logout } from "../controllers/auth/userAuthController";
+import { assignStoreIdToRequest } from "../_utils/requestModifiers/assignStoreIdToRequest";
 
 
 export const router = express.Router();
@@ -25,12 +26,12 @@ router.use("/me", userRouter);
 router.use("/admin", adminRouter);
 router.use("/platform/reviews", platformReviewsRouter);
 
-router.use(verifyPlanSubscription, assignPlanIdToRequest);
+router.use(assignStoreIdToRequest, assignPlanIdToRequest, verifyPlanSubscription);
 router.use("/store", storeRouter);
-router.use("/products", productNewRouter);
+router.use("/products", productRouter);
 router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
-router.use("/:storeId/coupons", couponsRouter); // TODO: convert into DyMo.
-router.use("/orders", orderRouter); // TODO: convert into DyMo.
+router.use("/:storeId/coupons", couponsRouter);
+router.use("/orders", orderRouter);
 
 // new router for dynamic model

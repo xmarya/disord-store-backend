@@ -1,14 +1,15 @@
 import crypto from "crypto";
-import { createDoc, getOneDocByFindOne } from "../_services/global";
-import { UserDocument } from "../_Types/User";
-import { AppError } from "../_utils/AppError";
-import { comparePasswords, generateRandomToken } from "../_utils/authUtils";
-import { catchAsync } from "../_utils/catchAsync";
-import jwtSignature from "../_utils/jwtToken/generateSignature";
-import tokenWithCookies from "../_utils/jwtToken/tokenWithCookies";
-import User from "../models/userModel";
+import { createDoc, getOneDocByFindOne } from "../../_services/global";
+import { UserDocument } from "../../_Types/User";
+import { AppError } from "../../_utils/AppError";
+import { comparePasswords, generateRandomToken } from "../../_utils/authUtils";
+import { catchAsync } from "../../_utils/catchAsync";
+import jwtSignature from "../../_utils/jwtToken/generateSignature";
+import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
+import User from "../../models/userModel";
 
-export const createNewStoreOwnerController = catchAsync(async (request, response, next) => { /*✅*/
+export const createNewStoreOwnerController = catchAsync(async (request, response, next) => {
+  /*✅*/
   const { firstName, lastName, email, password } = request.body;
   const data = { firstName, lastName, email, signMethod: "credentials", userType: "storeOwner", credentials: { password } };
   const newOwner = await createDoc<UserDocument>(User, data);
@@ -19,7 +20,8 @@ export const createNewStoreOwnerController = catchAsync(async (request, response
   });
 });
 
-export const createNewUserController = catchAsync(async (request, response, next) => { /*✅*/
+export const createNewUserController = catchAsync(async (request, response, next) => {
+  /*✅*/
   const { firstName, lastName, email, password } = request.body;
   const data = { firstName, lastName, email, signMethod: "credentials", userType: "user", credentials: { password } };
   const newUser = await createDoc<UserDocument>(User, data);
@@ -31,7 +33,8 @@ export const createNewUserController = catchAsync(async (request, response, next
   });
 });
 
-export const credentialsLogin = catchAsync(async (request, response, next) => {  /*✅*/
+export const credentialsLogin = catchAsync(async (request, response, next) => {
+  /*✅*/
   // STEP 1) getting the provided email and password from the request body to check the email:
   const { email, password } = request.body;
   console.log("credentialsLogin", email, password);
@@ -64,7 +67,7 @@ export const createNewDiscordUser = catchAsync(async (request, response, next) =
     signMethod: "discord",
     email: request.body.email,
     image: request.body.image,
-    firstName:  request.body.name,
+    firstName: request.body.name,
     discord: {
       discordId: request.body.id,
       username: request.body.name,

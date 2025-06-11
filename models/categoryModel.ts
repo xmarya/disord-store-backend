@@ -1,28 +1,30 @@
 import { CategoryDocument } from "../_Types/Category";
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import Store from "./storeModel";
+import Product from "./productModel";
 
-// type CategoryModel = Model<CategoryDocument>;
+type CategoryModel = mongoose.Model<CategoryDocument>;
 export const categorySchema = new Schema<CategoryDocument>({
   name: {
     type: String,
     required: [true, "the category name is required"],
-    unique:true
+    unique: true,
   },
   colour: {
     type: String,
     required: [true, "the category colour is required"],
   },
   createdBy: {
-    name:{
+    name: {
       type: String,
       required: [true, "the category createdBy username is required"],
     },
     id: {
-      type:Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       required: [true, "the category createdBy id is required"],
-    }
+    },
   },
-  // store: Schema.Types.ObjectId,
+  store: Schema.Types.ObjectId,
   products: [Schema.Types.ObjectId],
 });
 
@@ -45,3 +47,17 @@ categorySchema.pre("findOneAndDelete", async function (next) {
   next();
 });
 */
+categorySchema.index({ name: 1, store: 1 }, { unique: true });
+categorySchema.index({ name: 1, products: 1 }, { unique: true }); /*REQUIRES TESTING: does't it work with arrays? */
+
+categorySchema.post("findOneAndDelete", async function (deletedDoc) {
+  if (deletedDoc) {
+    await Promise.all([
+      Store.findByIdAndUpdate({ _id: deletedDoc.store }, { $pull: { categories: deletedDoc._id } }),
+      Product.updateMany({ _id: { $in: deletedDoc.products } }, { $pull: { categories: deletedDoc._id } }),
+    ]);
+  }
+});
+const Category = mongoose.model<CategoryDocument, CategoryModel>("Category", categorySchema);
+
+export default Category;

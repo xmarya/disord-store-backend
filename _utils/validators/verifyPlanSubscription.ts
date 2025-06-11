@@ -3,15 +3,14 @@ import type { Request, Response, NextFunction } from "express";
 import { AppError } from "../AppError";
 
 export async function verifyPlanSubscription(request: Request, response: Response, next: NextFunction) {
-   console.log("verifyPlanSubscription");
+  console.log("verifyPlanSubscription");
 
-  // if(request.user.userType !== "storeOwner" || request.user.userType === "storeAssistant") return next();
-  if(request.user.userType !== "storeOwner") return next();
-
-  if(!request.user.subscribedPlanDetails.paid) return next(new AppError(401, "you are not subscribed to any plan. Please subscribe then try again."));
+  if (!request.isPlanPaid) return next(new AppError(401, "this action is unautorised. you are not subscribed to any plan or haven't paid yet."));
   // has the subscription end?
-  //BUG: what if the user was an assistant? which doesn't have subscribeEnds field
-  if (!isFuture(request.user.subscribedPlanDetails.subscribeEnds)) return next(new AppError(401, "your subscription has expired."));
+  //NOTE: what if the user was an assistant? which doesn't have subscribeEnds field?
+  //      this edge-case is handled by putting assignStoreIdToRequest and assignPlanIdToRequest middlewares before verifyPlanSubscription,
+  //      so the plan information are available withing the request
+  if (!isFuture(request.planExpiryDate)) return next(new AppError(401, "your subscription has expired."));
 
   return next();
 }
