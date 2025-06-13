@@ -25,6 +25,7 @@ export async function createCategory(data: CategoryBasic) {
 }
 */
 
+import mongoose from "mongoose";
 import { CategoryBasic } from "../../_Types/Category";
 import { MongoId } from "../../_Types/MongoId";
 import Category from "../../models/categoryModel";
@@ -39,4 +40,8 @@ export async function assignProductToCategory(categories:Array<CategoryBasic>, p
 export async function deleteProductFromCategory(categories:Array<CategoryBasic>, productId:MongoId) {
   console.log("deleteProductFromCategory");
   await Category.updateMany({_id: {$in: categories}}, {$pull: { products: productId }});
+}
+
+export async function deleteAllCategories(storeId:MongoId, session:mongoose.ClientSession){
+  await Category.deleteMany({store: storeId}).session(session);
 }
