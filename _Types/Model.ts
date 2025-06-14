@@ -1,5 +1,3 @@
 
 
-export type Model = "User" | "Store" | "Product" | "Category"
-
-export type DynamicModel = "Product" | "Category"| "Review-store" | "Review-product"| "Ranking-store" | "Ranking-product"
+export type Model = "Admin" | "User" | "StoreAssistant" | "Store" | "Product" | "Category" | "Review" | "Order" | "Invoice" | "Plan"

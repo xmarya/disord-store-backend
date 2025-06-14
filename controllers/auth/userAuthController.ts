@@ -6,56 +6,48 @@ import { getOneDocByFindOne, getOneDocById, updateDoc } from "../../_services/gl
 import { updatePlanMonthlyStats } from "../../_services/plan/planService";
 import { StoreOwner, UserDocument } from "../../_Types/User";
 import { AppError } from "../../_utils/AppError";
-import { comparePasswords } from "../../_utils/authUtils";
 import { catchAsync } from "../../_utils/catchAsync";
 import jwtSignature from "../../_utils/jwtToken/generateSignature";
 import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
 import Plan from "../../models/planModel";
 import User from "../../models/userModel";
 import formatSubscriptionsLogs from "../../_utils/queryModifiers/formatSubscriptionsLogs";
+import Admin from "../../models/adminModel";
+import { comparePasswords } from "../../_utils/passwords/comparePasswords";
 
-export const getProfile = catchAsync(async (request, response, next) => {
+export const getUserProfile = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
-  const userProfile = await getOneDocById(User, userId, {select: ["firstName", "lastName", "email", "image", "phoneNumber"]});
+  const userProfile = await getOneDocById(User, userId, { select: ["firstName", "lastName", "email", "image", "phoneNumber"] });
 
-  if(!userProfile) return next(new AppError(400, "لم يتم العثور على بيانات المستخدم"));
+  if (!userProfile) return next(new AppError(400, "لم يتم العثور على بيانات المستخدم"));
 
   response.status(200).json({
     success: true,
-    userProfile
+    userProfile,
   });
 });
 
 export const getMySubscriptionsLogController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
-  const userPlansLog = await getOneDocById(User, userId, {select: ["subscribedPlanDetails", "subscriptionsLog"]});
-  if(!userPlansLog) return next(new AppError(400, "لم يتم العثور على البيانات المطلوبة"));
+  const userPlansLog = await getOneDocById(User, userId, { select: ["subscribedPlanDetails", "subscriptionsLog"] });
+  if (!userPlansLog) return next(new AppError(400, "لم يتم العثور على البيانات المطلوبة"));
 
-  const {subscribedPlanDetails, subscriptionsLog, planExpiresInDays} = userPlansLog as UserDocument & {planExpiresInDays:string};
+  const { subscribedPlanDetails, subscriptionsLog, planExpiresInDays } = userPlansLog as UserDocument & { planExpiresInDays: string };
   const currentSubscription = formatSubscriptionsLogs(subscribedPlanDetails, planExpiresInDays);
 
   response.status(200).json({
     success: true,
     currentSubscription,
-    subscriptionsLog
+    subscriptionsLog,
   });
 });
 
-export const changePassword = catchAsync(async (request, response, next) => {
-  console.log("changePassword");
+export const confirmUserChangePassword = catchAsync(async (request, response, next) => {
+  console.log("confirmUserChangePassword");
 
-  const userId = request.user.id || request.body.userId;
-  const { currentPassword, newPassword, confirmNewPassword } = request.body;
-
-  //STEP 1) check no missing input:
-  if (!currentPassword?.trim() || !newPassword?.trim() || !confirmNewPassword?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
-
-  //STEP 2) do they match ?
-  if (newPassword !== confirmNewPassword) return next(new AppError(400, "كلمات المرور غير متطابقة"));
-  const user = await User.findById(userId).select("credentials"); // for testing purposes
-  /* CHANGE LATER: 
-    // const user = await User.findById(request.user.id).select("credentials");  this info is provided by protect() md
-  */
+  const userId = request.user.id;
+  const { currentPassword, newPassword } = request.body;
+  const user = await getOneDocById(User, userId, {select: ["credentials"]});
 
   if (!user) return next(new AppError(404, "هذا المستخدم غير موجود"));
 
@@ -75,7 +67,8 @@ export const changePassword = catchAsync(async (request, response, next) => {
   });
 });
 
-export const updateUserProfile = catchAsync(async (request, response, next) => { /*✅*/
+export const updateUserProfile = catchAsync(async (request, response, next) => {
+  /*✅*/
   const userId = request.user.id;
   const { email, firstName, lastName }: Pick<UserDocument, "email" | "firstName" | "lastName"> = request.body;
 
@@ -87,13 +80,7 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
 
   if (firstName?.trim() === "" && lastName?.trim() === "") return next(new AppError(400, "الرجاء تعبئة حقول الاسم بالكامل"));
 
-  // if (username) {
-  //   const isUsernameExist = await User.findOne({ username });
-  //   if (isUsernameExist) return next(new AppError(400, "الرجاء اختيار اسم مستخدم آخر"));
-  // }
-
-  // await User.findByIdAndUpdate(userId, request.body);
-  const updatedUser = await updateDoc(User, userId, request.body);
+  const updatedUser = await updateDoc(User, userId, request.body)
 
   response.status(201).json({
     success: true,
@@ -101,9 +88,11 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
   });
 });
 
-export const createNewSubscribe = catchAsync(async (request, response, next) => { /*✅*/
+export const createNewSubscribe = catchAsync(async (request, response, next) => {
+  /*✅*/
+  console.log("createNewSubscribe");
   const { planId, paidPrice } = request.body;
-  if(!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
+  if (!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
   const plan = await getOneDocById(Plan, planId);
   if (!plan) return next(new AppError(400, "لايوجد باقة بهذا المعرف"));
 
@@ -119,7 +108,7 @@ export const createNewSubscribe = catchAsync(async (request, response, next) => 
       paid: true,
       subscribeStarts,
       subscribeEnds,
-      paidPrice
+      paidPrice,
     },
   };
 
@@ -150,6 +139,7 @@ export const renewalSubscription = catchAsync(async (request, response, next) =>
 
 // TODO: bank account controller, it's separate because it needs card data validation
 
+export const deleteUserAccount = catchAsync(async (request, response, next) => {});
 
 export function logout(request: Request, response: Response) {
   response.clearCookie("jwt");

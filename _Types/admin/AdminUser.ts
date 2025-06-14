@@ -12,4 +12,5 @@ export interface AdminDocument extends mongoose.Document {
     passwordChangedAt: Date;
   };
   userType: Extract<UserTypes, "admin">;
+  image:string
 }
