@@ -1,23 +1,24 @@
 import mongoose, { startSession } from "mongoose";
 import { MongoId } from "../../_Types/MongoId";
-import { ProductDocument } from "../../_Types/Product";
 import { StoreDataBody } from "../../_Types/Store";
 import { AppError } from "../../_utils/AppError";
+import Product from "../../models/productModel";
 import Store from "../../models/storeModel";
 import User from "../../models/userModel";
 
 
 export async function createStore(data:StoreDataBody) {
-    const {storeName, owner, logo, description} = data;
+    const {storeName, description, owner, inPlan, logo,} = data;
     const session = await startSession();
     session.startTransaction();
 
     try {
         const newStore = await Store.create([{
-            storeName,
-            owner,
-            description,
-            logo
+           storeName,
+           description,
+           logo,
+           owner,
+           inPlan
         }], {session});
 
         await User.findByIdAndUpdate(owner, {
@@ -36,15 +37,14 @@ export async function createStore(data:StoreDataBody) {
     }
 } 
 
-export async function getStoreWithProducts(storeId: string, ProductsModel:mongoose.Model<ProductDocument>) {
+export async function getStoreWithProducts(storeId: MongoId) {
     const store = await Store.findById(storeId);
-    const products = await ProductsModel.find();
+    const products = await Product.find({store:storeId});
 
     return {store, products};
 }
 
-export async function confirmAuthorization( userId:string, storeId:string):Promise<boolean> {
-    console.log("confirmAuthorization", "user",userId, "store",storeId);
+export async function confirmAuthorization( userId:string, storeId:MongoId):Promise<boolean> {
     //STEP 1) check if this userId is an owner Id or is in storeAssistants array
 
     const userIdExist = await Store.findOne({_id: storeId,

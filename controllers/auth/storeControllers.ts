@@ -1,7 +1,7 @@
 import { startSession } from "mongoose";
 import { deleteAllAssistants } from "../../_services/assistant/assistantService";
 import { updateDoc } from "../../_services/global";
-import { createStore, deleteStore } from "../../_services/store/storeService";
+import { createStore, deleteStore, getStoreWithProducts } from "../../_services/store/storeService";
 import { getOneStoreStats } from "../../_services/store/storeStatsService";
 import { resetStoreOwnerToDefault } from "../../_services/user/userService";
 import { MongoId } from "../../_Types/MongoId";
@@ -9,6 +9,11 @@ import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import Store from "../../models/storeModel";
 import { StoreDataBody, StoreDocument } from "./../../_Types/Store";
+import { deleteAllProducts } from "../../_services/product/productServices";
+import { deleteAllCategories } from "../../_services/category/categoryService";
+import { deleteAllResourceReviews } from "../../_services/review/reviewService";
+import { removeRanking } from "../../_services/ranking/rankingService";
+import { StoreOwner } from "../../_Types/User";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   // TODO: complete the store data
@@ -16,7 +21,7 @@ export const createStoreController = catchAsync(async (request, response, next) 
   if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
 
   //TODO: handling logo and uploading it to cloudflare
-  const data: StoreDataBody = { storeName, description, logo, owner: request.user.id, inPlan: request.plan };
+  const data: StoreDataBody = { storeName, description, logo, owner: request.user.id, inPlan: (request.user as StoreOwner).subscribedPlanDetails.planName };
   const newStore = await createStore(data);
 
   response.status(201).json({
@@ -45,15 +50,16 @@ export const getStoreStatsController = catchAsync(async (request, response, next
   });
 });
 
-export const updateMyStoreNewController = catchAsync(async (request, response, next) => {
+export const updateMyStoreController = catchAsync(async (request, response, next) => {
   // only allow storeName, description, logo
-  const { storeName, description, logo }: StoreDataBody = request.body;
-  if (!storeName?.trim() && !description?.trim() && logo) return next(new AppError(400, "request.body has no data to update"));
+  const { storeName, description }: StoreDataBody = request.body;
+  if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "request.body has no data to update"));
 
   const storeId = request.store;
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
-  const data = { storeName, description, logo };
-  const updatedStore = await updateDoc(Store, storeId, data);
+
+  // I'm only checking the main fields to make sure they are exist, and assigning the whole body for other fields in case the user updates them.
+  const updatedStore = await updateDoc(Store, storeId, request.body);
 
   response.status(201).json({
     success: true,
@@ -84,11 +90,6 @@ export const deleteMyStoreNewController = catchAsync(async (request, response, n
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
   await deleteStorePermanently(storeId);
 
-  /*TODO:
-  await Ranking.deleteOne(deletedDoc.id);
-  console.log("now check Ranking after delete");
-  await Review.deleteMany({ reviewedModel: deletedDoc.id})
-  */
   response.status(204).json({
     success: true,
   });
@@ -103,9 +104,16 @@ export async function deleteStorePermanently(storeId: MongoId) {
     await resetStoreOwnerToDefault(storeId, session);
     //STEP 2) delete corresponding storeAssistant:
     await deleteAllAssistants(storeId, session);
-    //TODO:3) delete products:
-    //TODO:4) delete categories:
-    //STEP 5) delete the store:
+    //STEP:3) delete products:
+    await deleteAllProducts(storeId, session);
+    //STEP:4) delete categories:
+    await deleteAllCategories(storeId, session);
+    //STEP:5) delete reviews:
+    await deleteAllResourceReviews(storeId, session);
+    //STEP:6) delete the rank:
+    await removeRanking(storeId, session);
+    /*TODO: what about all of the store's products' reviews? should I write a post(deleteMany) hook and call the ranking service from??*/
+    //STEP 7) delete the store:
     await deleteStore(storeId, session);
     console.log("test request.user.myStore before deletion the store", storeId);
 
@@ -126,3 +134,14 @@ export async function deleteStorePermanently(storeId: MongoId) {
 
   //TODO: add the deleted data to the AdminLog
 }
+
+export const previewStoreWithProducts = catchAsync( async(request, response, next) => {
+  const storeId = request.store;
+  const {store, products} = await getStoreWithProducts(storeId);
+
+  response.status(200).json({
+    success:true,
+    store,
+    products
+  });
+});
