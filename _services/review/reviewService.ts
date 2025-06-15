@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
-import Review from "../../models/reviewModel";
-import { MongoId } from "../../_Types/MongoId";
 import { Model } from "../../_Types/Model";
-import { ProductDocument } from "../../_Types/Product";
-import { StoreDocument } from "../../_Types/Store";
+import { MongoId } from "../../_Types/MongoId";
+import Review from "../../models/reviewModel";
 
 export async function confirmReviewAuthorisation(reviewId: string, userId: string): Promise<boolean> {
   console.log("confirmReviewAuthorisation", reviewId);
@@ -48,4 +46,8 @@ export async function calculateRatingsAverage(Model: Extract<Model, "Store" | "P
 
   //STEP 2) save the doc:
   await doc.save({ validateBeforeSave: false, session }); // Mongoose internally manages sessions for save() calls, because of that, it conflicts with the session inside setRanking. so I'll create one session inside the controller and pass it to both services
+}
+
+export async function deleteAllResourceReviews(resourceId:MongoId, session: mongoose.ClientSession) {
+  await Review.deleteMany({reviewedResourceId:resourceId}).session(session);
 }
