@@ -1,20 +1,19 @@
-import type { Request, Response, NextFunction } from "express";
-import { AppError } from "../AppError";
+import type { NextFunction, Request, Response } from "express";
 import { PlanQuota } from "../../_Types/Plan";
 import { getOneDocById } from "../../_services/global";
+import Category from "../../models/categoryModel";
 import Plan from "../../models/planModel";
-import mongoose from "mongoose";
-import Store from "../../models/storeModel";
+import Product from "../../models/productModel";
+import StoreAssistant from "../../models/storeAssistantModel";
+import { AppError } from "../AppError";
 
 
 const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
   return async (request: Request, response: Response, next: NextFunction) => {
     
-    const plan = await getOneDocById(Plan, request.plan, ["quota"]); /*REQUIRES TESTING*/
-    //   const plan = await getOneDocById(Plan, request.user.subscribedPlanDetails.planId);
+    const plan = await getOneDocById(Plan, request.plan, {select: ["quota"]});
     if (!plan) return next(new AppError(401, "no plan is associated with this id"));
 
-    // const storeId = request.user.myStore || request.body.modelId;
     const storeId = request.store;
     if (!storeId) return next(new AppError(400, "couldn't find the storeId"));
 
@@ -23,17 +22,15 @@ const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
 
     switch (quotaKey) {
       case "ofProducts":
-        countOfDocs = await mongoose.model(`Product-${storeId}`).countDocuments();
+        countOfDocs = await Product.countDocuments({store: storeId});
         break;
 
       case "ofCategories":
-        countOfDocs = await mongoose.model(`Category-${storeId}`).countDocuments();
+        countOfDocs = await Category.countDocuments({store: storeId});
         break;
 
       case "ofStoreAssistants":
-        const store = await getOneDocById(Store, storeId, ["storeAssistants"]);
-        if (!store) return next(new AppError(400, "couldn't find an assistant with this id"));
-        countOfDocs = store.storeAssistants?.length ?? 0;
+        countOfDocs = await StoreAssistant.countDocuments({inStore:storeId})
         break;
 
       case "ofColourThemes":
