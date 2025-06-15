@@ -11,7 +11,12 @@ const rankingSchema = new Schema<RankingDocument>(
     resourceId: {
       // which is going to be either storeId or productId
       type: Schema.Types.ObjectId,
-      required: [true, "the modelId field is required"],
+      required: [true, "the resourceId field is required"],
+    },
+    resource:{
+      type:String,
+      enum:["Store", "Product"],
+      required: [true, "the resource field is required"],
     },
     rank: {
       type: Number,
@@ -35,7 +40,7 @@ interface PopulateRanking {
 rankingSchema.index({ rank: -1, modelId: 1 });
 
 rankingSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
-  this.populate<{ modelId: PopulateRanking }>("resourceId");
+  this.populate<{ resourceId: PopulateRanking }>("resourceId");
   next();
 });
 

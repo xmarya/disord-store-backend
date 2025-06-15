@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Model } from "../../_Types/Model";
 import Ranking from "../../models/rankingModel";
+import { MongoId } from "../../_Types/MongoId";
 
 export async function setRanking(Model: Extract<Model, "Store" | "Product">, session: mongoose.ClientSession) {
   // Model is Product-${storeId} || Store
@@ -32,4 +33,10 @@ export async function setRanking(Model: Extract<Model, "Store" | "Product">, ses
       mongoose.model(Model).findByIdAndUpdate(doc._id, { ranking: index + 1 }, { session });
     })
   );
+}
+
+export async function removeRanking(resourceId:MongoId, session: mongoose.ClientSession) {
+  const deletedResource = await Ranking.findOneAndDelete({resourceId}).session(session);
+  if(!deletedResource) return;
+  await setRanking(deletedResource.resource, session);
 }
