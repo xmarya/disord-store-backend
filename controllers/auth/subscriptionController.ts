@@ -1,9 +1,14 @@
-import { getOneDocById } from "../../_services/global";
+import { addDays, isPast } from "date-fns";
+import { getOneDocById, updateDoc } from "../../_services/global";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import { getSubscriptionType } from "../../_utils/getSubscriptionType";
 import { startSubscription } from "../../_utils/startSubscription";
 import Plan from "../../models/planModel";
+import User from "../../models/userModel";
+import { PLAN_TRIAL_PERIOD } from "../../_data/constants";
+import { startSession } from "mongoose";
+import { updatePlanMonthlyStats } from "../../_services/plan/planService";
 
 export const createNewSubscribe = catchAsync(async (request, response, next) => {
   /*✅*/
@@ -41,4 +46,41 @@ export const renewalSubscription = catchAsync(async (request, response, next) =>
   });
 });
 
-export const cancelSubscription = catchAsync(async (request, response, next) => {});
+export const cancelSubscription = catchAsync(async (request, response, next) => {
+  const { notes } = request.body; // TODO: for the admin log
+  const userId = request.user.id;
+  const { subscribedPlanDetails } = await getOneDocById(User, userId, {select: ["subscribedPlanDetails"]});
+  if (!subscribedPlanDetails) return next(new AppError(400, "User has no active subscription"));
+
+  const trialOver = isPast(addDays(subscribedPlanDetails.subscribeStarts, PLAN_TRIAL_PERIOD));
+
+  if (trialOver) return next(new AppError(400, "the 10 days limit for cancellation is over"));
+
+  let updatedUser;
+  const session = await startSession();
+  try {
+    session.startTransaction();
+
+    //TODO: add an admin log
+    await updatePlanMonthlyStats(subscribedPlanDetails.planName, subscribedPlanDetails.paidPrice, "cancellation", session);
+    updatedUser = await updateDoc(User, userId, { $unset: { subscribedPlanDetails: "" } }, { session });
+
+    //TODO: refund the money using the User's bank account.
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    console.log((error as Error).message);
+    throw new AppError(500, "حدث خطأ أثناء معالجة العملية. الرجاء المحاولة مجددًا");
+  } finally {
+    await session.endSession();
+  }
+
+  request.planExpiryDate = new Date();
+  request.isPlanPaid = false;
+  request.plan = "";
+
+  response.status(200).json({
+    success: true,
+    updatedUser,
+  });
+});

@@ -9,7 +9,7 @@ import { addDays } from "date-fns";
 import { PlanDocument, SubscriptionTypes } from "../_Types/Plan";
 
 export async function startSubscription(userId: MongoId, plan: PlanDocument, paidPrice:number, subscriptionType:SubscriptionTypes) {
-    const {id:planId, planName} = plan;
+  const {id:planId, planName} = plan;
   const subscribeStarts = new Date();
   const subscribeEnds = addDays(subscribeStarts, SUBSCRIPTION_PERIOD);
 
@@ -30,7 +30,7 @@ export async function startSubscription(userId: MongoId, plan: PlanDocument, pai
   try {
     session.startTransaction();
 
-    await updatePlanMonthlyStats(plan.planName, plan.price.riyal, subscriptionType, session);
+    await updatePlanMonthlyStats(plan.planName, paidPrice, subscriptionType, session);
     updatedUser = await createNewSubscription(userId, userData, session);
 
     await session.commitTransaction();
