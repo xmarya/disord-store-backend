@@ -3,7 +3,7 @@ import { SUBSCRIPTION_PERIOD } from "../_data/constants";
 import { MongoId } from "../_Types/MongoId";
 import { StoreOwner } from "../_Types/User";
 import { updatePlanMonthlyStats } from "../_services/plan/planService";
-import { startNewSubscription } from "../_services/user/userService";
+import { createNewSubscription } from "../_services/user/userService";
 import { AppError } from "./AppError";
 import { addDays } from "date-fns";
 import { PlanDocument, SubscriptionTypes } from "../_Types/Plan";
@@ -31,7 +31,7 @@ export async function startSubscription(userId: MongoId, plan: PlanDocument, pai
     session.startTransaction();
 
     await updatePlanMonthlyStats(plan.planName, plan.price.riyal, subscriptionType, session);
-    updatedUser = await startNewSubscription(userId, userData, session);
+    updatedUser = await createNewSubscription(userId, userData, session);
 
     await session.commitTransaction();
   } catch (error) {
