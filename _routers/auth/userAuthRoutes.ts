@@ -1,5 +1,5 @@
 import express from "express";
-import { confirmUserChangePassword, createNewSubscribe, getMySubscriptionsLogController, renewalSubscription, updateUserProfile, deleteUserAccount, getUserProfile } from "../../controllers/auth/userAuthController";
+import { confirmUserChangePassword, createNewSubscribe, getMySubscriptionsLogController, renewalSubscription, updateUserProfile, deleteUserAccountController, getUserProfile } from "../../controllers/auth/userAuthController";
 import restrict from "../../_utils/protectors/restrict";
 import sanitisedData from "../../_utils/validators/sanitisedData";
 import { validateChangePassword } from "../../_utils/validators/validateChangePassword";
@@ -22,4 +22,4 @@ router.patch("/plan-unsubscribe"); // TODO: unsubscription controller, maybe we 
 router.use(restrict("admin", "storeOwner", "user"));
 router.route("/").get(getUserProfile).patch(updateUserProfile); /*✅*/
 router.route("/changePassword").patch(validateChangePassword, confirmUserChangePassword); /*✅*/
-router.route("/deleteAccount").delete(deleteUserAccount); //TODO: delete account controller User | Admin
+router.route("/deleteAccount").delete(deleteUserAccountController);

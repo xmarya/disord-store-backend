@@ -2,7 +2,7 @@ import { addDays } from "date-fns";
 import type { Request, Response } from "express";
 import { startSession } from "mongoose";
 import { SUBSCRIPTION_PERIOD } from "../../_data/constants";
-import { getOneDocByFindOne, getOneDocById, updateDoc } from "../../_services/global";
+import { deleteDoc, getOneDocByFindOne, getOneDocById, updateDoc } from "../../_services/global";
 import { updatePlanMonthlyStats } from "../../_services/plan/planService";
 import { StoreOwner, UserDocument } from "../../_Types/User";
 import { AppError } from "../../_utils/AppError";
@@ -139,7 +139,15 @@ export const renewalSubscription = catchAsync(async (request, response, next) =>
 
 // TODO: bank account controller, it's separate because it needs card data validation
 
-export const deleteUserAccount = catchAsync(async (request, response, next) => {});
+export const deleteUserAccountController = catchAsync(async (request, response, next) => {
+  const {userId} = request.params;
+
+  const deletedUser = await deleteDoc(User, userId);
+
+  response.status(204).json({
+    success:true
+  });
+});
 
 export function logout(request: Request, response: Response) {
   response.clearCookie("jwt");

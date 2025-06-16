@@ -14,6 +14,7 @@ import { validateChangePassword } from "../../_utils/validators/validateChangePa
 import { adminLoginController, confirmAdminChangePassword, getAdminProfile, updateAdminProfile } from "../../controllers/auth/admin/adminAuthController";
 import { resetPassword } from "../../_utils/passwords/resetPassword";
 import { forgetPassword } from "../../_utils/passwords/forgetPAssword";
+import { deleteUserAccountController } from "../../controllers/auth/userAuthController";
 
 export const router = express.Router();
 
@@ -46,7 +47,7 @@ router.get("/users", getAllUsersController); /*✅*/
 router
   .route("/users/:userId")
   .get(validateRequestParams("userId"), getOneUserController) /*✅*/
-  // .delete(validateRequestParams("userId"), deleteUsersController);
+  .delete(validateRequestParams("userId"), deleteUserAccountController);
 
 router.post("/users/unlimited-user", sanitisedData, validateUnlimitedUserData, createUnlimitedUserController);/*✅*/
 
