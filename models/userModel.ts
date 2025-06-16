@@ -93,7 +93,6 @@ const userSchema = new Schema<UserDocument, {},{}, UserVirtual>(
       planName: {
         type: String,
         enum: ["basic", "plus", "unlimited"],
-        required: [true, "the planName field is required"],
       },
       paidPrice: Number,
       paid: {
@@ -142,15 +141,16 @@ userSchema.pre("findOneAndUpdate", async function (next) {
 
   // STEP 2) get the to-be-updated fields:
   /*✅*/ const updatedFields = this.getUpdate() as mongoose.UpdateQuery<UserDocument>;
-  if (doc.userType !=="storeOwner" && !updatedFields?.subscribedPlanDetails?.subscribeStarts) return next();
-  console.log("this pre(findOneAndUpdate) for accumulating the count in subscriptionsLog");
+
+  if (doc.userType !=="storeOwner" || !updatedFields?.subscribedPlanDetails?.subscribeStarts) return next();
+  console.log("this pre(findOneAndUpdate) for accumulating the count in subscriptionsLog", !updatedFields?.subscribedPlanDetails?.subscribeStarts);
 
   const { subscribeStarts, planName, paidPrice } = updatedFields.subscribedPlanDetails;
   const logsMap = doc.subscriptionsLog;
 
   //STEP 3) insert the new log data:
   const key = lightFormat(subscribeStarts, "yyyy-MM-dd");
-  logsMap.set(key, { planName, price: paidPrice });
+  logsMap.set(key, { planName, price: paidPrice }); // JavaScript Map enforces uniqueness of keys, not values.
 
   // updatedFields.$set = updatedFields.$set ?? {}; since it now behaves as UpdateQuery<T>, not as aggregation pipeline
   updatedFields.$set.subscriptionsLog = logsMap;
@@ -193,10 +193,6 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   the date to be a key since it's an object; Maps are strict to have a string key
 */
 
-userSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
-  this.populate("subscribedPlanDetails.planId").select("-planName -features -unlimitedUser");
-  next();
-});
 
 
 // I decided to make this a virtual field, so it will be created and recalculated each time
@@ -294,7 +290,6 @@ userSchema.methods.generateRandomToken = async function () {
 };
 */
 
-// model(Document, Model)
 const User = mongoose.model<UserDocument, UserModel, UserVirtual>("User", userSchema);
 
 export default User;
