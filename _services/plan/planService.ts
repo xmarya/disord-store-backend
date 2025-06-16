@@ -18,28 +18,6 @@ export async function checkPlanName(id: MongoId): Promise<boolean> {
   return !!isUnlimited;
 }
 
-export async function getSubscriptionType(currentPlanId: MongoId, newPlanId: MongoId): Promise<Exclude<SubscriptionTypes, "new"> | null> {
-  // 1- make both tostring to comparison:
-  const toStringPlanIds = Array.from([currentPlanId, newPlanId], (planId) => planId.toString());
-  if(toStringPlanIds[0] === toStringPlanIds[1]) return "renewal";
-
-  const [currentPlanName, newPlanName] = await Promise.all([Plan.findById(currentPlanId, "planName").lean(), Plan.findById(newPlanId, "planName").lean()]);
-  const upgradeCombo = ["basic-plus" , "basic-unlimited" , "plus-unlimited"];
-
-  // combinations:
-  // basic to plus = upgrade 1 + 2 = 3
-  // basic to unlimited = upgrade 1 + 3 = 4
-  // plus to unlimited = upgrade 2 + 3 = 5
-  // plus to basic = downgrade 2 - 1 = 1
-  // unlimited to plus = downgrade 3 - 2 = 1
-  // unlimited to basic = downgrade 3 - 1 = 2
-
-  const combo = `${currentPlanName?.planName}-${newPlanName?.planName}`
-
-  if(upgradeCombo.includes(combo)) return "upgrade";
-  else return "downgrade";
-}
-
 export async function getMonthlyPlansStats(dateFilter: { date: { $gte: Date; $lte: Date } }) {
   /*✅*/
   const monthlyStats = await PlanStats.aggregate([
@@ -75,7 +53,7 @@ export async function getPlansStatsReport(sortBy: "year" | "profits" | "subscrib
 }
 
 // TODO: this service is going to be called when registering to a plan | renewal a plan | unsubscribing
-export async function updatePlanMonthlyStats(planName: PlansNames, profit: number, operationType: "new" | "renewal" | "upgrade" | "downgrade" | "cancellation", session: mongoose.ClientSession) {
+export async function updatePlanMonthlyStats(planName: PlansNames, profit: number, operationType: SubscriptionTypes | "cancellation", session: mongoose.ClientSession) {
   /*✅*/
   /* OLD CODE (kept for reference): 
         const firstDayOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1); // =< year-month-1st day

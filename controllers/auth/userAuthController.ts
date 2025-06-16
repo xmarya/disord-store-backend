@@ -1,20 +1,16 @@
-import { addDays } from "date-fns";
 import type { Request, Response } from "express";
-import { startSession } from "mongoose";
-import { SUBSCRIPTION_PERIOD } from "../../_data/constants";
 import { deleteDoc, getOneDocByFindOne, getOneDocById, updateDoc } from "../../_services/global";
-import { getSubscriptionType, updatePlanMonthlyStats } from "../../_services/plan/planService";
-import { StoreOwner, UserDocument } from "../../_Types/User";
+import { UserDocument } from "../../_Types/User";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import jwtSignature from "../../_utils/jwtToken/generateSignature";
 import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
+import { comparePasswords } from "../../_utils/passwords/comparePasswords";
+import formatSubscriptionsLogs from "../../_utils/queryModifiers/formatSubscriptionsLogs";
+import { startSubscription } from "../../_utils/startSubscription";
 import Plan from "../../models/planModel";
 import User from "../../models/userModel";
-import formatSubscriptionsLogs from "../../_utils/queryModifiers/formatSubscriptionsLogs";
-import { comparePasswords } from "../../_utils/passwords/comparePasswords";
-import { startNewSubscription } from "../../_services/user/userService";
-import { startSubscription } from "../../_utils/startSubscription";
+import { getSubscriptionType } from "../../_utils/getSubscriptionType";
 
 export const getUserProfile = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
