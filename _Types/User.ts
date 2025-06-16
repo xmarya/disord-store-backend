@@ -45,7 +45,7 @@ export interface RegularUser extends UserDataBody {
 export type UserPlan = {
   planId: MongoId;
   planName: PlansNames;
-  subscriptionType: "new" | "renewal" | "upgrade";
+  subscriptionType: "new" | "renewal" | "upgrade" | "downgrade";
   // originalPrice: number;
   paidPrice: number;
   paid: boolean;

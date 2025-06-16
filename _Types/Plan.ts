@@ -42,11 +42,13 @@ type StatsData = {
   profits: number;
   newSubscribers: number;
   renewals: number;
+  upgrades: number;
+  downgrades: number;
 };
 
 type PlanStats = {
   planName: PlansNames;
-  subscriptionType: "new" | "renewal";
+  subscriptionType: "new" | "renewal" | "upgrade" | "downgrade";
   date: Date;
   monthly: StatsData;
 };
