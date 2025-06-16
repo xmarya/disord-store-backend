@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import User from "../../models/userModel";
 import { MongoId } from "../../_Types/MongoId";
+import { StoreOwner, UserDocument } from "../../_Types/User";
 
 export async function createNewUnlimitedUser(data: any, session: mongoose.ClientSession) {
   const aNewUser = await User.findOneAndUpdate({ email: data.email }, { ...data }, {runValidators:false, new: true, upsert: true, setDefaultsOnInsert: true }).session(session);
@@ -35,7 +36,10 @@ export async function resetStoreOwnerToDefault(storeId: MongoId, session: mongoo
   ).session(session);
 }
 
-
+export async function startNewSubscription(userId:MongoId, data:Pick<StoreOwner, "subscribedPlanDetails">, session:mongoose.ClientSession) {
+  const updatedUser = await User.findByIdAndUpdate(userId, data, {session, runValidators:true, new:true});
+  return updatedUser;
+}
 
 export async function getUserSubscriptionsLog(userId: MongoId) {
   const logs = await User.aggregate([

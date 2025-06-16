@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 import { startSession } from "mongoose";
 import { SUBSCRIPTION_PERIOD } from "../../_data/constants";
 import { deleteDoc, getOneDocByFindOne, getOneDocById, updateDoc } from "../../_services/global";
-import { updatePlanMonthlyStats } from "../../_services/plan/planService";
+import { getSubscriptionType, updatePlanMonthlyStats } from "../../_services/plan/planService";
 import { StoreOwner, UserDocument } from "../../_Types/User";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
@@ -12,8 +12,9 @@ import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
 import Plan from "../../models/planModel";
 import User from "../../models/userModel";
 import formatSubscriptionsLogs from "../../_utils/queryModifiers/formatSubscriptionsLogs";
-import Admin from "../../models/adminModel";
 import { comparePasswords } from "../../_utils/passwords/comparePasswords";
+import { startNewSubscription } from "../../_services/user/userService";
+import { startSubscription } from "../../_utils/startSubscription";
 
 export const getUserProfile = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -47,7 +48,7 @@ export const confirmUserChangePassword = catchAsync(async (request, response, ne
 
   const userId = request.user.id;
   const { currentPassword, newPassword } = request.body;
-  const user = await getOneDocById(User, userId, {select: ["credentials"]});
+  const user = await getOneDocById(User, userId, { select: ["credentials"] });
 
   if (!user) return next(new AppError(404, "هذا المستخدم غير موجود"));
 
@@ -62,7 +63,7 @@ export const confirmUserChangePassword = catchAsync(async (request, response, ne
   const token = jwtSignature(userId, "1h");
   tokenWithCookies(response, token);
 
-  response.status(201).json({
+  response.status(203).json({
     success: true,
   });
 });
@@ -80,9 +81,9 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
 
   if (firstName?.trim() === "" && lastName?.trim() === "") return next(new AppError(400, "الرجاء تعبئة حقول الاسم بالكامل"));
 
-  const updatedUser = await updateDoc(User, userId, request.body)
+  const updatedUser = await updateDoc(User, userId, request.body);
 
-  response.status(201).json({
+  response.status(203).json({
     success: true,
     updatedUser,
   });
@@ -96,56 +97,43 @@ export const createNewSubscribe = catchAsync(async (request, response, next) => 
   const plan = await getOneDocById(Plan, planId);
   if (!plan) return next(new AppError(400, "لايوجد باقة بهذا المعرف"));
 
-  const userId = request.user.id;
-  const subscribeStarts = new Date();
-  const subscribeEnds = addDays(subscribeStarts, SUBSCRIPTION_PERIOD); // what is the format of this? is it plain JS Date object?
-  const userData: Partial<StoreOwner> = {
-    subscribedPlanDetails: {
-      planId: planId,
-      planName: plan.planName,
-      // originalPrice: plan.price.riyal,
-      subscriptionType: "new",
-      paid: true,
-      subscribeStarts,
-      subscribeEnds,
-      paidPrice,
-    },
-  };
+  const updatedUser = await startSubscription(request.user.id, plan, paidPrice, "new");
 
-  let updatedUser;
-  const session = await startSession();
-  try {
-    session.startTransaction();
-    // first update the Plan, then update the User
-    await updatePlanMonthlyStats(plan.planName, plan.price.riyal, "new", session);
-    updatedUser = await updateDoc(User, userId, userData, { session });
-
-    await session.commitTransaction();
-  } catch (error) {
-    await session.abortTransaction();
-    console.log((error as Error).message);
-    throw new AppError(500, "حدث خطأ أثناء معالجة العملية. الرجاء المحاولة مجددًا");
-  } finally {
-    await session.endSession();
-  }
-
-  response.status(201).json({
+  response.status(203).json({
     success: true,
-    updatedUser,
+    updatedUserSubscription: updatedUser?.subscribedPlanDetails,
   });
 });
 
-export const renewalSubscription = catchAsync(async (request, response, next) => {});
+export const renewalSubscription = catchAsync(async (request, response, next) => {
+  console.log("renewalSubscription");
+  const { planId: newPlanId, paidPrice } = request.body;
+  if (!newPlanId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
+  
+  const plan = await getOneDocById(Plan, newPlanId);
+  if (!plan) return next(new AppError(400, "لايوجد باقة بهذا المعرف"));
+
+  const currentPlanId = request.plan; // will this be available after the 30 days?
+  const subscriptionType = await getSubscriptionType(currentPlanId, newPlanId);
+  if (!subscriptionType) return;
+
+  const updatedUser = await startSubscription(request.user.id, plan, paidPrice, subscriptionType);
+
+  response.status(203).json({
+    success: true,
+    updatedUserSubscription: updatedUser?.subscribedPlanDetails,
+  });
+});
 
 // TODO: bank account controller, it's separate because it needs card data validation
 
 export const deleteUserAccountController = catchAsync(async (request, response, next) => {
-  const {userId} = request.params;
+  const { userId } = request.params;
 
   const deletedUser = await deleteDoc(User, userId);
 
   response.status(204).json({
-    success:true
+    success: true,
   });
 });
 

@@ -1,11 +1,12 @@
 import { endOfMonth, startOfMonth } from "date-fns";
 import mongoose from "mongoose";
-import { PlansNames, UnlimitedPlanDataBody } from "../../_Types/Plan";
+import { PlansNames, SubscriptionTypes, UnlimitedPlanDataBody } from "../../_Types/Plan";
 import Plan from "../../models/planModel";
 import PlanStats from "../../models/planStatsModel";
 import { MongoId } from "../../_Types/MongoId";
 
-export async function createUnlimitedPlan(data: UnlimitedPlanDataBody, session: mongoose.ClientSession) { /*✅*/
+export async function createUnlimitedPlan(data: UnlimitedPlanDataBody, session: mongoose.ClientSession) {
+  /*✅*/
   const newPlan = await Plan.create([data], { session });
 
   return newPlan[0];
@@ -17,7 +18,30 @@ export async function checkPlanName(id: MongoId): Promise<boolean> {
   return !!isUnlimited;
 }
 
-export async function getMonthlyPlansStats(dateFilter:{date: {$gte: Date, $lte: Date}}) { /*✅*/
+export async function getSubscriptionType(currentPlanId: MongoId, newPlanId: MongoId): Promise<Exclude<SubscriptionTypes, "new"> | null> {
+  // 1- make both tostring to comparison:
+  const toStringPlanIds = Array.from([currentPlanId, newPlanId], (planId) => planId.toString());
+  if(toStringPlanIds[0] === toStringPlanIds[1]) return "renewal";
+
+  const [currentPlanName, newPlanName] = await Promise.all([Plan.findById(currentPlanId, "planName").lean(), Plan.findById(newPlanId, "planName").lean()]);
+  const upgradeCombo = ["basic-plus" , "basic-unlimited" , "plus-unlimited"];
+
+  // combinations:
+  // basic to plus = upgrade 1 + 2 = 3
+  // basic to unlimited = upgrade 1 + 3 = 4
+  // plus to unlimited = upgrade 2 + 3 = 5
+  // plus to basic = downgrade 2 - 1 = 1
+  // unlimited to plus = downgrade 3 - 2 = 1
+  // unlimited to basic = downgrade 3 - 1 = 2
+
+  const combo = `${currentPlanName?.planName}-${newPlanName?.planName}`
+
+  if(upgradeCombo.includes(combo)) return "upgrade";
+  else return "downgrade";
+}
+
+export async function getMonthlyPlansStats(dateFilter: { date: { $gte: Date; $lte: Date } }) {
+  /*✅*/
   const monthlyStats = await PlanStats.aggregate([
     {
       $match: {
@@ -43,14 +67,16 @@ export async function getMonthlyPlansStats(dateFilter:{date: {$gte: Date, $lte: 
 
   return monthlyStats;
 }
-export async function getPlansStatsReport(sortBy: "year" | "profits" | "subscribers" = "year", sortOrder: "desc" | "asc" = "desc", specificYear?: number) {/*✅*/
+export async function getPlansStatsReport(sortBy: "year" | "profits" | "subscribers" = "year", sortOrder: "desc" | "asc" = "desc", specificYear?: number) {
+  /*✅*/
   const annualReport = await PlanStats.getAnnualStatsReport(sortBy, sortOrder, specificYear);
   const totalsReport = await PlanStats.getPlansTotalsReport();
-  return {annualReport, totalsReport};
+  return { annualReport, totalsReport };
 }
 
 // TODO: this service is going to be called when registering to a plan | renewal a plan | unsubscribing
-export async function updatePlanMonthlyStats(planName: PlansNames, profit: number, operationType: "new" | "renewal" | "upgrade" | "downgrade" | "cancellation", session: mongoose.ClientSession) {/*✅*/
+export async function updatePlanMonthlyStats(planName: PlansNames, profit: number, operationType: "new" | "renewal" | "upgrade" | "downgrade" | "cancellation", session: mongoose.ClientSession) {
+  /*✅*/
   /* OLD CODE (kept for reference): 
         const firstDayOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1); // =< year-month-1st day
         const lastDayOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
@@ -90,7 +116,6 @@ export async function updatePlanMonthlyStats(planName: PlansNames, profit: numbe
     },
     { new: true, upsert: true, setDefaultsOnInsert: true } // options
   ).session(session);
-
 }
 
 // subscription Timeline:

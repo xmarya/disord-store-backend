@@ -46,9 +46,10 @@ type StatsData = {
   downgrades: number;
 };
 
+export type SubscriptionTypes= "new" | "renewal" | "upgrade" | "downgrade";
 type PlanStats = {
   planName: PlansNames;
-  subscriptionType: "new" | "renewal" | "upgrade" | "downgrade";
+  subscriptionType: SubscriptionTypes;
   date: Date;
   monthly: StatsData;
 };
