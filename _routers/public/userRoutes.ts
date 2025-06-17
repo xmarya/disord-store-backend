@@ -4,7 +4,7 @@ import validateNewUserData from "../../_utils/validators/validateNewUserData";
 import { createNewDiscordUser, createNewStoreOwnerController, createNewUserController, credentialsLogin } from "../../controllers/public/userController";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
 import { resetPassword } from "../../_utils/passwords/resetPassword";
-import { forgetPassword } from "../../_utils/passwords/forgetPAssword";
+import { forgetPassword } from "../../_utils/passwords/forgetPassword";
 
 export const router = express.Router();
 console.log("user routes");
