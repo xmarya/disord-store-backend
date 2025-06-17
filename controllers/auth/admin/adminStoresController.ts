@@ -46,7 +46,7 @@ export const suspendStore = catchAsync(async (request, response, next) => {
 });
 
 export const deleteStore = catchAsync(async (request, response, next) => {
-  const deletedStore = deleteStorePermanently(request.params.storeId);
+  const deletedStore = await deleteStorePermanently(request.params.storeId);
   //TODO: create a new adminLog
   response.status(204).json({
     success: true,
