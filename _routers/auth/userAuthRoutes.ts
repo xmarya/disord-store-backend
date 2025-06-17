@@ -4,6 +4,7 @@ import restrict from "../../_utils/protectors/restrict";
 import sanitisedData from "../../_utils/validators/sanitisedData";
 import { validateChangePassword } from "../../_utils/validators/validateChangePassword";
 import { cancelSubscription, createNewSubscribe, renewalSubscription } from "../../controllers/auth/subscriptionController";
+import validateRequestParams from "../../_utils/validators/validateRequestParams";
 
 export const router = express.Router();
 console.log("/me Router");
@@ -21,4 +22,4 @@ router.patch("/plan-unsubscribe", cancelSubscription); // TODO: unsubscription c
 router.use(restrict("admin", "storeOwner", "user"));
 router.route("/").get(getUserProfile).patch(updateUserProfile); /*✅*/
 router.route("/changePassword").patch(validateChangePassword, confirmUserChangePassword); /*✅*/
-router.route("/deleteAccount").delete(deleteUserAccountController);
+router.route("/deleteAccount/:userId").delete(validateRequestParams("userId"),deleteUserAccountController);
