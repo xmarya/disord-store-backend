@@ -1,39 +1,16 @@
+import { addDays } from "date-fns";
 import { startSession } from "mongoose";
-import { createDoc, getAllDocs, getOneDocByFindOne, getOneDocById, updateDoc } from "../../../_services/global";
+import { SUBSCRIPTION_PERIOD } from "../../../_data/constants";
+import { createDoc, getAllDocs, getOneDocById, updateDoc } from "../../../_services/global";
 import { createUnlimitedPlan, updatePlanMonthlyStats } from "../../../_services/plan/planService";
 import { createNewUnlimitedUser } from "../../../_services/user/userService";
+import { MongoId } from "../../../_Types/MongoId";
 import { UnlimitedPlanDataBody } from "../../../_Types/Plan";
 import { AppError } from "../../../_utils/AppError";
-import { comparePasswords } from "../../../_utils/authUtils";
 import { catchAsync } from "../../../_utils/catchAsync";
-import jwtSignature from "../../../_utils/jwtToken/generateSignature";
-import tokenWithCookies from "../../../_utils/jwtToken/tokenWithCookies";
 import Admin from "../../../models/adminModel";
-import User from "../../../models/userModel";
-import { addDays } from "date-fns";
-import { SUBSCRIPTION_PERIOD } from "../../../_data/constants";
 import Plan from "../../../models/planModel";
-import { MongoId } from "../../../_Types/MongoId";
-
-export const adminLoginController = catchAsync(async (request, response, next) => {
-  const { email, password } = request.body;
-  if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
-
-  const admin = await getOneDocByFindOne(Admin, { condition: { email }, select: ["credentials"] });
-  if (!admin) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
-
-  console.log("adminLoginController", admin);
-  if (!(await comparePasswords(password, admin.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
-  console.log("ADMIN ID", admin.id);
-  //STEP 3) create the token:
-  const token = jwtSignature(admin.id, "1h");
-  tokenWithCookies(response, token);
-
-  response.status(200).json({
-    success: true,
-    token,
-  });
-});
+import User from "../../../models/userModel";
 
 export const createAdminController = catchAsync(async (request, response, next) => {
   const data = { ...request.body, credentials: { password: request.body.password } };
@@ -47,7 +24,7 @@ export const createAdminController = catchAsync(async (request, response, next) 
 export const createUnlimitedUserController = catchAsync(async (request, response, next) => {
   const { priceRiyal, priceDollar, features, quota } = request.body.plan;
 
-  if(!quota) return next(new AppError(400, "please insert a plan quota"));
+  if (!quota) return next(new AppError(400, "please insert a plan quota"));
   if (!priceRiyal || !priceDollar) return next(new AppError(400, "Please enter the plan's prices in riyals and dollars."));
   if (isNaN(priceRiyal) || isNaN(priceDollar)) return next(new AppError(400, "the prices should be of type number"));
 
@@ -68,11 +45,13 @@ export const createUnlimitedUserController = catchAsync(async (request, response
     const subscribeEnds = addDays(subscribeStarts, SUBSCRIPTION_PERIOD);
     const data = {
       ...request.body.user,
-      subscribedPlanDetails: { 
-        planId: newPlan._id, planName:"unlimited", 
+      subscribedPlanDetails: {
+        planId: newPlan._id,
+        planName: "unlimited",
         paidPrice: newPlan.price.riyal,
-        subscribeStarts, subscribeEnds,
-        paid:false,
+        subscribeStarts,
+        subscribeEnds,
+        paid: false,
       },
     };
 
@@ -80,10 +59,10 @@ export const createUnlimitedUserController = catchAsync(async (request, response
     const newUser = await createNewUnlimitedUser(data, session);
 
     // STEP 3) link the plan to the user:
-    await updateDoc(Plan, (newPlan._id as MongoId), {unlimitedUser: newUser._id}, {session});
+    await updateDoc(Plan, newPlan._id as MongoId, { unlimitedUser: newUser._id }, { session });
 
     // STEP 4) update the plans stats:
-    const {subscriptionType} = request.body.user;
+    const { subscriptionType } = request.body.user;
     await updatePlanMonthlyStats("unlimited", priceRiyal, subscriptionType, session);
 
     await session.commitTransaction();

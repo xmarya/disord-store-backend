@@ -49,9 +49,11 @@ export const renewalSubscription = catchAsync(async (request, response, next) =>
 export const cancelSubscription = catchAsync(async (request, response, next) => {
   const { notes } = request.body; // TODO: for the admin log
   const userId = request.user.id;
-  const { subscribedPlanDetails } = await getOneDocById(User, userId, {select: ["subscribedPlanDetails"]});
-  if (!subscribedPlanDetails) return next(new AppError(400, "User has no active subscription"));
+  const user = await getOneDocById(User, userId, {select: ["subscribedPlanDetails"]});
+  if (!user || !user.subscribedPlanDetails) return next(new AppError(400, "User has no active subscription"));
 
+  const {subscribedPlanDetails} = user;
+  
   const trialOver = isPast(addDays(subscribedPlanDetails.subscribeStarts, PLAN_TRIAL_PERIOD));
 
   if (trialOver) return next(new AppError(400, "the 10 days limit for cancellation is over"));

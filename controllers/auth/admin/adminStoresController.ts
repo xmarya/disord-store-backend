@@ -1,10 +1,8 @@
 import { updateDoc } from "../../../_services/global";
 import { getStoreWithProducts } from "../../../_services/store/storeService";
 import { getAllStoresStats, getOneStoreStats } from "../../../_services/store/storeStatsService";
-import { ProductDocument } from "../../../_Types/Product";
 import { AppError } from "../../../_utils/AppError";
 import { catchAsync } from "../../../_utils/catchAsync";
-import { getDynamicModel } from "../../../_utils/dynamicMongoModel";
 import Store from "../../../models/storeModel";
 import { deleteStorePermanently } from "../storeControllers";
 
@@ -24,11 +22,10 @@ export const getOneStoreInfo = catchAsync(async (request, response, next) => {
 
   const {dateFilter, sortBy, sortOrder} = request.dateQuery;
   const { storeId } = request.params;
-  const ProductModel = await getDynamicModel<ProductDocument>("Product", storeId);
   // const store = await getOneDocByFindOne(StoreStats, {field: "store", value: storeId}); //BUG this query returns only the first match
 
   const [{store, products}, stats] = await Promise.all([
-    await getStoreWithProducts(storeId, ProductModel),
+    await getStoreWithProducts(storeId),
     await getOneStoreStats(storeId, dateFilter, sortBy, sortOrder),
   ]);
 
