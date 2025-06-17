@@ -94,7 +94,7 @@ export const deleteUserAccountController = catchAsync(async (request, response, 
 
   if(request.user.userType === "storeOwner") {
     session = await startSession();
-    deleteStorePermanently(request.store, session);
+    await deleteStorePermanently(request.store, session);
     deletedUser = await deleteDoc(User, userId, {session});
   }
 
