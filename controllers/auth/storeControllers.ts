@@ -1,4 +1,4 @@
-import { startSession } from "mongoose";
+import mongoose, { startSession } from "mongoose";
 import { deleteAllAssistants } from "../../_services/assistant/assistantService";
 import { updateDoc } from "../../_services/global";
 import { createStore, deleteStore, getStoreWithProducts } from "../../_services/store/storeService";
@@ -85,18 +85,19 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
   });
 });
 
-export const deleteMyStoreNewController = catchAsync(async (request, response, next) => {
+export const deleteMyStoreController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
   await deleteStorePermanently(storeId);
 
   response.status(204).json({
     success: true,
+    message: "the store and all its related resources are deleted too."
   });
 });
 
-export async function deleteStorePermanently(storeId: MongoId) {
-  const session = await startSession();
+export async function deleteStorePermanently(storeId: MongoId, session?:mongoose.ClientSession) {
+  if(!session) session = await startSession();
 
   try {
     session.startTransaction();

@@ -7,7 +7,7 @@ import sanitisedData from "../../_utils/validators/sanitisedData";
 import checkAssistantPermissions from "../../_utils/validators/validateAssistantPermissions";
 import validateEmailConfirmation from "../../_utils/validators/validateEmailConfirmation";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import { deleteMyStoreNewController, getStoreStatsController, previewStoreWithProducts, updateMyStoreController, updateMyStoreStatus } from "../../controllers/auth/storeControllers";
+import { deleteMyStoreController, getStoreStatsController, previewStoreWithProducts, updateMyStoreController, updateMyStoreStatus } from "../../controllers/auth/storeControllers";
 
 export const router = express.Router();
 console.log("/store Router");
@@ -19,7 +19,7 @@ router
   .route("/")
   // .post(restrict("storeOwner"), sanitisedData, createStoreController)
   .patch(restrict("storeOwner"), hasAuthorization, sanitisedData, updateMyStoreController)
-  .delete(restrict("storeOwner"), hasAuthorization, deleteMyStoreNewController)
+  .delete(restrict("storeOwner"), hasAuthorization, deleteMyStoreController)
   .get(restrict("storeOwner", "storeAssistant"), previewStoreWithProducts);
 
 // NOTE: the validateEmailConfirmation is for not letting the user make the store active
