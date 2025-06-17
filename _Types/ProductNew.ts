@@ -1,13 +1,8 @@
 import mongoose from "mongoose";
 import { CategoryDocument } from "./Category";
-import { DigitalProduct } from "./DigitalProduct";
+import { ProductTypes } from "./ProductTypes";
 import { MongoId } from "./MongoId";
 
-
-type PhysicalProduct = {
-  type: "physical";
-  weight: number;
-};
 
 export interface ProductDataBody {
   name: string;
@@ -15,8 +10,7 @@ export interface ProductDataBody {
   image: Array<string>;
   description: string;
   stock: number | null;
-  productType: PhysicalProduct | DigitalProduct;
-  weight: number;
+  productType: ProductTypes;
 }
 
 export interface ProductBasic extends ProductDataBody {
