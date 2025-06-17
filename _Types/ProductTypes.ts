@@ -14,7 +14,7 @@ type ReadableFileExtension =
 
 type CompressedFiles = ".zip" | ".rar";
 
-type DigitalProduct = {
+export type DigitalProduct = {
   type: "digital";
   isPreviewable: boolean
   isDownloadable: boolean;
@@ -28,9 +28,7 @@ type DigitalProduct = {
   filePath:string // helps in Generating signed download links, Serving the file. 
 };
 
-type PhysicalProduct = {
+export type PhysicalProduct = {
   type: "physical";
   weight: number;
 };
-
-export type ProductTypes = PhysicalProduct | DigitalProduct;
