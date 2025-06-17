@@ -21,10 +21,10 @@ export interface StoreDataBody {
   description: string;
   logo?: string;
   inPlan: MongoId;
+  owner: MongoId;
 }
 
 export interface StoreBasic extends StoreDataBody {
-  owner: MongoId;
   status: "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
   verified: boolean;
   ratingsAverage: number;
@@ -36,7 +36,7 @@ export interface StoreBasic extends StoreDataBody {
 
 export interface StoreOptionals {
   storeAssistants?: Array<MongoId>;
-  categories?: Array<CategoryDocument>;
+  // categories?: Array<CategoryDocument>;
   colourTheme?: MongoId; // reference to one of the themes that defined inside ColourTheme Model, the user is going to select one theme
   products: Array<ProductDocument>;
   socialMedia: {

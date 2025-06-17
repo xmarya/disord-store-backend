@@ -25,6 +25,7 @@ export async function getAllDocs<T extends mongoose.Document>(Model: mongoose.Mo
   const filter = options?.condition ?? {};
 
   const docs = await query.find(filter).select(fields);
+  // return Array.isArray(docs) ? docs : [];
   return docs;
 }
 export async function getOneDocById<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, options?:QueryOptions<T>): Promise<T | null> {
@@ -35,29 +36,35 @@ export async function getOneDocById<T extends mongoose.Document>(Model: mongoose
 
 export async function getOneDocByFindOne<T extends mongoose.Document>(Model:mongoose.Model<T>, options?:QueryOptions<T>):Promise<T | null> {
   const fields = options?.select ? options.select.join(" ") : ""; /*✅*/
-  console.log("options?.condition!", options?.condition!);
+  // console.log("options?.condition!", options?.condition!);
   const doc = await Model.findOne(options?.condition!, fields);
   return doc;
 }
-export async function updateDoc<T extends mongoose.Document>(
-  Model: mongoose.Model<T>,
-  id: MongoId,
-  data: any,
-  updateOptions: { locals?: any; session?: mongoose.ClientSession } = {}
-): Promise<T | null> {
-  /* OLD CODE (kept for reference): 
-  const updatedDoc = await Model.findByIdAndUpdate(id, data).setOptions(locals);
-  */
-  const { locals, session } = updateOptions;
-  const query = Model.findByIdAndUpdate(id, data, { runValidators: true, new: true, session });
-  if (locals) query.setOptions(locals); /*REQUIRES TESTING*/
-  const updatedDoc = await query;
+// export async function updateDoc<T extends mongoose.Document>(
+//   Model: mongoose.Model<T>,
+//   id: MongoId,
+//   data: any,
+//   updateOptions: { locals?: any; session?: mongoose.ClientSession } = {}
+// ): Promise<T | null> {
+//   /* OLD CODE (kept for reference): 
+//   const updatedDoc = await Model.findByIdAndUpdate(id, data).setOptions(locals);
+//   */
+//  console.log("updateDoc service");
+//   const { locals, session } = updateOptions;
+//   const query = Model.findByIdAndUpdate(id, data, { runValidators: true, new: true, session });
+//   if (locals) query.setOptions(locals); /*REQUIRES TESTING*/
+//   const updatedDoc = await query;
+//   return updatedDoc;
+// }
+
+export async function updateDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, data: any, options?:QueryOptions<T>): Promise<T | null> {
+  const session = options?.session ?? null;
+  const updatedDoc = await Model.findOneAndUpdate({id, ...options?.condition}, data, {runValidators:true, new:true, session});
+
   return updatedDoc;
 }
-export async function deleteDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, /*locals?: any*/): Promise<T | null> {
-  const deletedDoc = Model.findByIdAndDelete(id);
-  // if (locals) query.setOptions(locals);
-  // const deletedDoc = await query;
+export async function deleteDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, options?:QueryOptions<T>): Promise<T | null> {
+  const deletedDoc = Model.findByIdAndDelete(id, {session: options?.session});
   return deletedDoc;
 }
 

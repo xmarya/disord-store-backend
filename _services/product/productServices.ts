@@ -1,6 +1,7 @@
 import { ProductBasic, ProductDocument } from "../../_Types/Product";
 import Product from "../../models/productModel";
 import { MongoId } from "../../_Types/MongoId";
+import mongoose from "mongoose";
 
 //TODO: delete the two below ONLY.
 
@@ -15,7 +16,7 @@ export async function getAllProducts(storeId:MongoId) {
   return products;
 }
 
-export async function updateProduct(productId: string, data: ProductDocument) {
+export async function updateProduct(storeId:MongoId, productId: MongoId, data: ProductDocument) { /*✅*/
   console.log("updateProduct");
   /* OLD CODE (kept for reference): 
   let addToSetStage = {};
@@ -31,8 +32,9 @@ export async function updateProduct(productId: string, data: ProductDocument) {
     }
   }
   */
-  const updatedProduct = await Product.updateOne(
-    { _id: productId },
+  
+  const updatedProduct = await Product.findOneAndUpdate(
+    { _id: productId, store:storeId },
     {
       $set: {
         ...data,
@@ -41,7 +43,7 @@ export async function updateProduct(productId: string, data: ProductDocument) {
       ...addToSetStage
       */
     },
-    { runValidators: true} // ensures validation still runs
+    { runValidators: true, new:true} // ensures validation still runs
   );
 
   return updatedProduct;
@@ -50,3 +52,7 @@ export async function updateProduct(productId: string, data: ProductDocument) {
 /* TRANSLATE: the categories must exactly match what's sent in the request.body. 
 so, to overwrite the existing array, $set should be used instead of $addToSet; since the later only add 
 a category if not exist, it doesn't remove any removed category */
+
+export async function deleteAllProducts(storeId:MongoId, session:mongoose.ClientSession){
+  await Product.deleteMany({store:storeId}).session(session)
+}

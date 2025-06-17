@@ -2,6 +2,7 @@ import { AppError } from "../AppError";
 import { catchAsync } from "../catchAsync";
 
 const validateJwtToken = catchAsync(async (request, response, next) => {
+  console.log(request.method, "|", request.path, "|", request.baseUrl, "|", request.originalUrl);
   let token:string;
 
   //STEP 1) if there a token in the request.cookies or request headers, get it:

@@ -46,7 +46,7 @@ export const updateProductController = catchAsync(async (request, response, next
   if (!request.body || Object.keys(request.body).length === 0) return next(new AppError(400, "no data was provided in the request.body"));
 
   const { categories } = request.body;
-  if (categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array"));
+  if (categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array")); /*✅*/
 
   const productId = request.params.productId;
 
@@ -56,12 +56,13 @@ export const updateProductController = catchAsync(async (request, response, next
       await updateProductInCategoryController(modelId, categories, productId, "assign");
       updatedProduct = await updateProduct(request.Model, productId, request.body); 
       }
-      else updatedProduct = await updateDoc(request.Model, productId, request.body);
+    else updatedProduct = await updateDoc(request.Model, productId, request.body);
   */
-  await updateProductInCategoryController(categories, productId, "assign"); /*REQUIRES TESTING */
-  const updatedProduct = await updateProduct(productId, request.body);
 
-  if (!updatedProduct) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
+  const updatedProduct = await updateProduct(request.store, productId, request.body);
+  if (!updatedProduct) return next(new AppError(400, "تأكد من صحة البيانات"));
+  await updateProductInCategoryController(categories, updatedProduct.id, "assign"); /*✅*/
+
 
   response.status(201).json({
     success: true,
@@ -79,7 +80,7 @@ export const deleteProductController = catchAsync(async (request, response, next
   const {categories} = deletedProduct as ProductDocument
   const [_, modelId] = request.Model.modelName.split("-");
   */
-  await updateProductInCategoryController(deletedProduct.categories, productId, "delete"); /*REQUIRES TESTING */
+  await updateProductInCategoryController(deletedProduct.categories, productId, "delete"); /*✅*/
   /*TODO:
   await Ranking.deleteOne(deletedDoc.id);
   console.log("now check Ranking after delete");

@@ -16,7 +16,6 @@ function deepSanitise(data: any): any {
 }
 
 export default function sanitisedData(request: Request, response:Response, next: NextFunction) {
-  console.log("sanitisedData", request.body);
   const sanitisedData = deepSanitise(request.body);
   if (sanitisedData === null || sanitisedData === undefined) return next(new AppError(400, "مدخلات خاطئة"));
 

@@ -35,6 +35,10 @@ const planStatsSchema = new Schema<PlanStatsDocument>(
         type: Number,
         default: 0,
       },
+      downgrades: {
+        type: Number,
+        default: 0,
+      },
     },
   },
   {
@@ -84,6 +88,7 @@ planStatsSchema.statics.getAnnualStatsReport = async function (sortBy: "year" | 
         newSubscribers: { $sum: "$monthly.newSubscribers" },
         renewals: { $sum: "$monthly.renewals" },
         upgrades: { $sum: "$monthly.upgrades" },
+        downgrades: { $sum: "$monthly.downgrades" },
       },
     },
     {
@@ -99,6 +104,7 @@ planStatsSchema.statics.getAnnualStatsReport = async function (sortBy: "year" | 
               newSubscribers: "$newSubscribers",
               renewals: "$renewals",
               upgrades: "$upgrades",
+              downgrades: "$downgrades",
             },
           },
         },
@@ -143,6 +149,7 @@ planStatsSchema.statics.getPlansTotalsReport = async function () {
         newSubscribers: { $sum: "$monthly.newSubscribers" },
         renewals: { $sum: "$monthly.renewals" },
         upgrades: { $sum: "$monthly.upgrades" },
+        downgrades: { $sum: "$monthly.downgrades" },
       },
     },
     {
@@ -153,6 +160,8 @@ planStatsSchema.statics.getPlansTotalsReport = async function () {
         profits: 1,
         newSubscribers: 1,
         renewals: 1,
+        upgrades:1,
+        downgrades:1
       },
     },
   ];
@@ -165,7 +174,8 @@ planStatsSchema.statics.getPlansTotalsReport = async function () {
       profits: item.profits,
       newSubscribers: item.newSubscribers,
       renewals: item.renewals,
-      upgrades: item?.upgrades,
+      upgrades: item.upgrades,
+      downgrades: item.downgrades,
     };
     return acc;
   }, {});

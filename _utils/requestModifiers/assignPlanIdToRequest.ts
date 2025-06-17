@@ -5,12 +5,13 @@ import { AppError } from "../AppError";
 import { catchAsync } from "../catchAsync";
 
 const assignPlanIdToRequest = catchAsync(async (request, response, next) => {
+  console.log("assignPlanIdToRequest");
   /* SOLILOQUY: 
     in case the user was an assistant, there is no data about the plan,
-    I only could know the storeId from the request.store
+    I could only know the storeId through the request.store
 
-    the store has inPlan field which only store the name of the plan,
-    However, it has the owner field which I could use to get the plan
+    the store has inPlan field which only stores the name of the plan,
+    However, it has the owner field which I can use to get the plan
     */
   const storeId = request.store;
   const store = await getOneDocById(Store, storeId, {select: ["owner"]});

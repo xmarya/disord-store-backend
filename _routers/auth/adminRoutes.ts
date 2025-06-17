@@ -10,13 +10,24 @@ import restrict from "../../_utils/protectors/restrict";
 import sanitisedData from "../../_utils/validators/sanitisedData";
 import validateNewUserData from "../../_utils/validators/validateNewUserData";
 import validateUnlimitedUserData from "../../_utils/validators/validateUnlimitedUserData";
+import { validateChangePassword } from "../../_utils/validators/validateChangePassword";
+import { adminLoginController, confirmAdminChangePassword, getAdminProfile, updateAdminProfile } from "../../controllers/auth/admin/adminAuthController";
+import { resetPassword } from "../../_utils/passwords/resetPassword";
+import { forgetPassword } from "../../_utils/passwords/forgetPAssword";
+import { deleteUserAccountController } from "../../controllers/auth/userAuthController";
 
 export const router = express.Router();
 
-//  console.log("new-dashboard/ADMIN");
+console.log("/admin Router");
+router.post("/forgetPassword", forgetPassword("Admin")); // this route must be at the top of the stack since it doesn't require to be logged-in.
 
 router.use(restrict("admin"));
-router.post("/administrator-user", sanitisedData, validateNewUserData, createAdminController); // ✅
+router.route("/").get(getAdminProfile).patch(updateAdminProfile); /*✅*/
+router.post("/administrator-user", sanitisedData, validateNewUserData, createAdminController); /*✅*/
+router.post("/login", adminLoginController);
+router.route("/changePassword").patch(validateChangePassword, confirmAdminChangePassword); /*✅*/
+router.route("/resetPassword/:randomToken").patch(validateRequestParams("randomToken"), resetPassword("Admin"));
+
 /* STORES 
     1- patch route for suspend store
 */
@@ -36,7 +47,7 @@ router.get("/users", getAllUsersController); /*✅*/
 router
   .route("/users/:userId")
   .get(validateRequestParams("userId"), getOneUserController) /*✅*/
-  // .delete(validateRequestParams("userId"), deleteUsersController);
+  .delete(validateRequestParams("userId"), deleteUserAccountController);
 
 router.post("/users/unlimited-user", sanitisedData, validateUnlimitedUserData, createUnlimitedUserController);/*✅*/
 

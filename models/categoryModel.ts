@@ -1,6 +1,5 @@
 import { CategoryDocument } from "../_Types/Category";
 import mongoose, { Schema } from "mongoose";
-import Store from "./storeModel";
 import Product from "./productModel";
 
 type CategoryModel = mongoose.Model<CategoryDocument>;
@@ -47,15 +46,17 @@ categorySchema.pre("findOneAndDelete", async function (next) {
   next();
 });
 */
-categorySchema.index({ name: 1, store: 1 }, { unique: true });
-categorySchema.index({ name: 1, products: 1 }, { unique: true }); /*REQUIRES TESTING: does't it work with arrays? */
+categorySchema.index({ name: 1, store: 1 }, { unique: true }); /*✅*/
+/* categorySchema.index({ name: 1, products: 1 }, { unique: true });  doesn't work with arrays */
 
+// this post(findOneAndDelete) is one a category document is deleted
 categorySchema.post("findOneAndDelete", async function (deletedDoc) {
+  console.log("categorySchema.post(findOneAndDelete)");
   if (deletedDoc) {
-    await Promise.all([
-      Store.findByIdAndUpdate({ _id: deletedDoc.store }, { $pull: { categories: deletedDoc._id } }),
-      Product.updateMany({ _id: { $in: deletedDoc.products } }, { $pull: { categories: deletedDoc._id } }),
-    ]);
+    // await Promise.all([
+      // Store.findByIdAndUpdate({ _id: deletedDoc.store }, { $pull: { categories: deletedDoc._id } }),
+      await Product.updateMany({ _id: { $in: deletedDoc.products } }, { $pull: { categories: deletedDoc._id } }); /*✅*/
+    // ]);
   }
 });
 const Category = mongoose.model<CategoryDocument, CategoryModel>("Category", categorySchema);

@@ -56,11 +56,11 @@ export const storeSchema = new Schema<StoreDocument>(
       colour: String,
       }],
       */
-
-    categories: [{
-      type:Schema.Types.ObjectId,
-      ref:"Category"
-    }],
+    // to be honest, I don't see any reasonable to store the categories inside the store doc
+    // categories: [{
+    //   type:Schema.Types.ObjectId,
+    //   ref:"Category"
+    // }],
     colourTheme: {
       /* SOLILOQUY: this should be one object not an array, 
       of course the plus users can views many theme but eventually they are going to select only one*/
@@ -139,7 +139,7 @@ from the StoreStats Model, also using the virtual won't allow to do date filteri
 // });
 
 storeSchema.pre(/^find/, function (this: Query<any, StoreDocument>, next) {
-  this.populate("owner categories");
+  this.populate("owner");
   next();
 });
 
@@ -153,7 +153,9 @@ storeSchema.virtual<ReviewDocument[]>("reviews", {
   ref:"Review",
   localField:"_id",
   foreignField: "reviewedResourceId"
-})
+});
+
+// TODO: وثيقة العمل الحر أو اثبات التجارية
 
 const Store = model<StoreDocument, StoreModel>("Store", storeSchema);
 

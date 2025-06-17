@@ -19,9 +19,8 @@ const getUserFromPayload = catchAsync(async (request, response, next) => {
     if (!user) return next(new AppError(401, "حدثت مشكلة. الرجاء تسجيل الدخول"));
   }
 
-  request.user = user; /*REQUIRES TESTING*/
+  request.user = user;
   console.log("after protecting");
-  console.log(request.user.id, request.user.userType);
 
   next();
 });

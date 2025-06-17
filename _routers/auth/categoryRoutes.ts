@@ -5,18 +5,17 @@ import sanitisedData from "../../_utils/validators/sanitisedData";
 import checkAssistantPermissions from "../../_utils/validators/validateAssistantPermissions";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
 import verifyUsedQuota from "../../_utils/validators/verifyUsedQuota";
-import { createCategoryController, deleteCategoryNewController, getAllCategoriesController, getCategoryController, updateCategoryNewController } from "../../controllers/auth/categoryController";
+import { createCategoryController, deleteCategoryController, getAllCategoriesController, getCategoryController, updateCategoryController } from "../../controllers/auth/categoryController";
 
 export const router = express.Router({mergeParams: true});
-// router.use(isStoreIdExist); // this middleware is used to ensure the storeId is exist before proceeding.
 
 router.use(restrict("storeOwner", "storeAssistant"), hasAuthorization);
 // router.use(validateModelId("Category"), assignModelToRequest("Category"));
 
 router.route("/")
 .post(verifyUsedQuota("ofCategories"),checkAssistantPermissions("addCategory"), sanitisedData, createCategoryController)
-.get(getAllCategoriesController);
+.get(getAllCategoriesController); /*✅*/
 router.route("/:categoryId")
 .get(validateRequestParams("categoryId"),getCategoryController)
-.patch(validateRequestParams("categoryId"),checkAssistantPermissions("editCategory"), sanitisedData, updateCategoryNewController)
-.delete(validateRequestParams("categoryId"),checkAssistantPermissions("deleteCategory"), deleteCategoryNewController);
+.patch(validateRequestParams("categoryId"),checkAssistantPermissions("editCategory"), sanitisedData, updateCategoryController) /*✅*/
+.delete(validateRequestParams("categoryId"),checkAssistantPermissions("deleteCategory"), deleteCategoryController); /*✅*/

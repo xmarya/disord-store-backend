@@ -50,3 +50,4 @@ export const SUPPORTED_DATE_FORMATS = [
 // };
 
 export const SUBSCRIPTION_PERIOD = 30;
+export const PLAN_TRIAL_PERIOD = 10;

@@ -1,13 +1,8 @@
 import crypto from "crypto";
-import bcrypt from "bcryptjs";
 import { addMinutes } from "date-fns";
 import { UserDocument } from "../_Types/User";
 import { AdminDocument } from "../_Types/admin/AdminUser";
 
-export async function comparePasswords(providedPassword: string, userPassword:string) {  /*✅*/
-    const result = await bcrypt.compare(providedPassword, userPassword);
-    return result;
-}
 
 export async function generateRandomToken(doc: UserDocument | AdminDocument) {
   // STEP 1) Generate the token:

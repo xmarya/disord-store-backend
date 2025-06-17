@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { ProductDocument } from "../_Types/Product";
+import { MongoId } from "../_Types/MongoId";
 
 type ProductModel = mongoose.Model<ProductDocument>;
 
@@ -30,11 +31,6 @@ export const productSchema = new Schema<ProductDocument>(
       type: String,
       required: [true, "the description field is required"],
     },
-    // status: {
-    //   type: String,
-    //   enum: ["inStock", "outOfStock"],
-    //   required: [true, "the productStatus is required"],
-    // },
     stock: {
       type: Number,
       required: false,
@@ -88,6 +84,65 @@ export const productSchema = new Schema<ProductDocument>(
     toObject: { virtuals: true },
   }
 );
+
+// this pre(/^find/) hook is for populating the categories:
+productSchema.pre(/^find/, function(this: mongoose.Query<any, any>, next) {
+  this.populate({path: "categories", select: "name colour"});
+  next();
+});
+
+// this pre(validate) is to ensure the product-category pair uniqueness:
+/* NOTE: 
+
+  1- the validate hook's `this` keyword is for document by default.
+    the reason I specifying it to be for query is because I want to access the new/updated value of the category.
+    see:https://mongoosejs.com/docs/middleware.html#naming
+  
+  2- I had a bug where updatedFields?.categories was always undefined.
+    so I tried to print the updatedFields only, it turned out the it had the categories indirectly inside '$set':
+     '$set': {
+    categories: [...],
+    updatedAt: 2025-06-13T10:43:17.290Z
+    }
+    I figured out that it's because inside updateProduct service I'm updating the categories using aggregation pipeline.
+    It's not like updating using the normal/usual way.
+    so, I should've accessed the categories array through the key name "$set".
+
+  3- I decided to comment out this hook because it made no sense for me having it while I'm
+    updating the categories using $set which is going to replace THE WHOLE existing array with the new coming array.
+    No need to worry about any duplication.
+*/
+
+/* OLD CODE (kept for reference):  
+productSchema.pre("validate",{document:false, query:true}, async function(next) {
+  const thisQuery = this as mongoose.Query<any,any>;
+  const updatedFields = thisQuery.getUpdate() as mongoose.UpdateQuery<ProductDocument>;
+  console.log("pre(validate)");
+  
+  const catsInQuery = updatedFields["$set"].categories as MongoId[];
+  if(!catsInQuery) return next();
+  console.log("updatedFields[\"$set\"].categories");
+  
+  const doc:ProductDocument = await thisQuery.model.findOne(thisQuery.getFilter()).select("categories");
+  
+  const catsInDocument:MongoId[] = doc.categories.map(cat => cat.id);
+  console.log(catsInDocument);
+  const isDuplicated = catsInQuery.some(catId => {
+    console.log("some", catId);
+    return catsInDocument.includes(catId.toString());
+  });
+  
+  console.log("isDuplicated", isDuplicated);
+  if(isDuplicated) {
+    const error = new mongoose.Error.ValidationError();
+    error.message = "validation failed. duplicated value of a category";
+    return next(error);
+  }
+  
+  next();
+});
+
+*/
 /* OLD CODE (kept for reference): 
 productSchema.pre("save", async function (this:ProductDocument, next) {
 if (this.isModified("categories")) {
@@ -183,7 +238,14 @@ productSchema.pre("findOneAndUpdate", async function(next) {
 productSchema.index({name: 1, store:1}, {unique:true}); // ensure uniqueness for the products' names in each store
 productSchema.index({ ranking: 1 });
 
-//TODO: delete these after fully refactoring everything
+// this post(deleteMany) hook is for deleting all of the product's rankings after deleting the store
+// it's a query hook. see: https://mongoosejs.com/docs/middleware.html#naming
+productSchema.post("deleteMany",{document:false, query:true} ,async function() {
+  const deletedDocs = await this.model.find(this.getFilter()).select("_id");
+  console.log("productSchema.post(deleteMany)", deletedDocs);
+
+});
+
 const Product = mongoose.model<ProductDocument, ProductModel>("Product", productSchema);
 
 export default Product;

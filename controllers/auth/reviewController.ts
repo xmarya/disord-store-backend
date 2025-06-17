@@ -32,12 +32,13 @@ async function updateResourceRatingController(Model: Extract<Model, "Store" | "P
 // the review then is going to be considered as a platform review which leads to storing the data in the wrong collection.
 
 export const createReviewController = catchAsync(async (request, response, next) => {
-  console.log("includes(product)",request.baseUrl.includes("product"));
+  console.log("includes(product)",request.path.includes("product"));
   // STEP 1) validate the data of the coming request.body:
-  const { reviewedResourceId, storeOrProduct, reviewBody, rating }: ReviewDataBody = request.body;
-  if (!reviewBody?.trim() || !rating || (reviewedResourceId as string)?.trim() || storeOrProduct?.trim()) return next(new AppError(400, "الرجاء التأكد من كتابة جميع البيانات قبل الإرسال"));
+  const { reviewedResourceId, reviewBody, rating }: ReviewDataBody = request.body;
+  if (!reviewBody?.trim() || !rating || (reviewedResourceId as string)?.trim()) return next(new AppError(400, "الرجاء التأكد من كتابة جميع البيانات قبل الإرسال"));
   if (isNaN(rating)) return next(new AppError(400, "the rating must be of type number"));
 
+  const storeOrProduct = request.baseUrl.includes("product") ? "Product" : "Store";
   const data = { reviewedResourceId, storeOrProduct, reviewBody, user: request.user.id, rating };
   const newReview = await createDoc(Review, data);
 
