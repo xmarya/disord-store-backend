@@ -10,6 +10,7 @@ import { comparePasswords } from "../../_utils/passwords/comparePasswords";
 import formatSubscriptionsLogs from "../../_utils/queryModifiers/formatSubscriptionsLogs";
 import User from "../../models/userModel";
 import { deleteStorePermanently } from "./storeControllers";
+import mongoose from "mongoose";
 
 export const getUserProfile = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -84,21 +85,23 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
   });
 });
 
-
 // TODO: bank account controller, it's separate because it needs card data validation
 
 export const deleteUserAccountController = catchAsync(async (request, response, next) => {
   const { userId } = request.params;
-  let session = null;
-  let deletedUser:UserDocument | null;
+  let session:mongoose.ClientSession | null;
+  let deletedUser: UserDocument | null;
 
-  if(request.user.userType === "storeOwner") {
+  if (request.user.userType === "storeOwner") {
     session = await startSession();
-    await deleteStorePermanently(request.store, session);
-    deletedUser = await deleteDoc(User, userId, {session});
-  }
-
-  else deletedUser = await deleteDoc(User, userId);
+    await session.withTransaction(async () => {
+      await deleteStorePermanently(request.store, session);
+      await deleteDoc(User, userId, { session });
+    });
+    session.endSession();
+  } 
+  
+  else await deleteDoc(User, userId);
 
   response.status(204).json({
     success: true,

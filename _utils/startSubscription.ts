@@ -1,15 +1,14 @@
 import { startSession } from "mongoose";
 import { SUBSCRIPTION_PERIOD } from "../_data/constants";
 import { MongoId } from "../_Types/MongoId";
-import { StoreOwner } from "../_Types/User";
+import { StoreOwner, UserDocument } from "../_Types/User";
 import { updatePlanMonthlyStats } from "../_services/plan/planService";
 import { createNewSubscription } from "../_services/user/userService";
-import { AppError } from "./AppError";
 import { addDays } from "date-fns";
 import { PlanDocument, SubscriptionTypes } from "../_Types/Plan";
 
-export async function startSubscription(userId: MongoId, plan: PlanDocument, paidPrice:number, subscriptionType:SubscriptionTypes) {
-  const {id:planId, planName} = plan;
+export async function startSubscription(userId: MongoId, plan: PlanDocument, paidPrice: number, subscriptionType: SubscriptionTypes) {
+  const { id: planId, planName } = plan;
   const subscribeStarts = new Date();
   const subscribeEnds = addDays(subscribeStarts, SUBSCRIPTION_PERIOD);
 
@@ -27,20 +26,15 @@ export async function startSubscription(userId: MongoId, plan: PlanDocument, pai
 
   let updatedUser;
   const session = await startSession();
-  try {
-    session.startTransaction();
-
+  
+  const result = await session.withTransaction(async () => {
     await updatePlanMonthlyStats(plan.planName, paidPrice, subscriptionType, session);
     updatedUser = await createNewSubscription(userId, userData, session);
 
-    await session.commitTransaction();
-  } catch (error) {
-    await session.abortTransaction();
-    console.log((error as Error).message);
-    throw new AppError(500, "حدث خطأ أثناء معالجة العملية. الرجاء المحاولة مجددًا");
-  } finally {
-    await session.endSession();
-  }
+    return updatedUser
+  });
 
-  return updatedUser;
+  await session.endSession();
+
+  return result;
 }

@@ -92,15 +92,14 @@ export const deleteMyStoreController = catchAsync(async (request, response, next
 
   response.status(204).json({
     success: true,
-    message: "the store and all its related resources are deleted too."
+    message: "the store and all its related resources are deleted.",
   });
 });
 
-export async function deleteStorePermanently(storeId: MongoId, session?:mongoose.ClientSession) {
-  if(!session) session = await startSession();
+export async function deleteStorePermanently(storeId: MongoId, session?: mongoose.ClientSession | null) {
+  if (!session) session = await startSession();
 
-  try {
-    session.startTransaction();
+  await session.withTransaction(async () => {
     //STEP 1) change userType and remove myStore:
     await resetStoreOwnerToDefault(storeId, session);
     //STEP 2) delete corresponding storeAssistant:
@@ -117,15 +116,8 @@ export async function deleteStorePermanently(storeId: MongoId, session?:mongoose
     //STEP 7) delete the store:
     await deleteStore(storeId, session);
     console.log("test request.user.myStore before deletion the store", storeId);
-
-    await session.commitTransaction();
-  } catch (error) {
-    console.log(error);
-    await session.abortTransaction();
-    throw new AppError(500, "something went wrong, Please try again.");
-  } finally {
-    await session.endSession();
-  }
+  });
+  await session.endSession();
 
   /* OLD CODE (kept for reference): 
   // if the deletion of the store went successfully, drop the collection (this functionality doesn't fully support session and transaction)
@@ -136,13 +128,13 @@ export async function deleteStorePermanently(storeId: MongoId, session?:mongoose
   //TODO: add the deleted data to the AdminLog
 }
 
-export const previewStoreWithProducts = catchAsync( async(request, response, next) => {
+export const previewStoreWithProducts = catchAsync(async (request, response, next) => {
   const storeId = request.store;
-  const {store, products} = await getStoreWithProducts(storeId);
+  const { store, products } = await getStoreWithProducts(storeId);
 
   response.status(200).json({
-    success:true,
+    success: true,
     store,
-    products
+    products,
   });
 });
