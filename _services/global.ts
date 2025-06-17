@@ -63,10 +63,8 @@ export async function updateDoc<T extends mongoose.Document>(Model: mongoose.Mod
 
   return updatedDoc;
 }
-export async function deleteDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, /*locals?: any*/): Promise<T | null> {
-  const deletedDoc = Model.findByIdAndDelete(id);
-  // if (locals) query.setOptions(locals);
-  // const deletedDoc = await query;
+export async function deleteDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, options?:QueryOptions<T>): Promise<T | null> {
+  const deletedDoc = Model.findByIdAndDelete(id, {session: options?.session});
   return deletedDoc;
 }
 
