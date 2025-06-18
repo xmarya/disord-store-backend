@@ -8,7 +8,7 @@ import { HandleErrorResponse } from "../../_utils/common";
 import { ProcessPaymobPayment } from "../../_services/payment/paymobService";
 import { AxiosError } from "axios";
 import { processPaymobWebhook, getPaymentSuccessHtml } from "../../_services/payment/paymnetServices";
-import Product from "../../models/productModel";
+import Product from "../../models/productNewModel";
 
 export const validateOrderInput = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {

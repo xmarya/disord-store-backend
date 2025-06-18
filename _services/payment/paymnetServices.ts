@@ -1,6 +1,6 @@
 import { verifyPaymobHmac, validatePaymobWebhook } from "../../_utils/paymobWebHookUtils";
 import Order from "../../models/orderModel";
-import Product from "../../models/productModel";
+import Product from "../../models/productNewModel";
 
 export const getPaymentSuccessHtml = (status: "success" | "error", errorMessage: string = ""): string => {
   return `
