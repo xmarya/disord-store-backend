@@ -23,6 +23,8 @@ export const getStoreWithProductsController = catchAsync(async (request, respons
 
   const { store, products } = await getStoreWithProducts(storeId);
   // NOTE: how to get the ratings/rankings of all the products? + how to allow filtering them?
+ 
+  if(store) delete (store as any)?.owner;
 
   response.status(200).json({
     success: true,
