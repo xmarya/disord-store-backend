@@ -7,7 +7,7 @@ import { updateProductInCategoryController } from "./categoryController";
 
 export const createProductController = catchAsync(async (request, response, next) => { /*REQUIRES TESTING*/
   const { categories } = request.body;
-  if (categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array")); /*✅*/
+  if (categories && categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array")); /*✅*/
 
   const storeId = request.store;
   const data = { store: storeId, ...request.body };
@@ -26,6 +26,7 @@ export const getAllProductsController = catchAsync(async (request, response, nex
 
   response.status(200).json({
     success: true,
+    result: products.length,
     products,
   });
 });
@@ -44,7 +45,7 @@ export const updateProductController = catchAsync(async (request, response, next
   if (!request.body || Object.keys(request.body).length === 0) return next(new AppError(400, "no data was provided in the request.body"));
 
   const { categories } = request.body;
-  if (categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array")); /*✅*/
+  if (categories && categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array")); /*✅*/
 
   const productId = request.params.productId;
 

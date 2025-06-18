@@ -140,10 +140,15 @@ from the StoreStats Model, also using the virtual won't allow to do date filteri
 //   foreignField: "store",
 // });
 
-storeSchema.pre(/^find/, function (this: Query<any, StoreDocument>, next) {
-  this.populate("owner");
-  next();
-});
+
+//NOTE: I'm not sure if commenting out the below hook would break the code somewhere. I searched to see if it is essential inside a controller or a service but didn't find any thing.
+// And for the reason why I commented it out is because the product model needs to populate the store, 
+// and the store in turn was going to populate its owner
+// which is an unnecessary piece of data in most of the cases where the store data are obtained.
+// storeSchema.pre(/^find/, function (this: Query<any, StoreDocument>, next) {
+//   this.populate("owner");
+//   next();
+// });
 
 storeSchema.virtual<ProductDocument[]>("products", {
   ref: "Product",

@@ -93,7 +93,7 @@ productSchema.index({ ranking: 1 });
 // this pre(/^find/) hook is for populating the categories:
 productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
   this.populate({ path: "categories", select: "name colour" });
-  this.populate({path:"store", select:"name ranking ratingsAverage ratingsQuantity verified"});
+  this.populate({path:"store", select:"name ranking ratingsAverage ratingsQuantity verified -owner"});
   next();
 });
 

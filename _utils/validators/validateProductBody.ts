@@ -11,7 +11,7 @@ export const validateProductBody = catchAsync(async (request, response, next)=> 
     if(productType === "digital") {
         const {fileName, filePath, fileSize}:DigitalProduct = request.body;
         if(!name?.trim() || !price || !description?.trim() || !fileName?.trim() || !filePath?.trim() || !fileSize?.trim())
-            return next(new AppError(400, "Please provide all necessary digital product data ({name, price, description, fileName, filePath, fileSize)"));
+            return next(new AppError(400, "Please provide all necessary digital product data (name, price, description, fileName, filePath, fileSize)"));
     }
 
     else if(productType === "physical") {

@@ -11,6 +11,7 @@ export const getStoresList = catchAsync( async(request, response, next)=> {
 
     response.status(200).json({
         success: true,
+        result: storesList.length,
         storesList
     });
 });
