@@ -4,7 +4,7 @@ import { CompressedFiles, FileSizeUnit, ImageExtension, ReadableFileExtension } 
 import mongoose from "mongoose";
 
 
-export interface ProductBasic extends mongoose.Document {
+export interface ProductDataBody {
   productType: "digital" | "physical";
   name: string;
   price: number;
@@ -13,6 +13,9 @@ export interface ProductBasic extends mongoose.Document {
   stock: number | null;
   categories: Array<CategoryDocument>;
   store: MongoId;
+}
+
+interface ProductBasic {
   ranking: number;
   ratingsAverage: number;
   ratingsQuantity: number;
@@ -20,7 +23,7 @@ export interface ProductBasic extends mongoose.Document {
   numberOfPurchases: number;
 }
 
-export interface DigitalProduct extends ProductBasic {
+export interface DigitalProduct extends ProductDataBody, ProductBasic {
   productType: "digital";
   isPreviewable: boolean;
   isDownloadable: boolean;
@@ -34,7 +37,7 @@ export interface DigitalProduct extends ProductBasic {
   filePath: string; // helps in Generating signed download links, Serving the file.
 }
 
-export interface PhysicalProduct extends ProductBasic {
+export interface PhysicalProduct extends ProductDataBody, ProductBasic {
   productType: "physical";
  weight:number;
 }

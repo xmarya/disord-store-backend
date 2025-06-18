@@ -45,9 +45,9 @@ const productSchema = new Schema(
       min: [0, "the stock field cannot be negative"],
     },
     weight: Number,
-    isPreviewable: { type: Boolean, default: false },
-    isDownloadable: { type: Boolean, default: false },
-    isStreamable: { type: Boolean, default: false },
+    isPreviewable: Boolean,
+    isDownloadable: Boolean,
+    isStreamable: Boolean,
     accessControl: {
       expiresAfter: Number,
       maxDownloads: Number,
@@ -93,11 +93,8 @@ productSchema.index({ ranking: 1 });
 // this pre(/^find/) hook is for populating the categories:
 productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
   this.populate({ path: "categories", select: "name colour" });
+  this.populate({path:"store", select:"name ranking ratingsAverage ratingsQuantity verified"});
   next();
-});
-
-productSchema.pre("validate", function (this: ProductDocument, next) {
-next();
 });
 
 // this post(deleteMany) hook is for deleting all of the product's rankings after deleting the store

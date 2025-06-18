@@ -3,9 +3,9 @@ import { PlanQuota } from "../../_Types/Plan";
 import { getOneDocById } from "../../_services/global";
 import Category from "../../models/categoryModel";
 import Plan from "../../models/planModel";
-import Product from "../../models/productModel";
 import StoreAssistant from "../../models/storeAssistantModel";
 import { AppError } from "../AppError";
+import Product from "../../models/productNewModel";
 
 
 const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {

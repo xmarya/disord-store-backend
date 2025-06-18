@@ -1,21 +1,19 @@
-import { createDoc, deleteDoc, getAllDocs, getOneDocById, updateDoc } from "../../_services/global";
+import { createDoc, deleteDoc, getAllDocs, getOneDocById } from "../../_services/global";
 import { updateProduct } from "../../_services/product/productServices";
-import { ProductDataBody } from "../../_Types/Product";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import Product from "../../models/productModel";
+import Product from "../../models/productNewModel";
 import { updateProductInCategoryController } from "./categoryController";
 
-export const createProductController = catchAsync(async (request, response, next) => {
-  const { name, description, price, image, stock, productType, weight }: ProductDataBody = request.body;
-  if (!name?.trim() || !price || !description?.trim() || !weight || !productType?.trim()) return next(new AppError(400, "Please add all the product's necessary data"));
-
-  if (isNaN(price) || isNaN(weight)) return next(new AppError(400, "product's weight and price must be of type number"));
+export const createProductController = catchAsync(async (request, response, next) => { /*REQUIRES TESTING*/
+  const { categories } = request.body;
+  if (categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array")); /*✅*/
 
   const storeId = request.store;
-  const data = { store: storeId, name, description, price, image, stock, productType, weight };
-  const newProd = await createDoc(Product, data);
+  const data = { store: storeId, ...request.body };
 
+  const newProd = await createDoc(Product, data);
+  await updateProductInCategoryController(categories, newProd.id, "assign");
   response.status(201).json({
     success: true,
     newProd,
@@ -62,7 +60,6 @@ export const updateProductController = catchAsync(async (request, response, next
   const updatedProduct = await updateProduct(request.store, productId, request.body);
   if (!updatedProduct) return next(new AppError(400, "تأكد من صحة البيانات"));
   await updateProductInCategoryController(categories, updatedProduct.id, "assign"); /*✅*/
-
 
   response.status(201).json({
     success: true,
