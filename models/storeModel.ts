@@ -8,6 +8,8 @@ export const storeSchema = new Schema<StoreDocument>(
   {
     storeName: {
       type: String,
+      maxlength: [20, "the maximum length for a store name is 20 characters"],
+      minlength: [3, "the minimum length for a store name is 3 characters"],
       required: true,
       unique: true,
       trim: true,
@@ -110,16 +112,16 @@ export const storeSchema = new Schema<StoreDocument>(
       // NOTE: this filed will be used to presents the ranking of store's products, it's irrelevant to the storeStats model.
     },
     ratingsAverage: {
-      type:Number,
-      default:null,
+      type: Number,
+      default: null,
       min: [1, "rating must be 1 to 5"],
       max: [5, "rating must be 1 to 5"],
-      set: (rating:number) => Math.round(rating * 10) / 10
+      set: (rating: number) => Math.round(rating * 10) / 10,
     },
     ratingsQuantity: {
-      type:Number,
-      default:0
-    }
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
@@ -138,10 +140,15 @@ from the StoreStats Model, also using the virtual won't allow to do date filteri
 //   foreignField: "store",
 // });
 
-storeSchema.pre(/^find/, function (this: Query<any, StoreDocument>, next) {
-  this.populate("owner");
-  next();
-});
+
+//NOTE: I'm not sure if commenting out the below hook would break the code somewhere. I searched to see if it is essential inside a controller or a service but didn't find any thing.
+// And for the reason why I commented it out is because the product model needs to populate the store, 
+// and the store in turn was going to populate its owner
+// which is an unnecessary piece of data in most of the cases where the store data are obtained.
+// storeSchema.pre(/^find/, function (this: Query<any, StoreDocument>, next) {
+//   this.populate("owner");
+//   next();
+// });
 
 storeSchema.virtual<ProductDocument[]>("products", {
   ref: "Product",
@@ -150,9 +157,9 @@ storeSchema.virtual<ProductDocument[]>("products", {
 });
 
 storeSchema.virtual<ReviewDocument[]>("reviews", {
-  ref:"Review",
-  localField:"_id",
-  foreignField: "reviewedResourceId"
+  ref: "Review",
+  localField: "_id",
+  foreignField: "reviewedResourceId",
 });
 
 // TODO: وثيقة العمل الحر أو اثبات التجارية

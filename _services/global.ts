@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import type { Request } from "express";
-import { KnownKeys } from "../_Types/TypeKeys";
 import { QueryOptions } from "../_Types/QueryOptions";
 import { MongoId } from "../_Types/MongoId";
 import { buildQuery } from "../_utils/queryModifiers/buildRequestQuery";
@@ -52,7 +51,7 @@ export async function getOneDocByFindOne<T extends mongoose.Document>(Model:mong
 //  console.log("updateDoc service");
 //   const { locals, session } = updateOptions;
 //   const query = Model.findByIdAndUpdate(id, data, { runValidators: true, new: true, session });
-//   if (locals) query.setOptions(locals); /*REQUIRES TESTING*/
+//   if (locals) query.setOptions(locals); 
 //   const updatedDoc = await query;
 //   return updatedDoc;
 // }

@@ -1,6 +1,6 @@
 import { CategoryDocument } from "../_Types/Category";
 import mongoose, { Schema } from "mongoose";
-import Product from "./productModel";
+import Product from "./productNewModel";
 
 type CategoryModel = mongoose.Model<CategoryDocument>;
 export const categorySchema = new Schema<CategoryDocument>({

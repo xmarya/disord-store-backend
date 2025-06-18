@@ -18,7 +18,8 @@ const CouponSchema = new Schema<ICoupon>({
     required: true,
   },
 }, { timestamps: true });
-CouponSchema.index({ storeId: 1 })
+CouponSchema.index({ storeId: 1 });
+CouponSchema.index({code: 1, storeId:1}, {unique:true});
 
 const Coupon = mongoose.model<ICoupon>("Coupon", CouponSchema);
 export default Coupon;

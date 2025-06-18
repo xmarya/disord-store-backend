@@ -14,6 +14,7 @@ export const getAllStoresInfo = catchAsync(async (request, response, next) => {
 
   response.status(200).json({
     success: true,
+    result: storesStats.length,
     storesStats,
   });
 });

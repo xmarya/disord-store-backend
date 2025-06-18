@@ -2,9 +2,9 @@ import mongoose, { startSession } from "mongoose";
 import { MongoId } from "../../_Types/MongoId";
 import { StoreDataBody } from "../../_Types/Store";
 import { AppError } from "../../_utils/AppError";
-import Product from "../../models/productModel";
 import Store from "../../models/storeModel";
 import User from "../../models/userModel";
+import Product from "../../models/productNewModel";
 
 
 export async function createStore(data:StoreDataBody) {
@@ -38,7 +38,7 @@ export async function createStore(data:StoreDataBody) {
 } 
 
 export async function getStoreWithProducts(storeId: MongoId) {
-    const store = await Store.findById(storeId);
+    const store = await Store.findById(storeId).populate("owner");
     const products = await Product.find({store:storeId});
 
     return {store, products};

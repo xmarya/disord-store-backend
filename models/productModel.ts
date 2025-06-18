@@ -246,6 +246,6 @@ productSchema.post("deleteMany",{document:false, query:true} ,async function() {
 
 });
 
-const Product = mongoose.model<ProductDocument, ProductModel>("Product", productSchema);
+// const Product = mongoose.model<ProductDocument, ProductModel>("Product", productSchema);
 
-export default Product;
+// export default Product;

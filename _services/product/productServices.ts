@@ -1,20 +1,7 @@
-import { ProductBasic, ProductDocument } from "../../_Types/Product";
-import Product from "../../models/productModel";
-import { MongoId } from "../../_Types/MongoId";
 import mongoose from "mongoose";
-
-//TODO: delete the two below ONLY.
-
-export async function createProduct(data: ProductBasic) {
-  const newProd = await Product.create(data);
-  return newProd;
-}
-
-export async function getAllProducts(storeId:MongoId) {
-  const products = await Product.find({ store: storeId });
-
-  return products;
-}
+import { MongoId } from "../../_Types/MongoId";
+import { ProductDocument } from "../../_Types/Product";
+import Product from "../../models/productNewModel";
 
 export async function updateProduct(storeId:MongoId, productId: MongoId, data: ProductDocument) { /*✅*/
   console.log("updateProduct");

@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import Product from "../../models/productModel";
 import Order from "../../models/orderModel";
 import Coupon from "../../models/couponModel";
 import { validateCoupon } from "../coupon/couponService";
 import { RoundToTwo } from "../../_utils/common";
 import { CreateOrderParams, IOrder, IOrderItem, IOrderItemCheck, Address } from "../../_Types/Order";
+import Product from "../../models/productNewModel";
 
 export const ProcessOrderItems = async (
   items: IOrderItemCheck[],
@@ -25,14 +25,7 @@ export const ProcessOrderItems = async (
   let hasPhysicalProduct = false; // Temporary flag during processing
 
   const productIds = items.map((item) => item.productId);
-  const products = await Product.find({ _id: { $in: productIds } })
-    .session(session)
-    .populate<{
-      store: { _id: mongoose.Types.ObjectId };
-    }>({
-      path: "store",
-      select: "_id",
-    });
+  const products = await Product.find({ _id: { $in: productIds } }).session(session); // the store field is populated. check productSchema.pre(/^find/ hook.
 
   const productMap = new Map(products.map((p) => [p._id.toString(), p]));
 

@@ -13,7 +13,7 @@ import validateUnlimitedUserData from "../../_utils/validators/validateUnlimited
 import { validateChangePassword } from "../../_utils/validators/validateChangePassword";
 import { adminLoginController, confirmAdminChangePassword, getAdminProfile, updateAdminProfile } from "../../controllers/auth/admin/adminAuthController";
 import { resetPassword } from "../../_utils/passwords/resetPassword";
-import { forgetPassword } from "../../_utils/passwords/forgetPAssword";
+import { forgetPassword } from "../../_utils/passwords/forgetPassword";
 import { deleteUserAccountController } from "../../controllers/auth/userAuthController";
 
 export const router = express.Router();
