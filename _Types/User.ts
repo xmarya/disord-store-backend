@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import { Address } from "./UserAddress";
-import { BankAccount } from "./UserBankAccount";
 import { PlansNames } from "./Plan";
 import { MongoId } from "./MongoId";
+import { CreditCardDocument } from "./CreditCard";
 
 type Credentials = {
   password: string;
@@ -36,7 +36,7 @@ export interface RegularUser extends UserDataBody {
   phoneNumber: string;
   image: string;
   addresses: Array<Address>;
-  bankAccounts: Array<BankAccount>;
+  bankAccounts: Array<CreditCardDocument>;
   defaultAddressId: mongoose.Types.ObjectId;
   defaultBankAccountId: mongoose.Types.ObjectId;
   createdAt: Date;
