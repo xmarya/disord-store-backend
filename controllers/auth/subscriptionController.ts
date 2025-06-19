@@ -1,17 +1,16 @@
 import { addDays, isPast } from "date-fns";
+import { startSession } from "mongoose";
+import { PLAN_TRIAL_PERIOD } from "../../_data/constants";
 import { getOneDocById, updateDoc } from "../../_services/global";
+import { updatePlanMonthlyStats } from "../../_services/plan/planService";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import { getSubscriptionType } from "../../_utils/getSubscriptionType";
 import { startSubscription } from "../../_utils/startSubscription";
 import Plan from "../../models/planModel";
 import User from "../../models/userModel";
-import { PLAN_TRIAL_PERIOD } from "../../_data/constants";
-import { startSession } from "mongoose";
-import { updatePlanMonthlyStats } from "../../_services/plan/planService";
-import { UserDocument } from "../../_Types/User";
 
-export const createNewSubscribe = catchAsync(async (request, response, next) => {
+export const createNewSubscribeController = catchAsync(async (request, response, next) => {
   /*✅*/
   console.log("createNewSubscribe");
   const { planId, paidPrice } = request.body;
@@ -27,7 +26,7 @@ export const createNewSubscribe = catchAsync(async (request, response, next) => 
   });
 });
 
-export const renewalSubscription = catchAsync(async (request, response, next) => {
+export const renewalSubscriptionController = catchAsync(async (request, response, next) => {
   console.log("renewalSubscription");
   const { planId: newPlanId, paidPrice } = request.body;
   if (!newPlanId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
@@ -47,7 +46,7 @@ export const renewalSubscription = catchAsync(async (request, response, next) =>
   });
 });
 
-export const cancelSubscription = catchAsync(async (request, response, next) => {
+export const cancelSubscriptionController = catchAsync(async (request, response, next) => {
   const { notes } = request.body; // TODO: for the admin log
   const userId = request.user.id;
   const user = await getOneDocById(User, userId, { select: ["subscribedPlanDetails"] });
