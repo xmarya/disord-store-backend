@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 import { MongoId } from "./MongoId";
 
-export type CreditCardDataBody = {
+export type UserCreditCardDataBody = {
   user:MongoId
   cardName: string;
   cardNumber: string;
   cardExpireIn: string;
   CVV:string,
+  isDefault:boolean,
 };
 
-export type CreditCardDocument = Omit<CreditCardDataBody, "CVV"> & mongoose.Document;
+export type UserCreditCardDocument = Omit<UserCreditCardDataBody, "CVV"> & mongoose.Document;

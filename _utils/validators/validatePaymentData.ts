@@ -9,12 +9,12 @@
 */
 
 import { isPast, isValid } from "date-fns";
-import { CreditCardDataBody } from "../../_Types/UserCreditCard";
+import { UserCreditCardDataBody } from "../../_Types/UserCreditCard";
 import { AppError } from "../AppError";
 import { catchAsync } from "../catchAsync";
 
 const validatePaymentData = catchAsync(async (request, response, next) => {
-  const { cardName, cardNumber, cardExpireIn, CVV } = request.body as CreditCardDataBody;
+  const { cardName, cardNumber, cardExpireIn, CVV } = request.body as UserCreditCardDataBody;
 
   if (!cardName?.trim() || !isValidLuhn(cardNumber) || !isStillValid(cardExpireIn) || CVV.length !== 3) return next(new AppError(400, "make sure the payment card details are valid."));
 
