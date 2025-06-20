@@ -6,10 +6,13 @@ import { validateChangePassword } from "../../_utils/validators/validateChangePa
 import { cancelSubscriptionController, createNewSubscribeController, renewalSubscriptionController } from "../../controllers/auth/subscriptionController";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
 import validatePaymentData from "../../_utils/validators/validatePaymentData";
+import {router as wishlistRouter} from "./wishlistRouter";
 import { createNewCreditCardController, deleteCreditCardController, getAllCreditCardsController, getOneCreditCardController, updateCreditCardController } from "../../controllers/auth/creditCardController";
 
 export const router = express.Router();
 console.log("/me Router");
+
+router.use("/wish-list", wishlistRouter);
 
 router.use(restrict("storeOwner"));
 router.route("/subscriptions").get(getMySubscriptionsLogController);

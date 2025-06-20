@@ -1,9 +1,9 @@
-import { Types } from "mongoose";
+import mongoose from "mongoose";
+import { MongoId } from "./MongoId";
 
-export interface Wishlist {
-  id: string;
-  user: Types.ObjectId;
-  product: Types.ObjectId;
+export interface WishlistDataBody {
+  user: MongoId;
+  product: MongoId;
 }
 
-export type WishlistDocument = Wishlist;
+export type WishlistDocument = WishlistDataBody & mongoose.Document;

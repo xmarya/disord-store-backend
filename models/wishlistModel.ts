@@ -1,7 +1,6 @@
-import { Model, Schema, model, models } from "mongoose";
+import mongoose, { Model, Schema } from "mongoose";
 import { WishlistDocument } from "../_Types/Wishlist";
 
-// a feature only accessible by the Plus subscribers
 type WishListModel = Model<WishlistDocument>;
 const wishlistSchema = new Schema<WishlistDocument>(
   {
@@ -25,8 +24,14 @@ const wishlistSchema = new Schema<WishlistDocument>(
   }
 );
 
-const Wishlist =
-  models?.Wishlist ||
-  model<WishlistDocument, WishListModel>("Wishlist", wishlistSchema);
+wishlistSchema.index({user:1, product:1}, {unique: true});
+
+// this pre(find) hook is for populating specific field from the product model
+wishlistSchema.pre("find", function(next){ /*REQUIRES TESTING*/
+  this.populate({path: "product", select: "name store price image productType stock numberOfPurchases ranking ratingsAverage ratingsQuantity"});
+  next();
+});
+
+const Wishlist = mongoose.model<WishlistDocument, WishListModel>("Wishlist", wishlistSchema);
 
 export default Wishlist;
