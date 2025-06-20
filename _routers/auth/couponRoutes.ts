@@ -3,6 +3,7 @@ import { createCoupon,UpdateCoupon,GetCouponById } from "../../controllers/auth/
 import restrict from "../../_utils/protectors/restrict";
 import hasAuthorization from "../../_utils/protectors/hasAuthorization";
 import sanitisedData from "../../_utils/validators/sanitisedData";
+import validateRequestParams from "../../_utils/validators/validateRequestParams";
 
 export const router = express.Router({mergeParams: true});
 
@@ -10,6 +11,6 @@ router.use(restrict("storeOwner", "storeAssistant"), hasAuthorization);
 
 router.post("/", sanitisedData, createCoupon);
 
-router.put("/:id",sanitisedData, UpdateCoupon);
+router.put("/:couponId", validateRequestParams("couponId"), sanitisedData, UpdateCoupon);
 
-router.get("/:id", GetCouponById);
+router.get("/:couponId", validateRequestParams("couponId"),  GetCouponById);

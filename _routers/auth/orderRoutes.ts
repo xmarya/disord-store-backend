@@ -5,12 +5,13 @@ import { AddOrder, GetUserOrders, validateOrderInput, PaymentSuccess, handlePaym
 import { GetShipmentData } from "../../controllers/auth/ShipmentOrder";
 import validateEmailConfirmation from "../../_utils/validators/validateEmailConfirmation";
 import validatePaymentData from "../../_utils/validators/validatePaymentData";
+import validateRequestParams from "../../_utils/validators/validateRequestParams";
 
 export const router = express.Router();
 
 //users
 router.post("/", validateEmailConfirmation, validateOrderInput, AddOrder);
-router.get("/user/:userId", GetUserOrders);
+router.get("/user/:userId", validateRequestParams("userId"), GetUserOrders);
 
 // Paymob Webhook
 router.post("/paymob/webhook",validatePaymentData, handlePaymobWebhook );
@@ -18,10 +19,10 @@ router.post("/paymob/webhook",validatePaymentData, handlePaymobWebhook );
 router.get("/payment-success", PaymentSuccess);
 //Admins only
 router.get("/", getAllOrders);
-router.get("/:id", GetOrderById);
+router.get("/:orderId", validateRequestParams("orderId"), GetOrderById);
 router.get("/revenue", getTotalRevenue);
 router.get("/invoice/pdf", generateRevenuePDF);
-router.get("/shipment/:orderId", GetShipmentData);
+router.get("/shipment/:orderId", validateRequestParams("orderId"), GetShipmentData);
 
 //TODO: please use checkAssistantPermissions("manageOrders") for preventing any unauthorised assistant from changing the orders' status 
 

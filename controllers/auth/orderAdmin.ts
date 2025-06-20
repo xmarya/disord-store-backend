@@ -36,9 +36,9 @@ export const getAllOrders = async (req: Request, res: Response) => {
 
 // get order by id 
 export const GetOrderById = async (req: Request, res: Response): Promise<any> => {
-  const {id} = req.params;
+  const {orderId} = req.params;
   try{
-    const order = await Order.findById(id)
+    const order = await Order.findById(orderId)
     if(!order){
       return res.status(404).json({status: "failed", message:'Order not found'})
     }
