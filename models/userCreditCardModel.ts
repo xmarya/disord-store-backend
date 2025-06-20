@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { CreditCardDocument } from "../_Types/CreditCard";
+import { CreditCardDocument } from "../_Types/UserCreditCard";
 
 type CreditCardModel = mongoose.Model<CreditCardDocument>;
 export const creditCardSchema = new mongoose.Schema<CreditCardDocument>(

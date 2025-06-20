@@ -1,12 +1,10 @@
-import "./storeModel"; // ✅ Make sure Store is registered before User
 import bcrypt from "bcryptjs";
 import { formatDistanceStrict, lightFormat } from "date-fns";
+import { arSA } from "date-fns/locale/ar-SA";
 import mongoose, { Schema } from "mongoose";
 import { HASHING_SALT } from "../_data/constants";
 import { UserDocument } from "../_Types/User";
-import { addressSchema } from "./userAddressModel";
-import { creditCardSchema } from "./userCreditCardModel";
-import { arSA } from "date-fns/locale/ar-SA";
+import "./storeModel"; // ✅ Make sure Store is registered before User
 
 interface UserVirtual {planExpiresInDays:string};
 
@@ -80,16 +78,14 @@ const userSchema = new Schema<UserDocument, {},{}, UserVirtual>(
         2- what about paypal/apple pay/google accounts? these shouldn't be saved in our side right?
           they should be dealt by the provider itself right?
      */
-    addresses: {type:[addressSchema], select: false},
-    bankAccounts: {type: [creditCardSchema], select:false},
     defaultAddressId: {
       type: Schema.Types.ObjectId,
       ref: "UserAddress",
       select: false, // NOTE: not sure about setting it to false
     },
-    defaultBankAccountId: {
+    defaultCreditCardId: {
       type: Schema.Types.ObjectId,
-      ref: "UserBankAccount",
+      ref: "UserCreditCard",
       select: false,
     },
     subscribedPlanDetails: {

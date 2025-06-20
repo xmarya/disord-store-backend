@@ -9,7 +9,7 @@
 */
 
 import { isPast, isValid } from "date-fns";
-import { CreditCardDataBody } from "../../_Types/CreditCard";
+import { CreditCardDataBody } from "../../_Types/UserCreditCard";
 import { AppError } from "../AppError";
 import { catchAsync } from "../catchAsync";
 
@@ -50,14 +50,15 @@ function isValidLuhn(cardNumber: string): boolean {
     */
   const digits = cardNumber.replace(/\D/g, "").split("").reverse().map(Number);
   //   if (digits.length !== 16) return false; NOTE: I'm not sure of what length the card number should be
-    console.log(digits);
+  console.log(digits);
   const result = digits.reduce((lastIterationSum, currentDigit, currentIndex) => {
-    if (currentIndex % 2 === 1) { // because the array is reversed, the logic should double the odd indices in order to ignore the check digit (check digit is the last digit in the original number) 
+    if (currentIndex % 2 === 1) {
+      // because the array is reversed, the logic should double the odd indices in order to ignore the check digit (check digit is the last digit in the original number)
       let digitDoubled = currentDigit * 2;
       return digitDoubled > 9 ? (lastIterationSum += digitDoubled - 9) : (lastIterationSum += digitDoubled);
     } else return (lastIterationSum += currentDigit);
   }, 0);
-  console.log(result, "=>",  result % 10);
+  console.log(result, "=>", result % 10);
   return result % 10 === 0;
 }
 
@@ -67,9 +68,9 @@ function isStillValid(expDate: string): boolean {
   let [month, year] = expDate.split(splitBy).map(Number);
   if (!month || !year || month < 1 || month > 12) return false;
 
-  if(year < 100) year += 2000; // since I assume the coming format is two-two (05-29); I used this condition
+  if (year < 100) year += 2000; // since I assume the coming format is two-two (05-29); I used this condition
 
-   // Expiry should be the **last day** of the month
+  // Expiry should be the **last day** of the month
   const cardFullDate = new Date(year, month, 0); // Day 0 of next month = last day of this month (the JS months are 0-based)
 
   console.log(isPast(cardFullDate));

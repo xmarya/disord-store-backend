@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
+import { MongoId } from "./MongoId";
 
 export type CreditCardDataBody = {
+  user:MongoId
   cardName: string;
   cardNumber: string;
   cardExpireIn: string;
