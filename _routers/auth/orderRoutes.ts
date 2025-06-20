@@ -4,6 +4,7 @@ import { getAllOrders, getTotalRevenue, GetOrderById } from "../../controllers/a
 import { AddOrder, GetUserOrders, validateOrderInput, PaymentSuccess, handlePaymobWebhook} from "../../controllers/auth/orderController";
 import { GetShipmentData } from "../../controllers/auth/ShipmentOrder";
 import validateEmailConfirmation from "../../_utils/validators/validateEmailConfirmation";
+import validatePaymentData from "../../_utils/validators/validatePaymentData";
 
 export const router = express.Router();
 
@@ -12,7 +13,7 @@ router.post("/", validateEmailConfirmation, validateOrderInput, AddOrder);
 router.get("/user/:userId", GetUserOrders);
 
 // Paymob Webhook
-router.post("/paymob/webhook", handlePaymobWebhook );
+router.post("/paymob/webhook",validatePaymentData, handlePaymobWebhook );
 
 router.get("/payment-success", PaymentSuccess);
 //Admins only
@@ -22,5 +23,5 @@ router.get("/revenue", getTotalRevenue);
 router.get("/invoice/pdf", generateRevenuePDF);
 router.get("/shipment/:orderId", GetShipmentData);
 
-//TODO: please use checkAssistantPermissions("manageOrders") for preventing any unauthorised assistant from changing the orders' state 
+//TODO: please use checkAssistantPermissions("manageOrders") for preventing any unauthorised assistant from changing the orders' status 
 

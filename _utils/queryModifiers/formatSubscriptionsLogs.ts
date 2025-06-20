@@ -5,7 +5,7 @@ function formatSubscriptionsLogs(subscribedPlanDetails:UserPlan, planExpiresInDa
     // const currentSubscription ,currentSubscriptionDetails, pastSubscriptions
     const {paidPrice, subscribeStarts, subscribeEnds, planId} = subscribedPlanDetails;
     const currentSubscription = {planName:planId?.planName, paidPrice, planExpiresInDays};
-    const currentSubscriptionDetails = {subscribeStarts, subscribeEnds, originalPrice: planId?.price, quota: planId?.quota};
+    const currentSubscriptionDetails = {subscribeStarts, subscribeEnds, originalPrice: planId?.price?.riyal, quota: planId?.quota};
 
     return {currentSubscription, currentSubscriptionDetails}
 }

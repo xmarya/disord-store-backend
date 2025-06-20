@@ -1,12 +1,10 @@
-import "./storeModel"; // ✅ Make sure Store is registered before User
 import bcrypt from "bcryptjs";
 import { formatDistanceStrict, lightFormat } from "date-fns";
+import { arSA } from "date-fns/locale/ar-SA";
 import mongoose, { Schema } from "mongoose";
 import { HASHING_SALT } from "../_data/constants";
 import { UserDocument } from "../_Types/User";
-import { addressSchema } from "./userAddressModel";
-import { bankAccountSchema } from "./userBankAccountModel";
-import { arSA } from "date-fns/locale/ar-SA";
+import "./storeModel"; // ✅ Make sure Store is registered before User
 
 interface UserVirtual {planExpiresInDays:string};
 
@@ -63,7 +61,12 @@ const userSchema = new Schema<UserDocument, {},{}, UserVirtual>(
     },
     firstName: String,
     lastName: String,
-    phoneNumber: String, // TODO: pre save isModified() for validation
+    phoneNumber: {
+      type:String,
+      minlength: [11, "the phone number should be 11 to 12 digits"],
+      maxlength:[12, "the phone number should be 11 to 12 digits"],
+      default: null
+    },
     userType: {
       type: String,
       enum: ["admin", "storeOwner", "storeAssistant", "user"] /* SOLILOQUY: what if the user can be both an owner and an assistant? in this case the type should be [String] */,
@@ -75,15 +78,15 @@ const userSchema = new Schema<UserDocument, {},{}, UserVirtual>(
         2- what about paypal/apple pay/google accounts? these shouldn't be saved in our side right?
           they should be dealt by the provider itself right?
      */
-    addresses: [addressSchema],
-    bankAccounts: [bankAccountSchema],
     defaultAddressId: {
       type: Schema.Types.ObjectId,
       ref: "UserAddress",
+      select: false, // NOTE: not sure about setting it to false
     },
-    defaultBankAccountId: {
+    defaultCreditCardId: {
       type: Schema.Types.ObjectId,
-      ref: "UserBankAccount",
+      ref: "UserCreditCard",
+      select: false,
     },
     subscribedPlanDetails: {
       planId: {
