@@ -52,7 +52,7 @@ export const createCoupon = async (req: Request, res: Response): Promise<void> =
 // Update coupon 
 export const UpdateCoupon = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const { couponId } = req.params;
     const data = couponSchema.partial().parse(req.body);
     const {
       code,
@@ -65,7 +65,7 @@ export const UpdateCoupon = async (req: Request, res: Response): Promise<void> =
       isActive
     } = data;
 
-    const coupon = await Coupon.findById(id);
+    const coupon = await Coupon.findById(couponId);
     if (!coupon) throw new Error("Coupon not found");
 
     if (code) coupon.code = code.toUpperCase().trim();
@@ -86,9 +86,9 @@ export const UpdateCoupon = async (req: Request, res: Response): Promise<void> =
 };
 // getc coupon by id
 export const GetCouponById = async (req: Request, res: Response): Promise<void> => {
-  const {id} = req.params;
+  const {couponId} = req.params;
   try{
-    const coupon = await Coupon.findById(id)
+    const coupon = await Coupon.findById(couponId)
     if (!coupon) throw new Error("Coupon not found");
     res.status(200).json({ status: "success", coupon });
   }catch(error) {
