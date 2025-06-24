@@ -68,18 +68,23 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
 invoiceSchema.index({ user: 1 });
 
 // this pre(save) hook is for generating the invoiceId
-invoiceSchema.pre("save", function (next) {
+invoiceSchema.pre("save", function (next) { /*✅*/
   // 250601-153259999
   // const [date, time] = format(new Date(), "yyMMdd Hmmss").split(" ");
 
-  this.invoiceId = format(new Date(), "yyMMdd-HHmmssSSS");
-  
-  console.log(this.invoiceId);
+  this.invoiceId = format(new Date(), "yyMMdd-HHmmssSSS");  
   next();
 });
 
 // this pre(find) is for populating the purchased products list
 invoiceSchema.pre("find", function(next) {
+  this.populate({path: "products", select: "name price store image"});
+  next();
+});
+
+// this pre(findOne) hook is for populating the both the buyer and the products fields -used by the storeOwner and storeAssistants
+invoiceSchema.pre("findOne", function(next) {
+  this.populate({path: "buyer", select: "firstName lastName image phoneNumber"});
   this.populate({path: "products", select: "name price store image"});
   next();
 });

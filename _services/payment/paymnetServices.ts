@@ -1,6 +1,6 @@
 import { verifyPaymobHmac, validatePaymobWebhook } from "../../_utils/paymobWebHookUtils";
 import Order from "../../models/orderModel";
-import Product from "../../models/productNewModel";
+import Product from "../../models/productModel";
 
 export const getPaymentSuccessHtml = (status: "success" | "error", errorMessage: string = ""): string => {
   return `
@@ -69,15 +69,12 @@ export const getPaymentSuccessHtml = (status: "success" | "error", errorMessage:
 export const processPaymobWebhook = async (body: any, hmac?: string) => {
   // 1. Validate HMAC
   if (!hmac || !verifyPaymobHmac(body, hmac)) {
-    throw new Error('Invalid HMAC signature');
+    throw new Error("Invalid HMAC signature");
   }
   // 2. Validate Schema
   const { obj } = validatePaymobWebhook(body);
   // 3. Find Order
-  const order = await findOrderByIdentifier(
-    obj.special_reference || 
-    obj.payment_key_claims?.next_payment_intention
-  );
+  const order = await findOrderByIdentifier(obj.special_reference || obj.payment_key_claims?.next_payment_intention);
   // 4. Update Order
   if (obj.success) {
     order.status = "Paid";
@@ -89,13 +86,10 @@ export const processPaymobWebhook = async (body: any, hmac?: string) => {
 };
 
 const findOrderByIdentifier = async (identifier?: string) => {
-  if (!identifier) throw new Error('No order identifier found');
-  
-  const order = await Order.findOne({ 
-    $or: [
-      { orderNumber: identifier },
-      { paymentIntentionId: identifier }
-    ]
+  if (!identifier) throw new Error("No order identifier found");
+
+  const order = await Order.findOne({
+    $or: [{ orderNumber: identifier }, { paymentIntentionId: identifier }],
   });
 
   if (!order) throw new Error(`Order not found: ${identifier}`);
@@ -103,9 +97,6 @@ const findOrderByIdentifier = async (identifier?: string) => {
 };
 
 const updateProductPurchases = async (items: any[]) => {
-  const productIds = items.map(item => item.productId);
-  await Product.updateMany(
-    { _id: { $in: productIds } },
-    { $inc: { numberOfPurchases: 1 } }
-  );
+  const productIds = items.map((item) => item.productId);
+  await Product.updateMany({ _id: { $in: productIds } }, { $inc: { numberOfPurchases: 1 } });
 };

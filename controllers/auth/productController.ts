@@ -2,10 +2,11 @@ import { createDoc, deleteDoc, getAllDocs, getOneDocById } from "../../_services
 import { updateProduct } from "../../_services/product/productServices";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import Product from "../../models/productNewModel";
+import Product from "../../models/productModel";
 import { updateProductInCategoryController } from "./categoryController";
 
-export const createProductController = catchAsync(async (request, response, next) => { /*REQUIRES TESTING*/
+export const createProductController = catchAsync(async (request, response, next) => {
+  /*REQUIRES TESTING*/
   const { categories } = request.body;
   if (categories && categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array")); /*✅*/
 

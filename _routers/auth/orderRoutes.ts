@@ -11,9 +11,8 @@ import restrict from "../../_utils/protectors/restrict";
 export const router = express.Router();
 
 //users
-router.use(restrict("user"));
-router.post("/", validateEmailConfirmation, validateOrderInput, AddOrder);
-router.get("/user/:userId", validateRequestParams("userId"), GetUserOrders);
+router.post("/",restrict("user"), validateEmailConfirmation, validateOrderInput, AddOrder);
+router.get("/user/:userId",restrict("user"), validateRequestParams("userId"), GetUserOrders);
 
 // Paymob Webhook
 router.post("/paymob/webhook",validatePaymentData, handlePaymobWebhook );

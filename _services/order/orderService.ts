@@ -4,11 +4,11 @@ import Coupon from "../../models/couponModel";
 import { validateCoupon } from "../coupon/couponService";
 import { RoundToTwo } from "../../_utils/common";
 import { CreateOrderParams, IOrder, IOrderItem, IOrderItemCheck, Address } from "../../_Types/Order";
-import Product from "../../models/productNewModel";
+import Product from "../../models/productModel";
 
 export const ProcessOrderItems = async (
   items: IOrderItemCheck[],
-  session: mongoose.ClientSession,
+  session: mongoose.ClientSession
 ): Promise<{
   processedItems: IOrderItem[];
   subtotal: number;
@@ -38,9 +38,7 @@ export const ProcessOrderItems = async (
       throw new Error(`Product with ID ${item.productId} not found`);
     }
     if (product.stock !== null && product.stock < item.quantity) {
-      throw new Error(
-        `Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`
-      );
+      throw new Error(`Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`);
     }
 
     if (product.stock !== null) {
@@ -59,7 +57,7 @@ export const ProcessOrderItems = async (
     }
 
     const itemPrice = product.price * item.quantity;
-    const itemDiscount = (product.price * (product.discount / 100)) * item.quantity;
+    const itemDiscount = product.price * (product.discount / 100) * item.quantity;
     const discountedPrice = itemPrice - itemDiscount;
 
     subtotal += itemPrice;
@@ -78,7 +76,7 @@ export const ProcessOrderItems = async (
       quantity: item.quantity,
       productType: product.productType,
       image: product.image,
-      description: product.description || ""
+      description: product.description || "",
     });
   }
 
@@ -116,15 +114,9 @@ export const ApplyCoupon = async (
   let eligibleSubtotal = 0;
 
   if (couponCode !== undefined && couponCode.trim() !== "") {
-    const userObjectId =
-      typeof userId === "string" ? new mongoose.Types.ObjectId(userId) : userId;
+    const userObjectId = typeof userId === "string" ? new mongoose.Types.ObjectId(userId) : userId;
 
-    const { coupon, discountAmount, eligibleSubtotal: calculatedEligibleSubtotal } = await validateCoupon(
-      couponCode,
-      userObjectId,
-      items,
-      session
-    );
+    const { coupon, discountAmount, eligibleSubtotal: calculatedEligibleSubtotal } = await validateCoupon(couponCode, userObjectId, items, session);
     couponDiscount = RoundToTwo(discountAmount);
     appliedCoupon = coupon;
     eligibleSubtotal = calculatedEligibleSubtotal;
@@ -136,20 +128,7 @@ export const ApplyCoupon = async (
 };
 
 export const CreateOrder = (params: CreateOrderParams & { hasMixedProducts: boolean }): IOrder => {
-  const {
-    userId,
-    orderNumber,
-    processedItems,
-    subtotal,
-    productDiscount,
-    couponDiscount,
-    appliedCoupon,
-    paymentMethod,
-    shippingAddress,
-    billingAddress,
-    hasDigitalProducts,
-    totalWeight,
-  } = params;
+  const { userId, orderNumber, processedItems, subtotal, productDiscount, couponDiscount, appliedCoupon, paymentMethod, shippingAddress, billingAddress, hasDigitalProducts, totalWeight } = params;
   let status = "Pending";
   if (hasDigitalProducts) {
     status = "Available";
@@ -164,7 +143,7 @@ export const CreateOrder = (params: CreateOrderParams & { hasMixedProducts: bool
     orderNumber,
     items: processedItems,
     shippingAddress: hasDigitalProducts ? undefined : shippingAddress,
-    billingAddress, 
+    billingAddress,
     subtotal: RoundToTwo(subtotal),
     productDiscount: RoundToTwo(productDiscount),
     couponDiscount: RoundToTwo(couponDiscount),
@@ -185,15 +164,8 @@ export const CreateOrder = (params: CreateOrderParams & { hasMixedProducts: bool
   return newOrder;
 };
 
-export const UpdateCouponUsage = async (
-  appliedCoupon: any,
-  session: mongoose.ClientSession
-): Promise<void> => {
+export const UpdateCouponUsage = async (appliedCoupon: any, session: mongoose.ClientSession): Promise<void> => {
   if (appliedCoupon) {
-    await Coupon.findByIdAndUpdate(
-      appliedCoupon._id,
-      { $inc: { usedCount: 1 } },
-      { session }
-    );
+    await Coupon.findByIdAndUpdate(appliedCoupon._id, { $inc: { usedCount: 1 } }, { session });
   }
 };
