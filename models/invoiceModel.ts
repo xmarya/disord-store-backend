@@ -1,15 +1,13 @@
+import { format, getMonth, getYear } from "date-fns";
 import { InvoiceDocument } from "../_Types/Invoice";
-import { Model, Schema, model} from "mongoose";
+import { Model, Schema, model } from "mongoose";
 
 type InvoiceModel = Model<InvoiceDocument>;
 export const invoiceSchema = new Schema<InvoiceDocument>(
   {
-    purchaseId: {
+    invoiceId: {
       type: String,
-      required: [true, "the purchaseId field is required"],
       unique: true,
-      default:
-        crypto.randomUUID() /* SOLILOQUY:  I think it's better to move this calculation to the mongoose query pre("save") instead*/,
     },
     buyer: {
       type: Schema.Types.ObjectId,
@@ -44,7 +42,6 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
     purchasedAt: {
       type: Date,
       default: Date.now(),
-      required: [true, "the purchasedAt field is required"],
     },
     status: {
       type: String,
@@ -70,7 +67,23 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
 
 invoiceSchema.index({ user: 1 });
 
-const Invoice =
-  model<InvoiceDocument, InvoiceModel>("Invoice", invoiceSchema);
+// this pre(save) hook is for generating the invoiceId
+invoiceSchema.pre("save", function (next) {
+  // 250601-153259999
+  // const [date, time] = format(new Date(), "yyMMdd Hmmss").split(" ");
+
+  this.invoiceId = format(new Date(), "yyMMdd-HHmmssSSS");
+  
+  console.log(this.invoiceId);
+  next();
+});
+
+// this pre(find) is for populating the purchased products list
+invoiceSchema.pre("find", function(next) {
+  this.populate({path: "products", select: "name price store image"});
+  next();
+});
+
+const Invoice = model<InvoiceDocument, InvoiceModel>("Invoice", invoiceSchema);
 
 export default Invoice;
