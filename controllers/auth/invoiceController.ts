@@ -1,7 +1,10 @@
-import  PDFDocument  from 'pdfkit';
 import { Request, Response } from "express";
 import { dirname, join } from 'path';
+import PDFDocument from 'pdfkit';
 import { fileURLToPath } from "url";
+import { getOneDocById } from '../../_services/global';
+import { catchAsync } from '../../_utils/catchAsync';
+import Invoice from '../../models/invoiceModel';
 import Order from "../../models/orderModel";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -114,3 +117,13 @@ export const generateRevenuePDF = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const getOneInvoiceController = catchAsync( async (request, response, next)=> {
+  const {invoiceId} = request.params;
+
+  const invoice = await getOneDocById(Invoice, invoiceId);
+  response.status(200).json({
+    success: true,
+    invoice
+  });
+});

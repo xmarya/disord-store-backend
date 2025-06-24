@@ -25,8 +25,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
 
   try {
     const { userId, items, paymentMethod, couponCode, shippingAddress, billingAddress, paymentType } = req.body as CreateOrderInput;
-    const { processedItems, subtotal, totalDiscount, hasDigitalProducts, totalWeight, hasMixedProducts } =
-    await ProcessOrderItems(items, session);
+    const { processedItems, subtotal, totalDiscount, hasDigitalProducts, totalWeight, hasMixedProducts } = await ProcessOrderItems(items, session);
 
     if (hasMixedProducts) {
       throw new Error("Orders cannot contain both digital and physical products");
@@ -64,7 +63,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       shippingAddress,
       billingAddress,
       hasDigitalProducts,
-      hasMixedProducts, 
+      hasMixedProducts,
       totalWeight,
     });
 
@@ -72,13 +71,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
     let paymobOrderId = null;
     if (paymentMethod === "Paymob") {
       try {
-        const paymentResult = await ProcessPaymobPayment(
-          orderNumber,
-          newOrder.totalPrice,
-          processedItems,
-          billingAddress!,
-          paymentType || "card"
-        );
+        const paymentResult = await ProcessPaymobPayment(orderNumber, newOrder.totalPrice, processedItems, billingAddress!, paymentType || "card");
         checkoutUrl = paymentResult.checkoutUrl;
         paymobOrderId = paymentResult.paymobOrderId;
         newOrder.paymentIntentionId = paymobOrderId;
@@ -87,19 +80,21 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
         const axiosError = error as AxiosError;
         throw new Error(`Paymob payment failed: ${axiosError.response?.status} - ${JSON.stringify(axiosError.response?.data)}`);
       }
-    } else if(paymentMethod === "COD"){
-      newOrder.status = 'Pending';
+    } else if (paymentMethod === "COD") {
+      newOrder.status = "Pending";
       newOrder.transaction_id = "COD-" + newOrder.orderNumber;
-      const productIds = processedItems.map(item => item.productId);
-      await Product.updateMany(
-        { _id: { $in: productIds } },
-        { $inc: { numberOfPurchases: 1 } },
-        { session }
-      );
+      const productIds = processedItems.map((item) => item.productId);
+      await Product.updateMany({ _id: { $in: productIds } }, { $inc: { numberOfPurchases: 1 } }, { session });
     }
 
     await UpdateCouponUsage(appliedCoupon, session);
     await newOrder.save({ session });
+
+    /*
+    TODO: add a new invoice after successful payment process:
+    const data as InvoiceDataBody = {buyer, products, paymentMethod, total, status: "successful", notes};
+    const newInvoice = await createDoc(Invoice, data);
+    */
 
     await session.commitTransaction();
     session.endSession();
@@ -142,10 +137,7 @@ export const GetUserOrders = async (req: Request, res: Response): Promise<any> =
   try {
     const { userId } = req.params;
 
-    const orders = await Order.find({ userId })
-      .select('orderNumber totalPrice status createdAt isDigital')
-      .populate('items', 'name image')
-      .sort({ createdAt: -1 });
+    const orders = await Order.find({ userId }).select("orderNumber totalPrice status createdAt isDigital").populate("items", "name image").sort({ createdAt: -1 });
 
     if (orders.length === 0) {
       return res.status(404).json({
@@ -176,15 +168,12 @@ export const GetUserOrders = async (req: Request, res: Response): Promise<any> =
 
 export const handlePaymobWebhook = async (req: Request, res: Response) => {
   try {
-    const result = await processPaymobWebhook(
-      req.body,
-      req.query.hmac as string
-    );
+    const result = await processPaymobWebhook(req.body, req.query.hmac as string);
 
     res.status(200).json({
       status: "success",
       order: result.orderNumber,
-      transaction: result.transaction_id
+      transaction: result.transaction_id,
     });
   } catch (error) {
     HandleErrorResponse(error, res);
