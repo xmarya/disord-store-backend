@@ -1,6 +1,5 @@
-import { format, getMonth, getYear } from "date-fns";
-import { InvoiceDocument } from "../_Types/Invoice";
 import { Model, Schema, model } from "mongoose";
+import { InvoiceDocument } from "../_Types/Invoice";
 
 type InvoiceModel = Model<InvoiceDocument>;
 export const invoiceSchema = new Schema<InvoiceDocument>(
@@ -14,35 +13,39 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
       ref: "User",
       required: [true, "the buyer field is required"],
     },
-    products: [
+    productsPerStore: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "Product",
-        required: [true, "the products field is required"],
+        store: {
+          type: Schema.Types.ObjectId,
+          ref: "Store",
+          required: true,
+        },
+        products: [
+          {
+            product: {
+              type: Schema.Types.ObjectId,
+              ref: "Product",
+              required: [true, "the products field is required"],
+            },
+            quantity: { type: Number, required: [true, "the quantity of the product must be specified"] },
+            priceAtPurchase: {
+              type: Number,
+              required: [true, "the priceAtPurchase of the product must be specified"],
+            },
+          },
+        ],
+        total: { type: Number, required: [true, "the total of the product must be specified"] },
       },
     ],
-    /*ENHANCE: as the same as the cartModel, I removed the store from here because 
-        I have the access to it from the products filed, ALSO and the main reason, there will be product from various stores for sure
-        then the store filed should be an array as well, so to avoid storing many things that are not necessary required
-        I removed it.
-    store: {
-        type: Schema.Types.ObjectId,
-        ref: "Store",
-        required: [true, "the store field is required"]
-    },*/
-    total: {
-      // NOTE: this filed is fixed unlike the total field from the cart, so there is no need to make it virtual.
-      type: Number,
-      required: [true, "the total field is required"],
+    invoiceTotal: {
+      type:Number,
+      required: [true, "the invoiceTotal of the product must be specified"]
     },
     paymentMethod: {
       type: String,
       required: [true, "the paymentMethod field is required"],
     },
-    purchasedAt: {
-      type: Date,
-      default: Date.now(),
-    },
+    purchasedAt: Date,
     status: {
       type: String,
       enum: ["successful", "cancelled", "processed", "refunded"],
@@ -65,27 +68,29 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
   }
 );
 
-invoiceSchema.index({ user: 1 });
+invoiceSchema.index({ buyer: 1 });
 
+/* OLD CODE (kept for reference): 
 // this pre(save) hook is for generating the invoiceId
-invoiceSchema.pre("save", function (next) { /*✅*/
-  // 250601-153259999
-  // const [date, time] = format(new Date(), "yyMMdd Hmmss").split(" ");
+invoiceSchema.pre("save", function (next) { ✅
+// 250601-153259999
+// const [date, time] = format(new Date(), "yyMMdd Hmmss").split(" ");
 
-  this.invoiceId = format(new Date(), "yyMMdd-HHmmssSSS");  
-  next();
+this.invoiceId = format(new Date(), "yyMMdd-HHmmssSSS");  
+next();
 });
+*/
 
 // this pre(find) is for populating the purchased products list
-invoiceSchema.pre("find", function(next) {
-  this.populate({path: "products", select: "name price store image"});
+invoiceSchema.pre("find", function (next) {
+  this.populate({ path: "products", select: "name price store image" });
   next();
 });
 
 // this pre(findOne) hook is for populating the both the buyer and the products fields -used by the storeOwner and storeAssistants
-invoiceSchema.pre("findOne", function(next) {
-  this.populate({path: "buyer", select: "firstName lastName image phoneNumber"});
-  this.populate({path: "products", select: "name price store image"});
+invoiceSchema.pre("findOne", function (next) {
+  this.populate({ path: "buyer", select: "firstName lastName image phoneNumber" });
+  this.populate({ path: "products", select: "name price store image" });
   next();
 });
 

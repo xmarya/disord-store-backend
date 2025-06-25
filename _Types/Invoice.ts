@@ -4,8 +4,16 @@ import { MongoId } from "./MongoId";
 
 export interface InvoiceDataBody {
   buyer: Types.ObjectId;
-  products: Array<ProductDocument>;
-  total: number;
+  productsPerStore: {
+    store:MongoId,
+    products: {
+      product:Array<MongoId>,
+      quantity:number,
+      priceAtPurchase:number
+    };
+    total: number;
+  }
+  invoiceTotal:number,
   paymentMethod: string;
   status: "successful" | "cancelled" | "processed" | "refunded";
   notes?: string;
