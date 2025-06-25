@@ -32,14 +32,18 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
               type: Number,
               required: [true, "the priceAtPurchase of the product must be specified"],
             },
+            name: { type: String, required: true },
+            discountedPrice: { type: Number, required: true },
+            productType: { type: String, enum: ["physical", "digital"], required: true },
+            image: String,
           },
         ],
         total: { type: Number, required: [true, "the total of the product must be specified"] },
       },
     ],
     invoiceTotal: {
-      type:Number,
-      required: [true, "the invoiceTotal of the product must be specified"]
+      type: Number,
+      required: [true, "the invoiceTotal of the product must be specified"],
     },
     paymentMethod: {
       type: String,
@@ -54,9 +58,13 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
       // we're not going to deal with the refund process, it is there to make the profits accurate by extracting the refunded amount if any happens
       required: [true, "the field is required"],
     },
-    notes: {
-      type: String,
-      trim: true,
+    shippingAddress: {
+      type: Schema.Types.ObjectId,
+      ref: "UserAddress",
+    },
+    billingAddress: {
+      type: Schema.Types.ObjectId,
+      ref: "UserAddress",
     },
   },
   {

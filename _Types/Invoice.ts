@@ -1,22 +1,28 @@
 import mongoose, { Types } from "mongoose";
-import { ProductDocument } from "./Product";
 import { MongoId } from "./MongoId";
 
 export interface InvoiceDataBody {
   buyer: Types.ObjectId;
-  productsPerStore: [{
-    store:MongoId,
-    products: {
-      product:Array<MongoId>,
-      quantity:number,
-      priceAtPurchase:number
-    };
-    total: number;
-  }]
-  invoiceTotal:number,
+  productsPerStore: [
+    {
+      store: MongoId;
+      products: {
+        product: Array<MongoId>;
+        quantity: number;
+        priceAtPurchase: number;
+        name: string;
+        discountedPrice: number;
+        productType: "physical" | "digital";
+        image: string;
+      };
+      total: number;
+    }
+  ];
+  invoiceTotal: number;
   paymentMethod: string;
   status: "successful" | "cancelled" | "processed" | "refunded";
-  notes?: string;
+  shippingAddress:MongoId,
+  billingAddress:MongoId,
 }
 export interface Invoice extends InvoiceDataBody {
   invoiceId: MongoId;
