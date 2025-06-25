@@ -4,7 +4,7 @@ import { MongoId } from "./MongoId";
 
 export interface InvoiceDataBody {
   buyer: Types.ObjectId;
-  productsPerStore: {
+  productsPerStore: [{
     store:MongoId,
     products: {
       product:Array<MongoId>,
@@ -12,7 +12,7 @@ export interface InvoiceDataBody {
       priceAtPurchase:number
     };
     total: number;
-  }
+  }]
   invoiceTotal:number,
   paymentMethod: string;
   status: "successful" | "cancelled" | "processed" | "refunded";
