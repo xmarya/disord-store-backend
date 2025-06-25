@@ -26,6 +26,11 @@ const cartSchema = new Schema<CartDocument>(
           type: Number,
           required: [true, "product price is required for the cart"],
         },
+        productType: {
+          type: String,
+          enum: ["physical", "digital"],
+          required: [true, "product type is required for the cart"],
+        },
         image: {
           type: String,
           required: [true, "product price is required for the cart"],
@@ -37,8 +42,11 @@ const cartSchema = new Schema<CartDocument>(
           default: 1,
         },
         discount: Number,
+        weight: Number,
       },
     ],
+    discountedPrice: Number,
+    totalWeight: Number,
   },
   {
     timestamps: true,
@@ -57,7 +65,7 @@ cartSchema.virtual("total").get(function () {
   // IN ADDITION, this approach will save me time of manual recalculations ✨
   return this.productsList.reduce((sum, prod) => {
     if (!prod.discount) prod.discount = 0;
-    const totalPrice = (prod.price - prod.discount) * prod.quantity;
+    const totalPrice = (prod.price - (prod.discount ?? 0)) * prod.quantity;
     return sum + totalPrice;
   }, 0);
 });

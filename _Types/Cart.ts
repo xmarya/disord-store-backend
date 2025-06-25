@@ -1,19 +1,22 @@
-import { Types } from "mongoose";
+import { MongoId } from "./MongoId";
 
 export interface Cart {
-  id: string;
-  user: Types.ObjectId;
+  user: MongoId;
   productsList: [
     {
-      productId: Types.ObjectId;
+      productId: MongoId;
       name: string;
       price: number;
       image: string;
       quantity: number;
+      productType: "physical" | "digital"
       discount?: number;
+      weight?:number
     }
   ];
   total: number;
+  discountedPrice?:number
+  totalWeight?:number
 }
 
 export type CartDocument = Cart;
