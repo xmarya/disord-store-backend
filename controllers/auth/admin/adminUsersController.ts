@@ -97,7 +97,7 @@ export const getAllUsersController = catchAsync(async (request, response, next) 
 });
 
 export const getOneUserController = catchAsync(async (request, response, next) => {
-  const user = await getOneDocById(User, request.params.userId, { select: ["-bankAccounts", "-addresses"] });
+  const user = await getOneDocById(User, request.params.userId);
   if (!user) return next(new AppError(400, "couldn't find a user with this id"));
   response.status(200).json({
     success: true,
