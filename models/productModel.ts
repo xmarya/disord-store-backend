@@ -90,6 +90,15 @@ const productSchema = new Schema(
 productSchema.index({ name: 1, store: 1 }, { unique: true });
 productSchema.index({ ranking: 1 });
 
+// this pre("save") hook is for adding the tax to the product price
+productSchema.pre("save", function(next) {
+  const taxRate = 0.15;
+  const priceAfterApplyingTax = this.price * taxRate;
+  this.price = priceAfterApplyingTax;
+
+  next();
+});
+
 // this pre(/^find/) hook is for populating the categories:
 productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
   console.log("productSchema.pre(/^find/");

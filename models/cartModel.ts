@@ -51,14 +51,6 @@ const cartSchema = new Schema<CartDocument>(
             discount: Number,
             discountedPrice: Number,
             weight: Number,
-            taxAmount:{
-              type:Number,
-              required: [true, "the amount of tax is required"]
-            },
-            priceWithTax:{
-              type:Number,
-              required: [true, "the amount of tax is required"]
-            },
           },
         ],
         countOfStoreProducts: Number,
@@ -66,7 +58,7 @@ const cartSchema = new Schema<CartDocument>(
         totalAfterDiscount: Number, // sum of discountedPrice only
         totalWeight: Number,
         appliedCoupon: String,
-        total: Number, // sum of all products' priceWithTax
+        total: Number,
       },
     ],
     countOfCartProducts: Number,
