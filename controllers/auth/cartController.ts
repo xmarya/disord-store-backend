@@ -6,12 +6,12 @@ import { catchAsync } from "../../_utils/catchAsync";
 import Cart from "../../models/cartModel";
 
 export const addToCartController = catchAsync(async (request, response, next) => {
-  const { productsPerStore, countOfCartProducts, totalOfDiscounts, cartTotal } = request.body as CartDataBody;
+  const { productsPerStore, countOfCartProducts, totalOfDiscounts, cartTotal, cartTotalWight, shippingFees } = request.body as CartDataBody;
   if ( productsPerStore.constructor !== Array || !productsPerStore.length) return next(new AppError(400, "can't create a cart with empty array"));
   if(!cartTotal || !totalOfDiscounts || !countOfCartProducts) return next(new AppError(400, "some data are missing"));
 
   const user = request.user.id;
-  const data = {user, productsPerStore, countOfCartProducts, totalOfDiscounts, cartTotal};
+  const data = {user, productsPerStore, countOfCartProducts, totalOfDiscounts, cartTotal, cartTotalWight ,shippingFees};
   const newCart = await addProductToCart(data);
 
   response.status(201).json({

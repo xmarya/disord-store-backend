@@ -29,7 +29,7 @@ const cartSchema = new Schema<CartDocument>(
               type: String,
               required: [true, "product name is required for the cart"],
             },
-            price: {
+            unitPrice: {
               type: Number,
               required: [true, "product price is required for the cart"],
             },
@@ -51,6 +51,14 @@ const cartSchema = new Schema<CartDocument>(
             discount: Number,
             discountedPrice: Number,
             weight: Number,
+            taxAmount:{
+              type:Number,
+              required: [true, "the amount of tax is required"]
+            },
+            priceWithTax:{
+              type:Number,
+              required: [true, "the amount of tax is required"]
+            },
           },
         ],
         countOfStoreProducts: Number,
@@ -62,7 +70,13 @@ const cartSchema = new Schema<CartDocument>(
       },
     ],
     countOfCartProducts: Number,
+    shippingFees:Number,
+    cartTotalWight:Number,
     totalOfDiscounts: Number, // grand discount (sum of all `totalAfterDiscount` from each store)
+    cartTotal: {
+      type:Number,
+      required:[true, "the cart total is required"]
+    }
   },
   {
     timestamps: true,
