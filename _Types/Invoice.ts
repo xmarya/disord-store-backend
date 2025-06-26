@@ -6,27 +6,30 @@ export interface InvoiceDataBody {
   productsPerStore: [
     {
       store: MongoId;
-      products: {
-        product: Array<MongoId>;
-        quantity: number;
-        priceAtPurchase: number;
+      products: [{
+        product: MongoId;
         name: string;
-        discountedPrice: number;
+        quantity: number;
+        unitPrice: number;
         productType: "physical" | "digital";
         image: string;
-      };
-      total: number;
+        discountedPrice?: number;
+        weight?:number,
+        productTotal:number
+      }];
     }
   ];
+  shippingFees?:number,
   invoiceTotal: number;
   paymentMethod: string;
   status: "successful" | "cancelled" | "processed" | "refunded";
-  shippingAddress:MongoId,
   billingAddress:MongoId,
+  shippingAddress?:MongoId,
+  shippingCompany:string,
 }
 export interface Invoice extends InvoiceDataBody {
   invoiceId: MongoId;
-  purchasedAt: Date;
+  releasedAt: Date;
 }
 
 export type InvoiceDocument = Invoice & mongoose.Document;
