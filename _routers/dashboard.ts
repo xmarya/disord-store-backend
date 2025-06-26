@@ -1,4 +1,5 @@
 import express from "express";
+import { router as settingsRouter } from "./auth/settingsRouter";
 import { router as adminRouter } from "./auth/adminRoutes";
 import { router as storeRouter } from "./auth/storeRoutes";
 import { router as assistantRouter } from "./auth/assistantRoutes";
@@ -25,6 +26,7 @@ router.get("/logout", logout); // NOTE: keep this before the validateJwtToken an
 
 router.use(validateJwtToken, getUserFromPayload);
 router.post("/new-store", restrict("storeOwner"), sanitisedData, createStoreController);
+router.use("/settings", settingsRouter)
 router.use("/me", userRouter);
 router.use("/admin", adminRouter);
 router.use("/platform/reviews", platformReviewsRouter);
