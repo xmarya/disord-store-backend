@@ -79,8 +79,6 @@ const cartSchema = new Schema<CartDocument>(
   }
 );
 
-cartSchema.index({ user: 1 }, { unique: true });
-
 /* OLD CODE (kept for reference): 
 // this virtual is the grand total (sum of all `totalWithTax` from each store)
 cartSchema.virtual("cartTotal").get(function () {
