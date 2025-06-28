@@ -1,6 +1,7 @@
 import { ms } from "../../_data/constants";
+import { createNewInvoices } from "../../_services/invoice/invoiceService";
 import { InvoiceDocument } from "../../_Types/Invoice";
-import { getJSON } from "../../_utils/redisOperations/redisJSON";
+import { deleteJSON, getAllJSON, getJSON } from "../../_utils/redisOperations/redisJSON";
 import { getIdsSet } from "../../_utils/redisOperations/redisSet";
 import bullmq from "./bullmq";
 
@@ -19,13 +20,8 @@ async function invoiceBullMQ() {
 
 async function batchWriteProcessor() {
   const key = "invoices";
-  const allInvoiceIds = await getIdsSet(key);
-  const invoices = await Promise.all(
-    allInvoiceIds.map((id) => {
-      const invoice = getJSON(`${key}:${id}`);
-      return invoice;
-    })
-  );
+
+  const invoices = (await getAllJSON(key)) ?? [];
 
   const filteredInvoices: InvoiceDocument[] = invoices.filter(Boolean).flat();
   // console.dir(filteredInvoices, { depth: null });
@@ -33,11 +29,10 @@ async function batchWriteProcessor() {
   if (!filteredInvoices.length) {
     console.log("No invoices to batch write");
   } else {
+    await createNewInvoices(filteredInvoices);
 
     console.log(`✅ Inserted ${filteredInvoices.length} invoices into DB`);
   }
 }
 
 export default invoiceBullMQ;
-
-// - duplicated josn, set of ids the belong to expired json
