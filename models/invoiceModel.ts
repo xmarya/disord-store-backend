@@ -15,14 +15,14 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
     },
     productsPerStore: [
       {
-        store: {
+        storeId: {
           type: Schema.Types.ObjectId,
           ref: "Store",
           required: true,
         },
         products: [
           {
-            product: {
+            productId: {
               type: Schema.Types.ObjectId,
               ref: "Product",
               required: [true, "the products field is required"],
@@ -43,7 +43,7 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
             },
           },
         ],
-        total: { type: Number, required: [true, "the total of the product must be specified"] },
+        // storeTotal: { type: Number, required: [true, "the storeTotal of the product must be specified"] },
       },
     ],
     invoiceTotal: {

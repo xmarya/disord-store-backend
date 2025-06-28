@@ -5,9 +5,9 @@ export interface InvoiceDataBody {
   buyer: Types.ObjectId;
   productsPerStore: [
     {
-      store: MongoId;
+      storeId: MongoId;
       products: [{
-        product: MongoId;
+        productId: MongoId;
         name: string;
         quantity: number;
         unitPrice: number;
@@ -25,7 +25,7 @@ export interface InvoiceDataBody {
   status: "successful" | "cancelled" | "processed" | "refunded";
   billingAddress:MongoId,
   shippingAddress?:MongoId,
-  shippingCompany:string,
+  shippingCompany?:string,
 }
 export interface Invoice extends InvoiceDataBody {
   invoiceId: MongoId;
