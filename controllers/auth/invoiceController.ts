@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import { dirname, join } from "path";
 import PDFDocument from "pdfkit";
 import { fileURLToPath } from "url";
-import { getOneDocById } from "../../_services/global";
+import { getAllDocs, getOneDocByFindOne, getOneDocById } from "../../_services/global";
 import { catchAsync } from "../../_utils/catchAsync";
 import Invoice from "../../models/invoiceModel";
 import Order from "../../models/orderModel";
-import { InvoiceDataBody } from "../../_Types/Invoice";
+import { InvoiceDataBody, InvoiceDocument } from "../../_Types/Invoice";
 import { format } from "date-fns";
 import { AppError } from "../../_utils/AppError";
 import { batchInvoices } from "../../_utils/jobs/batchInvoice";
@@ -113,33 +113,30 @@ export const generateRevenuePDF = async (req: Request, res: Response) => {
 };
 
 export async function createNewInvoiceController(data: InvoiceDataBody) {
-  const { buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees } = data;
+  const { orderId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees } = data;
 
-  if (!buyer || !paymentMethod?.trim() || !productsPerStore.length || !status || !invoiceTotal) throw new AppError(400, "some invoice data are missing");
+  if (!orderId || !buyer || !paymentMethod?.trim() || !productsPerStore.length || !status || !invoiceTotal) throw new AppError(400, "some invoice data are missing");
 
   // STEP 1) create invoiceId and releasedAt:
   const releasedAt = new Date();
   const invoiceId = format(releasedAt, "yyMMdd-HHmmssSSS");
-  
-  const fullData = { releasedAt, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees };
+
+  const fullData = { releasedAt, invoiceId, ...data };
 
   // STEP 2) save the data in the cache  be batched and to be handled later by bullmq:
   const success = await batchInvoices(invoiceId, fullData);
 
   // STEP 3) in case of failure, save it directly to the db.
-  if(!success) await createNewInvoices(fullData);
+  if (!success) await createNewInvoices(fullData);
 
   return fullData;
 }
 
-export const getAllInvoices = catchAsync(async (request, response, next) => {
-  // step 1) only get TODAY's invoices ( should I change the schedule of the cron job to run every midnight instead of running every 5 minutes?)
-  // step 2) in case there is no cached data/for older invoices, query the db, return the data from both the cache and the db
-});
 export const getOneInvoiceController = catchAsync(async (request, response, next) => {
-  const { invoiceId } = request.params;
+  // it depends on the /order/:orderId/invoice
+  const { orderId } = request.params;
 
-  const invoice = await getOneDocById(Invoice, invoiceId);
+  const invoice = await getOneDocByFindOne(Invoice, {condition: {orderId}});
   response.status(200).json({
     success: true,
     invoice,
@@ -152,18 +149,19 @@ export const testInvoiceController = catchAsync(async (request, response, next) 
 
   if (!paymentMethod?.trim() || !productsPerStore.length || !status || !invoiceTotal) throw new AppError(400, "some invoice data are missing");
 
+  const orderId = request.user.id;
   const buyer = request.user.id;
   // STEP 1) create invoiceId and releasedAt:
   const releasedAt = new Date();
   const invoiceId = format(releasedAt, "yyMMdd-HHmmssSSS");
 
-  const data = { releasedAt, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees };
+  const data = { orderId, releasedAt, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees };
 
   // STEP 2) save the data in the cache  be batched and to be handled later by bullmq:
   const success = await batchInvoices(invoiceId, data);
 
   // STEP 3) in case of failure, save it directly to the db.
-  if(!success) await createNewInvoices(data);
+  if (!success) await createNewInvoices(data);
 
   response.status(201).json({
     success: true,

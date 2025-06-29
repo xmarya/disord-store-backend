@@ -4,6 +4,8 @@ import { InvoiceDocument } from "../_Types/Invoice";
 type InvoiceModel = Model<InvoiceDocument>;
 export const invoiceSchema = new Schema<InvoiceDocument>(
   {
+    orderId: Schema.Types.ObjectId, // no need to populate, its purpose is link between the invoice and the order
+
     invoiceId: {
       type: String,
       unique: true,
@@ -43,7 +45,7 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
                   type: Number,
                   required: [true, "productTotal is required"],
                 },
-                _id:false
+                _id: false,
               },
             ],
           },

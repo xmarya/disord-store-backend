@@ -1,4 +1,5 @@
 import express from "express";
+import {router as invoiceRouter} from "./invoiceRoutes";
 import restrict from "../../_utils/protectors/restrict";
 import validateEmailConfirmation from "../../_utils/validators/validateEmailConfirmation";
 import validatePaymentData from "../../_utils/validators/validatePaymentData";
@@ -8,6 +9,8 @@ import { AddOrder, GetUserOrders, PaymentSuccess, handlePaymobWebhook, validateO
 import { GetShipmentData } from "../../controllers/auth/ShipmentOrder";
 
 export const router = express.Router();
+
+router.use("/:orderId/invoice", validateRequestParams("orderId"), invoiceRouter);
 
 //users
 router.post("/",restrict("user"), validateEmailConfirmation, validateOrderInput, AddOrder);
