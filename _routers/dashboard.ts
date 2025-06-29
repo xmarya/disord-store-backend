@@ -18,6 +18,7 @@ import { assignStoreIdToRequest } from "../_utils/requestModifiers/assignStoreId
 import restrict from "../_utils/protectors/restrict";
 import sanitisedData from "../_utils/validators/sanitisedData";
 import { createStoreController } from "../controllers/auth/storeControllers";
+import { testInvoiceController } from "../controllers/auth/invoiceController";
 
 export const router = express.Router();
 
@@ -38,3 +39,6 @@ router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
+
+// for testing purpose:
+router.post('/test-invoices', testInvoiceController);

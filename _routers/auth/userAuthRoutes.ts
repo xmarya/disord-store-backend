@@ -5,12 +5,14 @@ import { cancelSubscriptionController, createNewSubscribeController, renewalSubs
 import { getMySubscriptionsLogController } from "../../controllers/auth/userAuthController";
 import { router as cartRouter } from "./cartRouter";
 import { router as wishlistRouter } from "./wishlistRouter";
+import { router as invoiceRouter } from "./invoiceRoutes";
 
 export const router = express.Router();
 console.log("/me Router");
 
 router.use("/wish-list", restrict("user"), wishlistRouter);
-router.use("/cart", restrict("user"), cartRouter)
+router.use("/cart", restrict("user"), cartRouter);
+router.use("/invoices",restrict("user"),invoiceRouter);
 
 router.use(restrict("storeOwner"));
 router.route("/subscriptions").get(getMySubscriptionsLogController);

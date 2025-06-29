@@ -1,5 +1,6 @@
 import express from "express";
 import { router as reviewRouter } from "./reviewRoutes";
+import { router as invoiceRouter } from "./invoiceRoutes";
 import hasAuthorization from "../../_utils/protectors/hasAuthorization";
 import restrict from "../../_utils/protectors/restrict";
 import getDateQuery from "../../_utils/queryModifiers/getDateQuery";
@@ -14,7 +15,7 @@ console.log("/store Router");
 
 // router.use("/reviews", validateModelId("Review-store"), assignModelToRequest("Review-store"), reviewsRouter);
 router.use("/:storeId/reviews", validateRequestParams("storeId"), reviewRouter); /*REQUIRES TESTING: maybe this should be moved to the bottom of the stack*/
-
+router.use("/invoices", invoiceRouter)
 router
   .route("/")
   // .post(restrict("storeOwner"), sanitisedData, createStoreController)
