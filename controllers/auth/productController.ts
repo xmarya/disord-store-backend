@@ -22,7 +22,7 @@ export const createProductController = catchAsync(async (request, response, next
 });
 
 export const getAllProductsController = catchAsync(async (request, response, next) => {
-  const products = await getAllDocs(Product, request);
+  const products = await getAllDocs(Product, request, {select: ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"]});
   if (!products) return next(new AppError(404, "لم يتم العثور على منتجات"));
 
   response.status(200).json({
