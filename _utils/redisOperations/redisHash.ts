@@ -12,7 +12,8 @@ export async function setHash(hashKey: string, data: any) {
 }
 
 export async function getHash(hashKey: string) {
-  return { result: Boolean(await redis.hgetall(hashKey)) };
+  const data = await redis.hgetall(hashKey);
+  return { result: Boolean(data), data };
 }
 
 export async function deleteHash(hashKey: string) {
