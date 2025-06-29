@@ -13,39 +13,46 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
       ref: "User",
       required: [true, "the buyer field is required"],
     },
-    productsPerStore: [
-      {
-        storeId: {
-          type: Schema.Types.ObjectId,
-          ref: "Store",
-          required: true,
-        },
-        products: [
-          {
-            productId: {
-              type: Schema.Types.ObjectId,
-              ref: "Product",
-              required: [true, "the products field is required"],
-            },
-            name: { type: String, required: true },
-            quantity: { type: Number, required: [true, "the quantity of the product must be specified"] },
-            productType: { type: String, enum: ["physical", "digital"], required: true },
-            image: String,
-            unitPrice: {
-              type: Number,
-              required: [true, "the unitPrice of the product must be specified"],
-            },
-            discountedPrice: Number,
-            weight: Number,
-            productTotal: {
-              type: Number,
-              required: [true, "productTotal is required"],
-            },
+    productsPerStore: {
+      type: [
+        {
+          storeId: {
+            type: Schema.Types.ObjectId,
+            ref: "Store",
+            required: true,
           },
-        ],
-        // storeTotal: { type: Number, required: [true, "the storeTotal of the product must be specified"] },
-      },
-    ],
+          products: {
+            type: [
+              {
+                productId: {
+                  type: Schema.Types.ObjectId,
+                  ref: "Product",
+                  required: [true, "the products field is required"],
+                },
+                name: { type: String, required: true },
+                quantity: { type: Number, required: [true, "the quantity of the product must be specified"] },
+                productType: { type: String, enum: ["physical", "digital"], required: true },
+                image: String,
+                unitPrice: {
+                  type: Number,
+                  required: [true, "the unitPrice of the product must be specified"],
+                },
+                discountedPrice: Number,
+                weight: Number,
+                productTotal: {
+                  type: Number,
+                  required: [true, "productTotal is required"],
+                },
+                _id:false
+              },
+            ],
+          },
+          _id: false,
+          // storeTotal: { type: Number, required: [true, "the storeTotal of the product must be specified"] },
+        },
+      ],
+      _id: false,
+    },
     invoiceTotal: {
       type: Number,
       required: [true, "the invoiceTotal of the product must be specified"],
