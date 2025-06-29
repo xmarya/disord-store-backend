@@ -10,6 +10,7 @@ import { InvoiceDataBody } from "../../_Types/Invoice";
 import { format } from "date-fns";
 import { AppError } from "../../_utils/AppError";
 import { batchInvoices } from "../../_utils/jobs/batchInvoice";
+import { createNewInvoices } from "../../_services/invoice/invoiceService";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -119,9 +120,16 @@ export async function createNewInvoiceController(data: InvoiceDataBody) {
   // STEP 1) create invoiceId and releasedAt:
   const releasedAt = new Date();
   const invoiceId = format(releasedAt, "yyMMdd-HHmmssSSS");
-  // const invoiceData = {invoiceId, releasedAt, ...data}; // for saving to the db. which is not should be here
-  // STEP 2) pass the data to the redis controller to store it
-  await batchInvoices(invoiceId, data);
+  
+  const fullData = { releasedAt, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees };
+
+  // STEP 2) save the data in the cache  be batched and to be handled later by bullmq:
+  const success = await batchInvoices(invoiceId, fullData);
+
+  // STEP 3) in case of failure, save it directly to the db.
+  if(!success) await createNewInvoices(fullData);
+
+  return fullData;
 }
 
 export const getAllInvoices = catchAsync(async (request, response, next) => {
@@ -138,9 +146,7 @@ export const getOneInvoiceController = catchAsync(async (request, response, next
   });
 });
 
-
-
-export const testInvoiceController = catchAsync( async(request, response, next)  => {
+export const testInvoiceController = catchAsync(async (request, response, next) => {
   console.log("testInvoiceController");
   const { paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees } = request.body;
 
@@ -151,13 +157,16 @@ export const testInvoiceController = catchAsync( async(request, response, next) 
   const releasedAt = new Date();
   const invoiceId = format(releasedAt, "yyMMdd-HHmmssSSS");
 
-  const data = {releasedAt, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees}
+  const data = { releasedAt, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees };
 
-  // STEP 2) pass the data to the to the bullmq to be batched:
-  await batchInvoices(invoiceId, data);
+  // STEP 2) save the data in the cache  be batched and to be handled later by bullmq:
+  const success = await batchInvoices(invoiceId, data);
+
+  // STEP 3) in case of failure, save it directly to the db.
+  if(!success) await createNewInvoices(data);
 
   response.status(201).json({
     success: true,
-    data
+    data,
   });
 });

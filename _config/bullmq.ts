@@ -1,5 +1,5 @@
 import { Queue, QueueOptions, Worker } from "bullmq";
-import redis from "../redis";
+import redis from "./redis";
 
 // get the redis instance to connect:
 const connection = redis;
