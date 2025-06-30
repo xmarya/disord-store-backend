@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { AppError } from "../../_utils/AppError";
 import { batchInvoices } from "../../_utils/jobs/batchInvoice";
 import { createNewInvoices } from "../../_services/invoice/invoiceService";
+import { updateStoreStatsController } from "./storeStatsController";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -117,6 +118,8 @@ export async function createNewInvoiceController(data: InvoiceDataBody) {
 
   if (!orderId || !buyer || !paymentMethod?.trim() || !productsPerStore.length || !status || !invoiceTotal) throw new AppError(400, "some invoice data are missing");
 
+  const operationType = status === "successful" || status === "processed" ? "new-purchase" : "cancellation";
+
   // STEP 1) create invoiceId and releasedAt:
   const releasedAt = new Date();
   const invoiceId = format(releasedAt, "yyMMdd-HHmmssSSS");
@@ -127,7 +130,8 @@ export async function createNewInvoiceController(data: InvoiceDataBody) {
   const success = await batchInvoices(invoiceId, fullData);
 
   // STEP 3) in case of failure, save it directly to the db.
-  if (!success) await createNewInvoices(fullData);
+  if (!success) createNewInvoices(fullData); // I think there's no need to await the db query, since the invoice is returned in the response
+  updateStoreStatsController({ ...data, operationType }); // no need to await this too.
 
   return fullData;
 }
@@ -136,7 +140,7 @@ export const getOneInvoiceController = catchAsync(async (request, response, next
   // it depends on the /order/:orderId/invoice
   const { orderId } = request.params;
 
-  const invoice = await getOneDocByFindOne(Invoice, {condition: {orderId}});
+  const invoice = await getOneDocByFindOne(Invoice, { condition: { orderId } });
   response.status(200).json({
     success: true,
     invoice,
@@ -149,19 +153,22 @@ export const testInvoiceController = catchAsync(async (request, response, next) 
 
   if (!paymentMethod?.trim() || !productsPerStore.length || !status || !invoiceTotal) throw new AppError(400, "some invoice data are missing");
 
+  const operationType = status === "successful" || status === "processed" ? "new-purchase" : "cancellation";
+
   const orderId = request.user.id;
   const buyer = request.user.id;
   // STEP 1) create invoiceId and releasedAt:
   const releasedAt = new Date();
   const invoiceId = format(releasedAt, "yyMMdd-HHmmssSSS");
 
-  const data = { orderId, releasedAt, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees };
+  const data = { orderId, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees };
 
   // STEP 2) save the data in the cache  be batched and to be handled later by bullmq:
-  const success = await batchInvoices(invoiceId, data);
+  // const success = await batchInvoices(invoiceId, data);
 
   // STEP 3) in case of failure, save it directly to the db.
-  if (!success) await createNewInvoices(data);
+  // if (!success) await createNewInvoices(data);
+  updateStoreStatsController({ ...data, operationType }); // no need to await this too.
 
   response.status(201).json({
     success: true,
