@@ -16,17 +16,20 @@ export async function getJSON(key: string, path?: `$.${string}`) {
 
 
 export async function getAllJSON<T>(key: string):Promise<T[]> {
-  const {data} = await getIdsSet(key);
-  const allIds:T[] = [];
-  for (let index = 0; index < data.length; index++) {
-    console.log(`${key}:${data[index]}`);
-    const parsedJson = await getJSON(`${key}:${data[index]}`) as T;
+  console.log("getAllJSON");
+  const {data:idsSet} = await getIdsSet(key);
 
+  const allIds:T[] = [];
+
+  for (let index = 0; index < idsSet.length; index++) {
+    console.log(`${key}:${idsSet[index]}`);
+    const {data:parsedJson} = await getJSON(`${key}:${idsSet[index]}`);
+    console.log("parsedJson, ", parsedJson);
     if (parsedJson) {
       allIds.push(parsedJson);
       // don't these two should be done after successful writing to the db?
-      await deleteJSON(`${key}:${data[index]}`);
-      await removeIdFromSet(key, data[index]);
+      await deleteJSON(`${key}:${idsSet[index]}`);
+      await removeIdFromSet(key, idsSet[index]);
     }
   }
 
@@ -34,6 +37,7 @@ export async function getAllJSON<T>(key: string):Promise<T[]> {
 }
 
 export async function deleteJSON(key: string) {
-  const numOfMatchingJSON = (await redis.call("JSON.CLEAR", key, "$")) as number;
-  return {result: Boolean(numOfMatchingJSON)}; // JSON.CLEAR return 0 if there is no matches
+  const numOfMatchingJSON = (await redis.call("JSON.DEL", key)) as number;
+  console.log("deleteJSON", `key ${key}`, numOfMatchingJSON);
+  return {result: Boolean(numOfMatchingJSON)}; // JSON.DEL return 0 if there is no matches
 }

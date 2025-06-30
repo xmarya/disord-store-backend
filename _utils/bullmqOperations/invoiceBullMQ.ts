@@ -4,7 +4,7 @@ import { InvoiceDocument } from "../../_Types/Invoice";
 import { getAllJSON } from "../redisOperations/redisJSON";
 import bullmq from "../../_config/bullmq";
 
-const { queue, worker } = await bullmq("Invoice", batchWriteProcessor);
+const { queue, worker } = await bullmq("Invoice", invoiceWriteProcessor);
 
 async function invoiceBullMQ() {
   console.log("invoiceBullMQ");
@@ -13,7 +13,7 @@ async function invoiceBullMQ() {
   await queue.add("dbWriteBatch", {}, { repeat: { every: 2 * ms }, jobId: "invoice-batch-writer" });
 }
 
-async function batchWriteProcessor() {
+async function invoiceWriteProcessor() {
   const key = "invoices";
 
   const invoices = await getAllJSON<InvoiceDocument>(key);
