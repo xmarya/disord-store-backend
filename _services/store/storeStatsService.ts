@@ -130,8 +130,7 @@ export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $
   return formattedStats;
 }
 
-/*REQUIRES TESTING*/
-// TODO: call it after a successful payment
+// TODO: call it after a successful payment/cancellation (using loop, at the end of the invoice, no await)
 export async function updateStoreStats(
   storeId: MongoId,
   profit: number,
@@ -139,6 +138,7 @@ export async function updateStoreStats(
   operationType: "new-purchase" | "cancellation",
   session: mongoose.ClientSession
 ) {
+  console.log("updateStoreStats");
   const now = new Date();
   const dayStart = startOfDay(now);
   const dayEnd = endOfDay(now);
@@ -152,11 +152,9 @@ export async function updateStoreStats(
 
   for (const { productId, quantity } of products) {
     const key = `soldProducts.${productId}`;
-    // soldProductsUpdate.$inc ??= {};
+    soldProductsUpdate.$inc ??= {};
     soldProductsUpdate.$inc[key] = isIncrement ? quantity : -quantity;
   }
-
-  console.log("soldProductsUpdate.$inc[key] without .$inc??= {}", soldProductsUpdate);
 
   const updatedStats = await StoreStats.findOneAndUpdate(
     { store: storeId, date: { $gte: dayStart, $lte: dayEnd } },
