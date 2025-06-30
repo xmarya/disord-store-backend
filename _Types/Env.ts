@@ -9,7 +9,7 @@ declare global {
       COOKIE_EXPIREING_TIME: string;
       REDIS_PORT: string;
       REDIS_DATABASE_NAME: string;
-      REDIS_PUBLIC_END_POINT: string;
+      REDIS_HOST: string;
       REDIS_API_KEY: string;
       REDIS_USERNAME: string;
       REDIS_PASSWORD: string;

@@ -32,7 +32,6 @@ export interface InvoiceDataBody {
 }
 export interface Invoice extends InvoiceDataBody {
   invoiceId: MongoId;
-  releasedAt: Date;
 }
 
 export type InvoiceDocument = Invoice & mongoose.Document;
