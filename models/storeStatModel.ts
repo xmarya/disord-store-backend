@@ -18,7 +18,10 @@ export const storeStatsSchema = new Schema<StoreStatsDocument>({
     required: true,
     default: Date.now,
   },
-  profits: Number,
+  profits: {
+    type:Number,
+    set: (profit:number) => Math.round(profit * 10) / 10
+  },
   soldProducts:{
     type: Map,
     of: Number

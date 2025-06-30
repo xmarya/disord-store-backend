@@ -5,13 +5,11 @@ import Category from "../../models/categoryModel";
 import Plan from "../../models/planModel";
 import StoreAssistant from "../../models/storeAssistantModel";
 import { AppError } from "../AppError";
-import Product from "../../models/productNewModel";
-
+import Product from "../../models/productModel";
 
 const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
   return async (request: Request, response: Response, next: NextFunction) => {
-    
-    const plan = await getOneDocById(Plan, request.plan, {select: ["quota"]});
+    const plan = await getOneDocById(Plan, request.plan, { select: ["quota"] });
     if (!plan) return next(new AppError(401, "no plan is associated with this id"));
 
     const storeId = request.store;
@@ -22,15 +20,15 @@ const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
 
     switch (quotaKey) {
       case "ofProducts":
-        countOfDocs = await Product.countDocuments({store: storeId});
+        countOfDocs = await Product.countDocuments({ store: storeId });
         break;
 
       case "ofCategories":
-        countOfDocs = await Category.countDocuments({store: storeId});
+        countOfDocs = await Category.countDocuments({ store: storeId });
         break;
 
       case "ofStoreAssistants":
-        countOfDocs = await StoreAssistant.countDocuments({inStore:storeId})
+        countOfDocs = await StoreAssistant.countDocuments({ inStore: storeId });
         break;
 
       case "ofColourThemes":

@@ -1,4 +1,5 @@
 import express from "express";
+import { router as settingsRouter } from "./auth/settingsRouter";
 import { router as adminRouter } from "./auth/adminRoutes";
 import { router as storeRouter } from "./auth/storeRoutes";
 import { router as assistantRouter } from "./auth/assistantRoutes";
@@ -17,6 +18,7 @@ import { assignStoreIdToRequest } from "../_utils/requestModifiers/assignStoreId
 import restrict from "../_utils/protectors/restrict";
 import sanitisedData from "../_utils/validators/sanitisedData";
 import { createStoreController } from "../controllers/auth/storeControllers";
+import { testInvoiceController } from "../controllers/auth/invoiceController";
 
 export const router = express.Router();
 
@@ -25,6 +27,7 @@ router.get("/logout", logout); // NOTE: keep this before the validateJwtToken an
 
 router.use(validateJwtToken, getUserFromPayload);
 router.post("/new-store", restrict("storeOwner"), sanitisedData, createStoreController);
+router.use("/settings", settingsRouter)
 router.use("/me", userRouter);
 router.use("/admin", adminRouter);
 router.use("/platform/reviews", platformReviewsRouter);
@@ -36,3 +39,6 @@ router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
+
+// for testing purpose:
+router.post('/test-invoices', testInvoiceController);

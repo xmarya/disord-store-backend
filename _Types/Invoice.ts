@@ -1,16 +1,37 @@
-import { Types } from "mongoose";
-import { ProductDocument } from "./Product";
+import mongoose, { Types } from "mongoose";
+import { MongoId } from "./MongoId";
 
-export interface Invoice {
-  id: string;
-  purchaseId: String;
+export interface InvoiceDataBody {
+  orderId: MongoId;
   buyer: Types.ObjectId;
-  products: Array<ProductDocument>;
-  total: number;
+  productsPerStore: [
+    {
+      storeId: MongoId;
+      products: [
+        {
+          productId: MongoId;
+          name: string;
+          quantity: number;
+          unitPrice: number;
+          productType: "physical" | "digital";
+          image: string;
+          discountedPrice?: number;
+          weight?: number;
+          productTotal: number;
+        }
+      ];
+    }
+  ];
+  shippingFees?: number;
+  invoiceTotal: number;
   paymentMethod: string;
-  purchasedAt: Date;
   status: "successful" | "cancelled" | "processed" | "refunded";
-  notes?: string;
+  billingAddress: MongoId;
+  shippingAddress?: MongoId;
+  shippingCompany?: string;
+}
+export interface Invoice extends InvoiceDataBody {
+  invoiceId: MongoId;
 }
 
-export type InvoiceDocument = Invoice;
+export type InvoiceDocument = Invoice & mongoose.Document;

@@ -2,10 +2,11 @@ import { createDoc, deleteDoc, getAllDocs, getOneDocById } from "../../_services
 import { updateProduct } from "../../_services/product/productServices";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import Product from "../../models/productNewModel";
+import Product from "../../models/productModel";
 import { updateProductInCategoryController } from "./categoryController";
 
-export const createProductController = catchAsync(async (request, response, next) => { /*REQUIRES TESTING*/
+export const createProductController = catchAsync(async (request, response, next) => {
+  /*REQUIRES TESTING*/
   const { categories } = request.body;
   if (categories && categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array")); /*✅*/
 
@@ -21,7 +22,7 @@ export const createProductController = catchAsync(async (request, response, next
 });
 
 export const getAllProductsController = catchAsync(async (request, response, next) => {
-  const products = await getAllDocs(Product, request);
+  const products = await getAllDocs(Product, request, {select: ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"]});
   if (!products) return next(new AppError(404, "لم يتم العثور على منتجات"));
 
   response.status(200).json({

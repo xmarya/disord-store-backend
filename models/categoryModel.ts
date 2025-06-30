@@ -1,6 +1,6 @@
 import { CategoryDocument } from "../_Types/Category";
 import mongoose, { Schema } from "mongoose";
-import Product from "./productNewModel";
+import Product from "./productModel";
 
 type CategoryModel = mongoose.Model<CategoryDocument>;
 export const categorySchema = new Schema<CategoryDocument>({
@@ -54,8 +54,8 @@ categorySchema.post("findOneAndDelete", async function (deletedDoc) {
   console.log("categorySchema.post(findOneAndDelete)");
   if (deletedDoc) {
     // await Promise.all([
-      // Store.findByIdAndUpdate({ _id: deletedDoc.store }, { $pull: { categories: deletedDoc._id } }),
-      await Product.updateMany({ _id: { $in: deletedDoc.products } }, { $pull: { categories: deletedDoc._id } }); /*✅*/
+    // Store.findByIdAndUpdate({ _id: deletedDoc.store }, { $pull: { categories: deletedDoc._id } }),
+    await Product.updateMany({ _id: { $in: deletedDoc.products } }, { $pull: { categories: deletedDoc._id } }); /*✅*/
     // ]);
   }
 });
