@@ -92,11 +92,8 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
 
     /*
     TODO: add a new invoice after successful payment process:
-    const data as InvoiceDataBody = {buyer, products, paymentMethod, total, status: "successful", notes};
-    const newInvoice = await createDoc(Invoice, data);
-
-    TODO: update the store stats
-    updateStoreStats()
+    const newInvoice = await createNewInvoiceController();
+    and return the invoice in the response
     */
 
     await session.commitTransaction();
