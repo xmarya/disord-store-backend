@@ -26,7 +26,7 @@ export const router = express.Router();
 console.log("/dashboard ROUTER");
 router.get("/logout", logout); // NOTE: keep this before the validateJwtToken and getUserFromPayload middlewares
 
-router.use(validateJwtToken, refreshToken, getUserFromPayload);
+router.use(validateJwtToken, getUserFromPayload, refreshToken);
 router.post("/new-store", restrict("storeOwner"), sanitisedData, createStoreController);
 router.use("/settings", settingsRouter)
 router.use("/me", userRouter);
