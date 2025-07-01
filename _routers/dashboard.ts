@@ -19,13 +19,14 @@ import restrict from "../_utils/protectors/restrict";
 import sanitisedData from "../_utils/validators/sanitisedData";
 import { createStoreController } from "../controllers/auth/storeControllers";
 import { testInvoiceController } from "../controllers/auth/invoiceController";
+import refreshToken from "../_utils/jwtToken/refreshToken";
 
 export const router = express.Router();
 
 console.log("/dashboard ROUTER");
 router.get("/logout", logout); // NOTE: keep this before the validateJwtToken and getUserFromPayload middlewares
 
-router.use(validateJwtToken, getUserFromPayload);
+router.use(validateJwtToken, refreshToken, getUserFromPayload);
 router.post("/new-store", restrict("storeOwner"), sanitisedData, createStoreController);
 router.use("/settings", settingsRouter)
 router.use("/me", userRouter);
