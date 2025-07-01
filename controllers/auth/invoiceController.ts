@@ -1,16 +1,16 @@
+import { format } from "date-fns";
 import { Request, Response } from "express";
 import { dirname, join } from "path";
 import PDFDocument from "pdfkit";
 import { fileURLToPath } from "url";
-import { getAllDocs, getOneDocByFindOne, getOneDocById } from "../../_services/global";
+import { getOneDocByFindOne } from "../../_services/global";
+import { createNewInvoices } from "../../_services/invoice/invoiceService";
+import { InvoiceDataBody } from "../../_Types/Invoice";
+import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
+import { batchInvoices } from "../../_utils/jobs/batchInvoice";
 import Invoice from "../../models/invoiceModel";
 import Order from "../../models/orderModel";
-import { InvoiceDataBody, InvoiceDocument } from "../../_Types/Invoice";
-import { format } from "date-fns";
-import { AppError } from "../../_utils/AppError";
-import { batchInvoices } from "../../_utils/jobs/batchInvoice";
-import { createNewInvoices } from "../../_services/invoice/invoiceService";
 import { updateStoreStatsController } from "./storeStatsController";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -125,13 +125,15 @@ export async function createNewInvoiceController(data: InvoiceDataBody) {
   const invoiceId = format(releasedAt, "yyMMdd-HHmmssSSS");
 
   const fullData = { releasedAt, invoiceId, ...data };
+  await updateStoreStatsController(fullData, operationType);
 
-  // STEP 2) save the data in the cache  be batched and to be handled later by bullmq:
+  // STEP 2) save the data in the cache be batched and to be handled later by bullmq:
   const success = await batchInvoices(invoiceId, fullData);
 
   // STEP 3) in case of failure, save it directly to the db.
-  if (!success) createNewInvoices(fullData); // I think there's no need to await the db query, since the invoice is returned in the response
-  updateStoreStatsController({ ...data, operationType }); // no need to await this too.
+  if (!success) createNewInvoices(fullData);
+    // NOTE: no need to await this too. let it do its job in the background;
+    // the most important part is to show the profits ASAP in the store's dashboard.
 
   return fullData;
 }
@@ -164,11 +166,15 @@ export const testInvoiceController = catchAsync(async (request, response, next) 
   const data = { orderId, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees };
 
   // STEP 2) save the data in the cache  be batched and to be handled later by bullmq:
-  // const success = await batchInvoices(invoiceId, data);
+  const success = await batchInvoices(invoiceId, data);
 
   // STEP 3) in case of failure, save it directly to the db.
-  // if (!success) await createNewInvoices(data);
-  updateStoreStatsController({ ...data, operationType }); // no need to await this too.
+  if (!success) {
+    await updateStoreStatsController(data, operationType);
+    createNewInvoices(data);
+    // NOTE: no need to await this too. let it do its job in the background;
+    // the most important part is to show the profits ASAP in the store's dashboard.
+  }
 
   response.status(201).json({
     success: true,

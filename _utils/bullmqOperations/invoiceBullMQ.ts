@@ -4,7 +4,7 @@ import { InvoiceDocument } from "../../_Types/Invoice";
 import { getAllJSON } from "../redisOperations/redisJSON";
 import bullmq from "../../_config/bullmq";
 
-const { queue, worker } = await bullmq("Invoice", invoiceWriteProcessor);
+const { queue } = await bullmq("Invoice", invoiceWriteProcessor);
 
 async function invoiceBullMQ() {
   console.log("invoiceBullMQ");
