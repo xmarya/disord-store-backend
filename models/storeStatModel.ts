@@ -29,7 +29,7 @@ export const storeStatsSchema = new Schema<StoreStatsDocument>({
   numOfPurchases:Number,
   numOfCancellations:Number,
 }, {
-  timestamps: true,
+  // timestamps: true, it's a duplicated to the date
   strict:true,
   strictQuery:true,
   toObject: {virtuals: true},
