@@ -189,5 +189,5 @@ export async function updateStoreStats(
   }
 
   // return updatedStats;
-  return cleanedStats;
+  return cleanedStats ?? updatedStats;
 }
