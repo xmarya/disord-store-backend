@@ -109,7 +109,7 @@ export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $
     { $sort: { [sortBy]: sortOrder === "desc" ? -1 : 1 } },
   ]);
 
-  const formattedStats: Array<{ date: Date; totalSoldProducts: Record<string/*productId*/, number/*quantity*/> }> = stats.map((item) => {
+  const formattedStats: Array<{ date: Date; totalSoldProducts: Record<string /*productId*/, number /*quantity*/> }> = stats.map((item) => {
     const totalForEachProduct: Record<string, number> = {};
 
     item.soldProductMap.forEach((soldMap: Map<string, number>) => {
@@ -151,17 +151,42 @@ export async function updateStoreStats(
   let soldProductsUpdate: mongoose.UpdateQuery<StoreStatsDocument> = {};
 
   for (const { productId, quantity } of products) {
-    const key = `soldProducts.${productId}`;
+    const key = `soldProducts.${productId}`;// this is a must #2 about Maps in mongoose; without the prefix, mongoose gonna try to update the
+    //  top-level field named after the `productId` instead of a nested key inside soldProducts. 
+    // so basically mongoose gonna thought there's something after/inside/nested after the `productId` if the key was only this.
+    // IN SHORT: I want to update A FIELD WITHIN soldProducts.
     soldProductsUpdate.$inc ??= {};
     soldProductsUpdate.$inc[key] = isIncrement ? quantity : -quantity;
   }
 
-  const updatedStats = await StoreStats.findOneAndUpdate(
+  /*
+  1)  console.log("...[soldProductsUpdate] => ", ...[soldProductsUpdate]); this way doesn't do anything
+
+...[soldProductsUpdate] =>  {
+  '$inc': {
+    '684ac4c648085d1348231248': 1,
+    '684ac76f9e4ba6351f4fa887': 2,
+    '684ac6ed0d7b4453cf566bc5': 2
+  }
+}
+
+2) console.log("soldProductsUpdate.$inc => ", soldProductsUpdate.$inc);
+soldProductsUpdate.$inc =>  {
+  '684ac4c648085d1348231248': 1,
+  '684ac76f9e4ba6351f4fa887': 2,
+  '684ac6ed0d7b4453cf566bc5': 2
+}
+  */
+
+  console.log("soldProductsUpdate.$inc => ", soldProductsUpdate.$inc);
+
+  let updatedStats;
+ try {
+   updatedStats = await StoreStats.findOneAndUpdate(
     { store: storeId, date: { $gte: dayStart, $lte: dayEnd } },
     {
-      soldProductsUpdate,
-      //Or ...soldProductsUpdate, ?
       $inc: {
+        ...soldProductsUpdate.$inc,
         profits,
         numOfPurchases: purchase,
         numOfCancellations: cancellation,
@@ -171,8 +196,13 @@ export async function updateStoreStats(
         date: now,
       },
     },
-    { new: true, upsert: true, setDefaultsOnInsert: true }
-  ).session(session);
+    { new: true, upsert: true, runValidators: true, session }
+  );
+ } catch (error) {
+  console.log(error);
+ }
+
+ if (updatedStats) await updatedStats.validate(); // manually trigger validation; since runValidator option doesn't get triggered with $inc or $setOnInsert
 
   // clean up any quantity with 0 or minus value:
   let cleanedStats;
