@@ -30,25 +30,6 @@ export const createStoreController = catchAsync(async (request, response, next) 
   });
 });
 
-export const getStoreStatsController = catchAsync(async (request, response, next) => {
-  /* BUG: 
-  const { dates } = request.body;
-    this condition WOULD NEVER be wrong, the .length property doesn't assure that the dates is an ARRAY,
-    there is a possibility for it be a string and it has .length property too.
-    if(!dates.length) return next(new AppError(400, "specify the dates inside an array"));
-  */
-
-  const { dateFilter, sortBy, sortOrder } = request.dateQuery;
-  const storeId = request.store;
-
-  const stats = await getOneStoreStats(storeId, dateFilter, sortBy, sortOrder);
-  if (!stats) return next(new AppError(400, "no stats were found for this store"));
-
-  response.status(200).json({
-    success: true,
-    stats,
-  });
-});
 
 export const updateMyStoreController = catchAsync(async (request, response, next) => {
   // only allow storeName, description, logo

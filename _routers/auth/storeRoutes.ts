@@ -8,7 +8,8 @@ import sanitisedData from "../../_utils/validators/sanitisedData";
 import checkAssistantPermissions from "../../_utils/validators/validateAssistantPermissions";
 import validateEmailConfirmation from "../../_utils/validators/validateEmailConfirmation";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import { deleteMyStoreController, getStoreStatsController, previewStoreWithProducts, updateMyStoreController, updateMyStoreStatus } from "../../controllers/auth/storeControllers";
+import { deleteMyStoreController, previewStoreWithProducts, updateMyStoreController, updateMyStoreStatus } from "../../controllers/auth/storeControllers";
+import { getStoreStatsController } from "../../controllers/auth/storeStatsController";
 
 export const router = express.Router();
 console.log("/store Router");
