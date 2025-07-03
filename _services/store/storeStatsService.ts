@@ -136,12 +136,13 @@ export async function updateStoreStats(
   profit: number,
   products: Array<{ productId: MongoId; quantity: number }>,
   operationType: "new-purchase" | "cancellation",
-  session: mongoose.ClientSession
+  session: mongoose.ClientSession,
+  operationDate?:{$gte: Date;$lte: Date;},
 ) {
   console.log("updateStoreStats");
-  const now = new Date();
-  const dayStart = startOfDay(now);
-  const dayEnd = endOfDay(now);
+  // const now = new Date();
+  // const dayStart = startOfDay(now);
+  // const dayEnd = endOfDay(now);
 
   const isIncrement = operationType === "new-purchase";
   const profits = isIncrement ? profit : -profit;
@@ -178,12 +179,16 @@ soldProductsUpdate.$inc =>  {
 }
   */
 
-  console.log("soldProductsUpdate.$inc => ", soldProductsUpdate.$inc);
+  // console.log("soldProductsUpdate.$inc => ", soldProductsUpdate.$inc);
 
   let updatedStats;
+  const now = new Date();
+  const $gte = operationDate?.$gte ?? startOfDay(now);
+  const $lte = operationDate?.$lte ?? endOfDay(now);
+  
  try {
    updatedStats = await StoreStats.findOneAndUpdate(
-    { store: storeId, date: { $gte: dayStart, $lte: dayEnd } },
+    { store: storeId, date: { $gte, $lte } },
     {
       $inc: {
         ...soldProductsUpdate.$inc,
