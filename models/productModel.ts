@@ -104,8 +104,6 @@ productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
   console.log("productSchema.pre(/^find/");
   this.populate({ path: "categories", select: "name colour" });
   console.log("cate");
-  this.populate({ path: "store", select: "name ranking ratingsAverage ratingsQuantity verified" });
-  console.log("store");
   next();
 });
 
