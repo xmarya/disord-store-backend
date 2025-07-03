@@ -17,7 +17,6 @@ export const storeStatsSchema = new Schema<StoreStatsDocument>(
     */
       type: Date,
       required: true,
-      default: Date.now,
     },
     profits: {
       type: Number,
@@ -46,7 +45,6 @@ storeStatsSchema.index({ store: 1, date: 1 });
 
 
 storeStatsSchema.pre(/^find/, function (this: mongoose.Query<any, StoreStatsDocument>, next) {
-  // this.populate("store").select("storeName logo inPlan owner verified"); /*REQUIRES TESTING*/
   this.populate({
     path: "store",
     options: { select: "storeName logo inPlan owner verified" },

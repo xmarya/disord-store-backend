@@ -155,7 +155,7 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   const key = lightFormat(subscribeStarts, "yyyy-MM-dd");
   logsMap.set(key, { planName, price: paidPrice }); // JavaScript Map enforces uniqueness of keys, not values.
 
-  // updatedFields.$set = updatedFields.$set ?? {}; since it now behaves as UpdateQuery<T>, not as aggregation pipeline
+  // updatedFields.$set = updatedFields.$set ?? {}; need for this line; since it now behaves as UpdateQuery<T>, not as aggregation pipeline
   updatedFields.$set.subscriptionsLog = logsMap;
   next();
 });
