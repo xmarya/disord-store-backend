@@ -8,7 +8,7 @@ import { createNewInvoices } from "../../_services/invoice/invoiceService";
 import { InvoiceDataBody } from "../../_Types/Invoice";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import { batchInvoices } from "../../_utils/jobs/batchInvoice";
+import { batchInvoices } from "../../_utils/jobs/invoice";
 import Invoice from "../../models/invoiceModel";
 import Order from "../../models/orderModel";
 import { updateStoreStatsController } from "./storeStatsController";
@@ -164,17 +164,16 @@ export const testInvoiceController = catchAsync(async (request, response, next) 
   const invoiceId = format(releasedAt, "yyMMdd-HHmmssSSS");
 
   const data = { orderId, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees };
+  await updateStoreStatsController(data, operationType);
 
-  // STEP 2) save the data in the cache  be batched and to be handled later by bullmq:
-  const success = await batchInvoices(invoiceId, data);
+  // STEP 2) save the data in the cache be batched and to be handled later by bullmq:
+  // const success = await batchInvoices(invoiceId, data);
 
   // STEP 3) in case of failure, save it directly to the db.
-  if (!success) {
-    await updateStoreStatsController(data, operationType);
-    createNewInvoices(data);
+  // if (!success) createNewInvoices(data);
     // NOTE: no need to await this too. let it do its job in the background;
     // the most important part is to show the profits ASAP in the store's dashboard.
-  }
+
 
   response.status(201).json({
     success: true,
