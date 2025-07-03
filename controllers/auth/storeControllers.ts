@@ -2,7 +2,6 @@ import mongoose, { startSession } from "mongoose";
 import { deleteAllAssistants } from "../../_services/assistant/assistantService";
 import { updateDoc } from "../../_services/global";
 import { createStore, deleteStore, getStoreWithProducts } from "../../_services/store/storeService";
-import { getOneStoreStats } from "../../_services/store/storeStatsService";
 import { resetStoreOwnerToDefault } from "../../_services/user/userService";
 import { MongoId } from "../../_Types/MongoId";
 import { AppError } from "../../_utils/AppError";
