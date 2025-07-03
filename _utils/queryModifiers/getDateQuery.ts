@@ -12,7 +12,7 @@ const getDateQuery = catchAsync(async (request, response, next) => {
   //     lightFormat(startOfMonth(now), "yyyy-MM-dd"),
   //     lightFormat(endOfMonth(now), "yyyy-MM-dd")
   // ]
-  const filter: string[] = dates.length > 0 ? dates : [lightFormat(new Date(), "yyyy-MM-dd")];
+  const filter: string[] = dates.length > 0 ? dates : [lightFormat(new Date(), "yyyy-MM-dd")]; // set today as the default value if there is no dates array
   const dateFilter = buildDateFilter(filter);
   if (!dateFilter) return next(new AppError(400, `Please provide a date with one of these format: ${SUPPORTED_DATE_FORMATS.join(", ")}`));
 
