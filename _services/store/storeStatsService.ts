@@ -65,7 +65,8 @@ export async function getAllStoresStats(
   return allStats; // return the profits OAT only => [{storeName: "1", totalProfit: 123}, {storeName: "2", totalProfit: 123}]
 }
 /*REQUIRES TESTING*/
-export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $gte: Date; $lte: Date } }, sortBy: "date" | "profits" | "soldProducts" = "date", sortOrder: "desc" | "asc" = "desc") {
+export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $gte: Date; $lte: Date } }, sortBy: "date" | "totalProfits" | "totalSoldProducts" = "date", sortOrder: "desc" | "asc" = "desc") {
+  console.log("getOneStoreStats");
   // NOTE: THIS IS FOR STORE OWNER
   const stats = await StoreStats.aggregate([
     {
@@ -76,7 +77,7 @@ export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $
         // group them by the date AND accumulate the profits and the soleProducts
         _id: "$date",
         totalProfits: { $sum: "$profits" },
-        soldProductMap: { $push: "$soldProducts" }, // accumulate the Map values by pushing it as a whole. (NOTE that it's not "$soldProducts.quantity", no such a property like this. the soldProducts field is now a Map)
+        totalSoldProducts: { $push: "$soldProducts" }, // accumulate the Map values by pushing it as a whole. (NOTE that it's not "$soldProducts.quantity", no such a property like this. the soldProducts field is now a Map)
       },
 
       /* NOTE:
@@ -103,16 +104,28 @@ export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $
         _id: 0,
         date: "$_id",
         totalProfits: 1,
-        soldProductMap: 1,
+        totalSoldProducts: 1,
       },
     },
     { $sort: { [sortBy]: sortOrder === "desc" ? -1 : 1 } },
   ]);
 
-  const formattedStats: Array<{ date: Date; totalSoldProducts: Record<string /*productId*/, number /*quantity*/> }> = stats.map((item) => {
+  // console.log("stttaats", stats);
+
+  /*
+  stttaats => [
+  {
+    totalProfits: 390,
+    totalSoldProducts: [ [Object] ],
+    date: 2025-07-03T08:17:18.354Z
+  }
+]
+  */
+
+  const formattedStats: Array<{ date: Date; totalProfits:number, totalSoldProducts: Record<string /*productId*/, number /*quantity*/> }> = stats.map((item) => {
     const totalForEachProduct: Record<string, number> = {};
 
-    item.soldProductMap.forEach((soldMap: Map<string, number>) => {
+    item.totalSoldProducts.forEach((soldMap: Map<string, number>) => {
       if (!soldMap) return; // in case the original stats was null | undefined, or in case the productsMap was containing such a falsy values (protecting against invalid or missing data).
 
       Object.entries(soldMap).forEach(([productId, quantity]) => {
@@ -123,6 +136,7 @@ export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $
 
     return {
       date: item.date,
+      totalProfits:item.totalProfits,
       totalSoldProducts: totalForEachProduct,
     };
   });
