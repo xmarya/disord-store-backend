@@ -1,4 +1,4 @@
-import { createDoc, deleteDoc, getAllDocs, getOneDocById } from "../../_services/global";
+import { createDoc, deleteDoc, getOneDocById } from "../../_services/global";
 import { updateProduct } from "../../_services/product/productServices";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
@@ -21,16 +21,6 @@ export const createProductController = catchAsync(async (request, response, next
   });
 });
 
-export const getAllProductsController = catchAsync(async (request, response, next) => {
-  const products = await getAllDocs(Product, request, {select: ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"]});
-  if (!products) return next(new AppError(404, "لم يتم العثور على منتجات"));
-
-  response.status(200).json({
-    success: true,
-    result: products.length,
-    products,
-  });
-});
 
 export const getOneProductController = catchAsync(async (request, response, next) => {
   const product = await getOneDocById(Product, request.params.productId);

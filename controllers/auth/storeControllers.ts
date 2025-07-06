@@ -1,6 +1,6 @@
 import mongoose, { startSession } from "mongoose";
 import { deleteAllAssistants } from "../../_services/assistant/assistantService";
-import { updateDoc } from "../../_services/global";
+import { getOneDocById, updateDoc } from "../../_services/global";
 import { createStore, deleteStore, getStoreWithProducts } from "../../_services/store/storeService";
 import { resetStoreOwnerToDefault } from "../../_services/user/userService";
 import { MongoId } from "../../_Types/MongoId";
@@ -28,7 +28,6 @@ export const createStoreController = catchAsync(async (request, response, next) 
     newStore,
   });
 });
-
 
 export const updateMyStoreController = catchAsync(async (request, response, next) => {
   // only allow storeName, description, logo
@@ -108,13 +107,13 @@ export async function deleteStorePermanently(storeId: MongoId, session?: mongoos
   //TODO: add the deleted data to the AdminLog
 }
 
-export const previewStoreWithProducts = catchAsync(async (request, response, next) => {
+export const getMyStoreController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
-  const { store, products } = await getStoreWithProducts(storeId);
+  // const { store } = await getStoreWithProducts(storeId);
+  const store = await getOneDocById(Store, storeId);
 
   response.status(200).json({
     success: true,
     store,
-    products,
   });
 });
