@@ -1,5 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import { ProductDocument } from "../_Types/Product";
+import Ranking from "./rankingModel";
+import { MongoId } from "../_Types/MongoId";
+import tryCatch from "../_utils/tryCatch";
 
 type ProductModel = mongoose.Model<ProductDocument>;
 
@@ -101,7 +104,7 @@ productSchema.pre("save", function(next) {
 
 // this pre(/^find/) hook is for populating the categories:
 productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
-  console.log("productSchema.pre(/^find/");
+  console.log("productSchema.pre(/^find/ cat");
   this.populate({ path: "categories", select: "name colour" });
   // this.populate({ path: "store", select: "name ranking ratingsAverage ratingsQuantity verified" });
   next();
@@ -109,10 +112,12 @@ productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
 
 // this post(deleteMany) hook is for deleting all of the product's rankings after deleting the store
 // it's a query hook. see: https://mongoosejs.com/docs/middleware.html#naming
-productSchema.post("deleteMany", { document: false, query: true }, async function () {
-  const deletedDocs = await this.model.find(this.getFilter()).select("_id");
-  console.log("productSchema.post(deleteMany)", deletedDocs);
-  // TODO: complete the hook logic
+productSchema.post("deleteMany", { document: false, query: true }, async function () { /*REQUIRES TESTING*/
+  const deletedDocs:ProductDocument[] = await this.model.find(this.getFilter()).select("_id");
+  if (deletedDocs.length === 0) return;
+  console.log("productSchema.post(deleteMany)", deletedDocs.length);
+  const deletedProductsIds:MongoId[] = deletedDocs.map( doc => doc.id );
+  await Ranking.deleteMany({resource : "Product", resourceId: {$in: deletedProductsIds}});
 });
 
 const Product = mongoose.model<ProductDocument, ProductModel>("Product", productSchema);
