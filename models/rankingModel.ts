@@ -12,6 +12,7 @@ const rankingSchema = new Schema<RankingDocument>(
       // which is going to be either storeId or productId
       type: Schema.Types.ObjectId,
       required: [true, "the resourceId field is required"],
+      unique:true
     },
     resource:{
       type:String,
