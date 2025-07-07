@@ -8,7 +8,6 @@ import Category from "../../models/categoryModel";
 
 // protected
 export const createCategoryController = catchAsync(async (request, response, next) => {
-  //TODO check the plan quota: the assistant doesn't have any plan info, it's stored in the storeOwner. to make it easy let's add a reference tot he storeOwner plan in the store itself.
 
   const { name, colour } = request.body;
   if (!name?.trim()) return next(new AppError(400, "Please add a name to the category"));

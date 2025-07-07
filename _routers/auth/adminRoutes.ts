@@ -72,4 +72,4 @@ router
     2- select reviews to display in the home page
 */
 router.get("/platform/reviews", getAllPlatformReviewsController);
-router.route("/platform/reviews/:reviewId").patch(validateRequestParams("reviewId"), displayReviewInHomePage).delete(validateRequestParams("reviewId"), deletePlatformReviewController); // TODO: create one for the store
+router.route("/platform/reviews/:reviewId").patch(validateRequestParams("reviewId"), displayReviewInHomePage).delete(validateRequestParams("reviewId"), deletePlatformReviewController);

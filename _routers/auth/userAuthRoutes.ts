@@ -19,7 +19,7 @@ router.route("/subscriptions").get(getMySubscriptionsLogController);
 
 router.use(sanitisedData);
 router.patch("/new-subscribe", createNewSubscribeController); /*✅*/
-router.patch("/plan-renewal", renewalSubscriptionController); // TODO: renewal subscription controller (check if the user selected the same plan or upgraded it)
+router.patch("/plan-renewal", renewalSubscriptionController);
 /* CHANGE LATER: the above two must have a controller for the payment as the first md before proceeding to the updating */
-router.patch("/plan-unsubscribe", cancelSubscriptionController); // TODO: unsubscription controller, maybe we should check if the subscription has been less than 15 days
+router.patch("/plan-unsubscribe", cancelSubscriptionController);
 
