@@ -201,10 +201,11 @@ userSchema.pre("findOneAndUpdate", async function (next) {
 // I decided to make this a virtual field, so it will be created and recalculated each time
 // the data is retrieved which maintains the accuracy of how many days exactly are left.
 userSchema.virtual("planExpiresInDays").get(function () {
-  if (!this.subscribedPlanDetails.subscribeStarts) return 0;
+  console.log("planExpiresInDays");
+  if (!this.subscribedPlanDetails.subscribeStarts) return undefined; // the return 0 causes the planExpiresInDays field to be returned in the doc. using undefined prevents this.
   
   // TODO: corn job to reset subscribeStarts when the subscription ends
-  const days = formatDistanceStrict(this.subscribedPlanDetails.subscribeEnds, this.subscribedPlanDetails.subscribeStarts, { locale: arSA, unit: "day" });
+  const days = formatDistanceStrict(this.subscribedPlanDetails.subscribeEnds, new Date(), { locale: arSA, unit: "day" });
   return days;
   /* OLD CODE (kept for reference): 
   const ms = this.subscribeEnds.getTime() - this.subscribeStarts.getTime();
