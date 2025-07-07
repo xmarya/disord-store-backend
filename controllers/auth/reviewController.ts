@@ -87,8 +87,21 @@ export const updateReviewController = catchAsync(async (request, response, next)
 
   await updateResourceRatingController(updatedReview.storeOrProduct, updatedReview.reviewedResourceId);
 
-  response.status(200).json({
+  response.status(203).json({
     success: true,
+  });
+});
+
+export const updateStoreReplay = catchAsync(async (request, response, next) => { /*REQUIRES TESTING*/
+  const {storeReply} = request.body;
+
+  if(!storeReply?.trim()) return next(new AppError(400, "please write a replay to the customer"));
+
+  const updatedReview = await updateDoc(Review, request.params.reviewId, {storeReply});
+
+  response.status(203).json({
+    success:true,
+    updatedReview
   });
 });
 

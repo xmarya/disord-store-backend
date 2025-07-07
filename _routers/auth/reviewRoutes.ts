@@ -1,12 +1,15 @@
 import express from "express";
-import { createReviewController, deleteReviewController, getAllReviewsController, getOneReviewController, updateReviewController } from "../../controllers/auth/reviewController";
+import { createReviewController, deleteReviewController, getAllReviewsController, getOneReviewController, updateReviewController, updateStoreReplay } from "../../controllers/auth/reviewController";
 import { AppError } from "../../_utils/AppError";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
 import canWriteReview from "../../_utils/protectors/canWriteReview";
 import isWriter from "../../_utils/protectors/isWriter";
+import restrict from "../../_utils/protectors/restrict";
+import checkAssistantPermissions from "../../_utils/validators/validateAssistantPermissions";
 
 export const router = express.Router({mergeParams: true});
 
+router.route("/:reviewId/storeReplay").patch(validateRequestParams("reviewId"),restrict("storeOwner", "storeAssistant"), checkAssistantPermissions("replyToCustomers"), updateStoreReplay);
 
 router.use(canWriteReview);
 
