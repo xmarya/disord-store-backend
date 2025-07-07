@@ -13,20 +13,20 @@ import { getStoreStatsController } from "../../controllers/auth/storeStatsContro
 
 export const router = express.Router();
 console.log("/store Router");
-
+router.use(hasAuthorization);
 // router.use("/reviews", validateModelId("Review-store"), assignModelToRequest("Review-store"), reviewsRouter);
 router.use("/:storeId/reviews", validateRequestParams("storeId"), reviewRouter); /*REQUIRES TESTING: maybe this should be moved to the bottom of the stack*/
 router.use("/invoices", invoiceRouter)
 router
   .route("/")
   // .post(restrict("storeOwner"), sanitisedData, createStoreController)
-  .patch(restrict("storeOwner"), hasAuthorization, sanitisedData, updateMyStoreController)
-  .delete(restrict("storeOwner"), hasAuthorization, deleteMyStoreController)
+  .patch(restrict("storeOwner"), sanitisedData, updateMyStoreController)
+  .delete(restrict("storeOwner"), deleteMyStoreController)
   .get(restrict("storeOwner", "storeAssistant"), getMyStoreController);
 
 // NOTE: the validateEmailConfirmation is for not letting the user make the store active
-router.route("/status").patch(restrict("storeOwner"), validateEmailConfirmation, hasAuthorization, sanitisedData, updateMyStoreStatus);
+router.route("/status").patch(restrict("storeOwner"), validateEmailConfirmation, sanitisedData, updateMyStoreStatus);
 
 // router.use(restrict("storeOwner", "storeAssistant"), checkAssistantPermissions("previewStoreStats")); this doesn't have access to the /:storeId params
-router.route("/stats").get(restrict("storeOwner", "storeAssistant"), hasAuthorization, checkAssistantPermissions("previewStoreStats"), getDateQuery, getStoreStatsController);
+router.route("/stats").get(restrict("storeOwner", "storeAssistant"), checkAssistantPermissions("previewStoreStats"), getDateQuery, getStoreStatsController);
 // it has nothing to do with the corn-job. it's only for getting the stats
