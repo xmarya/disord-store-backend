@@ -9,6 +9,7 @@ import { router as orderRouter } from "./auth/orderRoutes";
 import { router as couponsRouter } from "./auth/couponRoutes";
 import { router as platformReviewsRouter } from "./auth/platformReviewsRoutes";
 import { router as productRouter } from "./auth/productRoutes";
+import { router as subscriptionsRouter } from "./auth/subscriptionsRoutes";
 import { verifyPlanSubscription } from "../_utils/validators/verifyPlanSubscription";
 import validateJwtToken from "../_utils/validators/validateJwtToken";
 import getUserFromPayload from "../_utils/protectors/getUserFromPayload";
@@ -23,7 +24,6 @@ import refreshToken from "../_utils/jwtToken/refreshToken";
 
 export const router = express.Router();
 
-console.log("/dashboard ROUTER");
 router.get("/logout", logout); // NOTE: keep this before the validateJwtToken and getUserFromPayload middlewares
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
@@ -34,6 +34,8 @@ router.use("/admin", adminRouter);
 router.use("/platform/reviews", platformReviewsRouter);
 
 router.use(assignStoreIdToRequest, assignPlanIdToRequest, verifyPlanSubscription);
+router.use("/subscriptions", subscriptionsRouter);
+
 router.use("/store", storeRouter);
 router.use("/products", productRouter);
 router.use("/categories", categoryRouter);
