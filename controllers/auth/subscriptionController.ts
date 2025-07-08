@@ -28,14 +28,14 @@ export const createNewSubscribeController = catchAsync(async (request, response,
 
 export const renewalSubscriptionController = catchAsync(async (request, response, next) => {
   console.log("renewalSubscription");
-  const { planId: newPlanId, paidPrice } = request.body;
-  if (!newPlanId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
+  const { planId, paidPrice } = request.body;
+  if (!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
 
-  const plan = await getOneDocById(Plan, newPlanId);
+  const plan = await getOneDocById(Plan, planId);
   if (!plan) return next(new AppError(400, "لايوجد باقة بهذا المعرف"));
 
-  const currentPlanId = request.plan; // will this be available after the 30 days?
-  const subscriptionType = await getSubscriptionType(currentPlanId, newPlanId);
+  const currentPlanId = request.plan;
+  const subscriptionType = await getSubscriptionType(currentPlanId, planId);
   if (!subscriptionType) return;
 
   const updatedUser = await startSubscription(request.user.id, plan, paidPrice, subscriptionType);
