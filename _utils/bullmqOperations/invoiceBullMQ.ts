@@ -1,8 +1,8 @@
 import { ms } from "../../_data/constants";
 import { createNewInvoices } from "../../_services/invoice/invoiceService";
 import { InvoiceDocument } from "../../_Types/Invoice";
-import { getAllJSON } from "../redisOperations/redisJSON";
 import bullmq from "../../_config/bullmq";
+import { getAllCachedData } from "../cacheControllers/globalCache";
 
 const { queue } = await bullmq("Invoice", invoiceWriteProcessor);
 
@@ -14,9 +14,11 @@ async function invoiceBullMQ() {
 }
 
 async function invoiceWriteProcessor() {
+  console.log("invoiceWriteProcessor");
   const key = "invoices";
 
-  const invoices = await getAllJSON<InvoiceDocument>(key);
+  // const invoices = await getAllJSON<InvoiceDocument>(key);
+  const invoices = await getAllCachedData<InvoiceDocument>(key);
 
   const filteredInvoices = invoices.filter(Boolean).flat();
   // console.dir(filteredInvoices, { depth: null });
