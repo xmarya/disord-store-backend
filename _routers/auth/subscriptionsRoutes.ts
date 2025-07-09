@@ -7,7 +7,7 @@ import { getMySubscriptionsLogController } from "../../controllers/auth/userAuth
 export const router = express.Router();
 
 router.use(restrict("storeOwner"));
-router.route("/subscriptions").get(getMySubscriptionsLogController);
+router.route("/").get(getMySubscriptionsLogController);
 
 router.use(sanitisedData);
 router.patch("/new-subscribe", createNewSubscribeController); /*✅*/
