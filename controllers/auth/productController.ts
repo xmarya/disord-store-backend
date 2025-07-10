@@ -4,7 +4,7 @@ import { createDoc, deleteDoc, getOneDocById } from "../../_services/global";
 import { updateProduct } from "../../_services/product/productServices";
 import { CategoryDocument } from "../../_Types/Category";
 import { AppError } from "../../_utils/AppError";
-import { setCachedData } from "../../_utils/cacheControllers/globalCache";
+import { removeFromCache, setCachedData } from "../../_utils/cacheControllers/globalCache";
 import { catchAsync } from "../../_utils/catchAsync";
 import Product from "../../models/productModel";
 import { categoriesInCache } from "./categoryController";
@@ -92,7 +92,7 @@ export const deleteProductController = catchAsync(async (request, response, next
     return deletedProduct;
   });
   
-  removeKeyValuePair(`Product:${productId}`); // remove from cache if exist
+  removeFromCache(`Product:${productId}`); // remove from cache if exist
   
   response.status(204).json({
     success: true,
