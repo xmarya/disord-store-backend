@@ -3,7 +3,7 @@ import { compressJSON, decompressJSON } from "../compression";
 import { getKeyValuePair, removeKeyValuePair, setKeyValuePair } from "../redisOperations/redisBasicFormat";
 import { getIdsSet, removeIdFromSet } from "../redisOperations/redisSet";
 
-export async function setCachedData<T>(key: string, data: object, TTL: "long" | "short" | "no-ttl") {
+export async function setCachedData(key: string, data: object, TTL: "long" | "short" | "no-ttl") {
   console.log("global setcacheData");
 
   const REDIS_TTL = TTL === "long" ? REDIS_LONG_TTL : TTL === "short" ? REDIS_SHORT_TTL : undefined;
@@ -43,4 +43,8 @@ export async function getAllCachedData<T>(key:string):Promise<T[]> {
   }
 
   return allData;
+}
+
+export async function removeFromCache(key:string) {
+  removeKeyValuePair(key);
 }
