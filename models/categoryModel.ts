@@ -14,14 +14,17 @@ export const categorySchema = new Schema<CategoryDocument>({
     required: [true, "the category colour is required"],
   },
   createdBy: {
-    name: {
-      type: String,
-      required: [true, "the category createdBy username is required"],
-    },
-    id: {
-      type: Schema.Types.ObjectId,
-      required: [true, "the category createdBy id is required"],
-    },
+    name: String,
+    id: Schema.Types.ObjectId,
+    date:{
+      type:Date,
+      default: Date.now
+    }
+  },
+  updatedBy: {
+    name: String,
+    id: Schema.Types.ObjectId,
+    date:Date,
   },
   store: Schema.Types.ObjectId,
   products: [Schema.Types.ObjectId],

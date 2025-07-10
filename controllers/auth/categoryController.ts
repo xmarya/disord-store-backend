@@ -1,22 +1,22 @@
-import { assignProductToCategory, deleteProductFromCategory } from "../../_services/category/categoryService";
-import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, getOneDocById, updateDoc } from "../../_services/global";
+import { getAllProductCategories } from "../../_services/category/categoryService";
+import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from "../../_services/global";
 import { CategoryBasic } from "../../_Types/Category";
 import { MongoId } from "../../_Types/MongoId";
 import { AppError } from "../../_utils/AppError";
+import { getCachedData, setCachedData } from "../../_utils/cacheControllers/globalCache";
 import { catchAsync } from "../../_utils/catchAsync";
 import Category from "../../models/categoryModel";
 
 // protected
 export const createCategoryController = catchAsync(async (request, response, next) => {
-
   const { name, colour } = request.body;
   if (!name?.trim()) return next(new AppError(400, "Please add a name to the category"));
 
   const userName = `${request.user.firstName} ${request.user.lastName}`;
   const userId = request.user.id;
   const storeId = request.store;
-
-  const data: CategoryBasic = { name, colour, createdBy: { name: userName, id: userId }, store: storeId };
+  const createdBy = { name: userName, id: userId };
+  const data = { name, colour, createdBy, store: storeId };
   const newCategory = await createDoc(Category, data);
 
   response.status(201).json({
@@ -49,11 +49,13 @@ export const getCategoryController = catchAsync(async (request, response, next) 
   });
 });
 
-export const updateCategoryController = catchAsync(async (request, response, next) => { /*✅*/
+export const updateCategoryController = catchAsync(async (request, response, next) => {
+  /*✅*/
   // NOTE: only allow the category's name and colour to be editable:
   const { name, colour } = request.body;
   const { categoryId } = request.params;
-  const updatedCategory = await updateDoc(Category, categoryId, {name, colour}, { condition: { store: request.store } });
+  const updatedBy = { name: `${request.user.firstName} ${request.user.lastName}`, id: request.user.id, date: new Date() };
+  const updatedCategory = await updateDoc(Category, categoryId, { name, colour, updatedBy }, { condition: { store: request.store } });
 
   response.status(201).json({
     success: true,
@@ -68,9 +70,27 @@ export const deleteCategoryController = catchAsync(async (request, response, nex
   });
 });
 
+/* OLD CODE (kept for reference): 
 export async function updateProductInCategoryController(categories: Array<CategoryBasic>, productId: MongoId, operationType: "assign" | "delete") {
   if (operationType === "assign") await assignProductToCategory(categories, productId);
   else deleteProductFromCategory(categories, productId);
+}
+*/
+
+export async function categoriesInCache(productId: MongoId): Promise<CategoryBasic[]> {
+  let categories;
+
+  // STEP 1) look in cache:
+  categories = await getCachedData<CategoryBasic[]>(`Categories:${productId}`);
+  console.log("from cache", categories?.length);
+  // STEP 2) nothing? get from db:
+  if (!categories) {
+    categories = await getAllProductCategories(productId);
+    console.log("from db", categories?.length);
+    setCachedData(`Categories:${productId}`, categories, "long");
+  }
+
+  return categories;
 }
 
 /* OLD CODE (kept for reference): 
