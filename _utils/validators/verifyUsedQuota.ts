@@ -46,7 +46,7 @@ const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
 
     if (countOfDocs < definedQuota) return next();
 
-    return next(new AppError(403, `you've reached the limit of your ${quotaKey.slice(0,2)} quota`));
+    return next(new AppError(403, `you've reached the limit of your ${quotaKey.slice(2)} quota`));
   };
 };
 

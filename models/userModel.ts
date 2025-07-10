@@ -145,8 +145,7 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   // STEP 2) get the to-be-updated fields:
   /*✅*/ const updatedFields = this.getUpdate() as mongoose.UpdateQuery<UserDocument>;
 
-  if (doc.userType !=="storeOwner" || !updatedFields?.subscribedPlanDetails?.subscribeStarts) return next();
-  console.log("this pre(findOneAndUpdate) for accumulating the count in subscriptionsLog", !updatedFields?.subscribedPlanDetails?.subscribeStarts);
+  if (doc.userType !=="storeOwner" || !updatedFields?.subscribedPlanDetails?.subscribeStarts) return next(); // don't enter if the updated fields has nothing to do with the subscription
 
   const { subscribeStarts, planName, paidPrice } = updatedFields.subscribedPlanDetails;
   const logsMap = doc.subscriptionsLog;

@@ -18,7 +18,6 @@ import { deleteUserAccountController } from "../../controllers/auth/userAuthCont
 
 export const router = express.Router();
 
-console.log("/admin Router");
 router.post("/forgetPassword", forgetPassword("Admin")); // this route must be at the top of the stack since it doesn't require to be logged-in.
 
 router.use(restrict("admin"));

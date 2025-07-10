@@ -12,7 +12,6 @@ import { deleteMyStoreController, getMyStoreController, updateMyStoreController,
 import { getStoreStatsController } from "../../controllers/auth/storeStatsController";
 
 export const router = express.Router();
-console.log("/store Router");
 router.use(hasAuthorization);
 // router.use("/reviews", validateModelId("Review-store"), assignModelToRequest("Review-store"), reviewsRouter);
 router.use("/:storeId/reviews", validateRequestParams("storeId"), reviewRouter); /*REQUIRES TESTING: maybe this should be moved to the bottom of the stack*/
