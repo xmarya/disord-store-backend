@@ -1,9 +1,16 @@
+import { startSession } from "mongoose";
+import { deleteProductFromCategory, updateProductInCategories } from "../../_services/category/categoryService";
 import { createDoc, deleteDoc, getOneDocById } from "../../_services/global";
 import { updateProduct } from "../../_services/product/productServices";
+import { CategoryDocument } from "../../_Types/Category";
 import { AppError } from "../../_utils/AppError";
+import { setCachedData } from "../../_utils/cacheControllers/globalCache";
 import { catchAsync } from "../../_utils/catchAsync";
 import Product from "../../models/productModel";
-import { updateProductInCategoryController } from "./categoryController";
+import { categoriesInCache } from "./categoryController";
+import { removeRanking } from "../../_services/ranking/rankingService";
+import { deleteAllResourceReviews } from "../../_services/review/reviewService";
+import { removeKeyValuePair } from "../../_utils/redisOperations/redisBasicFormat";
 
 export const createProductController = catchAsync(async (request, response, next) => {
   /*REQUIRES TESTING*/
@@ -14,17 +21,23 @@ export const createProductController = catchAsync(async (request, response, next
   const data = { store: storeId, ...request.body };
 
   const newProd = await createDoc(Product, data);
-  await updateProductInCategoryController(categories, newProd.id, "assign");
+  if (categories) {
+    await updateProductInCategories(categories, newProd.id);
+    setCachedData(`Category:${newProd.id}`, newProd.categories, "long"); // set the new cats, without waiting
+  }
+
   response.status(201).json({
     success: true,
     newProd,
   });
 });
 
-
 export const getOneProductController = catchAsync(async (request, response, next) => {
-  const product = await getOneDocById(Product, request.params.productId);
+  let product = await getOneDocById(Product, request.params.productId);
   if (!product) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
+  const cats = await categoriesInCache(request.params.productId);
+
+  product.categories = cats as CategoryDocument[];
 
   response.status(200).json({
     success: true,
@@ -51,9 +64,13 @@ export const updateProductController = catchAsync(async (request, response, next
 
   const updatedProduct = await updateProduct(request.store, productId, request.body);
   if (!updatedProduct) return next(new AppError(400, "تأكد من صحة البيانات"));
-  await updateProductInCategoryController(categories, updatedProduct.id, "assign"); /*✅*/
 
-  response.status(201).json({
+  if (categories) {
+    await updateProductInCategories(categories, productId); /*✅*/
+    setCachedData(`Category:${productId}`, updatedProduct.categories, "long"); // set the new cats, without waiting
+  }
+
+  response.status(203).json({
     success: true,
     updatedProduct,
   });
@@ -62,23 +79,24 @@ export const updateProductController = catchAsync(async (request, response, next
 export const deleteProductController = catchAsync(async (request, response, next) => {
   const productId = request.params.productId;
 
-  const deletedProduct = await deleteDoc(Product, productId);
-  if (!deletedProduct) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
+  const session = await startSession();
 
-  /* OLD CODE (kept for reference): 
-  const {categories} = deletedProduct as ProductDocument
-  const [_, modelId] = request.Model.modelName.split("-");
-  */
-  await updateProductInCategoryController(deletedProduct.categories, productId, "delete"); /*✅*/
-  /*TODO:
-  await Ranking.deleteOne(deletedDoc.id);
-  console.log("now check Ranking after delete");
-  await Review.deleteMany({ reviewedModel: deletedDoc.id})
-  */
+  const result = await session.withTransaction(async () => {
+    const deletedProduct = await deleteDoc(Product, productId, { session });
+    if (!deletedProduct) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
 
+    await deleteProductFromCategory(deletedProduct.categories, productId, session); /*✅*/
+    await removeRanking(productId, session);
+    await deleteAllResourceReviews(productId, session);
+    
+    return deletedProduct;
+  });
+  
+  removeKeyValuePair(`Product:${productId}`); // remove from cache if exist
+  
   response.status(204).json({
     success: true,
-    deletedProduct,
+    result /*REQUIRES TESTING */,
   });
 });
 

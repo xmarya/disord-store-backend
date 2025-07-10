@@ -32,7 +32,7 @@ export async function updateProduct(storeId: MongoId, productId: MongoId, data: 
       */
     },
     { runValidators: true, new: true } // ensures validation still runs
-  );
+  ).populate({path:"categories", select:"name colour createdBy updatedBy"});
 
   return updatedProduct;
 }

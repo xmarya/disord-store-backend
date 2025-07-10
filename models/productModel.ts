@@ -103,12 +103,12 @@ productSchema.pre("save", function(next) {
 });
 
 // this pre(/^find/) hook is for populating the categories:
-productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
-  console.log("productSchema.pre(/^find/ cat");
-  this.populate({ path: "categories", select: "name colour" });
-  // this.populate({ path: "store", select: "name ranking ratingsAverage ratingsQuantity verified" });
-  next();
-});
+// productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
+//   console.log("productSchema.pre(/^find/ cat");
+//   this.populate({ path: "categories", select: "name colour" });
+//   // this.populate({ path: "store", select: "name ranking ratingsAverage ratingsQuantity verified" });
+//   next();
+// });
 
 // this post(deleteMany) hook is for deleting all of the product's rankings after deleting the store
 // it's a query hook. see: https://mongoosejs.com/docs/middleware.html#naming

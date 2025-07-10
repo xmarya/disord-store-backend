@@ -68,9 +68,9 @@ export async function updateProductInCategories(categories:Array<CategoryBasic>,
 }
 
 // NOTE: this is going to be called when deleting a product permanently.
-export async function deleteProductFromCategory(categories:Array<CategoryBasic>, productId:MongoId) {
+export async function deleteProductFromCategory(categories:Array<CategoryBasic>, productId:MongoId, session:mongoose.ClientSession) {
   console.log("deleteProductFromCategory");
-  await Category.updateMany({_id: {$in: categories}}, {$pull: { products: productId }});
+  await Category.updateMany({_id: {$in: categories}}, {$pull: { products: productId }}).session(session);
   // get all the cats that have this product id,
   // remove the one that is not in the new cats array
   // await Category.find({products: "684ac7b49e4ba6351f4fa89d"});
