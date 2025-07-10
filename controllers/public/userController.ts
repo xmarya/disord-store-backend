@@ -51,7 +51,7 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
 
   response.status(200).json({
     success: true,
-    token,
+    // token,
     /*
       for security reasons, it is preferred to not including it in the response body
       email,
