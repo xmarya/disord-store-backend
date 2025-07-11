@@ -45,9 +45,8 @@ export async function createStore(data: StoreDataBody) {
 }
 
 export async function getStoreWithProducts(storeId: MongoId) {
-  const store = await Store.findById(storeId).populate("owner");
-  const products = await Product.find({ store: storeId });
-
+  const store = await Store.findById(storeId).populate({path: "products", select: "name image price productType description stock discount numberOfPurchases ranking ratingsAverage ratingsQuantity"});
+const products = store?.products;
   return { store, products };
 }
 

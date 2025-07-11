@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 
-export default function jwtSignature(id:string, expiresIn: "1h" | "1ms" ) {
+export default function jwtSignature(id:string, expiresIn: "1h" ) {
     if (!process.env.JWT_SALT) {
         throw new Error("JWT_SALT is not defined");
     }

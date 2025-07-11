@@ -38,5 +38,5 @@ export async function setRanking(Model: Extract<Model, "Store" | "Product">, ses
 export async function removeRanking(resourceId:MongoId, session: mongoose.ClientSession) {
   const deletedResource = await Ranking.findOneAndDelete({resourceId}).session(session);
   if(!deletedResource) return;
-  await setRanking(deletedResource.resource, session);
+  setRanking(deletedResource.resource, session); // run it without blocking the main thread
 }

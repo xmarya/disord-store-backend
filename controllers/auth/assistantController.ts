@@ -7,8 +7,6 @@ import Store from "../../models/storeModel";
 
 export const createAssistantController = catchAsync(async (request, response, next) => {
   console.log("create Assistant Controller");
-  //TODO: check the plan before proceeding
-
   const { permissions } = request.body;
   if (!permissions) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 

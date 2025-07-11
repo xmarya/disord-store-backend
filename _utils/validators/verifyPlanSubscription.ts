@@ -3,7 +3,6 @@ import type { Request, Response, NextFunction } from "express";
 import { AppError } from "../AppError";
 
 export async function verifyPlanSubscription(request: Request, response: Response, next: NextFunction) {
-  console.log("verifyPlanSubscription");
 
   if (!request.isPlanPaid) return next(new AppError(401, "this action is unautorised. you are not subscribed to any plan or haven't paid yet."));
   // has the subscription end?

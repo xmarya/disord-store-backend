@@ -4,12 +4,12 @@ import express from "express";
 import mongoSanitize from "express-mongo-sanitize";
 import ratelimit from "express-rate-limit";
 import {router as userRouter} from "./_routers/public/userRoutes";
-import {router as storeRouter} from "./_routers/public/storeRoutes";
+import {router as storeAndProductRouter} from "./_routers/public/storeAndProductRoutes";
 import { router as dashboardRouter } from "./_routers/dashboard";
 
 
 const app = express();
-app.set("trust proxy", true);
+// app.set("trust proxy", true);
 const limiter = ratelimit({
         max: 100, // #requests per hour.
         windowMs: 60 * 60 * 100, // the calculation of 1 hour.
@@ -31,7 +31,7 @@ app.use(cookieParser()); // the above line parsers the data from the body, this 
 app.use(mongoSanitize());
 app.use(cors());
 
-app.use("/api/v1/stores", storeRouter);
+app.use("/api/v1/public", storeAndProductRouter);
 app.use("/api/v1/auth", userRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 

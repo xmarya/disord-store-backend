@@ -6,6 +6,7 @@ import Plan from "../../models/planModel";
 import StoreAssistant from "../../models/storeAssistantModel";
 import { AppError } from "../AppError";
 import Product from "../../models/productModel";
+import ColourTheme from "../../models/colourThemeModel";
 
 const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
   return async (request: Request, response: Response, next: NextFunction) => {
@@ -32,12 +33,12 @@ const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
         break;
 
       case "ofColourThemes":
-        countOfDocs = 1; /* CHANGE LATER: to actual logic */
+        countOfDocs = await ColourTheme.countDocuments({store: storeId});
         break;
 
-      case "ofShipmentCompanies":
-        countOfDocs = 1; /* CHANGE LATER: to actual logic */
-        break;
+      // case "ofShipmentCompanies":
+      //   countOfDocs = 1; /* CHANGE LATER: to actual logic */
+      //   break;
 
       default:
         return next(new AppError(400, "invalid quotaKey"));
@@ -45,7 +46,7 @@ const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
 
     if (countOfDocs < definedQuota) return next();
 
-    return next(new AppError(403, "you've reached the limit of your plan quota"));
+    return next(new AppError(403, `you've reached the limit of your ${quotaKey.slice(2)} quota`));
   };
 };
 

@@ -63,7 +63,6 @@ export const invoiceSchema = new Schema<InvoiceDocument>(
       type: String,
       required: [true, "the paymentMethod field is required"],
     },
-    releasedAt: Date,
     status: {
       type: String,
       enum: ["successful", "cancelled", "processed", "refunded"],

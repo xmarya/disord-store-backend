@@ -145,8 +145,7 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   // STEP 2) get the to-be-updated fields:
   /*✅*/ const updatedFields = this.getUpdate() as mongoose.UpdateQuery<UserDocument>;
 
-  if (doc.userType !=="storeOwner" || !updatedFields?.subscribedPlanDetails?.subscribeStarts) return next();
-  console.log("this pre(findOneAndUpdate) for accumulating the count in subscriptionsLog", !updatedFields?.subscribedPlanDetails?.subscribeStarts);
+  if (doc.userType !=="storeOwner" || !updatedFields?.subscribedPlanDetails?.subscribeStarts) return next(); // don't enter if the updated fields has nothing to do with the subscription
 
   const { subscribeStarts, planName, paidPrice } = updatedFields.subscribedPlanDetails;
   const logsMap = doc.subscriptionsLog;
@@ -155,7 +154,7 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   const key = lightFormat(subscribeStarts, "yyyy-MM-dd");
   logsMap.set(key, { planName, price: paidPrice }); // JavaScript Map enforces uniqueness of keys, not values.
 
-  // updatedFields.$set = updatedFields.$set ?? {}; since it now behaves as UpdateQuery<T>, not as aggregation pipeline
+  // updatedFields.$set = updatedFields.$set ?? {}; need for this line; since it now behaves as UpdateQuery<T>, not as aggregation pipeline
   updatedFields.$set.subscriptionsLog = logsMap;
   next();
 });
@@ -201,10 +200,11 @@ userSchema.pre("findOneAndUpdate", async function (next) {
 // I decided to make this a virtual field, so it will be created and recalculated each time
 // the data is retrieved which maintains the accuracy of how many days exactly are left.
 userSchema.virtual("planExpiresInDays").get(function () {
-  if (!this.subscribedPlanDetails.subscribeStarts) return 0;
+  console.log("planExpiresInDays");
+  if (!this.subscribedPlanDetails.subscribeStarts) return undefined; // the return 0 causes the planExpiresInDays field to be returned in the doc. using undefined prevents this.
   
   // TODO: corn job to reset subscribeStarts when the subscription ends
-  const days = formatDistanceStrict(this.subscribedPlanDetails.subscribeEnds, this.subscribedPlanDetails.subscribeStarts, { locale: arSA, unit: "day" });
+  const days = formatDistanceStrict(this.subscribedPlanDetails.subscribeEnds, new Date(), { locale: arSA, unit: "day" });
   return days;
   /* OLD CODE (kept for reference): 
   const ms = this.subscribeEnds.getTime() - this.subscribeStarts.getTime();

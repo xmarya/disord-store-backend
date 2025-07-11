@@ -52,7 +52,6 @@ export async function getPlansStatsReport(sortBy: "year" | "profits" | "subscrib
   return { annualReport, totalsReport };
 }
 
-// TODO: this service is going to be called when registering to a plan | renewal a plan | unsubscribing
 export async function updatePlanMonthlyStats(planName: PlansNames, profit: number, operationType: SubscriptionTypes | "cancellation", session: mongoose.ClientSession) {
   /*✅*/
   /* OLD CODE (kept for reference): 

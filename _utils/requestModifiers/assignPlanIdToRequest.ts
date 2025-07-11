@@ -5,7 +5,7 @@ import { AppError } from "../AppError";
 import { catchAsync } from "../catchAsync";
 
 const assignPlanIdToRequest = catchAsync(async (request, response, next) => {
-  console.log("assignPlanIdToRequest");
+  // console.log("assignPlanIdToRequest");
   /* SOLILOQUY: 
     in case the user was an assistant, there is no data about the plan,
     I could only know the storeId through the request.store

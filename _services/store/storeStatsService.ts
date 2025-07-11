@@ -65,7 +65,8 @@ export async function getAllStoresStats(
   return allStats; // return the profits OAT only => [{storeName: "1", totalProfit: 123}, {storeName: "2", totalProfit: 123}]
 }
 /*REQUIRES TESTING*/
-export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $gte: Date; $lte: Date } }, sortBy: "date" | "profits" | "soldProducts" = "date", sortOrder: "desc" | "asc" = "desc") {
+export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $gte: Date; $lte: Date } }, sortBy: "date" | "totalProfits" | "totalSoldProducts" = "date", sortOrder: "desc" | "asc" = "desc") {
+  console.log("getOneStoreStats");
   // NOTE: THIS IS FOR STORE OWNER
   const stats = await StoreStats.aggregate([
     {
@@ -76,7 +77,7 @@ export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $
         // group them by the date AND accumulate the profits and the soleProducts
         _id: "$date",
         totalProfits: { $sum: "$profits" },
-        soldProductMap: { $push: "$soldProducts" }, // accumulate the Map values by pushing it as a whole. (NOTE that it's not "$soldProducts.quantity", no such a property like this. the soldProducts field is now a Map)
+        totalSoldProducts: { $push: "$soldProducts" }, // accumulate the Map values by pushing it as a whole. (NOTE that it's not "$soldProducts.quantity", no such a property like this. the soldProducts field is now a Map)
       },
 
       /* NOTE:
@@ -103,16 +104,28 @@ export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $
         _id: 0,
         date: "$_id",
         totalProfits: 1,
-        soldProductMap: 1,
+        totalSoldProducts: 1,
       },
     },
     { $sort: { [sortBy]: sortOrder === "desc" ? -1 : 1 } },
   ]);
 
-  const formattedStats: Array<{ date: Date; totalSoldProducts: Record<string/*productId*/, number/*quantity*/> }> = stats.map((item) => {
+  // console.log("stttaats", stats);
+
+  /*
+  stttaats => [
+  {
+    totalProfits: 390,
+    totalSoldProducts: [ [Object] ],
+    date: 2025-07-03T08:17:18.354Z
+  }
+]
+  */
+
+  const formattedStats: Array<{ date: Date; totalProfits:number, totalSoldProducts: Record<string /*productId*/, number /*quantity*/> }> = stats.map((item) => {
     const totalForEachProduct: Record<string, number> = {};
 
-    item.soldProductMap.forEach((soldMap: Map<string, number>) => {
+    item.totalSoldProducts.forEach((soldMap: Map<string, number>) => {
       if (!soldMap) return; // in case the original stats was null | undefined, or in case the productsMap was containing such a falsy values (protecting against invalid or missing data).
 
       Object.entries(soldMap).forEach(([productId, quantity]) => {
@@ -123,6 +136,7 @@ export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $
 
     return {
       date: item.date,
+      totalProfits:item.totalProfits,
       totalSoldProducts: totalForEachProduct,
     };
   });
@@ -136,12 +150,13 @@ export async function updateStoreStats(
   profit: number,
   products: Array<{ productId: MongoId; quantity: number }>,
   operationType: "new-purchase" | "cancellation",
-  session: mongoose.ClientSession
+  session: mongoose.ClientSession,
+  operationDate?:{$gte: Date;$lte: Date;},
 ) {
   console.log("updateStoreStats");
-  const now = new Date();
-  const dayStart = startOfDay(now);
-  const dayEnd = endOfDay(now);
+  // const now = new Date();
+  // const dayStart = startOfDay(now);
+  // const dayEnd = endOfDay(now);
 
   const isIncrement = operationType === "new-purchase";
   const profits = isIncrement ? profit : -profit;
@@ -151,17 +166,46 @@ export async function updateStoreStats(
   let soldProductsUpdate: mongoose.UpdateQuery<StoreStatsDocument> = {};
 
   for (const { productId, quantity } of products) {
-    const key = `soldProducts.${productId}`;
+    const key = `soldProducts.${productId}`;// this is a must #2 about Maps in mongoose; without the prefix, mongoose gonna try to update the
+    //  top-level field named after the `productId` instead of a nested key inside soldProducts. 
+    // so basically mongoose gonna thought there's something after/inside/nested after the `productId` if the key was only this.
+    // IN SHORT: I want to update A FIELD WITHIN soldProducts.
     soldProductsUpdate.$inc ??= {};
     soldProductsUpdate.$inc[key] = isIncrement ? quantity : -quantity;
   }
 
-  const updatedStats = await StoreStats.findOneAndUpdate(
-    { store: storeId, date: { $gte: dayStart, $lte: dayEnd } },
+  /*
+  1)  console.log("...[soldProductsUpdate] => ", ...[soldProductsUpdate]); this way doesn't do anything
+
+...[soldProductsUpdate] =>  {
+  '$inc': {
+    '684ac4c648085d1348231248': 1,
+    '684ac76f9e4ba6351f4fa887': 2,
+    '684ac6ed0d7b4453cf566bc5': 2
+  }
+}
+
+2) console.log("soldProductsUpdate.$inc => ", soldProductsUpdate.$inc);
+soldProductsUpdate.$inc =>  {
+  '684ac4c648085d1348231248': 1,
+  '684ac76f9e4ba6351f4fa887': 2,
+  '684ac6ed0d7b4453cf566bc5': 2
+}
+  */
+
+  // console.log("soldProductsUpdate.$inc => ", soldProductsUpdate.$inc);
+
+  let updatedStats;
+  const now = new Date();
+  const $gte = operationDate?.$gte ?? startOfDay(now);
+  const $lte = operationDate?.$lte ?? endOfDay(now);
+  
+ try {
+   updatedStats = await StoreStats.findOneAndUpdate(
+    { store: storeId, date: { $gte, $lte } },
     {
-      soldProductsUpdate,
-      //Or ...soldProductsUpdate, ?
       $inc: {
+        ...soldProductsUpdate.$inc,
         profits,
         numOfPurchases: purchase,
         numOfCancellations: cancellation,
@@ -171,8 +215,13 @@ export async function updateStoreStats(
         date: now,
       },
     },
-    { new: true, upsert: true, setDefaultsOnInsert: true }
-  ).session(session);
+    { new: true, upsert: true, runValidators: true, session }
+  );
+ } catch (error) {
+  console.log(error);
+ }
+
+ if (updatedStats) await updatedStats.validate(); // manually trigger validation; since runValidator option doesn't get triggered with $inc or $setOnInsert
 
   // clean up any quantity with 0 or minus value:
   let cleanedStats;
@@ -189,5 +238,5 @@ export async function updateStoreStats(
   }
 
   // return updatedStats;
-  return cleanedStats;
+  return cleanedStats ?? updatedStats;
 }

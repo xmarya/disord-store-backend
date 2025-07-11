@@ -1,8 +1,7 @@
 import mongoose, { startSession } from "mongoose";
 import { deleteAllAssistants } from "../../_services/assistant/assistantService";
-import { updateDoc } from "../../_services/global";
+import { getOneDocById, updateDoc } from "../../_services/global";
 import { createStore, deleteStore, getStoreWithProducts } from "../../_services/store/storeService";
-import { getOneStoreStats } from "../../_services/store/storeStatsService";
 import { resetStoreOwnerToDefault } from "../../_services/user/userService";
 import { MongoId } from "../../_Types/MongoId";
 import { AppError } from "../../_utils/AppError";
@@ -27,26 +26,6 @@ export const createStoreController = catchAsync(async (request, response, next) 
   response.status(201).json({
     success: true,
     newStore,
-  });
-});
-
-export const getStoreStatsController = catchAsync(async (request, response, next) => {
-  /* BUG: 
-  const { dates } = request.body;
-    this condition WOULD NEVER be wrong, the .length property doesn't assure that the dates is an ARRAY,
-    there is a possibility for it be a string and it has .length property too.
-    if(!dates.length) return next(new AppError(400, "specify the dates inside an array"));
-  */
-
-  const { dateFilter, sortBy, sortOrder } = request.dateQuery;
-  const storeId = request.store;
-
-  const stats = await getOneStoreStats(storeId, dateFilter, sortBy, sortOrder);
-  if (!stats) return next(new AppError(400, "no stats were found for this store"));
-
-  response.status(200).json({
-    success: true,
-    stats,
   });
 });
 
@@ -128,13 +107,13 @@ export async function deleteStorePermanently(storeId: MongoId, session?: mongoos
   //TODO: add the deleted data to the AdminLog
 }
 
-export const previewStoreWithProducts = catchAsync(async (request, response, next) => {
+export const getMyStoreController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
-  const { store, products } = await getStoreWithProducts(storeId);
+  // const { store } = await getStoreWithProducts(storeId);
+  const store = await getOneDocById(Store, storeId);
 
   response.status(200).json({
     success: true,
     store,
-    products,
   });
 });

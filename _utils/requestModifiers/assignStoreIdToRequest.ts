@@ -4,7 +4,7 @@ import { AppError } from "../AppError";
 import { catchAsync } from "../catchAsync";
 
 export const assignStoreIdToRequest = catchAsync(async (request, response, next) => {
-  console.log("assignStoreIdToRequest");
+  // console.log("assignStoreIdToRequest");
   if (request.user.userType !== "storeOwner" && request.user.userType !== "storeAssistant") return next(new AppError(403, "غير مصرح لك الوصول للصفحة"));
 
   let storeId;

@@ -20,8 +20,6 @@ const getUserFromPayload = catchAsync(async (request, response, next) => {
   }
 
   request.user = user;
-  console.log("after protecting");
-
   next();
 });
 
