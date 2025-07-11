@@ -9,7 +9,7 @@ import { router as dashboardRouter } from "./_routers/dashboard";
 
 
 const app = express();
-app.set("trust proxy", true);
+// app.set("trust proxy", true);
 const limiter = ratelimit({
         max: 100, // #requests per hour.
         windowMs: 60 * 60 * 100, // the calculation of 1 hour.
