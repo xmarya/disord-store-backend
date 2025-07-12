@@ -32,7 +32,7 @@ export const createStoreController = catchAsync(async (request, response, next) 
 export const updateMyStoreController = catchAsync(async (request, response, next) => {
   // only allow storeName, description, logo
   const { storeName, description }: StoreDataBody = request.body;
-  if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "request.body has no data to update"));
+  if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "request.body must contain the storeName description"));
 
   const storeId = request.store;
   if (!storeId) return next(new AppError(400, "Couldn't find request.user.myStore"));
