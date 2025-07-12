@@ -27,6 +27,7 @@ export const router = express.Router();
 router.get("/logout", logout); // NOTE: keep this before the validateJwtToken and getUserFromPayload middlewares
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
+router.use("/subscriptions", restrict("storeOwner"), subscriptionsRouter);
 router.post("/new-store", restrict("storeOwner"), sanitisedData, createStoreController);
 router.use("/settings", settingsRouter)
 router.use("/me", userRouter);
@@ -34,7 +35,6 @@ router.use("/admin", adminRouter);
 router.use("/platform/reviews", platformReviewsRouter);
 
 router.use(assignStoreIdToRequest, assignPlanIdToRequest, verifyPlanSubscription);
-router.use("/subscriptions", subscriptionsRouter);
 
 router.use("/store", storeRouter);
 router.use("/products", productRouter);
