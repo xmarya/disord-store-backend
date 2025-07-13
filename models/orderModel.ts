@@ -50,25 +50,27 @@ export const OrderSchema = new Schema<IOrder>(
     totalPrice: { type: Number, required: true },
     couponCode: { type: String },
     paymentMethod: { type: String, enum: ["COD", "Paymob"], required: true },
-    status: { 
-      type: String, 
-      enum: ["Pending", "Paid", "Shipped", "Delivered", "Cancelled", "Available", "Returned", "On the Way to You", "Return in Progress"], 
-      default: "Pending" 
+    status: {
+      type: String,
+      enum: ["Pending", "Paid", "Shipped", "Delivered", "Cancelled", "Available", "Returned", "On the Way to You", "Return in Progress"],
+      default: "Pending",
     },
     totalWeight: { type: Number, default: 0 },
     transaction_id: { type: String },
     paymentIntentionId: { type: String },
+    trackingNumber: { type: String },
+    shipmentCompany: { type: String },
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
 
 // Physical logic
-OrderSchema.pre('validate', function(next) {
+OrderSchema.pre("validate", function (next) {
   if (this.isNew && this.isDigital) {
-    this.status = 'Available';
+    this.status = "Available";
     this.totalWeight = 0;
-    this.shippingAddress = undefined; 
+    this.shippingAddress = undefined;
   }
   next();
 });
