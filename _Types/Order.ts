@@ -1,4 +1,5 @@
-import mongoose, { Document } from "mongoose";
+import { Document } from "mongoose";
+import { MongoId } from "./MongoId";
 
 export interface Address {
   email: string;
@@ -14,8 +15,8 @@ export interface Address {
 }
 
 export interface IOrderItem {
-  productId: mongoose.Types.ObjectId;
-  storeId: mongoose.Types.ObjectId;
+  productId: MongoId;
+  storeId: MongoId;
   name: string;
   price: number;
   discountedPrice: number;
@@ -26,8 +27,8 @@ export interface IOrderItem {
 }
 
 export interface IOrder extends Document {
-  _id: mongoose.Types.ObjectId;
-  userId: mongoose.Types.ObjectId;
+  _id: MongoId;
+  userId: MongoId;
   orderNumber: string;
   items: IOrderItem[];
   shippingAddress?: Address; // Optional for digital products

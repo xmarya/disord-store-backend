@@ -27,7 +27,7 @@ export const ProcessOrderItems = async (
   const productIds = items.map((item) => item.productId);
   const products = await Product.find({ _id: { $in: productIds } }).session(session); // the store field is populated. check productSchema.pre(/^find/ hook.
 
-  const productMap = new Map(products.map((p) => [p._id.toString(), p]));
+  const productMap = new Map(products.map((p) => [p.id, p])); // changed from p._it.tostring() to the id, which is the string version. _id is Object and id is string
 
   if (products.length === 0) throw new Error("No products found");
 
@@ -68,8 +68,8 @@ export const ProcessOrderItems = async (
     }
 
     processedItems.push({
-      productId: product._id,
-      storeId: product.store._id,
+      productId: product.id, // changed from _id to id, which is the string version
+      storeId: product.store,// the store is not populated so it's safe to use it without specifying the id. still needs testing though
       name: product.name,
       price: product.price,
       discountedPrice: RoundToTwo(discountedPrice / item.quantity),
