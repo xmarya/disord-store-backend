@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import { Address } from "./UserAddress";
 import { PlansNames } from "./Plan";
 import { MongoId } from "./MongoId";
-import { CreditCardDocument } from "./UserCreditCard";
 
 type Credentials = {
   password: string;
