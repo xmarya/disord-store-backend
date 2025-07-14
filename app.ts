@@ -1,12 +1,11 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express from "express";
+import express, { ErrorRequestHandler } from "express";
 import mongoSanitize from "express-mongo-sanitize";
 import ratelimit from "express-rate-limit";
 import {router as userRouter} from "./_routers/public/userRoutes";
 import {router as storeAndProductRouter} from "./_routers/public/storeAndProductRoutes";
 import { router as dashboardRouter } from "./_routers/dashboard";
-import type {Request, Response, NextFunction, Errback} from "express"
 
 
 const app = express();
@@ -35,6 +34,15 @@ app.use(cors());
 app.use("/api/v1/public", storeAndProductRouter);
 app.use("/api/v1/auth", userRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
+
+app.use(((error, request, response, next) => {
+  
+  response.status(error.statusCode).json({
+    success: false,
+    message: error.message
+  });
+
+}) as ErrorRequestHandler); // ok
 
 
 export default app;
