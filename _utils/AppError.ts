@@ -1,12 +1,12 @@
 // handles edge-cases
 export class AppError extends Error {
-  StatusCode: number;
+  statusCode: number;
   status: string;
   isOperational: boolean;
-  constructor(StatusCode: number, message: string) {
+  constructor(statusCode: number, message: string) {
     super(message);
-    this.StatusCode = StatusCode;
-    this.status = `${StatusCode}`.startsWith("4") ? "fail" : "error";
+    this.statusCode = statusCode;
+    this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
     this.isOperational = true;
     //currentObj, AppError class itself
     Error.captureStackTrace(this, this.constructor);

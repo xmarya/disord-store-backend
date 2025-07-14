@@ -35,6 +35,21 @@ app.use("/api/v1/public", storeAndProductRouter);
 app.use("/api/v1/auth", userRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 
+app.use((error, request, response, next) => {
+  console.error("🔥 ERROR:", error);
+  next(error);
+});
+app.use((error, request, response, next) => {
+  console.error(response); // You can comment this out in production
+
+  const statusCode = error.statusCode || 500;
+  const message = error.message || "Internal server error";
+
+  response.status(statusCode).json({
+    status: "error",
+    message,
+  });
+});
 
 
 export default app;
