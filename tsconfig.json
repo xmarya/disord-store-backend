@@ -116,5 +116,6 @@
     "typeRoots": ["./node_modules/@types", "./_Types/*"],
     "outDir": "dist"
   },
-  "include": ["./**/*"]
+  "include": ["./**/*"],
+  "exclude": ["./old", ".meantToBeDeleted.ts"]
 }
