@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node ./dist/index.cjs",
     "dev": "nodemon --watch ./**/*.ts --ext ts --exec tsx server.ts",
-    "build": "webpack"
+    "build": "webpack --config webpack.config.js"
   },
   "keywords": [],
   "author": "",
