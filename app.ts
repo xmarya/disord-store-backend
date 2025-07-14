@@ -6,6 +6,7 @@ import ratelimit from "express-rate-limit";
 import {router as userRouter} from "./_routers/public/userRoutes";
 import {router as storeAndProductRouter} from "./_routers/public/storeAndProductRoutes";
 import { router as dashboardRouter } from "./_routers/dashboard";
+import type {Request, Response, NextFunction, Errback} from "express"
 
 
 const app = express();
@@ -34,22 +35,6 @@ app.use(cors());
 app.use("/api/v1/public", storeAndProductRouter);
 app.use("/api/v1/auth", userRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
-
-app.use((error, request, response, next) => {
-  console.error("🔥 ERROR:", error);
-  next(error);
-});
-app.use((error, request, response, next) => {
-  console.error(response); // You can comment this out in production
-
-  const statusCode = error.statusCode || 500;
-  const message = error.message || "Internal server error";
-
-  response.status(statusCode).json({
-    status: "error",
-    message,
-  });
-});
 
 
 export default app;
