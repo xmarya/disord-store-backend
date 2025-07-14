@@ -1,6 +1,4 @@
 import { InvoiceDataBody } from "../../_Types/Invoice";
-import { setKeyValuePair } from "../redisOperations/redisBasicFormat";
-import { setJSON } from "../../old/redisJSON";
 import { createIdsSet } from "../redisOperations/redisSet";
 import { setCachedData } from "./globalCache";
 
