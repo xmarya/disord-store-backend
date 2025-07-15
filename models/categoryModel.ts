@@ -50,7 +50,6 @@ categorySchema.pre("findOneAndDelete", async function (next) {
 });
 */
 categorySchema.index({ name: 1, store: 1 }, { unique: true }); /*✅*/
-categorySchema.index({store:1});
 /* categorySchema.index({ name: 1, products: 1 }, { unique: true });  doesn't work with arrays */
 
 // this post(findOneAndDelete) is one a category document is deleted
