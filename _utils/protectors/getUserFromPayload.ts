@@ -1,6 +1,4 @@
 import { getOneDocById } from "../../_services/global";
-import { AdminDocument } from "../../_Types/admin/AdminUser";
-import { UserDocument } from "../../_Types/User";
 import Admin from "../../models/adminModel";
 import User from "../../models/userModel";
 import { AppError } from "../AppError";
