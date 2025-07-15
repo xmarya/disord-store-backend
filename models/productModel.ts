@@ -92,6 +92,7 @@ const productSchema = new Schema(
 
 productSchema.index({ name: 1, store: 1 }, { unique: true });
 productSchema.index({ ranking: 1 });
+productSchema.index({store:1});
 
 // this pre("save") hook is for adding the tax to the product price
 productSchema.pre("save", function(next) {

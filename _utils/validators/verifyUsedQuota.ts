@@ -7,6 +7,15 @@ import StoreAssistant from "../../models/storeAssistantModel";
 import { AppError } from "../AppError";
 import Product from "../../models/productModel";
 import ColourTheme from "../../models/colourThemeModel";
+import mongoose from "mongoose";
+import { MongoId } from "../../_Types/MongoId";
+
+async function getDocsCount<T extends mongoose.Document>(Model: mongoose.Model<T>, condition: Record<string, MongoId>) {
+  const result: Array<{ countOfDocs: number }> = await Model.aggregate([{ $match: condition }, { $count: "countOfDocs" }]);
+  const countOfDocs: number = result.length === 0 ? 0 : result[0].countOfDocs;
+
+  return countOfDocs;
+}
 
 const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
   return async (request: Request, response: Response, next: NextFunction) => {
@@ -21,19 +30,19 @@ const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
 
     switch (quotaKey) {
       case "ofProducts":
-        countOfDocs = await Product.countDocuments({ store: storeId });
+        countOfDocs = await getDocsCount(Product, { store: storeId });
         break;
 
       case "ofCategories":
-        countOfDocs = await Category.countDocuments({ store: storeId });
+        countOfDocs = await getDocsCount(Category, { store: storeId });
         break;
 
       case "ofStoreAssistants":
-        countOfDocs = await StoreAssistant.countDocuments({ inStore: storeId });
+        countOfDocs = await getDocsCount(StoreAssistant, { inStore: storeId });
         break;
 
       case "ofColourThemes":
-        countOfDocs = await ColourTheme.countDocuments({store: storeId});
+        countOfDocs = await getDocsCount(ColourTheme, { store: storeId });
         break;
 
       // case "ofShipmentCompanies":
@@ -44,6 +53,7 @@ const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
         return next(new AppError(400, "invalid quotaKey"));
     }
 
+    /* countOfDocs could be undefined in case there are no docs were found, which means no docs related to that store */
     if (countOfDocs < definedQuota) return next();
 
     return next(new AppError(403, `you've reached the limit of your ${quotaKey.slice(2)} quota`));

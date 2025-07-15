@@ -9,6 +9,7 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      unique: [true, "make sure this assistant id is not registered for another store"]
     },
     inStore: {
       type: Schema.Types.ObjectId,
@@ -63,6 +64,8 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
     toObject: { virtuals: true },
   }
 );
+
+storeAssistantSchema.index({inStore: 1});
 
 const StoreAssistant =
   model<StoreAssistantDocument, StoreAssistantModel>(

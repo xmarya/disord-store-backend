@@ -42,7 +42,7 @@ export const storeStatsSchema = new Schema<StoreStatsDocument>(
 );
 
 storeStatsSchema.index({ store: 1, date: 1 });
-
+storeStatsSchema.index({store:1});
 
 storeStatsSchema.pre(/^find/, function (this: mongoose.Query<any, StoreStatsDocument>, next) {
   this.populate({
