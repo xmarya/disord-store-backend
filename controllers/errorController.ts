@@ -6,11 +6,11 @@ function formatErrorResponse(error: AppError & { code: number | undefined }): { 
   if (code === 11000) return { statusCode: 400, message: `لا يمكن إضافة قيمة موجودة مسبقًا` };
   if (name === "CastError") return { statusCode: 400, message: "نوع المدخلات خاطئة" };
   if (name === "TokenExpiredError") return { statusCode: statusCode || 401, message: "انتهت مدة الجلسة. الرجاء تسجيل الدخول" };
-  else return { statusCode: 500, message: error.message || "حدث خطأ أثناء معالجة العملية. الرجاء المحاولة مجددًا" };
+  else return { statusCode: statusCode || 500, message: error.message || "حدث خطأ أثناء معالجة العملية. الرجاء المحاولة مجددًا" };
 }
 
 const errorController: ErrorRequestHandler = (error: AppError & { code: number | undefined }, request, response, next) => {
-  console.log("errorController");
+  console.log("errorController", error);
   //   const {name, message:errorMessage} = error;
   //   console.log(name, errorMessage, error?.code);
   const { message, statusCode } = formatErrorResponse(error);
