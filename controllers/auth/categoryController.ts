@@ -26,11 +26,12 @@ export const createCategoryController = catchAsync(async (request, response, nex
 });
 
 export const getAllCategoriesController = catchAsync(async (request, response, next) => {
-  const categories = await getAllDocs(Category, request);
+  const categories = await getAllDocs(Category, request, {condition: {store:request.store}});
   if (!categories) return next(new AppError(404, "لا يوجد فئات في هذا المتجر"));
 
   response.status(200).json({
     success: true,
+    results: categories.length,
     categories,
   });
 });
@@ -39,8 +40,7 @@ export const getCategoryController = catchAsync(async (request, response, next) 
   // const category = await getOneDocById(Category, request.params.categoryId);
   // another way of doing it. it is not a duplicated step for hasAuthorisation middleware.
   // without this extra condition the user can use a categoryId of a different store and still can get it
-  const category = getOneDocByFindOne(Category, { condition: { _id: request.params.categoryId, store: request.store } });
-
+  const category = await getOneDocByFindOne(Category, { condition: { id:request.params.categoryId, store:request.store } });
   if (!category) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
 
   response.status(200).json({
