@@ -27,7 +27,6 @@ export const adminLoginController = catchAsync(async (request, response, next) =
 });
 
 export const confirmAdminChangePassword = catchAsync(async (request, response, next) => {
-  console.log("confirmUserChangePassword");
 
   const adminId = request.user.id;
   const { currentPassword, newPassword } = request.body;

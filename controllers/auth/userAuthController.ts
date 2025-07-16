@@ -40,7 +40,6 @@ export const getMySubscriptionsLogController = catchAsync(async (request, respon
 });
 
 export const confirmUserChangePassword = catchAsync(async (request, response, next) => {
-  console.log("confirmUserChangePassword");
 
   const userId = request.user.id;
   const { currentPassword, newPassword } = request.body;

@@ -254,8 +254,6 @@ userSchema.pre("save", async function (next) {
   if (!this.isNew && this.credentials && this.isModified("credentials.password")) {
     this.credentials.password = await bcrypt.hash(this.credentials.password, HASHING_SALT);
     this.credentials.passwordChangedAt = new Date();
-    console.log(`pre save hook if for forget/rest password`, this.credentials);
-    console.log("DONE ✅");
   }
 
   next();

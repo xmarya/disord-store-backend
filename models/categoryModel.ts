@@ -54,7 +54,6 @@ categorySchema.index({ name: 1, store: 1 }, { unique: true }); /*✅*/
 
 // this post(findOneAndDelete) is one a category document is deleted
 categorySchema.post("findOneAndDelete", async function (deletedDoc) {
-  console.log("categorySchema.post(findOneAndDelete)");
   if (deletedDoc) {
     // await Promise.all([
     // Store.findByIdAndUpdate({ _id: deletedDoc.store }, { $pull: { categories: deletedDoc._id } }),

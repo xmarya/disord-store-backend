@@ -10,10 +10,8 @@ import Product from "../../models/productModel";
 import { categoriesInCache } from "./categoryController";
 import { removeRanking } from "../../_services/ranking/rankingService";
 import { deleteAllResourceReviews } from "../../_services/review/reviewService";
-import { removeKeyValuePair } from "../../_utils/redisOperations/redisBasicFormat";
 
 export const createProductController = catchAsync(async (request, response, next) => {
-  /*REQUIRES TESTING*/
   const { categories } = request.body;
   if (categories && categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array")); /*✅*/
 
