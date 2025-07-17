@@ -81,13 +81,13 @@ export async function categoriesInCache(productId: MongoId): Promise<CategoryBas
   let categories;
 
   // STEP 1) look in cache:
-  categories = await getCachedData<CategoryBasic[]>(`Categories:${productId}`);
+  categories = await getCachedData<CategoryBasic[]>(`Category:${productId}`);
   console.log("from cache", categories?.length);
   // STEP 2) nothing? get from db:
   if (!categories) {
     categories = await getAllProductCategories(productId);
     console.log("from db", categories?.length);
-    setCachedData(`Categories:${productId}`, categories, "long");
+    setCachedData(`Category:${productId}`, categories, "long");
   }
 
   return categories;
