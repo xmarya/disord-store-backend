@@ -1,6 +1,6 @@
 import { AdminDocument } from "../../_Types/admin/AdminUser";
 import { UserDocument } from "../../_Types/User";
-import { setCachedData } from "./globalCache";
+import { setCompressedCachedData } from "./globalCache";
 
 async function cacheUser(user: UserDocument | AdminDocument) {
   const data = {
@@ -18,7 +18,7 @@ async function cacheUser(user: UserDocument | AdminDocument) {
 
   console.log("data before setCachedData", data);
 
-  setCachedData(`User:${data.id}`, data, "user-ttl");
+  setCompressedCachedData(`User:${data.id}`, data, "one-hour");
 }
 
 export default cacheUser;

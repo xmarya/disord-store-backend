@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { getCachedData } from "./globalCache";
+import { getDecompressedCachedData } from "./globalCache";
 
 type CacheKeys = "Product:query" | "Store:query" | "Products:store";
 
@@ -17,7 +17,7 @@ function buildCacheKey(cacheKey: CacheKeys, request: Request): string {
 const checkCache = (cacheKey: CacheKeys) => {
   return async (request: Request, response: Response, next: NextFunction) => {
     const key = buildCacheKey(cacheKey, request);
-    const data = await getCachedData(key);
+    const data = await getDecompressedCachedData(key);
 
     if (!data) return next();
 

@@ -1,17 +1,11 @@
-import { REDIS_LONG_TTL, REDIS_SHORT_TTL, REDIS_USER_TTL } from "../../_data/constants";
-import { RedisTTL, TTLMap } from "../../_Types/RedisCache";
+import { ttl } from "../../_data/constants";
+import { RedisTTL } from "../../_Types/RedisCache";
 import { compressJSON, decompressJSON } from "../compression";
 import { getKeyValuePair, removeKeyValuePair, setKeyValuePair } from "../redisOperations/redisBasicFormat";
 import { getIdsSet, removeIdFromSet } from "../redisOperations/redisSet";
 
-const ttl:TTLMap = {
-  "long": REDIS_LONG_TTL,
-  "short": REDIS_SHORT_TTL,
-  "user-ttl": REDIS_USER_TTL,
-  "no-ttl": undefined,
-};
 
-export async function setCachedData(key: string, data: object, TTL: RedisTTL) {
+export async function setCompressedCachedData(key: string, data: object, TTL: RedisTTL) {
   console.log("global setcacheData");
 
   // const REDIS_TTL = TTL === "long" ? REDIS_LONG_TTL : TTL === "short" ? REDIS_SHORT_TTL : undefined;
@@ -20,7 +14,7 @@ export async function setCachedData(key: string, data: object, TTL: RedisTTL) {
   return result;
 }
 
-export async function getCachedData<T>(key: string): Promise<T | null> {
+export async function getDecompressedCachedData<T>(key: string): Promise<T | null> {
   console.log("global getCachedData");
   const { data } = await getKeyValuePair(key);
   if(!data) return null;
@@ -39,7 +33,7 @@ export async function getAllCachedData<T>(key:string):Promise<T[]> {
   const allData:T[] = [];
 
   for(let index = 0; index < allIds.length; index++) {
-    const orgData = await getCachedData<T>(`${key}:${allIds[index]}`);
+    const orgData = await getDecompressedCachedData<T>(`${key}:${allIds[index]}`);
 
     if(orgData) { // STEP 4) if the original data isn't null, push, then delete it along with its id from the cache: 
       allData.push(orgData);
