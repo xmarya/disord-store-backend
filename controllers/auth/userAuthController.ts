@@ -11,6 +11,8 @@ import formatSubscriptionsLogs from "../../_utils/queryModifiers/formatSubscript
 import User from "../../models/userModel";
 import { deleteStorePermanently } from "./storeControllers";
 import mongoose from "mongoose";
+import cacheUser from "../../_utils/cacheControllers/user";
+import { removeFromCache } from "../../_utils/cacheControllers/globalCache";
 
 export const getUserProfile = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -78,6 +80,8 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
 
   const updatedUser = await updateDoc(User, userId, request.body);
 
+  // update the cached data:
+  updatedUser && cacheUser(updatedUser);
   response.status(203).json({
     success: true,
     updatedUser,
@@ -108,6 +112,7 @@ export const deleteUserAccountController = catchAsync(async (request, response, 
 });
 
 export function logout(request: Request, response: Response) {
+  removeFromCache(`User:${request.user.id}`);
   response.clearCookie("jwt");
   response.setHeader("Clear-Site-Data", "cookies"); // for browsers
   response.status(200).json({ success: true, message: "you've logged-out" });

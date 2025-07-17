@@ -1,5 +1,6 @@
 import { getOneDocByFindOne, getOneDocById, updateDoc } from "../../../_services/global";
 import { AppError } from "../../../_utils/AppError";
+import cacheUser from "../../../_utils/cacheControllers/user";
 import { catchAsync } from "../../../_utils/catchAsync";
 import jwtSignature from "../../../_utils/jwtToken/generateSignature";
 import tokenWithCookies from "../../../_utils/jwtToken/tokenWithCookies";
@@ -10,7 +11,7 @@ export const adminLoginController = catchAsync(async (request, response, next) =
   const { email, password } = request.body;
   if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
-  const admin = await getOneDocByFindOne(Admin, { condition: { email }, select: ["credentials"] });
+  const admin = await getOneDocByFindOne(Admin, { condition: { email } });
   if (!admin) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   console.log("adminLoginController", admin);
@@ -20,6 +21,7 @@ export const adminLoginController = catchAsync(async (request, response, next) =
   const token = jwtSignature(admin.id, "1h");
   tokenWithCookies(response, token);
 
+  cacheUser(admin);
   response.status(200).json({
     success: true,
     // token,

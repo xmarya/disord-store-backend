@@ -1,6 +1,7 @@
 import { createDoc, getOneDocByFindOne } from "../../_services/global";
 import { UserDocument } from "../../_Types/User";
 import { AppError } from "../../_utils/AppError";
+import cacheUser from "../../_utils/cacheControllers/user";
 import { catchAsync } from "../../_utils/catchAsync";
 import jwtSignature from "../../_utils/jwtToken/generateSignature";
 import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
@@ -36,10 +37,9 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   /*✅*/
   // STEP 1) getting the provided email and password from the request body to check the email:
   const { email, password } = request.body;
-  console.log("credentialsLogin");
   if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
-  const user = await getOneDocByFindOne(User, { condition: { email }, select: ["credentials"] });
+  const user = await getOneDocByFindOne(User, { condition: { email }, select: ["credentials", "firstName", "lastName", "userType", "subscribedPlanDetails", "myStore", "image"] });
   if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   // STEP 2) checking the password:
@@ -48,6 +48,9 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   //STEP 3) create the token:
   const token = jwtSignature(user.id, "1h");
   tokenWithCookies(response, token);
+
+  // STEP 4) caching without awaiting
+  cacheUser(user);
 
   response.status(200).json({
     success: true,
