@@ -9,6 +9,7 @@ import { getSubscriptionType } from "../../_utils/getSubscriptionType";
 import { startSubscription } from "../../_utils/startSubscription";
 import Plan from "../../models/planModel";
 import User from "../../models/userModel";
+import cacheUser from "../../_utils/cacheControllers/user";
 
 export const createNewSubscribeController = catchAsync(async (request, response, next) => {
   /*✅*/
@@ -58,17 +59,21 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
 
   if (trialOver) return next(new AppError(400, "the 10 days limit for cancellation is over"));
 
-  let updatedUser;
   const session = await startSession();
-  await session.withTransaction(async () => {
+  const updatedUser = await session.withTransaction(async () => {
     //TODO: add an admin log
     await updatePlanMonthlyStats(subscribedPlanDetails.planName, subscribedPlanDetails.paidPrice, "cancellation", session);
-    await updateDoc(User, userId, { $unset: { subscribedPlanDetails: "" } }, { session });
+    const updatedUser = await updateDoc(User, userId, { $unset: { subscribedPlanDetails: "" } }, { session });
 
-    //TODO: refund the money using the User's bank account.
+    return updatedUser;
   });
 
   await session.endSession();
+
+  //TODO: refund the money using the User's bank account.
+
+  updatedUser && cacheUser(updatedUser);
+  console.log("the returned user from th transaction", updatedUser);
 
   request.planExpiryDate = new Date();
   request.isPlanPaid = false;
