@@ -17,7 +17,7 @@ export const forgetPassword = (Model: Extract<Model, "Admin" | "User">) =>
 
     if (user.id) {
       //STEP 2) generate random token and the reset URL:
-      randomToken = await generateRandomToken(user);
+      randomToken = await generateRandomToken(user, "forgetPassword");
       resetURL = `${request.protocol}://${request.get("host")}/api/v1/auth/resetPassword/${randomToken}`;
     }
 

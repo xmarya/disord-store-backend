@@ -5,13 +5,15 @@ import { createNewDiscordUser, createNewStoreOwnerController, createNewUserContr
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
 import { resetPassword } from "../../_utils/passwords/resetPassword";
 import { forgetPassword } from "../../_utils/passwords/forgetPassword";
+import confirmUserEmail from "../../_utils/email/confirmUserEmail";
 
 export const router = express.Router();
-
+console.log("usersRoute");
 router.use(sanitisedData);
 router.post("/user-signup", validateNewUserData, createNewUserController);
 router.post("/storeOwner-signup", validateNewUserData, createNewStoreOwnerController);
 router.post("/login", credentialsLogin);
 router.post("/discord", createNewDiscordUser);
+router.patch("/confirmEmail/:randomToken", validateRequestParams("randomToken"), confirmUserEmail);/*REQUIRES TESTING*/
 router.patch("/resetPassword/:randomToken", validateRequestParams("randomToken"), resetPassword("User")); /*REQUIRES TESTING*/
 router.post("/forgetPassword", forgetPassword("User"));

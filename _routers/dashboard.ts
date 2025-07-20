@@ -21,12 +21,15 @@ import sanitisedData from "../_utils/validators/sanitisedData";
 import { createStoreController } from "../controllers/auth/storeControllers";
 import { testInvoiceController } from "../controllers/auth/invoiceController";
 import refreshToken from "../_utils/jwtToken/refreshToken";
+import assignFromCacheToRequest from "../_utils/requestModifiers/assignFromCacheToRequest";
+import { sendConfirmationEmail } from "../_utils/email/sendConfirmationEmail";
 
 export const router = express.Router();
 
 router.get("/logout", logout); // NOTE: keep this before the validateJwtToken and getUserFromPayload middlewares
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
+router.post("/emailConfirmation", sendConfirmationEmail);
 router.use("/subscriptions", restrict("storeOwner"), subscriptionsRouter);
 router.post("/new-store", restrict("storeOwner"), sanitisedData, createStoreController);
 router.use("/settings", settingsRouter)
@@ -34,7 +37,7 @@ router.use("/me", userRouter);
 router.use("/admin", adminRouter);
 router.use("/platform/reviews", platformReviewsRouter);
 
-router.use(assignStoreIdToRequest, assignPlanIdToRequest, verifyPlanSubscription);
+router.use(assignFromCacheToRequest,assignStoreIdToRequest, assignPlanIdToRequest, verifyPlanSubscription);
 
 router.use("/store", storeRouter);
 router.use("/products", productRouter);
