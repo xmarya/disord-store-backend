@@ -1,6 +1,6 @@
 import { AdminDocument } from "../../_Types/admin/AdminUser";
 import { UserDocument } from "../../_Types/User";
-import { setCompressedCachedData } from "./globalCache";
+import { setCompressedCacheData } from "./globalCache";
 
 async function cacheUser(user: UserDocument | AdminDocument) {
   const data = {
@@ -9,16 +9,18 @@ async function cacheUser(user: UserDocument | AdminDocument) {
     firstName: user.firstName,
     lastName: user.lastName,
     image: user.image,
-    ...(user.userType === "storeOwner" && { emailConfirmed: user.credentials.emailConfirmed, subscribedPlanDetails: user.subscribedPlanDetails, discord: user.discord, myStore: user?.myStore }),
+    email:user.email,
+    emailConfirmed: user.credentials.emailConfirmed,
+    ...(user.userType === "storeOwner" && { subscribedPlanDetails: user.subscribedPlanDetails, myStore: user.myStore }),
     // TRANSLATE: the reason behind HOW TS COULD INFER THE RIGHT PART IN THE LINE ABOVE once I did user.userType === "storeOwner"
     // is because in AdminDocument I did explicitly set the userType to be "admin".
     // so, if the user.userType === "storeOwner" is true, then that denies the possibility of the user being of type AdminDocument,
     // leaving us with the other type
   };
 
-  console.log("data before setCachedData", data);
+  // console.log("data before setCachedData", data);
 
-  setCompressedCachedData(`User:${data.id}`, data, "one-hour");
+  setCompressedCacheData(`User:${data.id}`, data, "one-hour");
 }
 
 export default cacheUser;

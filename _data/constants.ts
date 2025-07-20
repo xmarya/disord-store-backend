@@ -14,7 +14,8 @@ export const SUBSCRIPTION_PERIOD = 30;
 export const PLAN_TRIAL_PERIOD = 10;
 
 export const REDIS_ONE_HOUR_TTL = 3600; // 1 hour, like the JWT_EXPIRING_TIME
-export const REDIS_LONG_TTL = 300; // 5 minutes
+// export const REDIS_LONG_TTL = 300; // 5 minutes
+export const REDIS_LONG_TTL = 900; // 15 minutes
 export const REDIS_SHORT_TTL = 90; // minute and half. used for stores' stats
 
 export const ttl: TTLMap = {

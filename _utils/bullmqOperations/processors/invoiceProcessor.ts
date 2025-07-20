@@ -1,8 +1,8 @@
-import { ms } from "../../_data/constants";
-import { createNewInvoices } from "../../_services/invoice/invoiceService";
-import { InvoiceDocument } from "../../_Types/Invoice";
-import bullmq from "../../_config/bullmq";
-import { getAllCachedData } from "../cacheControllers/globalCache";
+import { ms } from "../../../_data/constants";
+import { createNewInvoices } from "../../../_services/invoice/invoiceService";
+import { InvoiceDocument } from "../../../_Types/Invoice";
+import bullmq from "../../../_config/bullmq";
+import { getAllCachedData } from "../../cacheControllers/globalCache";
 
 const { queue } = await bullmq("Invoice", invoiceWriteProcessor);
 
@@ -15,7 +15,7 @@ async function invoiceBullMQ() {
 
 async function invoiceWriteProcessor() {
   console.log("invoiceWriteProcessor");
-  const key = "invoices";
+  const key = "Invoices";
 
   // const invoices = await getAllJSON<InvoiceDocument>(key);
   const invoices = await getAllCachedData<InvoiceDocument>(key);

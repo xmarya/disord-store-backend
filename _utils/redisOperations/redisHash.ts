@@ -24,5 +24,5 @@ export async function getHash<T>(hashKey: string, field?: string): Promise<T | n
 }
 
 export async function deleteHash(hashKey: string) {
-  return { result: Boolean(await redis.hdel(hashKey)) };
+  return { result: Boolean(await redis.del(hashKey)) };
 }
