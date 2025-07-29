@@ -4,7 +4,7 @@ import User from "../../models/userModel";
 import { AppError } from "../AppError";
 import { catchAsync } from "../catchAsync";
 import { generateRandomToken } from "../generateRandomToken";
-import { setHash } from "../redisOperations/redisHash";
+import { createRedisHash } from "../redisOperations/redisHash";
 
 export const sendConfirmationEmail = catchAsync(async (request, response, next) => {
   const { userType } = request.user;
@@ -33,11 +33,11 @@ export const sendConfirmationEmail = catchAsync(async (request, response, next) 
 
   const key = `Email:${randomToken.slice(0, 12)}`;
   const data = {
-    id:user.id,
-    userType:request.user.userType
-  }
+    id: user.id,
+    userType: request.user.userType,
+  };
 
-  setHash(key, data, "long");
+  await createRedisHash(key, data, "one-hour");
 
   response.status(200).json({
     success: true,
