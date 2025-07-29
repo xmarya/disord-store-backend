@@ -7,15 +7,12 @@ import { getAllCachedData } from "../../cacheControllers/globalCache";
 const { queue } = await bullmq("Invoice", invoiceWriteProcessor);
 
 async function invoiceBullMQ() {
-  console.log("invoiceBullMQ");
-
   // STEP 1) add job to the queue:
   await queue.add("dbWriteBatch", {}, { repeat: { every: 2 * ms }, jobId: "invoice-batch-writer" });
 }
 
 async function invoiceWriteProcessor() {
-  console.log("invoiceWriteProcessor");
-  const key = "Invoices";
+  const key = "Invoice";
 
   // const invoices = await getAllJSON<InvoiceDocument>(key);
   const invoices = await getAllCachedData<InvoiceDocument>(key);

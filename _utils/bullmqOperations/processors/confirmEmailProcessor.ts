@@ -15,12 +15,12 @@ async function confirmEmailBullMQ() {
 }
 
 async function confirmEmailProcessor() {
-  console.log("confirmEmailProcessor");
+
   // STEP 1) get lists of data ids stored in the cache
   const emailsToBeConfirmed = await getAllCachedData<{ Model: "User" | "Admin"; id: string; randomToken: string }>("EmailConfirm");
   const filteredData = emailsToBeConfirmed.filter(Boolean);
 
-  console.log("filteredData", filteredData);
+
   if (!filteredData.length) return;
 
   const userModelOperations = [];
