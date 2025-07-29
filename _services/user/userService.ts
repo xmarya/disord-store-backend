@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import User from "../../models/userModel";
 import { MongoId } from "../../_Types/MongoId";
 import { StoreOwner } from "../../_Types/User";
+import User from "../../models/userModel";
 
-export async function createNewUnlimitedUser(data: any, session: mongoose.ClientSession) {
-  const aNewUser = await User.findOneAndUpdate({ email: data.email }, { ...data }, {runValidators:false, new: true, upsert: true, setDefaultsOnInsert: true }).session(session);
+export async function createNewUnlimitedUser(data: StoreOwner, session: mongoose.ClientSession) {
+  const aNewUser = await User.findOneAndUpdate({ email: data.email }, { ...data }, { runValidators: true, new: true, upsert: true, setDefaultsOnInsert: true }).session(session);
   return aNewUser;
 }
 
@@ -18,7 +18,6 @@ export const getUserByEmail = async (email: string) => {
 */
 
 export async function resetStoreOwnerToDefault(storeId: MongoId, session: mongoose.ClientSession) {
-  console.log("resetStoreOwnerToDefault");
   // await User.updateOne({_id: userId}, {
   //     userType:"user",
   //     $unset: {
@@ -36,8 +35,8 @@ export async function resetStoreOwnerToDefault(storeId: MongoId, session: mongoo
   ).session(session);
 }
 
-export async function createNewSubscription(userId:MongoId, data:Pick<StoreOwner, "subscribedPlanDetails">, session:mongoose.ClientSession) {
-  const updatedUser = await User.findByIdAndUpdate(userId, data, {session, runValidators:true, new:true});
+export async function createNewSubscription(userId: MongoId, data: Pick<StoreOwner, "subscribedPlanDetails">, session: mongoose.ClientSession) {
+  const updatedUser = await User.findByIdAndUpdate(userId, data, { session, runValidators: true, new: true });
   return updatedUser;
 }
 
@@ -93,7 +92,20 @@ export async function getUserSubscriptionsLog(userId: MongoId) {
       },
     },
   ]);
-  
 
   return logs;
+}
+export async function confirmUserEmail(bulkOps: any) {
+  // let user: UserDocument | AdminDocument = await mongoose
+  //   .model(Model)
+  //   .findOne({
+  //     _id: id,
+  //     "credentials.emailConfirmationToken": hashedToken,
+  //     // "credentials.emailConfirmationExpires": { $gt: new Date() },
+  //     // NOTE: no longer need for this condition, since I'm checking the availability of
+  //     // the token expiration time in confirmUserEmail depending if the data is still in the cache or not.
+  //   })
+  //   .select("credentials");
+
+  await User.bulkWrite(bulkOps);
 }
