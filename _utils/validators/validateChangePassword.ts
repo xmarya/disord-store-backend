@@ -2,7 +2,6 @@ import { AppError } from "../AppError";
 import { catchAsync } from "../catchAsync";
 
 export const validateChangePassword = catchAsync(async (request, response, next) => {
-  console.log("changePassword");
 
   const { currentPassword, newPassword, confirmNewPassword } = request.body;
 

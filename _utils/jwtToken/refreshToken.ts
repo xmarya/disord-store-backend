@@ -6,6 +6,7 @@ import tokenWithCookies from "./tokenWithCookies";
 
 
 const refreshToken = catchAsync(async(request, response, next) => {
+
     const {token, user} = request;
     
     // check if there is a valid token or not
@@ -18,7 +19,7 @@ const refreshToken = catchAsync(async(request, response, next) => {
         const refreshedToken = jwtSignature(user.id, "1h");
         tokenWithCookies(response, refreshedToken);
         response.set("x-refreshed-token", "true");
-        console.log("the token is refreshed");
+
     }
     
     next();

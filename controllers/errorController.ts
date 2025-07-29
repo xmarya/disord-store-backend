@@ -10,7 +10,6 @@ function formatErrorResponse(error: AppError & { code: number | undefined }): { 
 }
 
 const errorController: ErrorRequestHandler = (error: AppError & { code: number | undefined }, request, response, next) => {
-  console.log("errorController", error);
   //   const {name, message:errorMessage} = error;
   //   console.log(name, errorMessage, error?.code);
   const { message, statusCode } = formatErrorResponse(error);

@@ -5,7 +5,7 @@ import { UserDocument } from "../../_Types/User";
 import Admin from "../../models/adminModel";
 import User from "../../models/userModel";
 import { AppError } from "../AppError";
-import { getCachedData } from "../cacheControllers/globalCache";
+import { getDecompressedCacheData } from "../cacheControllers/globalCache";
 import { catchAsync } from "../catchAsync";
 import { jwtVerify } from "../jwtToken/jwtVerify";
 
@@ -15,7 +15,7 @@ const getUserFromPayload = catchAsync(async (request, response, next) => {
   // STEP 2) validate the token:
   const payload = await jwtVerify(request.token, process.env.JWT_SALT!);
 
-  user = (await getCachedData(`User:${payload.id}`)) || (await getUserFromDB(payload.id));
+  user = (await getDecompressedCacheData(`User:${payload.id}`)) || (await getUserFromDB(payload.id));
   if (!user) return next(new AppError(401, "حدثت مشكلة. الرجاء تسجيل الدخول"));
 
   request.user = user;
@@ -23,11 +23,11 @@ const getUserFromPayload = catchAsync(async (request, response, next) => {
 });
 
 async function getUserFromDB(id: MongoId) {
-  console.log("getUserFromDB");
+
   let user: UserDocument | AdminDocument | null;
   user = await getOneDocById(User, id);
   if (!user) user = await getOneDocById(Admin, id);
-  
+
   return user;
 }
 

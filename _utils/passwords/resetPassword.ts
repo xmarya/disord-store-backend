@@ -5,7 +5,6 @@ import { AppError } from "../AppError";
 import mongoose from "mongoose";
 
 export const resetPassword = (Model:Extract<Model, "Admin" | "User">) => catchAsync(async (request, response, next) => {
-  console.log("resetPassword");
 
   //STEP 1) get the random token and compare it with the stored on in the db:
   const hashedToken = crypto.createHash("sha256").update(request.params.randomToken).digest("hex");
