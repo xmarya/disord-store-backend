@@ -1,12 +1,12 @@
 import { createAssistant, deleteAssistant } from "../../_services/assistant/assistantService";
-import { getOneDocByFindOne, getOneDocById } from "../../_services/global";
+import { getAllDocs, getOneDocByFindOne, getOneDocById, isExist, updateDoc } from "../../_services/global";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import StoreAssistant from "../../models/storeAssistantModel";
-import Store from "../../models/storeModel";
+import User from "../../models/userModel";
 
 export const createAssistantController = catchAsync(async (request, response, next) => {
-  console.log("create Assistant Controller");
+
   const { permissions } = request.body;
   if (!permissions) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
@@ -24,11 +24,10 @@ export const createAssistantController = catchAsync(async (request, response, ne
 
 export const getAllAssistantsController = catchAsync(async (request, response, next) => {
   const storeId = request.store; // NOTE: myStore property is only available for the storeOwner. Only the owner who can view all the assistants
-  if (!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
 
-  const assistants = await getOneDocById(Store, storeId, { select: ["storeAssistants"] });
+  const assistants = await getAllDocs(StoreAssistant, request, { condition: { inStore: storeId } });
 
-  if (!assistants?.storeAssistants?.length) return next(new AppError(404, "لا يوجد مساعدين في هذا المتجر"));
+  if (!assistants?.length) return next(new AppError(404, "لا يوجد مساعدين في هذا المتجر"));
 
   response.status(200).json({
     success: true,
@@ -37,10 +36,8 @@ export const getAllAssistantsController = catchAsync(async (request, response, n
 });
 
 export const getOneAssistantController = catchAsync(async (request, response, next) => {
-  const storeId = request.store;
-  if (!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
 
-  const assistantId = request.params.id;
+  const { assistantId } = request.params;
   if (!assistantId) return next(new AppError(400, "لابد من توفير معرف المستخدم"));
 
   const assistant = await getOneDocByFindOne(StoreAssistant, { condition: { assistant: assistantId } });
@@ -53,11 +50,27 @@ export const getOneAssistantController = catchAsync(async (request, response, ne
   });
 });
 
+export const updateAssistantController = catchAsync(async (request, response, next) => {
+  if (!Object.keys(request.body).length) return next(new AppError(400, "no data was provided in the request.body"));
+  const { assistantId } = request.params;
+  const { permissions } = request.body;
+  if (permissions) await updateDoc(StoreAssistant, assistantId, permissions);
+
+  const otherData:Record<string, any> = {};
+  for(const [key, value] of Object.entries(request.body)) {
+    if(typeof value === "string" && value.trim()) otherData[key] = value.trim();
+  }
+
+  Object.keys(otherData).length && await updateDoc(User, assistantId, otherData);
+  response.status(203).json({
+    success: true,
+  });
+});
+
 export const deleteAssistantController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
-  if (!storeId) return next(new AppError(400, "لابد من توفير معرف المتجر"));
 
-  const assistantId = request.params.id;
+  const { assistantId } = request.params;
   if (!assistantId) return next(new AppError(400, "لابد من توفير معرف المستخدم"));
 
   await deleteAssistant(storeId, assistantId);
