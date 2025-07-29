@@ -69,7 +69,7 @@ export const ProcessOrderItems = async (
 
     processedItems.push({
       productId: product.id, // changed from _id to id, which is the string version
-      storeId: product.store,// the store is not populated so it's safe to use it without specifying the id. still needs testing though
+      storeId: product.store, // the store is not populated so it's safe to use it without specifying the id. still needs testing though
       name: product.name,
       price: product.price,
       discountedPrice: RoundToTwo(discountedPrice / item.quantity),
@@ -164,7 +164,7 @@ export const CreateOrder = (params: CreateOrderParams & { hasMixedProducts: bool
   return newOrder;
 };
 
-export const UpdateCouponUsage = async (appliedCoupon: any, session: mongoose.ClientSession): Promise<void> => {
+export const updateCouponUsage = async (appliedCoupon: any, session: mongoose.ClientSession): Promise<void> => {
   if (appliedCoupon) {
     await Coupon.findByIdAndUpdate(appliedCoupon._id, { $inc: { usedCount: 1 } }, { session });
   }
