@@ -1,7 +1,7 @@
 import { startSession } from "mongoose";
 import { SUBSCRIPTION_PERIOD } from "../_data/constants";
 import { MongoId } from "../_Types/MongoId";
-import { StoreOwner, UserDocument } from "../_Types/User";
+import { StoreOwner } from "../_Types/User";
 import { updatePlanMonthlyStats } from "../_services/plan/planService";
 import { createNewSubscription } from "../_services/user/userService";
 import { addDays } from "date-fns";
@@ -36,8 +36,7 @@ export async function startSubscription(userId: MongoId, plan: PlanDocument, pai
 
   await session.endSession();
 
-  updatedUser && cacheUser(updatedUser);
-  console.log("the returned user from the startSubscription", updatedUser);
+  updatedUser && await cacheUser(updatedUser);
 
   return updatedUser;
 }
