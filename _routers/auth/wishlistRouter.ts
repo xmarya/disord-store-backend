@@ -1,9 +1,6 @@
 import express from "express";
-import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import { addProductToWishlistController, deleteProductFromWishlistController, getWishlistController } from "../../controllers/auth/wishlistController";
-
+import { getWishlistController, updateWishlistController } from "../../controllers/auth/wishlistController";
 
 export const router = express.Router();
 
-router.route("/").post(addProductToWishlistController).get(getWishlistController);
-router.delete("/:productId", validateRequestParams("productId"), deleteProductFromWishlistController);
+router.route("/").patch(updateWishlistController).get(getWishlistController);
