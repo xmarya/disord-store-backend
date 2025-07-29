@@ -1,13 +1,13 @@
 import dotenv from "dotenv";
-dotenv.config({ path: "./.env" });
 import { dbStartConnection } from "./_config/db";
 import app from "./app";
-import invoiceBullMQ from "./_utils/bullmqOperations/invoiceBullMQ";
+import initiateBullMQJobs from "./_utils/bullmqOperations/jobs/initialJobProsessors";
+dotenv.config({ path: "./.env" });
 
 const port = process.env.PORT || 3000;
 
-dbStartConnection();
-// invoiceBullMQ();
+await dbStartConnection();
+await initiateBullMQJobs();
 const server = app.listen(port, () => {
   console.log(`the server is running on port ${port}...`);
 });
