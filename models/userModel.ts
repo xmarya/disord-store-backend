@@ -6,14 +6,16 @@ import { HASHING_SALT } from "../_data/constants";
 import { UserDocument } from "../_Types/User";
 import "./storeModel"; // ✅ Make sure Store is registered before User
 
-interface UserVirtual {planExpiresInDays:string};
+interface UserVirtual {
+  planExpiresInDays: string;
+}
 
 // UserModel is only used when creating the Mongoose model at the last of the file (after creating the Schema).
-type UserModel = mongoose.Model<UserDocument, {},{}, UserVirtual>;
+type UserModel = mongoose.Model<UserDocument, {}, {}, UserVirtual>;
 
 // Schema<T> expects the first generic type to be an object containing ALL the schema fields.
 // The first argument for Schema<> should be the document type, not the model type.
-const userSchema = new Schema<UserDocument, {},{}, UserVirtual>(
+const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
   {
     email: {
       type: String,
@@ -35,6 +37,8 @@ const userSchema = new Schema<UserDocument, {},{}, UserVirtual>(
         type: Boolean,
         default: false,
       },
+      emailConfirmationToken: String,
+      emailConfirmationExpires: Date,
       // passwordConfirm: String, // NOTE: zod will be use to validate this filed
       // on the front-end + the field itself won't be saved in the db.
       // it's only use inside the pre hook to check the password
@@ -62,10 +66,10 @@ const userSchema = new Schema<UserDocument, {},{}, UserVirtual>(
     firstName: String,
     lastName: String,
     phoneNumber: {
-      type:String,
+      type: String,
       minlength: [11, "the phone number should be 11 to 12 digits"],
-      maxlength:[12, "the phone number should be 11 to 12 digits"],
-      default: null
+      maxlength: [12, "the phone number should be 11 to 12 digits"],
+      default: undefined,
     },
     userType: {
       type: String,
@@ -82,28 +86,32 @@ const userSchema = new Schema<UserDocument, {},{}, UserVirtual>(
       type: Schema.Types.ObjectId,
       ref: "UserAddress",
       select: false, // NOTE: not sure about setting it to false
+      default: undefined,
     },
     defaultCreditCardId: {
       type: Schema.Types.ObjectId,
       ref: "UserCreditCard",
       select: false,
+      default: undefined,
     },
     subscribedPlanDetails: {
       planId: {
         type: Schema.Types.ObjectId,
         ref: "Plan",
+        default: undefined,
       },
       planName: {
         type: String,
         enum: ["basic", "plus", "unlimited"],
+        default: undefined,
       },
-      paidPrice: Number,
+      paidPrice: { type: Number, default: undefined },
       paid: {
         type: Boolean,
         default: undefined,
       },
-      subscribeStarts: Date,
-      subscribeEnds: Date,
+      subscribeStarts: { type: Date, default: undefined },
+      subscribeEnds: { type: Date, default: undefined },
     },
     subscriptionsLog: {
       type: Map,
@@ -119,6 +127,7 @@ const userSchema = new Schema<UserDocument, {},{}, UserVirtual>(
     myStore: {
       type: Schema.Types.ObjectId,
       ref: "Store",
+      default: undefined,
     },
     createdAt: {
       type: Date,
@@ -138,14 +147,13 @@ const userSchema = new Schema<UserDocument, {},{}, UserVirtual>(
 
 // this pre(findOneAndUpdate) for accumulating the count in subscriptionsLog whenever the subscribeStarts field has been modified during a new/renewal subscribing process
 userSchema.pre("findOneAndUpdate", async function (next) {
-
   // STEP 1) get the original doc in order to access the userType and its subscriptionsLog field:
   const doc: UserDocument = await this.model.findOne(this.getFilter()).select("userType subscriptionsLog");
 
   // STEP 2) get the to-be-updated fields:
   /*✅*/ const updatedFields = this.getUpdate() as mongoose.UpdateQuery<UserDocument>;
 
-  if (doc.userType !=="storeOwner" || !updatedFields?.subscribedPlanDetails?.subscribeStarts) return next(); // don't enter if the updated fields has nothing to do with the subscription
+  if (doc?.userType !== "storeOwner" || !updatedFields?.subscribedPlanDetails?.subscribeStarts) return next(); // don't enter if the updated fields has nothing to do with the subscription
 
   const { subscribeStarts, planName, paidPrice } = updatedFields.subscribedPlanDetails;
   const logsMap = doc.subscriptionsLog;
@@ -195,22 +203,18 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   the date to be a key since it's an object; Maps are strict to have a string key
 */
 
-
-
 // I decided to make this a virtual field, so it will be created and recalculated each time
 // the data is retrieved which maintains the accuracy of how many days exactly are left.
 userSchema.virtual("planExpiresInDays").get(function () {
-  console.log("planExpiresInDays");
-  if (!this.subscribedPlanDetails.subscribeStarts) return undefined; // the return 0 causes the planExpiresInDays field to be returned in the doc. using undefined prevents this.
-  
-  // TODO: corn job to reset subscribeStarts when the subscription ends
+  if (!this.subscribedPlanDetails.subscribeStarts || this.userType === "storeAssistant") return undefined; // the return 0 causes the planExpiresInDays field to be returned in the doc. using undefined prevents this.
+
   const days = formatDistanceStrict(this.subscribedPlanDetails.subscribeEnds, new Date(), { locale: arSA, unit: "day" });
   return days;
   /* OLD CODE (kept for reference): 
   const ms = this.subscribeEnds.getTime() - this.subscribeStarts.getTime();
   return Math.floor(ms / (1000 * 60 * 60 * 24));
   */
-  
+
   // NOTE: this.subscribeEnds and this.subscribeStarts are Date objects, not numbers.
   // TypeScript does not allow arithmetic (-) directly between Date objects.
   // so, we'll convert them to a number by using getTime(), the result is going to be a timestamp in milliseconds
@@ -240,11 +244,9 @@ userSchema.virtual("planExpiresInDays").get(function () {
 userSchema.pre("save", async function (next) {
   // STEP 1) check if the user isNew and the signMethod is credentials: (the condition this.credentials is for getting rid ot possibly undefined error)
   if (this.isNew && this.signMethod === "credentials" && this.credentials) {
-    console.log("pre hook is for encrypting the pass before saving it for NEW USERS");
-    console.log("this.credentials.password", this.credentials.password);
+
     this.credentials.password = await bcrypt.hash(this.credentials.password, HASHING_SALT);
-    console.log("pre save hook for NEW USERS", this.credentials.password);
-    console.log("DONE ✅");
+
   }
   next();
 });

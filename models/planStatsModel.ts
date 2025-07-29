@@ -51,7 +51,6 @@ const planStatsSchema = new Schema<PlanStatsDocument>(
 );
 
 planStatsSchema.statics.getAnnualStatsReport = async function (sortBy: "year" | "profits" | "subscribers", sortOrder: "desc" | "asc", specificYear?: number) {
-  /*REQUIRES TESTING*/
   // aggregate, group them by the planName-year, return them as an array of years objects
   // [2024: { planName1: {subscribers, profits}, planName2: {subscribers, profits} },
   // 2025: { planName1: {subscribers, profits}, planName2: {subscribers, profits} }]

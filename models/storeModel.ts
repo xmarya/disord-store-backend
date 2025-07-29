@@ -150,17 +150,17 @@ from the StoreStats Model, also using the virtual won't allow to do date filteri
 //   next();
 // });
 
-storeSchema.virtual<ProductDocument[]>("products", {
-  ref: "Product",
-  localField: "_id",
-  foreignField: "store",
-});
+// storeSchema.virtual<ProductDocument[]>("products", {
+//   ref: "Product",
+//   localField: "_id",
+//   foreignField: "store",
+// });
 
-storeSchema.virtual<ReviewDocument[]>("reviews", {
-  ref: "Review",
-  localField: "_id",
-  foreignField: "reviewedResourceId",
-});
+// storeSchema.virtual<ReviewDocument[]>("reviews", {
+//   ref: "Review",
+//   localField: "_id",
+//   foreignField: "reviewedResourceId",
+// });
 
 // TODO: وثيقة العمل الحر أو اثبات التجارية
 
