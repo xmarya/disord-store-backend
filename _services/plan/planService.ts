@@ -18,7 +18,7 @@ export async function checkPlanName(id: MongoId): Promise<boolean> {
   return !!isUnlimited;
 }
 
-export async function getMonthlyPlansStats(dateFilter: { date: { $gte: Date; $lte: Date } }) {
+export async function getMonthlyPlansStats(dateFilter: { date: { $gte: Date; $lte: Date } }, sortBy: "subscribers" | "profits" = "profits", sortOrder: "asc" | "desc" = "desc") {
   /*✅*/
   const monthlyStats = await PlanStats.aggregate([
     {
@@ -33,6 +33,7 @@ export async function getMonthlyPlansStats(dateFilter: { date: { $gte: Date; $lt
         profits: { $sum: "$monthly.profits" },
       },
     },
+    {$sort:{ [sortBy]: sortOrder === "desc" ? -1 : 1}},
     {
       $project: {
         _id: 0,
@@ -60,7 +61,6 @@ export async function updatePlanMonthlyStats(planName: PlansNames, profit: numbe
         // Here’s the key trick: In JavaScript, when you pass 0 as the day of the month,
         // it gives you the last day of the previous month. So, new Date(2025, 5, 0) → 2025-05-31
     */
-  console.log("updatePlanMonthlyStats");
   const now = new Date();
   const firstDayOfCurrentMonth = startOfMonth(now);
   const lastDayOfCurrentMonth = endOfMonth(now);
