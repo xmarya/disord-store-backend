@@ -19,11 +19,11 @@ async function getDocsCount<T extends mongoose.Document>(Model: mongoose.Model<T
 
 const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
   return async (request: Request, response: Response, next: NextFunction) => {
-    const plan = await getOneDocById(Plan, request.plan, { select: ["quota"] });
+    const plan = await getOneDocById(Plan, request.plan, { select: ["quota", "planName"] });
     if (!plan) return next(new AppError(401, "no plan is associated with this id"));
 
     const storeId = request.store;
-    if (!storeId) return next(new AppError(400, "couldn't find the storeId"));
+    if (!storeId) return next(new AppError(404, "couldn't find the storeId"));
 
     const definedQuota = plan.quota[quotaKey];
     let countOfDocs: number;
@@ -38,10 +38,12 @@ const verifyUsedQuota = (quotaKey: keyof PlanQuota) => {
         break;
 
       case "ofStoreAssistants":
+        if (plan.planName === "basic") return next(new AppError(403, "you must upgrade your plan to plus or limited in order to create an assistant."));
         countOfDocs = await getDocsCount(StoreAssistant, { inStore: storeId });
         break;
-
-      case "ofColourThemes":
+        
+        case "ofColourThemes":
+        if (plan.planName === "basic") return next(new AppError(403, "you must upgrade your plan to plus or limited in order to change the colour theme."));
         countOfDocs = await getDocsCount(ColourTheme, { store: storeId });
         break;
 
