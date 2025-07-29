@@ -1,17 +1,19 @@
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
+import { MongoId } from "./MongoId";
 
 export type AssistantRegisterData = {
   email: string;
   password: string;
-  username: string;
+  firstName: string;
+  lastName: string;
   storeId: string;
   permissions: AssistantPermissions;
 };
 
 export interface StoreAssistant {
   id: string;
-  assistant: Types.ObjectId;
-  inStore: Types.ObjectId;
+  assistant: MongoId;
+  inStore: MongoId;
   permissions: AssistantPermissions;
 }
 
@@ -28,7 +30,7 @@ export interface AssistantPermissions {
   editDiscount: boolean;
   previewStoreStats: boolean;
   addCoupon: boolean;
-  UpdateCoupon: boolean;
+  updateCoupon: boolean;
   replyToCustomers:boolean,
   manageOrders:boolean
 }
