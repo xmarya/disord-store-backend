@@ -7,6 +7,7 @@ const validateRequestParams = (paramsName: string) => {
     const resourceId = request.params[paramsName];
 
     if (!resourceId) return next(new AppError(400, `request.params.${paramsName} is missing`));
+    if(paramsName === "randomToken") return next();
     if (!mongoose.Types.ObjectId.isValid(resourceId)) return next(new AppError(400, `${resourceId} is invalid`));
 
     next();
