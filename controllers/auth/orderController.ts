@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import { ApplyCoupon, CreateOrder, ProcessOrderItems, UpdateCouponUsage } from "../../_services/order/orderService";
+import { ApplyCoupon, CreateOrder, ProcessOrderItems, updateCouponUsage } from "../../_services/order/orderService";
 import Order from "../../models/orderModel";
 import { generateOrderNumber } from "../../_utils/genrateOrderNumber";
 import { CreateOrderInput, createOrderSchema } from "../../_services/order/zodSchemas/orderSchemas";
@@ -9,6 +9,9 @@ import { ProcessPaymobPayment } from "../../_services/payment/paymobService";
 import { AxiosError } from "axios";
 import { processPaymobWebhook, getPaymentSuccessHtml } from "../../_services/payment/paymnetServices";
 import Product from "../../models/productModel";
+import { catchAsync } from "../../_utils/catchAsync";
+import { getOneDocById } from "../../_services/global";
+import { AppError } from "../../_utils/AppError";
 
 export const validateOrderInput = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -24,7 +27,8 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
   session.startTransaction();
 
   try {
-    const { userId, items, paymentMethod, couponCode, shippingAddress, billingAddress, paymentType } = req.body as CreateOrderInput;
+    const userId = req.user.id;
+    const { /*userId,*/ items, paymentMethod, couponCode, shippingAddress, billingAddress, paymentType } = req.body as CreateOrderInput;
     const { processedItems, subtotal, totalDiscount, hasDigitalProducts, totalWeight, hasMixedProducts } = await ProcessOrderItems(items, session);
 
     if (hasMixedProducts) {
@@ -87,7 +91,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       await Product.updateMany({ _id: { $in: productIds } }, { $inc: { numberOfPurchases: 1 } }, { session });
     }
 
-    await UpdateCouponUsage(appliedCoupon, session);
+    await updateCouponUsage(appliedCoupon, session);
     await newOrder.save({ session });
 
     /*
@@ -135,8 +139,8 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
 
 export const GetUserOrders = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { userId } = req.params;
-
+    // const { userId } = req.params; // NOTE: the user data is available inside the request, no need for passing params
+    const userId = req.user._id;
     const orders = await Order.find({ userId }).select("orderNumber totalPrice status createdAt isDigital").populate("items", "name image").sort({ createdAt: -1 });
 
     if (orders.length === 0) {
@@ -165,6 +169,17 @@ export const GetUserOrders = async (req: Request, res: Response): Promise<any> =
     HandleErrorResponse(error, res);
   }
 };
+
+export const getOneOrder = catchAsync(async(request, response, next) => {
+
+  const {orderId} = request.params;
+  const order = await getOneDocById(Order, orderId);
+  if(!order) return next(new AppError(400, "no order was found with this orderId"));
+  response.status(200).json({
+    success: true,
+    order
+  });
+});
 
 export const handlePaymobWebhook = async (req: Request, res: Response) => {
   try {
