@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 import { MongoId } from "./MongoId";
 
 export interface WishlistDataBody {
-  user: MongoId;
-  product: MongoId;
+  products: Array<MongoId>;
 }
 
-export type WishlistDocument = WishlistDataBody & mongoose.Document;
+export type WishlistDocument = { user: MongoId; product: MongoId } & mongoose.Document;
