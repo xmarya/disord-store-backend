@@ -5,7 +5,6 @@ import Product from "../../models/productModel";
 
 export async function updateProduct(storeId: MongoId, productId: MongoId, data: ProductDocument) {
   /*✅*/
-  console.log("updateProduct");
   /* OLD CODE (kept for reference): 
   let addToSetStage = {};
   
