@@ -5,7 +5,6 @@ import { MongoId } from "../../_Types/MongoId";
 import { StoreStatsDocument } from "../../_Types/StoreStats";
 import { PlansNames } from "../../_Types/Plan";
 
-/*REQUIRES TESTING*/
 export async function getAllStoresStats(
   sortBy: "totalProfits" | "createdAt" = "totalProfits",
   sortOrder: "desc" | "asc" = "desc",
@@ -64,9 +63,8 @@ export async function getAllStoresStats(
 
   return allStats; // return the profits OAT only => [{storeName: "1", totalProfit: 123}, {storeName: "2", totalProfit: 123}]
 }
-/*REQUIRES TESTING*/
 export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $gte: Date; $lte: Date } }, sortBy: "date" | "totalProfits" | "totalSoldProducts" = "date", sortOrder: "desc" | "asc" = "desc") {
-  console.log("getOneStoreStats");
+
   // NOTE: THIS IS FOR STORE OWNER
   const stats = await StoreStats.aggregate([
     {
@@ -153,7 +151,7 @@ export async function updateStoreStats(
   session: mongoose.ClientSession,
   operationDate?:{$gte: Date;$lte: Date;},
 ) {
-  console.log("updateStoreStats");
+
   // const now = new Date();
   // const dayStart = startOfDay(now);
   // const dayEnd = endOfDay(now);
@@ -239,4 +237,8 @@ soldProductsUpdate.$inc =>  {
 
   // return updatedStats;
   return cleanedStats ?? updatedStats;
+}
+
+export async function deleteStoreStats(storeId:MongoId, session:mongoose.ClientSession) {
+  await StoreStats.deleteOne({store: storeId}).session(session);
 }
