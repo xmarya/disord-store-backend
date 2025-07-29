@@ -5,7 +5,7 @@ import validateEmailConfirmation from "../../_utils/validators/validateEmailConf
 import validatePaymentData from "../../_utils/validators/validatePaymentData";
 import validateRequestParams from "../../_utils/validators/validateRequestParams";
 import { GetOrderById, getAllOrders, getTotalRevenue } from "../../controllers/auth/orderAdmin";
-import { AddOrder, GetUserOrders, PaymentSuccess, handlePaymobWebhook, validateOrderInput } from "../../controllers/auth/orderController";
+import { AddOrder, GetUserOrders, PaymentSuccess, getOneOrder, handlePaymobWebhook, validateOrderInput } from "../../controllers/auth/orderController";
 import { GetShipmentData } from "../../controllers/auth/ShipmentOrder";
 
 export const router = express.Router();
@@ -13,8 +13,12 @@ export const router = express.Router();
 router.use("/:orderId/invoice", validateRequestParams("orderId"), invoiceRouter);
 
 //users
-router.post("/",restrict("user"), validateEmailConfirmation, validateOrderInput, AddOrder);
-router.get("/user/:userId",restrict("user"), validateRequestParams("userId"), GetUserOrders);
+// router.post("/",restrict("user"), validateEmailConfirmation, validateOrderInput, AddOrder);
+// router.get("/user/:userId",restrict("user"), validateRequestParams("userId"), GetUserOrders);
+// NOTE: these routes are now /dashboard/me/orders
+router.route("/").post(validateEmailConfirmation, validateOrderInput, AddOrder).get(GetUserOrders);
+router.get("/:orderId", validateRequestParams("orderId"), getOneOrder);
+
 
 // Paymob Webhook
 router.post("/paymob/webhook",validatePaymentData, handlePaymobWebhook );
