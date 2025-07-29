@@ -4,11 +4,10 @@ import { createDoc, deleteDoc, getOneDocById } from "../../_services/global";
 import { updateProduct } from "../../_services/product/productServices";
 import { CategoryDocument } from "../../_Types/Category";
 import { AppError } from "../../_utils/AppError";
-import { removeFromCache, setCachedData } from "../../_utils/cacheControllers/globalCache";
+import { deleteFromCache, setCompressedCacheData } from "../../_utils/cacheControllers/globalCache";
 import { catchAsync } from "../../_utils/catchAsync";
 import Product from "../../models/productModel";
 import { categoriesInCache } from "./categoryController";
-import { removeRanking } from "../../_services/ranking/rankingService";
 import { deleteAllResourceReviews } from "../../_services/review/reviewService";
 
 export const createProductController = catchAsync(async (request, response, next) => {
@@ -21,7 +20,7 @@ export const createProductController = catchAsync(async (request, response, next
   const newProd = await createDoc(Product, data);
   if (categories) {
     await updateProductInCategories(categories, newProd.id);
-    setCachedData(`Category:${newProd.id}`, newProd.categories, "long"); // set the new cats, without waiting
+    await setCompressedCacheData(`Category:${newProd.id}`, newProd.categories, "fifteen-minutes"); // set the new cats, without waiting
   }
 
   response.status(201).json({
@@ -65,7 +64,7 @@ export const updateProductController = catchAsync(async (request, response, next
 
   if (categories) {
     await updateProductInCategories(categories, productId); /*✅*/
-    setCachedData(`Category:${productId}`, updatedProduct.categories, "long"); // set the new cats, without waiting
+    await setCompressedCacheData(`Category:${productId}`, updatedProduct.categories, "fifteen-minutes"); // set the new cats, without waiting
   }
 
   response.status(203).json({
@@ -84,14 +83,13 @@ export const deleteProductController = catchAsync(async (request, response, next
     if (!deletedProduct) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
 
     await deleteProductFromCategory(deletedProduct.categories, productId, session); /*✅*/
-    await removeRanking(productId, session);
     await deleteAllResourceReviews(productId, session);
-    
+
     return deletedProduct;
   });
-  
-  removeFromCache(`Product:${productId}`); // remove from cache if exist
-  
+
+  deleteFromCache(`Product:${productId}`); // remove from cache if exist
+
   response.status(204).json({
     success: true,
     result /*REQUIRES TESTING */,

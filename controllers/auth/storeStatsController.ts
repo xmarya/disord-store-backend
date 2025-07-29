@@ -20,7 +20,7 @@ type StatsPerStore = Array<{
   products: Array<{ productId: MongoId; quantity: number }>;
 }>;
 export async function updateStoreStatsController(data: Pick<InvoiceDataBody, "productsPerStore">, operationType: "new-purchase" | "cancellation") {
-  console.log("updateStoreStatsController");
+
   const { productsPerStore } = data;
   const statsPerStore: StatsPerStore = productsPerStore.map(({ storeId, products }) => ({
     storeId,
@@ -55,7 +55,7 @@ export const getStoreStatsController = catchAsync(async (request, response, next
   const { dateFilter, sortBy, sortOrder } = request.dateQuery;
   const storeId = request.store;
   const stats = await getOneStoreStats(storeId, dateFilter, sortBy, sortOrder);
-  if (!stats) return next(new AppError(400, "no stats were found for this store"));
+  if (!stats) return next(new AppError(404, "no stats were found for this store"));
 
   response.status(200).json({
     success: true,

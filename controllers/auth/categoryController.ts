@@ -3,7 +3,7 @@ import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from 
 import { CategoryBasic } from "../../_Types/Category";
 import { MongoId } from "../../_Types/MongoId";
 import { AppError } from "../../_utils/AppError";
-import { getCachedData, setCachedData } from "../../_utils/cacheControllers/globalCache";
+import { getDecompressedCacheData, setCompressedCacheData } from "../../_utils/cacheControllers/globalCache";
 import { catchAsync } from "../../_utils/catchAsync";
 import Category from "../../models/categoryModel";
 
@@ -26,7 +26,7 @@ export const createCategoryController = catchAsync(async (request, response, nex
 });
 
 export const getAllCategoriesController = catchAsync(async (request, response, next) => {
-  const categories = await getAllDocs(Category, request, {condition: {store:request.store}});
+  const categories = await getAllDocs(Category, request, { condition: { store: request.store } });
   if (!categories) return next(new AppError(404, "لا يوجد فئات في هذا المتجر"));
 
   response.status(200).json({
@@ -40,7 +40,7 @@ export const getCategoryController = catchAsync(async (request, response, next) 
   // const category = await getOneDocById(Category, request.params.categoryId);
   // another way of doing it. it is not a duplicated step for hasAuthorisation middleware.
   // without this extra condition the user can use a categoryId of a different store and still can get it
-  const category = await getOneDocByFindOne(Category, { condition: { id:request.params.categoryId, store:request.store } });
+  const category = await getOneDocByFindOne(Category, { condition: { id: request.params.categoryId, store: request.store } });
   if (!category) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
 
   response.status(200).json({
@@ -81,13 +81,13 @@ export async function categoriesInCache(productId: MongoId): Promise<CategoryBas
   let categories;
 
   // STEP 1) look in cache:
-  categories = await getCachedData<CategoryBasic[]>(`Category:${productId}`);
-  console.log("from cache", categories?.length);
+  categories = await getDecompressedCacheData<CategoryBasic[]>(`Category:${productId}`);
+
   // STEP 2) nothing? get from db:
   if (!categories) {
     categories = await getAllProductCategories(productId);
-    console.log("from db", categories?.length);
-    setCachedData(`Category:${productId}`, categories, "long");
+
+    await setCompressedCacheData(`Category:${productId}`, categories, "fifteen-minutes");
   }
 
   return categories;
