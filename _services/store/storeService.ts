@@ -4,7 +4,6 @@ import { StoreDataBody } from "../../_Types/Store";
 import { AppError } from "../../_utils/AppError";
 import Store from "../../models/storeModel";
 import User from "../../models/userModel";
-import Product from "../../models/productModel";
 
 export async function createStore(data: StoreDataBody) {
   const { storeName, description, owner, inPlan, logo } = data;
@@ -42,12 +41,6 @@ export async function createStore(data: StoreDataBody) {
   } finally {
     await session.endSession();
   }
-}
-
-export async function getStoreWithProducts(storeId: MongoId) {
-  const store = await Store.findById(storeId).populate({path: "products", select: "name image price productType description stock discount numberOfPurchases ranking ratingsAverage ratingsQuantity"});
-const products = store?.products;
-  return { store, products };
 }
 
 export async function confirmAuthorization(userId: string, storeId: MongoId): Promise<boolean> {
