@@ -1,8 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 import { ProductDocument } from "../_Types/Product";
-import Ranking from "./rankingModel";
-import { MongoId } from "../_Types/MongoId";
-import tryCatch from "../_utils/tryCatch";
 
 type ProductModel = mongoose.Model<ProductDocument>;
 
@@ -92,34 +89,17 @@ const productSchema = new Schema(
 
 productSchema.index({ name: 1, store: 1 }, { unique: true });
 productSchema.index({ ranking: 1 });
-productSchema.index({store:1});
+productSchema.index({ store: 1 });
 
-// this pre("save") hook is for adding the tax to the product price
-productSchema.pre("save", function(next) {
-  const taxRate = 0.15;
-  const priceAfterApplyingTax = this.price * taxRate;
-  this.price = priceAfterApplyingTax;
-
+// this pre(/^find/) hook is for populating the categories:
+productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
+  this.populate({ path: "categories", select: "name colour" });
+  this.populate({ path: "store", select: "storeName verified" });
   next();
 });
 
-// this pre(/^find/) hook is for populating the categories:
-// productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
-//   console.log("productSchema.pre(/^find/ cat");
-//   this.populate({ path: "categories", select: "name colour" });
-//   // this.populate({ path: "store", select: "name ranking ratingsAverage ratingsQuantity verified" });
-//   next();
-// });
 
-// this post(deleteMany) hook is for deleting all of the product's rankings after deleting the store
-// it's a query hook. see: https://mongoosejs.com/docs/middleware.html#naming
-productSchema.post("deleteMany", { document: false, query: true }, async function () { /*REQUIRES TESTING*/
-  const deletedDocs:ProductDocument[] = await this.model.find(this.getFilter()).select("_id");
-  if (deletedDocs.length === 0) return;
-  console.log("productSchema.post(deleteMany)", deletedDocs.length);
-  const deletedProductsIds:MongoId[] = deletedDocs.map( doc => doc.id );
-  await Ranking.deleteMany({resource : "Product", resourceId: {$in: deletedProductsIds}});
-});
+// TODO: pre hook for deleting all the reviews when deleting one/many product/s 
 
 const Product = mongoose.model<ProductDocument, ProductModel>("Product", productSchema);
 
