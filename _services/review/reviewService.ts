@@ -4,14 +4,12 @@ import { MongoId } from "../../_Types/MongoId";
 import Review from "../../models/reviewModel";
 
 export async function confirmReviewAuthorisation(reviewId: string, userId: string): Promise<boolean> {
-  console.log("confirmReviewAuthorisation", reviewId);
   const authorised = await Review.exists({ _id: reviewId, writer: userId });
 
   return !!authorised;
 }
 
 export async function calculateRatingsAverage(Model: Extract<Model, "Store" | "Product">, resourceId: MongoId, session: mongoose.ClientSession) {
-  console.log("inside updateModelRating", Model);
 
   /* OLD CODE (kept for reference):  
     const collection = resourceName.concat(`s-${modelId}`);
@@ -20,7 +18,7 @@ export async function calculateRatingsAverage(Model: Extract<Model, "Store" | "P
 
   const stats = await Review.aggregate([
     {
-      $match: { reviewedResourceId: resourceId },
+      $match: { reviewedResourceId: new mongoose.Types.ObjectId(resourceId) },
     },
     {
       $group: {
@@ -32,7 +30,7 @@ export async function calculateRatingsAverage(Model: Extract<Model, "Store" | "P
   ]);
 
   // STEP 2) update the resource ratingsAverage and ratingsQuantity: (whether an update or delete)
-  const doc = await mongoose.model(Model).findById(resourceId);
+  const doc = await mongoose.model(Model).findById(resourceId).select("ratingsAverage ratingsQuantity ranking");
 
   if (stats.length > 0) {
     // if there are review docs for the resource
@@ -42,6 +40,7 @@ export async function calculateRatingsAverage(Model: Extract<Model, "Store" | "P
     // if there are no review docs for the resource -all were deleted- then reset to 0
     doc.ratingsQuantity = 0;
     doc.ratingsAverage = 0;
+    doc.ranking = null;
   }
 
   //STEP 2) save the doc:
