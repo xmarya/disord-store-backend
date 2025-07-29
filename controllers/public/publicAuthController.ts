@@ -39,7 +39,7 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   const { email, password } = request.body;
   if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
-  const user = await getOneDocByFindOne(User, { condition: { email }, select: ["credentials", "firstName", "lastName", "userType", "subscribedPlanDetails", "myStore", "image"] });
+  const user = await getOneDocByFindOne(User, { condition: { email }, select: ["credentials", "email", "firstName", "lastName", "userType", "subscribedPlanDetails", "myStore", "image"] });
   if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   // STEP 2) checking the password:

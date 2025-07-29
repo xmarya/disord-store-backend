@@ -3,8 +3,8 @@ import cors from "cors";
 import express, { ErrorRequestHandler } from "express";
 import mongoSanitize from "express-mongo-sanitize";
 import ratelimit from "express-rate-limit";
-import {router as userRouter} from "./_routers/public/userRoutes";
-import {router as storeAndProductRouter} from "./_routers/public/storeAndProductRoutes";
+import {router as publicAuthRouter} from "./_routers/public/publicAuthRoutes";
+import {router as resourcesPublicRouter} from "./_routers/public/resourcesPublicRoutes";
 import { router as dashboardRouter } from "./_routers/dashboard";
 import errorController from "./controllers/errorController";
 
@@ -32,8 +32,8 @@ app.use(cookieParser()); // the above line parsers the data from the body, this 
 app.use(mongoSanitize());
 app.use(cors());
 
-app.use("/api/v1/public", storeAndProductRouter);
-app.use("/api/v1/auth", userRouter);
+app.use("/api/v1/public", resourcesPublicRouter);
+app.use("/api/v1/auth", publicAuthRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use(errorController);
 /*
