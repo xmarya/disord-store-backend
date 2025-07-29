@@ -1,15 +1,16 @@
-import { updateDoc } from "../../../_services/global";
-import { getStoreWithProducts } from "../../../_services/store/storeService";
+import { startSession } from "mongoose";
+import { getAllDocs, getOneDocById, updateDoc } from "../../../_services/global";
 import { getAllStoresStats, getOneStoreStats } from "../../../_services/store/storeStatsService";
 import { AppError } from "../../../_utils/AppError";
 import { catchAsync } from "../../../_utils/catchAsync";
 import Store from "../../../models/storeModel";
 import { deleteStorePermanently } from "../storeControllers";
+import Product from "../../../models/productModel";
 
 export const getAllStoresInfo = catchAsync(async (request, response, next) => {
-  const {sortBy, sortOrder, plan, verified} = request.body;
+  const { sortBy, sortOrder, plan, verified } = request.body;
   // returns the store names, logo, owners, in which plan, verified, total profit??
-  const storesStats = await getAllStoresStats(sortBy, sortOrder, {plan, verified});
+  const storesStats = await getAllStoresStats(sortBy, sortOrder, { plan, verified });
   if (!storesStats) return next(new AppError(500, "couldn't fetch stores data, try again later."));
 
   response.status(200).json({
@@ -20,21 +21,24 @@ export const getAllStoresInfo = catchAsync(async (request, response, next) => {
 });
 
 export const getOneStoreInfo = catchAsync(async (request, response, next) => {
-
-  const {dateFilter, sortBy, sortOrder} = request.dateQuery;
+  const { dateFilter, sortBy, sortOrder } = request.dateQuery;
   const { storeId } = request.params;
   // const store = await getOneDocByFindOne(StoreStats, {field: "store", value: storeId}); //BUG this query returns only the first match
 
-  const [{store, products}, stats] = await Promise.all([
-    await getStoreWithProducts(storeId),
-    await getOneStoreStats(storeId, dateFilter, sortBy, sortOrder),
-  ]);
+  const session = await startSession();
+  const { store, products, stats } = await session.withTransaction(async () => {
+    const store = await getOneDocById(Store, storeId, { session });
+    const products = await getAllDocs(Product, request, { condition: { store: storeId } });
+    const stats = await getOneStoreStats(storeId, dateFilter, sortBy, sortOrder);
+
+    return { store, products, stats };
+  });
 
   response.status(200).json({
     success: true,
     store,
     products,
-    stats
+    stats,
   });
 });
 
@@ -47,7 +51,12 @@ export const suspendStore = catchAsync(async (request, response, next) => {
 });
 
 export const deleteStore = catchAsync(async (request, response, next) => {
-  const deletedStore = await deleteStorePermanently(request.params.storeId);
+  const session = await startSession();
+  const deletedStore = await session.withTransaction(async () => {
+    return await deleteStorePermanently(request.params.storeId, session);
+  });
+  await session.endSession();
+
   //TODO: create a new adminLog
   response.status(204).json({
     success: true,
