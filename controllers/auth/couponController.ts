@@ -50,7 +50,7 @@ export const createCoupon = async (req: Request, res: Response): Promise<void> =
 };
 
 // Update coupon 
-export const UpdateCoupon = async (req: Request, res: Response): Promise<void> => {
+export const updateCoupon = async (req: Request, res: Response): Promise<void> => {
   try {
     const { couponId } = req.params;
     const data = couponSchema.partial().parse(req.body);
