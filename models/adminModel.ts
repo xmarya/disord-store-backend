@@ -20,7 +20,13 @@ const adminSchema = new Schema<AdminDocument>(
       required: [true, "the email field is required"],
     },
     credentials: {
-      password:String,
+      emailConfirmed: {
+        type: Boolean,
+        default: false,
+      },
+      emailConfirmationToken: String,
+      emailConfirmationExpires:Date,
+      password: String,
       passwordResetToken: String,
       passwordResetExpires: Date,
       passwordChangedAt: Date,
@@ -29,7 +35,7 @@ const adminSchema = new Schema<AdminDocument>(
       type: String,
       default: "admin",
     },
-    image:String,
+    image: String,
   },
   {
     timestamps: true,
