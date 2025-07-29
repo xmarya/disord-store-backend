@@ -1,6 +1,8 @@
 import express from "express";
-import { addToCartController, getMyCartController, updateCartController } from "../../controllers/auth/cartController";
+import {  addToCartController, getMyCartController, deleteFromCart } from "../../controllers/auth/cartController";
+import validateRequestParams from "../../_utils/validators/validateRequestParams";
 
 export const router = express.Router();
 
-router.route("/").post(addToCartController).get(getMyCartController).patch(updateCartController);
+router.route("/").patch(addToCartController).get(getMyCartController);
+router.delete("/:productId", validateRequestParams("productId"), deleteFromCart);

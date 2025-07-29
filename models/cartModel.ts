@@ -9,66 +9,90 @@ const cartSchema = new Schema<CartDocument>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // ensure one cart per user
+      // unique: true, // ensure one cart per user
     },
-    productsPerStore: [
-      {
-        storeId: {
-          type: Schema.Types.ObjectId,
-          ref: "Product",
-          required: [true, "store id is required for the cart"],
-        },
-        products: [
-          {
-            productId: {
-              type: Schema.Types.ObjectId,
-              ref: "Product",
-              required: [true, "product id is required for the cart"],
-            },
-            name: {
-              type: String,
-              required: [true, "product name is required for the cart"],
-            },
-            unitPrice: {
-              type: Number,
-              required: [true, "product price is required for the cart"],
-            },
-            productType: {
-              type: String,
-              enum: ["physical", "digital"],
-              required: [true, "product type is required for the cart"],
-            },
-            image: {
-              type: String,
-              required: [true, "product price is required for the cart"],
-            },
-            quantity: {
-              type: Number,
-              required: true,
-              min: 1,
-              default: 1,
-            },
-            discount: Number,
-            discountedPrice: Number,
-            weight: Number,
-          },
-        ],
-        countOfStoreProducts: Number,
-        totalBeforeDiscount: Number, // sum of price only
-        totalAfterDiscount: Number, // sum of discountedPrice only
-        totalWeight: Number,
-        appliedCoupon: String,
-        total: Number,
-      },
-    ],
-    countOfCartProducts: Number,
-    shippingFees:Number,
-    cartTotalWight:Number,
-    totalOfDiscounts: Number, // grand discount (sum of all `totalAfterDiscount` from each store)
-    cartTotal: {
-      type:Number,
-      required:[true, "the cart total is required"]
+    store: {
+      type: Schema.Types.ObjectId,
+      ref: "Store",
+      required: [true, "store id is required"],
+    },
+    product: {
+      type: Schema.Types.ObjectId,
+      ref: "Product",
+      required: [true, "product id is required"],
+    },
+    quantity: {
+      type: Number,
+      required: [true, "quantity is required"]
     }
+
+    /*OLD CODE (kept for reference):
+    productsPerStore: {
+      type: [
+        {
+          storeId: {
+            type: Schema.Types.ObjectId,
+            ref: "Product",
+            required: [true, "store id is required for the cart"],
+          },
+          products: {
+            type: [
+              {
+                product: {
+                  type: Schema.Types.ObjectId,
+                  ref: "Product",
+                  required: [true, "product id is required for the cart"],
+                },
+                // name: {
+                //   type: String,
+                //   required: [true, "product name is required for the cart"],
+                // },
+                // unitPrice: {
+                //   type: Number,
+                //   required: [true, "product price is required for the cart"],
+                // },
+                // productType: {
+                //   type: String,
+                //   enum: ["physical", "digital"],
+                //   required: [true, "product type is required for the cart"],
+                // },
+                // image: {
+                //   type: String,
+                //   required: [true, "product price is required for the cart"],
+                // },
+                quantity: {
+                  type: Number,
+                  required: true,
+                  min: 1,
+                  default: 1,
+                },
+                // discount: Number,
+                // discountedPrice: Number,
+                // weight: Number,
+              },
+            ],
+           _id:false
+          },
+          // countOfStoreProducts: Number,
+          // totalBeforeDiscount: Number, // sum of price only
+          // totalAfterDiscount: Number, // sum of discountedPrice only
+          // totalWeight: Number,
+          // appliedCoupon: String,
+          // total: Number,
+        },
+      ],
+      _id: false,
+    },
+
+    */
+    // countOfCartProducts: Number,
+    // shippingFees:Number,
+    // cartTotalWight:Number,
+    // totalOfDiscounts: Number, // grand discount (sum of all `totalAfterDiscount` from each store)
+    // cartTotal: {
+    //   type:Number,
+    //   required:[true, "the cart total is required"]
+    // }
   },
   {
     timestamps: true,

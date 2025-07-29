@@ -1,31 +1,29 @@
-import { addProductToCart } from "../../_services/cart/cartServices";
-import { getOneDocByFindOne } from "../../_services/global";
+import { addProductToCart, deleteProductFromCart, getUserCart } from "../../_services/cart/cartServices";
 import { CartDataBody } from "../../_Types/Cart";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import Cart from "../../models/cartModel";
+
 
 export const addToCartController = catchAsync(async (request, response, next) => {
-  const { productsPerStore, countOfCartProducts, totalOfDiscounts, cartTotal, cartTotalWight, shippingFees } = request.body as CartDataBody;
-  if ( productsPerStore.constructor !== Array || !productsPerStore.length) return next(new AppError(400, "can't create a cart with empty array"));
-  if(!cartTotal || !totalOfDiscounts || !countOfCartProducts) return next(new AppError(400, "some data are missing"));
+  const {store, product, quantity} = request.body;
+  if(!store?.trim() || !product?.trim() || !quantity) return next(new AppError(400, "some cart data are missing"));
 
   const user = request.user.id;
-  const data = {user, productsPerStore, countOfCartProducts, totalOfDiscounts, cartTotal, cartTotalWight ,shippingFees};
-  const newCart = await addProductToCart(data);
+  const data: CartDataBody = {user, store, product, quantity}
+  const cart = await addProductToCart(data);
+  // await addJob("Cart", user, data);
 
-  response.status(201).json({
+  response.status(203).json({
     success: true,
-    newCart
+    cart
   });
-
 });
 
 export const getMyCartController = catchAsync(async (request, response, next) => {
   const user = request.user.id;
-  const cart = await getOneDocByFindOne(Cart, user);
+  const cart = await getUserCart(user);
 
-  if(!cart?.id) return next(new AppError(400, "no cart found for the user"));
+  if(!cart?.length) return next(new AppError(404, "no cart found for the user"));
 
   response.status(200).json({
     success: true,
@@ -33,18 +31,13 @@ export const getMyCartController = catchAsync(async (request, response, next) =>
   });
 });
 
-export const updateCartController = catchAsync(async (request, response, next) => {
-  const user = request.user.id;
-  // the update here is going to be similar to categories,
-  // I'm gonna use $set to update whatever are there in the cart,
-  // for empty the cart functionality, it is gonna be like this:
-  // 1- the front end removes all the data immediately
-  // send a patch request to the back-end with products is an empty array []
-  const data = {user, ...request.body};
-  const updatedCart = await addProductToCart(data);
+export const deleteFromCart = catchAsync(async (request, response, next) => {
+  const {productId} = request.params;
+  const user = request.user.id
 
-  response.status(201).json({
+  await deleteProductFromCart(user, productId);
+
+  response.status(204).json({
     success: true,
-    updatedCart
   });
 });
