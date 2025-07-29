@@ -2,15 +2,7 @@ import mongoose from "mongoose";
 import { Address } from "./UserAddress";
 import { PlansNames } from "./Plan";
 import { MongoId } from "./MongoId";
-
-type Credentials = {
-  password: string;
-  passwordConfirm: string;
-  emailConfirmed: boolean;
-  passwordResetToken: string;
-  passwordResetExpires: Date;
-  passwordChangedAt: Date;
-};
+import { Credentials } from "./UserCredentials";
 
 type Discord = {
   discordId: string;
