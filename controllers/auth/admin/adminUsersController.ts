@@ -26,7 +26,6 @@ export const createUnlimitedUserController = catchAsync(async (request, response
 
   if (!quota) return next(new AppError(400, "please insert a plan quota"));
   if (!priceRiyal || !priceDollar) return next(new AppError(400, "Please enter the plan's prices in riyals and dollars."));
-  if (isNaN(priceRiyal) || isNaN(priceDollar)) return next(new AppError(400, "the prices should be of type number"));
 
   const session = await startSession();
   try {
@@ -75,7 +74,7 @@ export const createUnlimitedUserController = catchAsync(async (request, response
       success: true,
       email: newUser.email,
       subscribedPlanDetails: newUser.subscribedPlanDetails,
-      invoiceLink,
+      // invoiceLink,
     });
   } catch (error) {
     console.log(error);
@@ -88,7 +87,7 @@ export const createUnlimitedUserController = catchAsync(async (request, response
 
 export const getAllUsersController = catchAsync(async (request, response, next) => {
   const users = await getAllDocs(User, request, { select: ["firstName", "lastName", "email", "image", "userType"] });
-  if (!users) return next(new AppError(400, "no data was found"));
+  if (!users) return next(new AppError(404, "no data was found"));
 
   response.status(200).json({
     success: true,
@@ -98,7 +97,7 @@ export const getAllUsersController = catchAsync(async (request, response, next) 
 
 export const getOneUserController = catchAsync(async (request, response, next) => {
   const user = await getOneDocById(User, request.params.userId);
-  if (!user) return next(new AppError(400, "couldn't find a user with this id"));
+  if (!user) return next(new AppError(404, "couldn't find a user with this id"));
   response.status(200).json({
     success: true,
     user,

@@ -14,14 +14,14 @@ export const adminLoginController = catchAsync(async (request, response, next) =
   const admin = await getOneDocByFindOne(Admin, { condition: { email } });
   if (!admin) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
-  console.log("adminLoginController", admin);
+
   if (!(await comparePasswords(password, admin.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   //STEP 3) create the token:
   const token = jwtSignature(admin.id, "1h");
   tokenWithCookies(response, token);
 
-  cacheUser(admin);
+  await cacheUser(admin);
   response.status(200).json({
     success: true,
     // token,
@@ -56,7 +56,7 @@ export const getAdminProfile = catchAsync(async (request, response, next) => {
   const adminId = request.user.id;
   const adminProfile = await getOneDocById(Admin, adminId, { select: ["firstName", "lastName", "email", "image"] });
 
-  if (!adminProfile) return next(new AppError(400, "لم يتم العثور على بيانات المستخدم"));
+  if (!adminProfile) return next(new AppError(404, "لم يتم العثور على بيانات المستخدم"));
 
   response.status(200).json({
     success: true,
@@ -69,7 +69,7 @@ export const updateAdminProfile = catchAsync(async (request, response, next) => 
 
   if (email) {
     const isEmailExist = await getOneDocByFindOne(Admin, { condition: { email } }); /*✅*/
-    console.log("isEmailExist", isEmailExist);
+
     if (isEmailExist) return next(new AppError(400, "لا يمكن استخدام هذا البريد الإلكتروني"));
   }
 

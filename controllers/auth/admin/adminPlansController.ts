@@ -7,7 +7,7 @@ import Plan from "../../../models/planModel";
 
 export const getAllPlanController = catchAsync(async (request, response, next) => {
   const plans = await getAllDocs(Plan, request);
-  if (!plans) return next(new AppError(400, "no data was found"));
+  if (!plans) return next(new AppError(440, "no data was found"));
 
   response.status(200).json({
     success: true,
@@ -18,7 +18,7 @@ export const getAllPlanController = catchAsync(async (request, response, next) =
 export const getPlanController = catchAsync(async (request, response, next) => {
   const plan = await getOneDocById(Plan, request.params.planId);
 
-  if (!plan) return next(new AppError(400, "no plan was found with this id"));
+  if (!plan) return next(new AppError(404, "no plan was found with this id"));
   response.status(200).json({
     success: true,
     plan,
@@ -44,10 +44,10 @@ export const updatePlanController = catchAsync(async (request, response, next) =
 });
 
 export const getMonthlyPlansStatsController = catchAsync(async (request, response, next) => {
-  const { dateFilter } = request.dateQuery;
-  console.log("built dateFilter", dateFilter);
-  const allPlansStats = await getMonthlyPlansStats(dateFilter);
-  if (!allPlansStats.length) return next(new AppError(400, "couldn't find data for the specific date"));
+  const { dateFilter, sortBy, sortOrder } = request.dateQuery;
+
+  const allPlansStats = await getMonthlyPlansStats(dateFilter, sortBy, sortOrder);
+  if (!allPlansStats.length) return next(new AppError(404, "couldn't find data for the specific date"));
 
   response.status(200).json({
     success: true,
@@ -56,7 +56,6 @@ export const getMonthlyPlansStatsController = catchAsync(async (request, respons
 });
 
 export const getPlansStatsReportController = catchAsync(async (request, response, next) => {
-  /*REQUIRES TESTING*/
   const { sortBy, sortOrder, year } = request.body;
   const reports = await getPlansStatsReport(sortBy, sortOrder, year);
 
