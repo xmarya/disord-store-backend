@@ -1,18 +1,17 @@
 import type { Request, Response } from "express";
-import { startSession } from "mongoose";
-import { deleteDoc, getOneDocByFindOne, getOneDocById, updateDoc } from "../../_services/global";
+import { getOneDocById, updateDoc } from "../../_services/global";
+import { deleteRegularUser, deleteStoreOwner } from "../../_services/user/deleteUserService";
 import { UserDocument } from "../../_Types/User";
 import { AppError } from "../../_utils/AppError";
+import { deleteFromCache } from "../../_utils/cacheControllers/globalCache";
+import cacheUser from "../../_utils/cacheControllers/user";
 import { catchAsync } from "../../_utils/catchAsync";
 import jwtSignature from "../../_utils/jwtToken/generateSignature";
 import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
 import { comparePasswords } from "../../_utils/passwords/comparePasswords";
 import formatSubscriptionsLogs from "../../_utils/queryModifiers/formatSubscriptionsLogs";
+import { deleteRedisHash } from "../../_utils/redisOperations/redisHash";
 import User from "../../models/userModel";
-import { deleteStorePermanently } from "./storeControllers";
-import mongoose from "mongoose";
-import cacheUser from "../../_utils/cacheControllers/user";
-import { removeFromCache } from "../../_utils/cacheControllers/globalCache";
 
 export const getUserProfile = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -42,7 +41,6 @@ export const getMySubscriptionsLogController = catchAsync(async (request, respon
 });
 
 export const confirmUserChangePassword = catchAsync(async (request, response, next) => {
-
   const userId = request.user.id;
   const { currentPassword, newPassword } = request.body;
   const user = await getOneDocById(User, userId, { select: ["credentials"] });
@@ -68,20 +66,13 @@ export const confirmUserChangePassword = catchAsync(async (request, response, ne
 export const updateUserProfile = catchAsync(async (request, response, next) => {
   /*✅*/
   const userId = request.user.id;
-  const { email, firstName, lastName }: Pick<UserDocument, "email" | "firstName" | "lastName"> = request.body;
-
-  if (email) {
-    const isEmailExist = await getOneDocByFindOne(User, { condition: { email } }); /*✅*/
-    console.log("isEmailExist", isEmailExist);
-    if (isEmailExist) return next(new AppError(400, "لا يمكن استخدام هذا البريد الإلكتروني"));
-  }
-
+  let { firstName, lastName }: Pick<UserDocument, "firstName" | "lastName"> = request.body;
   if (firstName?.trim() === "" && lastName?.trim() === "") return next(new AppError(400, "الرجاء تعبئة حقول الاسم بالكامل"));
 
   const updatedUser = await updateDoc(User, userId, request.body);
 
   // update the cached data:
-  updatedUser && cacheUser(updatedUser);
+  updatedUser && (await cacheUser(updatedUser));
   response.status(203).json({
     success: true,
     updatedUser,
@@ -92,19 +83,14 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
 
 export const deleteUserAccountController = catchAsync(async (request, response, next) => {
   const { userId } = request.params;
-  let session:mongoose.ClientSession | null;
-  let deletedUser: UserDocument | null;
-
-  if (request.user.userType === "storeOwner") {
-    session = await startSession();
-    await session.withTransaction(async () => {
-      await deleteStorePermanently(request.store, session);
-      await deleteDoc(User, userId, { session });
-    });
-    session.endSession();
-  } 
   
-  else await deleteDoc(User, userId);
+  const user = await getOneDocById(User, userId, { select: ["userType", "myStore"] });
+  
+  if (!user) return next(new AppError(404, "no user with this id"));
+  if (user.userType === "storeAssistant") return next(new AppError(400, "this route is not for deleting a storeAssistant"));
+
+  if (user.userType === "storeOwner") await deleteStoreOwner(userId,user.myStore);
+  else  await deleteRegularUser(userId);
 
   response.status(204).json({
     success: true,
@@ -112,7 +98,8 @@ export const deleteUserAccountController = catchAsync(async (request, response, 
 });
 
 export function logout(request: Request, response: Response) {
-  removeFromCache(`User:${request.user.id}`);
+  deleteFromCache(`User:${request.user.id}`);
+  request.user.userType === "storeOwner" && deleteRedisHash(`StoreAndPlan:${request.user.myStore}`);
   response.clearCookie("jwt");
   response.setHeader("Clear-Site-Data", "cookies"); // for browsers
   response.status(200).json({ success: true, message: "you've logged-out" });
