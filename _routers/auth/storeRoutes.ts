@@ -1,5 +1,5 @@
 import express from "express";
-import { router as reviewRouter } from "./reviewRoutes";
+import { router as reviewRouter } from "./reviews/privateReviewRoutes";
 import { router as invoiceRouter } from "./invoiceRoutes";
 import hasAuthorization from "../../_utils/protectors/hasAuthorization";
 import restrict from "../../_utils/protectors/restrict";
@@ -13,9 +13,10 @@ import { getStoreStatsController } from "../../controllers/auth/storeStatsContro
 
 export const router = express.Router();
 router.use(hasAuthorization);
-// router.use("/reviews", validateModelId("Review-store"), assignModelToRequest("Review-store"), reviewsRouter);
-router.use("/:storeId/reviews", validateRequestParams("storeId"), reviewRouter); /*REQUIRES TESTING: maybe this should be moved to the bottom of the stack*/
-router.use("/invoices", invoiceRouter)
+
+router.use("/reviews", reviewRouter);
+router.use("/invoices", invoiceRouter);
+
 router
   .route("/")
   // .post(restrict("storeOwner"), sanitisedData, createStoreController)

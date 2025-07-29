@@ -10,7 +10,7 @@ router.use(restrict("storeOwner"));
 router.route("/").get(getMySubscriptionsLogController);
 
 router.use(sanitisedData);
-router.patch("/new-subscribe", createNewSubscribeController); /*✅*/
+router.patch("/newSubscribe", createNewSubscribeController);
 router.patch("/renewal", renewalSubscriptionController);
 /* CHANGE LATER: the above two must have a controller for the payment as the first md before proceeding to the updating */
 router.patch("/unsubscribe", cancelSubscriptionController);

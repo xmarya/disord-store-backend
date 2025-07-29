@@ -1,31 +1,25 @@
 import express from "express";
-import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
-import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import { createAdminController, createUnlimitedUserController, getAllUsersController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
-import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviewController";
-import { displayReviewInHomePage } from "../../controllers/auth/admin/adminReviewsController";
-import { getAllPlanController, getPlanController, getMonthlyPlansStatsController, updatePlanController, getPlansStatsReportController } from "../../controllers/auth/admin/adminPlansController";
-import getDateQuery from "../../_utils/queryModifiers/getDateQuery";
 import restrict from "../../_utils/protectors/restrict";
+import getDateQuery from "../../_utils/queryModifiers/getDateQuery";
 import sanitisedData from "../../_utils/validators/sanitisedData";
-import validateNewUserData from "../../_utils/validators/validateNewUserData";
-import validateUnlimitedUserData from "../../_utils/validators/validateUnlimitedUserData";
 import { validateChangePassword } from "../../_utils/validators/validateChangePassword";
-import { adminLoginController, confirmAdminChangePassword, getAdminProfile, updateAdminProfile } from "../../controllers/auth/admin/adminAuthController";
-import { resetPassword } from "../../_utils/passwords/resetPassword";
-import { forgetPassword } from "../../_utils/passwords/forgetPassword";
+import validateNewUserData from "../../_utils/validators/validateNewUserData";
+import validateRequestParams from "../../_utils/validators/validateRequestParams";
+import validateUnlimitedUserData from "../../_utils/validators/validateUnlimitedUserData";
+import { confirmAdminChangePassword, getAdminProfile, updateAdminProfile } from "../../controllers/auth/admin/adminAuthController";
+import { getAllPlanController, getMonthlyPlansStatsController, getPlanController, getPlansStatsReportController, updatePlanController } from "../../controllers/auth/admin/adminPlansController";
+import { displayReviewInHomePage } from "../../controllers/auth/admin/adminReviewsController";
+import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
+import { createAdminController, createUnlimitedUserController, getAllUsersController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
+import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviews/platformReviewController";
 import { deleteUserAccountController } from "../../controllers/auth/userAuthController";
 
 export const router = express.Router();
 
-router.post("/forgetPassword", forgetPassword("Admin")); // this route must be at the top of the stack since it doesn't require to be logged-in.
-
 router.use(restrict("admin"));
 router.route("/").get(getAdminProfile).patch(updateAdminProfile); /*✅*/
-router.post("/administrator-user", sanitisedData, validateNewUserData, createAdminController); /*✅*/
-router.post("/login", adminLoginController);
+router.post("/administratorUser", sanitisedData, validateNewUserData, createAdminController); /*✅*/
 router.route("/changePassword").patch(validateChangePassword, confirmAdminChangePassword); /*✅*/
-router.route("/resetPassword/:randomToken").patch(validateRequestParams("randomToken"), resetPassword("Admin"));
 
 /* STORES 
     1- patch route for suspend store
@@ -42,13 +36,13 @@ router
     2- create unlimited plan user
     3- delete user
 */
+router.post("/users/unlimitedUser", sanitisedData, validateUnlimitedUserData, createUnlimitedUserController); /*✅*/
 router.get("/users", getAllUsersController); /*✅*/
 router
   .route("/users/:userId")
   .get(validateRequestParams("userId"), getOneUserController) /*✅*/
   .delete(validateRequestParams("userId"), deleteUserAccountController);
 
-router.post("/users/unlimited-user", sanitisedData, validateUnlimitedUserData, createUnlimitedUserController);/*✅*/
 
 /* PLANS 
     1- get route for plans stats ✅
@@ -56,15 +50,14 @@ router.post("/users/unlimited-user", sanitisedData, validateUnlimitedUserData, c
     3- get plans stats
 */
 router.get("/plans", getAllPlanController);
-// rule of 👍🏻: remember to keep the specific routes at the top of the routes stack, whilst keeping the general -especially that has /:params) at the bottom of the stack 
-router.get("/plans/monthly-stats", getDateQuery, getMonthlyPlansStatsController);/*✅*/ // for displaying data per month (the default is this month)
-router.get("/plans/plans-reports", getPlansStatsReportController); /*✅*/
+// rule of 👍🏻: remember to keep the specific routes at the top of the routes stack, whilst keeping the general -especially that has /:params) at the bottom of the stack
+router.get("/plans/monthlyStats", getDateQuery, getMonthlyPlansStatsController); /*✅*/ // for displaying data per month (the default is this month)
+router.get("/plans/plansReports", getPlansStatsReportController); /*✅*/
 
 router
   .route("/plans/:planId")
   .get(validateRequestParams("planId"), getPlanController) // NOTE: it's useful for getting a customisable plan -I mean the unlimited-
   .patch(validateRequestParams("planId"), sanitisedData, updatePlanController);
-
 
 /* REVIEWS ✅
     1- get all reviews
