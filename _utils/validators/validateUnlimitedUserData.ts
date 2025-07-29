@@ -36,11 +36,12 @@ const validateUnlimitedUserData = catchAsync(async (request, response, next) => 
     if (!email?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
     const isEmailExist = await getOneDocByFindOne(User, { condition: { email } });
-    if (!isEmailExist) return next(new AppError(400, "لا يمكن استخدام هذا البريد الإلكتروني  للتسجيل"));
+    if (!isEmailExist) return next(new AppError(400, "لايوجد مستخدم بهذا البريد الإلكتروني"));
 
     user = {
       email,
       subscriptionType,
+      // BUG: the inPlan property of a store should be updated along with the upgrade. may I'll use hook
     };
   }
 
