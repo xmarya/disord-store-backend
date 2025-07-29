@@ -1,11 +1,11 @@
 import { MongoId } from "../../_Types/MongoId";
-import { setHash } from "../redisOperations/redisHash";
+import { createRedisHash } from "../redisOperations/redisHash";
 
 async function cacheStoreAndPlan(store: MongoId, plan: MongoId, isPaid: boolean, planExpiryDate: Date) {
-    const data = {store, plan, isPaid, planExpiryDate};
-    
-    const result = await setHash(`StoreAndPlan:${store}`, data, "one-hour");
-    console.log("cacheStoreAndPlan", result);
+  const data = { store, plan, isPaid, planExpiryDate };
+
+  const result = await createRedisHash(`StoreAndPlan:${store}`, data, "one-hour");
+
 }
 
 export default cacheStoreAndPlan;

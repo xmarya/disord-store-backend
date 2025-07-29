@@ -1,6 +1,6 @@
 export type TTLMap = {
-  long: number;
-  short: number;
+  "two-minutes": number;
+  "fifteen-minutes": number;
   "one-hour": number;
   "no-ttl": undefined;
 };

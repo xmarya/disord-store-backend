@@ -14,6 +14,7 @@ declare global {
       REDIS_USERNAME: string;
       REDIS_PASSWORD: string;
       REDIS_TLS: string;
+      RESEND_KEY: string;
     }
   }
 }

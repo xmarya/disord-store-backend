@@ -9,20 +9,20 @@ import { RedisTTL } from "../../_Types/RedisCache";
     - Set a short TTL for stores' stats
     - Batching the stores' profit (cache them => write into the db at one query operation)
 */
-export async function setHash(hashKey: string, data: any, TTL: RedisTTL) {
+export async function createRedisHash(hashKey: string, data: object, TTL: RedisTTL) {
   const result = await redis.hset(hashKey, data);
   // if TTL is anything except "no-ttl"
-  if(ttl[TTL]) redis.expire(hashKey, ttl[TTL]);
+  if (ttl[TTL]) await redis.expire(hashKey, ttl[TTL]);
   return Boolean(result);
 }
 
-export async function getHash<T>(hashKey: string, field?: string): Promise<T | null> {
+export async function getRedisHash<T>(hashKey: string, field?: string): Promise<T | null> {
   const hashFun = field ? redis.hget(hashKey, field) : redis.hgetall(hashKey);
   const data = (await hashFun) as T | null; // await the promise of the result of ternary operator
-  console.log("getHash", data);
+
   return data;
 }
 
-export async function deleteHash(hashKey: string) {
+export async function deleteRedisHash(hashKey: string) {
   return { result: Boolean(await redis.del(hashKey)) };
 }

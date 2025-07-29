@@ -20,7 +20,7 @@ async function cacheUser(user: UserDocument | AdminDocument) {
 
   // console.log("data before setCachedData", data);
 
-  setCompressedCacheData(`User:${data.id}`, data, "one-hour");
+  await setCompressedCacheData(`User:${data.id}`, data, "one-hour");
 }
 
 export default cacheUser;

@@ -1,7 +1,13 @@
 import redis from "../../_config/redis";
+import { ttl } from "../../_data/constants";
+import { RedisTTL } from "../../_Types/RedisCache";
 
-export async function createSortedSet(name: string, member: string, score: string | number) {
-  await redis.zadd(name, score, member);
+export async function createRedisSortedSet(name: string, member: string, score: string | number, TTL: RedisTTL) {
+  const result = await redis.zadd(name, score, member);
+  if (ttl[TTL]) redis.expire(name, ttl[TTL]);
+
+
+  return Boolean(result);
 }
 
 export async function getSortedSetOf(name: string, min?: number, max?: number) {
