@@ -10,14 +10,15 @@ import { startSubscription } from "../../_utils/startSubscription";
 import Plan from "../../models/planModel";
 import User from "../../models/userModel";
 import cacheUser from "../../_utils/cacheControllers/user";
+import cacheStoreAndPlan from "../../_utils/cacheControllers/storeAndPlan";
 
 export const createNewSubscribeController = catchAsync(async (request, response, next) => {
   /*✅*/
-  console.log("createNewSubscribe");
+
   const { planId, paidPrice } = request.body;
   if (!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
   const plan = await getOneDocById(Plan, planId);
-  if (!plan) return next(new AppError(400, "لايوجد باقة بهذا المعرف"));
+  if (!plan) return next(new AppError(404, "لايوجد باقة بهذا المعرف"));
 
   const updatedUser = await startSubscription(request.user.id, plan, paidPrice, "new");
 
@@ -28,12 +29,12 @@ export const createNewSubscribeController = catchAsync(async (request, response,
 });
 
 export const renewalSubscriptionController = catchAsync(async (request, response, next) => {
-  console.log("renewalSubscription");
+
   const { planId, paidPrice } = request.body;
   if (!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
 
   const plan = await getOneDocById(Plan, planId);
-  if (!plan) return next(new AppError(400, "لايوجد باقة بهذا المعرف"));
+  if (!plan) return next(new AppError(404, "لايوجد باقة بهذا المعرف"));
 
   const currentPlanId = request.plan;
   const subscriptionType = await getSubscriptionType(currentPlanId, planId);
@@ -51,7 +52,7 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
   const { notes } = request.body; // TODO: for the admin log
   const userId = request.user.id;
   const user = await getOneDocById(User, userId, { select: ["subscribedPlanDetails"] });
-  if (!user || !user.subscribedPlanDetails) return next(new AppError(400, "User has no active subscription"));
+  if (!user || !user.subscribedPlanDetails) return next(new AppError(404, "User has no active subscription"));
 
   const { subscribedPlanDetails } = user;
 
@@ -73,11 +74,14 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
   //TODO: refund the money using the User's bank account.
 
   updatedUser && cacheUser(updatedUser);
-  console.log("the returned user from th transaction", updatedUser);
 
+  
   request.planExpiryDate = new Date();
   request.isPlanPaid = false;
   request.plan = "";
+
+  // TODO: update the hash of StoreAndPlan
+  await cacheStoreAndPlan(request.store, request.plan, request.isPlanPaid, request.planExpiryDate);
 
   response.status(200).json({
     success: true,
