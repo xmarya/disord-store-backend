@@ -57,7 +57,6 @@ planStatsSchema.statics.getAnnualStatsReport = async function (sortBy: "year" | 
   // 2025: { planName1: {subscribers, profits}, planName2: {subscribers, profits} }]
   // if the specificYear was provided, return only its data
 
-  console.log("getAnnualStatsReport");
   const yearStage = specificYear
     ? {
         $match: {
@@ -127,7 +126,7 @@ planStatsSchema.statics.getAnnualStatsReport = async function (sortBy: "year" | 
   ]);
 
   if (specificYear) {
-    const match = results.find((res) => res.year === specificYear);
+    const match = results.find((res) => res.year === +(specificYear)); // this condition had a bug resulted in an empty data because I was doing a comparison between a string and a number
     return match || { [specificYear]: {} };
   }
 
@@ -138,7 +137,7 @@ planStatsSchema.statics.getAnnualStatsReport = async function (sortBy: "year" | 
 };
 
 planStatsSchema.statics.getPlansTotalsReport = async function () {
-  console.log("getPlansTotalsReport");
+
   // aggregate, group them by the planName, return as an object {planName: {subscribers, profits}}
   const pipeline = [
     {
