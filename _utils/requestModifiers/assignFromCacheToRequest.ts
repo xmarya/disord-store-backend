@@ -1,6 +1,9 @@
+import { getOneDocByFindOne } from "../../_services/global";
 import { MongoId } from "../../_Types/MongoId";
+import Store from "../../models/storeModel";
+import { AppError } from "../AppError";
 import { catchAsync } from "../catchAsync";
-import { getHash } from "../redisOperations/redisHash";
+import { getRedisHash } from "../redisOperations/redisHash";
 
 type StoreAndPlan = {
   store: MongoId;
@@ -9,14 +12,16 @@ type StoreAndPlan = {
   planExpiryDate: Date;
 };
 export const assignFromCacheToRequest = catchAsync(async (request, response, next) => {
-  const userId = request.user.id;
-  const key = `StoreAndPlan:${userId}`;
-  const data = await getHash<StoreAndPlan>(key);
+  if (request.user.userType !== "storeOwner" && request.user.userType !== "storeAssistant") return next(new AppError(403, "غير مصرح لك الوصول للصفحة"));
+  const userId = request.user._id;
+  const store = await getOneDocByFindOne(Store, { condition: { $or: [{ owner: userId }, { storeAssistants: userId }] } });
+  const key = `StoreAndPlan:${store?.id}`;
+  const data = await getRedisHash<StoreAndPlan>(key);
   if (!data) return next();
 
-  const { store, plan, isPaid, planExpiryDate } = data;
+  const { store: cacheStore, plan, isPaid, planExpiryDate } = data;
 
-  request.store = store;
+  request.store = cacheStore;
   request.plan = plan;
   request.isPlanPaid = isPaid;
   request.planExpiryDate = planExpiryDate;

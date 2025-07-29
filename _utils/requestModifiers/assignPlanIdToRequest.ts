@@ -20,16 +20,15 @@ const assignPlanIdToRequest = catchAsync(async (request, response, next) => {
   // NOTE: I'm only checking using the plan, as it the only value that tells me if the user has
   // a running subscription or not. inside cancelSubscriptionController I'm setting the plan to empty string which is a false value.
 
-  console.log("PLAN ID ISN'T FROM THE CACHE");
 
   const storeId = request.store;
   const store = await getOneDocById(Store, storeId, { select: ["owner"] });
 
-  if (!store) return next(new AppError(400, "couldn't find the store"));
+  if (!store) return next(new AppError(404, "couldn't find the store"));
 
   // TODO: skip the query if the user is the store owner
   const owner = await getOneDocById(User, store.owner, { select: ["subscribedPlanDetails"] });
-  if (!owner) return next(new AppError(400, "couldn't find the store owner"));
+  if (!owner) return next(new AppError(404, "couldn't find the store owner"));
 
   request.plan = owner.subscribedPlanDetails.planId;
   request.isPlanPaid = owner.subscribedPlanDetails.paid;
@@ -37,7 +36,7 @@ const assignPlanIdToRequest = catchAsync(async (request, response, next) => {
 
   // since the code progressed until this point, that mean the data are not available in the cache.
   // so, cache them without awaiting:
-  cacheStoreAndPlan(request.store, request.plan, request.isPlanPaid, request.planExpiryDate);
+  await cacheStoreAndPlan(request.store, request.plan, request.isPlanPaid, request.planExpiryDate);
   next();
 });
 

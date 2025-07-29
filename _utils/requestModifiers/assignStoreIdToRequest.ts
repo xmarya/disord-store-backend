@@ -5,12 +5,10 @@ import { catchAsync } from "../catchAsync";
 
 export const assignStoreIdToRequest = catchAsync(async (request, response, next) => {
   // console.log("assignStoreIdToRequest");
-  if (request.user.userType !== "storeOwner" && request.user.userType !== "storeAssistant") return next(new AppError(403, "غير مصرح لك الوصول للصفحة"));
-
+  
   // if the store is exist from the previous cache middleware
   if (request.store) return next();
 
-  console.log("STORE ID ISN'T FROM THE CACHE");
   const user = request.user;
   let storeId;
 
