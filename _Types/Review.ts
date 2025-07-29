@@ -1,9 +1,17 @@
 import mongoose from "mongoose";
 import { Model } from "./Model";
 import { MongoId } from "./MongoId";
+import { UserTypes } from "./User";
 
-export interface ReviewDataBody {
+interface SharedReviewDataBody {
   writer: MongoId,
+  userType: UserTypes,
+  firstName:string,
+  lastName:string,
+  image:string,
+}
+
+export interface ReviewDataBody extends SharedReviewDataBody {
   storeOrProduct: Extract<Model, "Store" | "Product">,
   reviewedResourceId: MongoId,
   reviewBody:string,
@@ -21,8 +29,8 @@ export interface ReviewModel extends mongoose.Model<ReviewDocument> {
 }
 */
 
-export interface PlatformReviewDataBody {
-  user: MongoId;
+export interface PlatformReviewDataBody extends SharedReviewDataBody {
+  writer: MongoId;
   reviewBody: string;
 }
 

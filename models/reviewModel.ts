@@ -22,7 +22,7 @@ export const reviewSchema = new mongoose.Schema<ReviewDocument>(
     },
     reviewBody: {
       type: String,
-      minlength: [50, "minimum length is 50 characters"],
+      minlength: [10, "minimum length is 50 characters"],
       maxlength: [500, "maximum length is 500 characters"],
       required: [true, "the reviewBody field is required"],
     },
@@ -32,6 +32,20 @@ export const reviewSchema = new mongoose.Schema<ReviewDocument>(
       min: 1,
       max: 5,
     },
+    userType: {
+      type: String,
+      enum: ["user", "storeOwner", "storeAssistant"],
+      required: [true, "the userType field is required"],
+    },
+    firstName: {
+      type: String,
+      required: [true, "the firstName field is required"],
+    },
+    lastName: {
+      type: String,
+      required: [true, "the lastName field is required"],
+    },
+    image: String,
     storeReply: {
       type: String,
       maxlength: [500, "maximum length is 500 characters"],
@@ -53,7 +67,7 @@ export const reviewSchema = new mongoose.Schema<ReviewDocument>(
 
 // ensure that the uniqueness of the roaster/bean-user combination,
 // so there are no duplicated reviews from the same user on the same doc:
-reviewSchema.index({ reviewedModel: 1 , user: 1}, { unique: true});
+reviewSchema.index({ reviewedResourceId: 1, writer: 1 }, { unique: true });
 const Review = mongoose.model<ReviewDocument, ReviewModel>("Review", reviewSchema);
 
 export default Review;
