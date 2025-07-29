@@ -3,7 +3,7 @@ import User from "../../models/userModel";
 import StoreAssistant from "../../models/storeAssistantModel";
 import Store from "../../models/storeModel";
 import { AppError } from "../../_utils/AppError";
-import { AssistantRegisterData, StoreAssistantDocument } from "../../_Types/StoreAssistant";
+import { AssistantRegisterData } from "../../_Types/StoreAssistant";
 import { MongoId } from "../../_Types/MongoId";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
@@ -13,15 +13,14 @@ import { MongoId } from "../../_Types/MongoId";
 */
 
 export async function createAssistant(data: AssistantRegisterData) {
-  console.log("create Assistant service");
-  const { email, password, username, permissions, storeId } = data;
+  const { email, password, firstName, lastName, permissions, storeId } = data;
   const session = await startSession();
   session.startTransaction();
 
   try {
     //STEP ) check if the store is exist:
     const store = await Store.findById(storeId);
-    if (!store) throw new AppError(400, "لايوجد متجر  بهذا المعرف");
+    if (!store) throw new AppError(404, "لايوجد متجر  بهذا المعرف");
 
     //STEP : create a new user with userType = assistant:
     const user = await User.create(
@@ -30,8 +29,9 @@ export async function createAssistant(data: AssistantRegisterData) {
           signMethod: "credentials",
           userType: "storeAssistant",
           email,
+          firstName,
+          lastName,
           credentials: { password },
-          username,
         },
       ],
       { session }
@@ -104,8 +104,7 @@ export async function getAssistantPermissions(storeId:MongoId, assistantId:strin
     return assistant;
 }
 
-export async function deleteAllAssistants(storeId: MongoId, session:mongoose.ClientSession) {
-  console.log("deleteAllAssistants");
+export async function deleteAllAssistants(storeId: MongoId, session: mongoose.ClientSession) {
   //STEP 1) get all the assistants ids based on the storeId to delete them from assistants collection:
   const assistantsId = await StoreAssistant.find({inStore: storeId}).select("assistant"); // this is going to have the mongodb default _id and the assistant field
   if(!assistantsId) return;
