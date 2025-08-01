@@ -1,4 +1,5 @@
 export type TTLMap = {
+  "one-minute": number;
   "two-minutes": number;
   "fifteen-minutes": number;
   "one-hour": number;
