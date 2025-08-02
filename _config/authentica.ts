@@ -1,33 +1,58 @@
-import { AuthenticaFullRequest, AuthenticaRequestType, AuthenticaResponse } from "../_Types/AuthenticaOTP";
-import { AppError } from "../_utils/AppError";
+import { AuthenticaBalance, AuthenticaFullRequest, AuthenticaRequestEndpoint, AuthenticaResponse } from "../_Types/AuthenticaOTP";
+import { catchAsync } from "../_utils/catchAsync";
+import createUserLoginToken from "../_utils/jwtToken/createUserLoginToken";
 
-const API_URL_PRODUCTION = (requestType: AuthenticaRequestType) => `https://api.authentica.sa/api/v2${requestType}`;
-const API_URL_MOCK = (requestType: AuthenticaRequestType) => `https://private-anon-550e751df7-authenticasa.apiary-mock.com/api/v2${requestType}`;
-const API_KEY = process.env.AUTHENTICA_API_KEY;
+const API_URL = (requestEndpoint: AuthenticaRequestEndpoint) => `https://api.authentica.sa/api/v2${requestEndpoint}`;
 
-const headers = {
-  "Content-Type": "application/json",
-  "Accept": "application/json",
-  "X-Authorization": API_KEY,
-};
+async function authentica({ requestEndpoint, body }: AuthenticaFullRequest) {
+  // const development = process.env.NODE_ENV === "development";
+  // const API_KEY = development ? process.env.AUTHENTICA_API_KEY_TEST : process.env.AUTHENTICA_API_KEY;
+  const API_KEY = process.env.AUTHENTICA_API_KEY_TEST;
+  const URL = API_URL(requestEndpoint);
 
-async function authentica({requestType,body}:AuthenticaFullRequest) {
-    const URL = process.env.NODE_ENV === "development" ? API_URL_MOCK(requestType) : API_URL_PRODUCTION(requestType);
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "X-Authorization": API_KEY,
+  };
 
-    const response = await fetch(URL, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body)
-    });
-    const data = await response.json() as AuthenticaResponse;
-    console.log("wahtauthenticadata", data);
-    // if(data.statusCode !== 200) return new AppError(data.statusCode, data.message);
+  const response = await fetch(URL, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
 
-    console.log("AUTHENTICA SUCCESS 🎉");
+  const data = (await response.json());
 
-    return data;
-
+  return data;
 }
+
+export const getAuthenticaBalance = catchAsync(async (request, response, next) => {
+  const URL = "https://api.authentica.sa/api/v2/balance";
+  const API_KEY = process.env.AUTHENTICA_API_KEY_TEST;
+
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "X-Authorization": API_KEY,
+  };
+
+  const result = await fetch(URL, {
+    method: "GET",
+    headers,
+  });
+
+  const { data } = (await result.json()) as AuthenticaBalance;
+
+  console.log(data.balance, !!data.balance);
+  if(data.balance) return next(); // enough balance ? move to send the otp
+
+  await createUserLoginToken(request.body.user, response);
+  response.status(200).json({
+    success:true,
+    message: "successful login"
+  });
+});
 
 export default authentica;
 

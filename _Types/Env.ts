@@ -16,6 +16,7 @@ declare global {
       REDIS_TLS: string;
       RESEND_KEY: string;
       AUTHENTICA_API_KEY:string
+      AUTHENTICA_API_KEY_TEST:string
     }
   }
 }

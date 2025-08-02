@@ -7,7 +7,7 @@ dotenv.config({ path: "./.env" });
 const port = process.env.PORT || 3000;
 
 await dbStartConnection();
-await initiateBullMQJobs();
+// await initiateBullMQJobs();
 const server = app.listen(port, () => {
   console.log(`the server is running on port ${port}...`);
 });
