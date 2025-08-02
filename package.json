@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@novu/api": "^1.5.0",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "bullmq": "^5.56.0",

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@novu/api':
+        specifier: ^1.5.0
+        version: 1.5.0(zod@3.24.2)
       axios:
         specifier: ^1.8.4
         version: 1.9.0
@@ -307,6 +310,16 @@ packages:
     resolution: {integrity: sha512-x0fWaQtYp4E6sktbsdAqnehxDgEc/VwM7uLsRCYWaiGu0ykYdZPiS8zCWdnjHwyiumousxfBm4SO31eXqwEZhQ==}
     cpu: [x64]
     os: [win32]
+
+  '@novu/api@1.5.0':
+    resolution: {integrity: sha512-WILnDmCpinlI3OkqMPyyV/F4JivxGcXZ28sga/bzT5FYtqO+5IFJz6vZx7YvAsAomhoVDUNZfq/SvTJuQZoVuw==}
+    hasBin: true
+    peerDependencies:
+      '@modelcontextprotocol/sdk': '>=1.5.0 <1.10.0'
+      zod: ^3
+    peerDependenciesMeta:
+      '@modelcontextprotocol/sdk':
+        optional: true
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
@@ -1696,6 +1709,10 @@ snapshots:
 
   '@msgpackr-extract/msgpackr-extract-win32-x64@3.0.3':
     optional: true
+
+  '@novu/api@1.5.0(zod@3.24.2)':
+    dependencies:
+      zod: 3.24.2
 
   '@swc/helpers@0.5.15':
     dependencies:
