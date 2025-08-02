@@ -1,5 +1,6 @@
-import { getOneDocByFindOne } from "../../_services/global";
+import { getOneDocByFindOne, getOneDocById } from "../../_services/global";
 import { UserDocument } from "../../_Types/User";
+import User from "../../models/userModel";
 import cacheUser from "../cacheControllers/user";
 import jwtSignature from "./generateSignature";
 import tokenWithCookies from "./tokenWithCookies";
@@ -13,8 +14,8 @@ async function createUserLoginToken(user:UserDocument, response:Response) {
   tokenWithCookies(response, token);
 
   // STEP 4) fetching and caching without awaiting
-//   const user = await getOneDocByFindOne(User);
-  await cacheUser(user);
+  const loggedInUser = await getOneDocById(User, user.id);
+  loggedInUser && await cacheUser(loggedInUser);
 }
 
 export default createUserLoginToken;
