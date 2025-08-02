@@ -61,18 +61,18 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
 });
 
 export const sendOTP = catchAsync(async (request, response, next) => {
-  /* CHANGE LATER: use the user's real data */
-  const { user, isEmail } = request.body;
+  const isEmail = request.body.isEmail;
+  const user:UserDocument = request.body.user;
   const method = isEmail ? "email" : "sms";
 
   const body: AuthenticaSendOTPDataBody<typeof method> = isEmail
     ? { method: "email", email: "shhmanager1@gmail.com" }
     : {
         method: "sms",
-        phone: `+966${540020221}`,
+        phone: user.phoneNumber,
         template_id: "5",
-        fallback_phone: `+966${540020221}`,
-        fallback_email: "shhmanager1@gmail.com",
+        fallback_phone: user.phoneNumber,
+        fallback_email: user.email,
       };
   // STEP 4) send an OTP
   const {success, message} = (await authentica({ requestEndpoint: "/send-otp", body })) as AuthenticaResponse<"/send-otp">;
