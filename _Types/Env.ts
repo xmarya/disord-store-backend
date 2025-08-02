@@ -1,7 +1,7 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      NODE_ENV: string;
+      NODE_ENV: "development" | "production";
       LOCAL_DB: string;
       ATLAS_DB: string;
       JWT_SALT: string;
@@ -15,6 +15,8 @@ declare global {
       REDIS_PASSWORD: string;
       REDIS_TLS: string;
       RESEND_KEY: string;
+      AUTHENTICA_API_KEY:string
+      AUTHENTICA_API_KEY_TEST:string
     }
   }
 }

@@ -24,7 +24,7 @@ export interface RegularUser extends UserDataBody {
   userType: UserTypes;
   firstName: string;
   lastName: string;
-  phoneNumber: string;
+  phoneNumber: `+966${string}`;
   image: string;
   defaultAddressId: MongoId;
   defaultCreditCardId: MongoId;

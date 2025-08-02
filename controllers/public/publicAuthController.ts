@@ -1,10 +1,10 @@
+import authentica from "../../_config/authentica";
 import { createDoc, getOneDocByFindOne } from "../../_services/global";
+import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody, AuthenticaVerifyOTPResponse } from "../../_Types/AuthenticaOTP";
 import { UserDocument } from "../../_Types/User";
+import { CredentialsLoginDataBody } from "../../_Types/UserCredentials";
 import { AppError } from "../../_utils/AppError";
-import cacheUser from "../../_utils/cacheControllers/user";
 import { catchAsync } from "../../_utils/catchAsync";
-import jwtSignature from "../../_utils/jwtToken/generateSignature";
-import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
 import { comparePasswords } from "../../_utils/passwords/comparePasswords";
 import User from "../../models/userModel";
 
@@ -34,33 +34,74 @@ export const createNewUserController = catchAsync(async (request, response, next
 });
 
 export const credentialsLogin = catchAsync(async (request, response, next) => {
-  /*✅*/
-  // STEP 1) getting the provided email and password from the request body to check the email:
-  const { email, password } = request.body;
-  if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
+  // STEP 1) getting the provided email/phone and password from the request body to start checking:
+  const { password, emailOrPhoneNumber }: CredentialsLoginDataBody = request.body;
+  if (!emailOrPhoneNumber?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
-  const user = await getOneDocByFindOne(User, { condition: { email }, select: ["credentials", "email", "firstName", "lastName", "userType", "subscribedPlanDetails", "myStore", "image"] });
+  const isEmail = emailOrPhoneNumber.includes("@");
+  const condition = isEmail ? { email: emailOrPhoneNumber } : { phoneNumber: emailOrPhoneNumber };
+
+  const user = await getOneDocByFindOne(User, {
+    // condition: { email },
+    condition,
+    select: ["credentials", "email", "firstName", "lastName", "userType", "subscribedPlanDetails", "myStore", "image", "phoneNumber"],
+  });
   if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   // STEP 2) checking the password:
   if (!(await comparePasswords(password, user.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
-  //STEP 3) create the token:
-  const token = jwtSignature(user.id, "1h");
-  tokenWithCookies(response, token);
+  const plainUser = user.toObject();
+  delete plainUser.credentials.password;
 
-  // STEP 4) caching without awaiting
-  cacheUser(user);
+  request.body = {}; // remove old body to insert the new.
+  request.body.user = plainUser;
+  request.body.isEmail = isEmail;
+  next();
+});
 
-  response.status(200).json({
-    success: true,
-    // token,
-    /*
-      for security reasons, it is preferred to not including it in the response body
+export const sendOTP = catchAsync(async (request, response, next) => {
+  const isEmail = request.body.isEmail;
+  const user:UserDocument = request.body.user;
+  const method = isEmail ? "email" : "sms";
+
+  const body: AuthenticaSendOTPDataBody<typeof method> = isEmail
+    ? { method: "email", email: "shhmanager1@gmail.com" }
+    : {
+        method: "sms",
+        phone: user.phoneNumber,
+        template_id: "5",
+        fallback_phone: user.phoneNumber,
+        fallback_email: user.email,
+      };
+  // STEP 4) send an OTP
+  const {success, message} = (await authentica({ requestEndpoint: "/send-otp", body })) as AuthenticaResponse<"/send-otp">;
+
+  const statusCode = success ? 200 : 400;
+  response.status(statusCode).json({
+    success: !!success,
+    message: message,
+  });
+});
+
+export const verifyOTP = catchAsync(async (request, response, next) => {
+  const { otp, email, phone }: AuthenticaVerifyOTPDataBody = request.body;
+  if (!otp?.trim()) return next(new AppError(400, "الرجاء ادخال رمز التحقق المرسل."));
+  if (!email?.trim() && !phone?.trim()) return next(new AppError(400, "الرجاء ادخال معلومات تسجيل الدخول المستخدمة"));
+
+  const { message, status } = (await authentica({
+    requestEndpoint: "/verify-otp",
+    body: {
+      otp,
       email,
-      id: user.id,
-    */
-    // username: user.username, no need for this since I'm only selecting the credentials in the query =>.select("credentials");
+      phone,
+    },
+  })) as AuthenticaResponse<"/verify-otp">;
+
+  const statusCode = status === true ? 200 : 400;
+  response.status(statusCode).json({
+    success: status,
+    message: message,
   });
 });
 

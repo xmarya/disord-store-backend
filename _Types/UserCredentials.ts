@@ -8,3 +8,8 @@ export type Credentials = {
   passwordResetExpires: Date;
   passwordChangedAt: Date;
 };
+
+export type CredentialsLoginDataBody = {
+  password:string,
+  emailOrPhoneNumber:string
+}
