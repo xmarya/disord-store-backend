@@ -1,21 +1,29 @@
+import type { Response } from "express";
 import { getOneDocByFindOne, getOneDocById } from "../../_services/global";
+import { AdminDocument } from "../../_Types/admin/AdminUser";
 import { UserDocument } from "../../_Types/User";
 import User from "../../models/userModel";
 import cacheUser from "../cacheControllers/user";
+import createNovuSubscriber from "../novu/subscribers/createSubscriber";
 import jwtSignature from "./generateSignature";
 import tokenWithCookies from "./tokenWithCookies";
-import type {Response} from "express";
+import Admin from "../../models/adminModel";
+import { AppError } from "../AppError";
 
+async function createUserLoginToken(response: Response, condition: Record<string, string | undefined>) {
+  const loggedInUser = (await getOneDocByFindOne(User, { condition })) ?? (await getOneDocByFindOne(Admin, { condition }));
 
-async function createUserLoginToken(user:UserDocument, response:Response) {
-  // TODO the below code will be moved to /verify-login-otp, so the token is going to be sent in case the user passes the email-password verification then the otp verification
-  //STEP 3) create the token:
-  const token = jwtSignature(user.id, "1h");
-  tokenWithCookies(response, token);
+  if (loggedInUser) {
+    //STEP 3) create the token:
+    const token = jwtSignature(loggedInUser.id, "1h");
+    tokenWithCookies(response, token);
 
-  // STEP 4) fetching and caching without awaiting
-  const loggedInUser = await getOneDocById(User, user.id);
-  loggedInUser && await cacheUser(loggedInUser);
+    // STEP 4) fetching and caching without awaiting
+    await cacheUser(loggedInUser);
+    await createNovuSubscriber(loggedInUser);
+  }
+
+  else throw new AppError(400,"Couldn't generate login token. Please try to login again.")
 }
 
 export default createUserLoginToken;
