@@ -1,6 +1,5 @@
 import { AuthenticaBalance, AuthenticaFullRequest, AuthenticaRequestEndpoint, AuthenticaResponse } from "../_Types/AuthenticaOTP";
 import { catchAsync } from "../_utils/catchAsync";
-import createUserLoginToken from "../_utils/jwtToken/createUserLoginToken";
 
 const API_URL = (requestEndpoint: AuthenticaRequestEndpoint) => `https://api.authentica.sa/api/v2${requestEndpoint}`;
 
@@ -45,28 +44,11 @@ export const getAuthenticaBalance = catchAsync(async (request, response, next) =
   const { data } = (await result.json()) as AuthenticaBalance;
 
   console.log(data.balance, !!data.balance);
-  if(data.balance) return next(); // enough balance ? move to send the otp
+  if(data.balance) return next(); // enough balance ? move to send the otp via email or SMS
 
-  await createUserLoginToken(request.body.user, response);
-  response.status(200).json({
-    success:true,
-    message: "successful login"
-  });
+  request.loginMethod = {"email": ""}
+  console.log("loginMethod changed to default ");
+  next();
 });
 
 export default authentica;
-
-// TODOs:
-// 1- util for generating 6-digits, time sensitive OTP
-// 2- create a route for sending the OTP to authentica in order to be send then to the end user
-// 3- cache the OTP-phoneNumber pair
-// 4- create a route for verifying
-
-/*
-  Trigger: The OTP flow starts with a trigger event. This can be an action such as a user attempting to log in or register.
-OTP Generation: Upon receiving the trigger, the server generates a unique OTP. This OTP is usually a random, time-sensitive code.
-OTP Delivery: The generated OTP is delivered to the user through their chosen medium, such as email or SMS.
-User Input: The user receives the OTP and enters it into the application.
-OTP Verification: If the OTP verification is successful, the user is authenticated and allowed to proceed with their intended action.
-
-*/
