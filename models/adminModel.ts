@@ -19,6 +19,19 @@ const adminSchema = new Schema<AdminDocument>(
       type: String,
       required: [true, "the email field is required"],
     },
+    phoneNumber: {
+      type: String,
+      // the format must be +9665xxxxxxxx
+      minlength: [13, "the phone number should be 11 to 12 digits"],
+      maxlength: [13, "the phone number should be 11 to 12 digits"],
+      default: undefined,
+      validate: {
+        validator: function(value:string) {
+          return value.startsWith("+966");
+        },
+        message: props => `${props.value} isn't a valid phone number. it must starts with +966`
+      }
+    },
     credentials: {
       emailConfirmed: {
         type: Boolean,
