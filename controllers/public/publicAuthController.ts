@@ -1,11 +1,11 @@
 import authentica from "../../_config/authentica";
-import { createDoc, getOneDocByFindOne } from "../../_services/global";
-import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody, AuthenticaVerifyOTPResponse } from "../../_Types/AuthenticaOTP";
+import { createDoc } from "../../_services/global";
+import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "../../_Types/AuthenticaOTP";
 import { UserDocument } from "../../_Types/User";
 import { CredentialsLoginDataBody } from "../../_Types/UserCredentials";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import { comparePasswords } from "../../_utils/passwords/comparePasswords";
+import createUserLoginToken from "../../_utils/jwtToken/createUserLoginToken";
 import User from "../../models/userModel";
 
 export const createNewStoreOwnerController = catchAsync(async (request, response, next) => {
@@ -39,6 +39,18 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   if (!emailOrPhoneNumber?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
   const isEmail = emailOrPhoneNumber.includes("@");
+  request.loginMethod = isEmail ? { email: emailOrPhoneNumber } : { phoneNumber: emailOrPhoneNumber };
+
+  next();
+});
+
+/* OLD CODE (kept for reference): 
+export const credentialsLoginOld = catchAsync(async (request, response, next) => {
+  // S 1) getting the provided email/phone and password from the request body to start checking:
+  const { password, emailOrPhoneNumber }: CredentialsLoginDataBody = request.body;
+  if (!emailOrPhoneNumber?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
+
+  const isEmail = emailOrPhoneNumber.includes("@");
   const condition = isEmail ? { email: emailOrPhoneNumber } : { phoneNumber: emailOrPhoneNumber };
 
   const user = await getOneDocByFindOne(User, {
@@ -48,7 +60,7 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   });
   if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
-  // STEP 2) checking the password:
+  // S 2) checking the password:
   if (!(await comparePasswords(password, user.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   const plainUser = user.toObject();
@@ -60,22 +72,25 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   next();
 });
 
-export const sendOTP = catchAsync(async (request, response, next) => {
-  const isEmail = request.body.isEmail;
-  const user:UserDocument = request.body.user;
-  const method = isEmail ? "email" : "sms";
+*/
 
+export const sendOTP = catchAsync(async (request, response, next) => {
+
+  const user = request.user;
+  const isEmail = request.loginMethod.hasOwnProperty("email");
+
+  const method = isEmail ? "email" : "sms";
   const body: AuthenticaSendOTPDataBody<typeof method> = isEmail
-    ? { method: "email", email: user?.email }
+    ? { method: "email", email: user.email }
     : {
         method: "sms",
-        phone: user?.phoneNumber,
+        phone: user.phoneNumber,
         template_id: "5",
-        fallback_phone: user?.phoneNumber,
-        fallback_email: user?.email,
+        fallback_phone: user.phoneNumber,
+        fallback_email: user.email,
       };
   // STEP 4) send an OTP
-  const {success, message} = (await authentica({ requestEndpoint: "/send-otp", body })) as AuthenticaResponse<"/send-otp">;
+  const { success, message } = (await authentica({ requestEndpoint: "/send-otp", body })) as AuthenticaResponse<"/send-otp">;
 
   const statusCode = success ? 200 : 400;
   response.status(statusCode).json({
@@ -98,6 +113,8 @@ export const verifyOTP = catchAsync(async (request, response, next) => {
     },
   })) as AuthenticaResponse<"/verify-otp">;
 
+  const condition: Record<string, string | undefined> = email ? {email} : {phoneNumber:phone};
+  await createUserLoginToken(response, condition);
   const statusCode = status === true ? 200 : 400;
   response.status(statusCode).json({
     success: status,

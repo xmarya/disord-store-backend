@@ -1,4 +1,5 @@
 import { getOneDocByFindOne, getOneDocById, updateDoc } from "../../../_services/global";
+import { CredentialsLoginDataBody } from "../../../_Types/UserCredentials";
 import { AppError } from "../../../_utils/AppError";
 import cacheUser from "../../../_utils/cacheControllers/user";
 import { catchAsync } from "../../../_utils/catchAsync";
@@ -7,27 +8,41 @@ import tokenWithCookies from "../../../_utils/jwtToken/tokenWithCookies";
 import { comparePasswords } from "../../../_utils/passwords/comparePasswords";
 import Admin from "../../../models/adminModel";
 
+/* OLD CODE (kept for reference): 
 export const adminLoginController = catchAsync(async (request, response, next) => {
-  const { email, password } = request.body;
-  if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
-
-  const admin = await getOneDocByFindOne(Admin, { condition: { email } });
-  if (!admin) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
-
-
+  const { emailOrPhoneNumber, password }:CredentialsLoginDataBody = request.body;
+  if (!emailOrPhoneNumber?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
+  
+  const isEmail = emailOrPhoneNumber.includes("@");
+  const condition = isEmail ? { email: emailOrPhoneNumber } : { phoneNumber: emailOrPhoneNumber };
+  
+  const admin = await getOneDocByFindOne(Admin, { 
+    condition, 
+    select:["credentials","firstName", "lastName", "email", "phoneNumber", "image"] });
+    
+    if (!admin) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
   if (!(await comparePasswords(password, admin.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
-  //STEP 3) create the token:
-  const token = jwtSignature(admin.id, "1h");
-  tokenWithCookies(response, token);
+  const plainAdmin = admin.toObject();
+  delete plainAdmin.credentials.password;
 
-  await cacheUser(admin);
-  response.status(200).json({
-    success: true,
-    // token,
+  request.body = {}; // remove old body to insert the new.
+  request.body.user = plainAdmin;
+  request.body.isEmail = isEmail;
+  next();
+  
+  // //S 3) create the token:
+  // const token = jwtSignature(admin.id, "1h");
+  // tokenWithCookies(response, token);
+  
+  // await cacheUser(admin);
+  // response.status(200).json({
+    //   success: true,
+    //   // token,
+    // });
   });
-});
-
+  
+  */
 export const confirmAdminChangePassword = catchAsync(async (request, response, next) => {
 
   const adminId = request.user.id;
