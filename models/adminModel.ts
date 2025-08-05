@@ -33,13 +33,17 @@ const adminSchema = new Schema<AdminDocument>(
       }
     },
     credentials: {
+      password: {
+        type: String,
+        minLength: [8, "your password must be at least 8 characters"],
+        select: false,
+      },
       emailConfirmed: {
         type: Boolean,
         default: false,
       },
       emailConfirmationToken: String,
       emailConfirmationExpires:Date,
-      password: String,
       passwordResetToken: String,
       passwordResetExpires: Date,
       passwordChangedAt: Date,
