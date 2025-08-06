@@ -7,7 +7,7 @@ import User from "../../models/userModel";
 import { AppError } from "../AppError";
 import { getDecompressedCacheData } from "../cacheControllers/globalCache";
 import { catchAsync } from "../catchAsync";
-import { jwtVerify } from "../jwtToken/jwtVerify";
+import jwtVerify from "../jwtToken/jwtVerify";
 
 const getUserFromPayload = catchAsync(async (request, response, next) => {
   let user: UserDocument | AdminDocument | null;
