@@ -5,7 +5,9 @@ import { UserDocument } from "../../_Types/User";
 import { CredentialsLoginDataBody } from "../../_Types/UserCredentials";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import createUserLoginToken from "../../_utils/jwtToken/createUserLoginToken";
+import jwtSignature from "../../_utils/jwtToken/generateSignature";
+import jwtVerify from "../../_utils/jwtToken/jwtVerify";
+import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
 import User from "../../models/userModel";
 
 export const createNewStoreOwnerController = catchAsync(async (request, response, next) => {
@@ -13,6 +15,8 @@ export const createNewStoreOwnerController = catchAsync(async (request, response
   const { firstName, lastName, email, password } = request.body;
   const data = { firstName, lastName, email, signMethod: "credentials", userType: "storeOwner", credentials: { password } };
   const newOwner = await createDoc<UserDocument>(User, data);
+  // TODO new novu subscriber
+  // TODO send welcome email
   newOwner.credentials!.password = "";
   response.status(201).json({
     success: true,
@@ -25,6 +29,8 @@ export const createNewUserController = catchAsync(async (request, response, next
   const { firstName, lastName, email, password } = request.body;
   const data = { firstName, lastName, email, signMethod: "credentials", userType: "user", credentials: { password } };
   const newUser = await createDoc<UserDocument>(User, data);
+  // TODO new novu subscriber
+  // TODO send welcome email
   newUser.credentials!.password = "";
 
   response.status(201).json({
@@ -75,7 +81,6 @@ export const credentialsLoginOld = catchAsync(async (request, response, next) =>
 */
 
 export const sendOTP = catchAsync(async (request, response, next) => {
-
   const user = request.user;
   const isEmail = request.loginMethod.hasOwnProperty("email");
 
@@ -92,18 +97,25 @@ export const sendOTP = catchAsync(async (request, response, next) => {
   // STEP 4) send an OTP
   const { success, message } = (await authentica({ requestEndpoint: "/send-otp", body })) as AuthenticaResponse<"/send-otp">;
 
-  const statusCode = success ? 200 : 400;
-  response.status(statusCode).json({
-    success: !!success,
+  if (!success) return next(new AppError(400, message));
+
+  const temporeToken = jwtSignature(user.id, "1m");
+  response.status(200).json({
+    success: true,
     message: message,
+    temporeToken,
   });
 });
 
 export const verifyOTP = catchAsync(async (request, response, next) => {
-  const { otp, email, phone }: AuthenticaVerifyOTPDataBody = request.body;
+  const { temporeToken, otp, email, phone }: AuthenticaVerifyOTPDataBody = request.body;
   if (!otp?.trim()) return next(new AppError(400, "الرجاء ادخال رمز التحقق المرسل."));
   if (!email?.trim() && !phone?.trim()) return next(new AppError(400, "الرجاء ادخال معلومات تسجيل الدخول المستخدمة"));
 
+  // STEP 1) validate the token:
+  const payload = await jwtVerify(temporeToken, process.env.JWT_SALT!);
+
+  // STEP 2) validate the OTP:
   const { message, status } = (await authentica({
     requestEndpoint: "/verify-otp",
     body: {
@@ -113,10 +125,12 @@ export const verifyOTP = catchAsync(async (request, response, next) => {
     },
   })) as AuthenticaResponse<"/verify-otp">;
 
-  const condition: Record<string, string | undefined> = email ? {email} : {phoneNumber:phone};
-  await createUserLoginToken(response, condition);
-  const statusCode = status === true ? 200 : 400;
-  response.status(statusCode).json({
+  if (!status || !payload.id) return next(new AppError(400, "OTP or temporeToken has expired"));
+
+  const token = jwtSignature(payload.id, "1h");
+  tokenWithCookies(response, token);
+
+  response.status(200).json({
     success: status,
     message: message,
   });

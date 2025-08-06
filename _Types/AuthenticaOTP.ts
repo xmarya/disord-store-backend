@@ -29,6 +29,7 @@ type FailedOTP = {
 export type AuthenticaSendOTPDataBody<T = "email" | "phoneNumber"> = T extends "email" ? EmailDataBody : PhoneNumberDataBody;
 
 export type AuthenticaVerifyOTPDataBody = {
+  temporeToken: string;
   otp: string;
   phone?: `+966${string}`;
   email?: string;
@@ -61,7 +62,7 @@ export type AuthenticaFullRequest =
     }
   | {
       requestEndpoint: "/verify-otp";
-      body: AuthenticaVerifyOTPDataBody;
+      body: Omit<AuthenticaVerifyOTPDataBody, "temporeToken">;
     };
 
 export type AuthenticaResponse<T extends AuthenticaRequestEndpoint> = T extends "/send-otp" ? AuthenticaSendOTPResponse : AuthenticaVerifyOTPResponse;
