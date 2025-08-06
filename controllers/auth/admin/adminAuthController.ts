@@ -1,7 +1,5 @@
 import { getOneDocByFindOne, getOneDocById, updateDoc } from "../../../_services/global";
-import { CredentialsLoginDataBody } from "../../../_Types/UserCredentials";
 import { AppError } from "../../../_utils/AppError";
-import cacheUser from "../../../_utils/cacheControllers/user";
 import { catchAsync } from "../../../_utils/catchAsync";
 import jwtSignature from "../../../_utils/jwtToken/generateSignature";
 import tokenWithCookies from "../../../_utils/jwtToken/tokenWithCookies";
