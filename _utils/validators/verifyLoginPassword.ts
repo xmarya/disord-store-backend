@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { getOneDocByFindOne } from "../../_services/global";
 import { CredentialsLoginDataBody } from "../../_Types/UserCredentials";
 import { AppError } from "../AppError";
