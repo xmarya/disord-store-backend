@@ -16,7 +16,7 @@ async function generateEmailConfirmationToken(user: UserDocument | AdminDocument
   const key = `Email:${randomToken.slice(0, 12)}`;
   const data = {
     id: user.id,
-    userType: request.user.userType,
+    userType: user.userType,
   };
 
   await createRedisHash(key, data, "one-hour");
