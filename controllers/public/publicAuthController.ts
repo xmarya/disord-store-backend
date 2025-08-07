@@ -5,9 +5,11 @@ import { UserDocument } from "../../_Types/User";
 import { CredentialsLoginDataBody } from "../../_Types/UserCredentials";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
+import generateEmailConfirmationToken from "../../_utils/email/generateEmailConfirmationToken";
 import jwtSignature from "../../_utils/jwtToken/generateSignature";
 import jwtVerify from "../../_utils/jwtToken/jwtVerify";
 import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
+import sendWelcome from "../../_utils/novu/workflowTriggers/welcomeEmail";
 import User from "../../models/userModel";
 
 export const createNewStoreOwnerController = catchAsync(async (request, response, next) => {
@@ -15,10 +17,11 @@ export const createNewStoreOwnerController = catchAsync(async (request, response
   const { firstName, lastName, email, password } = request.body;
   const data = { firstName, lastName, email, signMethod: "credentials", userType: "storeOwner", credentials: { password } };
   const newOwner = await createDoc<UserDocument>(User, data);
-  // TODO new novu subscriber
-  // TODO send welcome email
+
   newOwner.credentials!.password = "";
-  
+  const confirmUrl = await generateEmailConfirmationToken(newOwner, request);
+  await sendWelcome("welcome-store-owner", newOwner, confirmUrl);
+
   response.status(201).json({
     success: true,
     newOwner,
@@ -33,6 +36,8 @@ export const createNewUserController = catchAsync(async (request, response, next
   // TODO new novu subscriber
   // TODO send welcome email
   newUser.credentials!.password = "";
+  const confirmUrl = await generateEmailConfirmationToken(newUser, request);
+  await sendWelcome("welcome-general", newUser, confirmUrl);
 
   response.status(201).json({
     success: true,
@@ -147,6 +152,7 @@ export const createNewDiscordUser = catchAsync(async (request, response, next) =
       discordId: request.body.id,
       username: request.body.name,
     },
+    "credentials.emailConfirmed": true,
   });
 
   response.status(201).json({
