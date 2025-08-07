@@ -30,7 +30,7 @@ const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
     credentials: {
       password: {
         type: String,
-        minLength: [8, "your password must be at least 8 characters"],
+        // minLength: [8, "your password must be at least 8 characters"], caused a problem as mongoose validation on nested objects doesn't work reliably unless using new Schema() to treat nested structure as subdocuments .
         select: false,
       },
       emailConfirmed: {
@@ -72,11 +72,11 @@ const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
       maxlength: [13, "the phone number should be 11 to 12 digits"],
       default: undefined,
       validate: {
-        validator: function(value:string) {
+        validator: function (value: string) {
           return value.startsWith("+966");
         },
-        message: props => `${props.value} isn't a valid phone number. it must starts with +966`
-      }
+        message: (props) => `${props.value} isn't a valid phone number. it must starts with +966`,
+      },
     },
     userType: {
       type: String,
@@ -251,9 +251,7 @@ userSchema.virtual("planExpiresInDays").get(function () {
 userSchema.pre("save", async function (next) {
   // STEP 1) check if the user isNew and the signMethod is credentials: (the condition this.credentials is for getting rid ot possibly undefined error)
   if (this.isNew && this.signMethod === "credentials" && this.credentials) {
-
     this.credentials.password = await bcrypt.hash(this.credentials.password, HASHING_SALT);
-
   }
   next();
 });
