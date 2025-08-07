@@ -18,6 +18,7 @@ export const createNewStoreOwnerController = catchAsync(async (request, response
   // TODO new novu subscriber
   // TODO send welcome email
   newOwner.credentials!.password = "";
+  
   response.status(201).json({
     success: true,
     newOwner,
@@ -102,7 +103,7 @@ export const sendOTP = catchAsync(async (request, response, next) => {
   const temporeToken = jwtSignature(user.id, "1m");
   response.status(200).json({
     success: true,
-    message: message,
+    message: `${message} to ${Object.values(request.loginMethod)[0]}`,
     temporeToken,
   });
 });
