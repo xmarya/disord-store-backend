@@ -1,7 +1,7 @@
 import authentica from "../../_config/authentica";
 import { createDoc } from "../../_services/global";
 import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "../../_Types/AuthenticaOTP";
-import { UserDocument } from "../../_Types/User";
+import { UserDocument, UserTypes } from "../../_Types/User";
 import { CredentialsLoginDataBody } from "../../_Types/UserCredentials";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
@@ -12,34 +12,16 @@ import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
 import sendWelcome from "../../_utils/novu/workflowTriggers/welcomeEmail";
 import User from "../../models/userModel";
 
-export const createNewStoreOwnerController = catchAsync(async (request, response, next) => {
-  /*✅*/
+
+export const createNewUserController = (userType:Extract<UserTypes, "user" |"storeOwner">) => catchAsync(async (request, response, next) => {
   const { firstName, lastName, email, password } = request.body;
 
-  const data = { firstName, lastName, email, signMethod: "credentials", userType: "storeOwner", credentials: { password } };
-  const newOwner = await createDoc<UserDocument>(User, data);
-
-  const confirmUrl = await generateEmailConfirmationToken(newOwner, request);
-  await sendWelcome("welcome-store-owner", newOwner, confirmUrl);
-  newOwner.credentials!.password = "";
-  newOwner.credentials!.emailConfirmationToken = "";
-  newOwner.credentials!.emailConfirmationExpires = null;
-
-  response.status(201).json({
-    success: true,
-    newOwner,
-  });
-});
-
-export const createNewUserController = catchAsync(async (request, response, next) => {
-  /*✅*/
-  const { firstName, lastName, email, password } = request.body;
-  const data = { firstName, lastName, email, signMethod: "credentials", userType: "user", credentials: { password } };
+  const data = { firstName, lastName, email, signMethod: "credentials", userType, credentials: { password } };
   const newUser = await createDoc<UserDocument>(User, data);
 
+  const workflowId = userType === "storeOwner" ? "welcome-store-owner" : "welcome-general";
   const confirmUrl = await generateEmailConfirmationToken(newUser, request);
-  await sendWelcome("welcome-general", newUser, confirmUrl);
-
+  await sendWelcome(workflowId, newUser, confirmUrl);
   newUser.credentials!.password = "";
   newUser.credentials!.emailConfirmationToken = "";
   newUser.credentials!.emailConfirmationExpires = null;
@@ -49,6 +31,7 @@ export const createNewUserController = catchAsync(async (request, response, next
     newUser,
   });
 });
+
 
 export const credentialsLogin = catchAsync(async (request, response, next) => {
   // STEP 1) getting the provided email/phone and password from the request body to start checking:
