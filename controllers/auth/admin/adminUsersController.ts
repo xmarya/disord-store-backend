@@ -11,10 +11,15 @@ import { catchAsync } from "../../../_utils/catchAsync";
 import Admin from "../../../models/adminModel";
 import Plan from "../../../models/planModel";
 import User from "../../../models/userModel";
+import novuSendWelcome from "../../../_utils/novu/workflowTriggers/welcomeEmail";
+import generateEmailConfirmationToken from "../../../_utils/email/generateEmailConfirmationToken";
 
 export const createAdminController = catchAsync(async (request, response, next) => {
   const data = { ...request.body, credentials: { password: request.body.password } };
-  await createDoc(Admin, data);
+  const admin = await createDoc(Admin, data);
+
+   const confirmUrl = await generateEmailConfirmationToken(admin, request);
+  await novuSendWelcome("welcome-admin", admin, confirmUrl);
 
   response.status(201).json({
     success: true,

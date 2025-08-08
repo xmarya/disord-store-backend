@@ -9,7 +9,7 @@ import generateEmailConfirmationToken from "../../_utils/email/generateEmailConf
 import jwtSignature from "../../_utils/jwtToken/generateSignature";
 import jwtVerify from "../../_utils/jwtToken/jwtVerify";
 import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
-import sendWelcome from "../../_utils/novu/workflowTriggers/welcomeEmail";
+import novuSendWelcome from "../../_utils/novu/workflowTriggers/welcomeEmail";
 import User from "../../models/userModel";
 
 
@@ -21,7 +21,7 @@ export const createNewUserController = (userType:Extract<UserTypes, "user" |"sto
 
   const workflowId = userType === "storeOwner" ? "welcome-store-owner" : "welcome-general";
   const confirmUrl = await generateEmailConfirmationToken(newUser, request);
-  await sendWelcome(workflowId, newUser, confirmUrl);
+  await novuSendWelcome(workflowId, newUser, confirmUrl);
   newUser.credentials!.password = "";
   newUser.credentials!.emailConfirmationToken = "";
   newUser.credentials!.emailConfirmationExpires = null;
@@ -142,6 +142,8 @@ export const createNewDiscordUser = catchAsync(async (request, response, next) =
     },
     "credentials.emailConfirmed": true,
   });
+
+  await novuSendWelcome("welcome-general", newDiscordUser);
 
   response.status(201).json({
     success: true,
