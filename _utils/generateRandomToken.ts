@@ -24,8 +24,8 @@ export async function generateRandomToken(doc: UserDocument | AdminDocument, tok
     doc.credentials.emailConfirmationExpires = addMinutes(new Date(), 60);
   }
 
-  //STEP 4) saving the changes:
-  await doc.save({ validateBeforeSave: true });
+  //STEP 4) saving the changes without validation as I'm not saving any critical data:
+  await doc.save({ validateBeforeSave: false });
 
   return randomToken;
 }

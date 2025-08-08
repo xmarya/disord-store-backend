@@ -30,15 +30,15 @@ const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
     credentials: {
       password: {
         type: String,
-        // minLength: [8, "your password must be at least 8 characters"], caused a problem as mongoose validation on nested objects doesn't work reliably unless using new Schema() to treat nested structure as subdocuments .
+        minLength: [8, "your password must be at least 8 characters"],
         select: false,
       },
       emailConfirmed: {
         type: Boolean,
         default: false,
       },
-      emailConfirmationToken: String,
-      emailConfirmationExpires: Date,
+      emailConfirmationToken: { type: String, select: false },
+      emailConfirmationExpires: { type: Date, select: false, default: null },
       // passwordConfirm: String, // NOTE: zod will be use to validate this filed
       // on the front-end + the field itself won't be saved in the db.
       // it's only use inside the pre hook to check the password

@@ -15,12 +15,15 @@ import User from "../../models/userModel";
 export const createNewStoreOwnerController = catchAsync(async (request, response, next) => {
   /*✅*/
   const { firstName, lastName, email, password } = request.body;
+
   const data = { firstName, lastName, email, signMethod: "credentials", userType: "storeOwner", credentials: { password } };
   const newOwner = await createDoc<UserDocument>(User, data);
 
-  newOwner.credentials!.password = "";
   const confirmUrl = await generateEmailConfirmationToken(newOwner, request);
   await sendWelcome("welcome-store-owner", newOwner, confirmUrl);
+  newOwner.credentials!.password = "";
+  newOwner.credentials!.emailConfirmationToken = "";
+  newOwner.credentials!.emailConfirmationExpires = null;
 
   response.status(201).json({
     success: true,
@@ -33,11 +36,13 @@ export const createNewUserController = catchAsync(async (request, response, next
   const { firstName, lastName, email, password } = request.body;
   const data = { firstName, lastName, email, signMethod: "credentials", userType: "user", credentials: { password } };
   const newUser = await createDoc<UserDocument>(User, data);
-  // TODO new novu subscriber
-  // TODO send welcome email
-  newUser.credentials!.password = "";
+
   const confirmUrl = await generateEmailConfirmationToken(newUser, request);
   await sendWelcome("welcome-general", newUser, confirmUrl);
+
+  newUser.credentials!.password = "";
+  newUser.credentials!.emailConfirmationToken = "";
+  newUser.credentials!.emailConfirmationExpires = null;
 
   response.status(201).json({
     success: true,
