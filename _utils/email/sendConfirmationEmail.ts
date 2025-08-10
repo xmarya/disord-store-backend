@@ -7,7 +7,7 @@ import generateEmailConfirmationToken from "./generateEmailConfirmationToken";
 
 export const sendConfirmationEmail = catchAsync(async (request, response, next) => {
   const { userType } = request.user;
-  const query = ["user", "storeOwner"].includes(userType) ? getOneDocById(User, request.user.id, { select: ["credentials"] }) : getOneDocById(Admin, request.user.id, { select: ["credentials"] });
+  const query = ["user", "storeOwner"].includes(userType) ? getOneDocById(User, request.user.id, { select: ["credentials", "userType"] }) : getOneDocById(Admin, request.user.id, { select: ["credentials", "userType"] });
 
   const user = await query;
 
