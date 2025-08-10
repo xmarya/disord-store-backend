@@ -20,7 +20,6 @@ async function createUserLoginToken(response: Response, condition: Record<string
 
     // STEP 4) fetching and caching without awaiting
     await cacheUser(loggedInUser);
-    await createNovuSubscriber(loggedInUser);
   }
 
   else throw new AppError(400,"Couldn't generate login token. Please try to login again.")
