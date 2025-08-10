@@ -16,9 +16,9 @@ export async function createRedisHash(hashKey: string, data: object, TTL: RedisT
   return Boolean(result);
 }
 
-export async function getRedisHash<T>(hashKey: string, field?: string): Promise<T | {}> {
+export async function getRedisHash<T>(hashKey: string, field?: string): Promise<T | null> {
   const hashFun = field ? redis.hget(hashKey, field) : redis.hgetall(hashKey);
-  const data = (await hashFun) as T | {}; // await the promise of the result of ternary operator
+  const data = (await hashFun) as T | null; // await the promise of the result of ternary operator
 
   return data;
 }
