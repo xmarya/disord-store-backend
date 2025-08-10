@@ -2,6 +2,7 @@ import { createAssistant, deleteAssistant } from "../../_services/assistant/assi
 import { getAllDocs, getOneDocByFindOne, getOneDocById, isExist, updateDoc } from "../../_services/global";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
+import novuCreateAssistantSubscriber from "../../_utils/novu/subscribers/createSubscriber";
 import StoreAssistant from "../../models/storeAssistantModel";
 import User from "../../models/userModel";
 
@@ -14,7 +15,9 @@ export const createAssistantController = catchAsync(async (request, response, ne
 
   const data = { ...request.body, permissions, storeId };
 
-  const assistant = await createAssistant(data);
+  const {assistant, user} = await createAssistant(data);
+
+  await novuCreateAssistantSubscriber(user, assistant.inStore, assistant.permissions);
 
   response.status(201).json({
     success: true,

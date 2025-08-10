@@ -56,7 +56,7 @@ export async function createAssistant(data: AssistantRegisterData) {
     // (since th transactions should be as short as possible):
     await Store.findByIdAndUpdate(storeId, { $addToSet: { storeAssistants: user[0].id } }); // it should have be linked to the user, not the assistant, it could have be also assistant[0].assistant
 
-    return assistant;
+    return {assistant: assistant[0], user:user[0]};
   } catch (error) {
     await session.abortTransaction();
     const message = (error as AppError).message || "لم تتم العملية بنجاح. حاول مجددًا"

@@ -1,25 +1,25 @@
 import novu from "../../../_config/novu";
 import { AdminDocument } from "../../../_Types/admin/AdminUser";
+import { MongoId } from "../../../_Types/MongoId";
+import { AssistantPermissions } from "../../../_Types/StoreAssistant";
 import { UserDocument } from "../../../_Types/User";
 
 
-async function createNovuSubscriber(user: UserDocument | AdminDocument) {
-    const {id, firstName, lastName, image, userType, email, phoneNumber } = user;
-    const subscriber = await novu.subscribers.create({
+export async function novuCreateAssistantSubscriber(user: UserDocument, store:MongoId, permissions:AssistantPermissions) {
+    const {id, firstName, lastName, userType, email, phoneNumber } = user;
+    await novu.subscribers.create({
         subscriberId: id,
         firstName,
         lastName,
-        avatar: image,
-        email,
+        email: "shhmanager1@gmail.com",
         phone: phoneNumber,
         data: {
             userType,
-            ...(userType === "storeOwner" && {store: user.myStore})
+            store,
+            permissions
         }
     });
 
-    console.log("whatnovesubscriber", subscriber);
-
 }
 
-export default createNovuSubscriber;
+export default novuCreateAssistantSubscriber;
