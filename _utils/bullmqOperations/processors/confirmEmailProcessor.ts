@@ -11,7 +11,7 @@ import { confirmAdminEmail } from "../../../_services/admin/adminService";
 const { queue } = await bullmq("EmailConfirm", confirmEmailProcessor);
 
 async function confirmEmailBullMQ() {
-  await queue.add("dbUpdateBatch", {}, { repeat: { every: 2 * ms }, jobId: "invoice-batch-writer" });
+  await queue.add("dbUpdateBatch", {}, { repeat: { every: 15000 }, jobId: "email-batch-writer" });
 }
 
 async function confirmEmailProcessor() {
