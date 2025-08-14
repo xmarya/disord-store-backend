@@ -228,10 +228,6 @@ userSchema.virtual("planExpiresInDays").get(function () {
   // we'll take it and convert it into a day by dividing by dividing by (1000 * 60 * 60 * 24) .
 });
 
-// userSchema.pre(/^find/, function (this: Query<any, any>, next) {
-//   this.populate("myStore").select("_id");
-//   next();
-// });
 
 /* OLD CODE (kept for reference): 
     userSchema.pre("save", function (next) {
@@ -266,37 +262,6 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-/* OLD CODE (kept for reference): 
-userSchema.methods.comparePasswords = async function (providedPassword: string, userPassword: string) {
-  instanced methods are available on the document, 
-  so, `this` keyword points to the current document. then why we're not using this.password?
-  actually in this case, since we have set the password to select false, 
-  this.password will not be available. So we will pass it from the controllerAuth since we've got it there.
- const result = await bcrypt.compare(providedPassword, userPassword);
- console.log(result);
- return result;
-};
-*/
-
-/* OLD CODE (kept for reference): 
-userSchema.methods.generateRandomToken = async function () {
-  //STEP 1) generate the token:
-  const randomToken = crypto.randomBytes(32).toString("hex");
-  
-  //STEP 2) start an expiring time for the GRT:
-  const tokenExpiresIn = new Date(Date.now() + 5 * 60 * 1000); // lasts for 5 minutes
-  
-  //STEP 3) store the token after hashing/expiring time in credentials:
-  this.credentials.passwordResetToken = crypto.createHash("sha256").update(randomToken).digest("hex");
-  this.credentials.passwordResetExpires = tokenExpiresIn;
-  
-  //STEP 4) saving the changes:
-  await this.save({ validateBeforeSave: false });
-  console.log({ randomToken }, this.credentials.passwordResetExpires);
-  
-  return randomToken;
-};
-*/
 
 const User = mongoose.model<UserDocument, UserModel, UserVirtual>("User", userSchema);
 
