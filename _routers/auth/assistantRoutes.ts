@@ -1,12 +1,12 @@
 import express from "express";
 import { createAssistantController, deleteAssistantController, getAllAssistantsController, getOneAssistantController, updateAssistantController } from "../../controllers/auth/assistantController";
-import verifyUsedQuota from "../../_utils/validators/verifyUsedQuota";
-import restrict from "../../_utils/protectors/restrict";
-import validateNewUserData from "../../_utils/validators/validateNewUserData";
-import sanitisedData from "../../_utils/validators/sanitisedData";
-import validateEmailConfirmation from "../../_utils/validators/validateEmailConfirmation";
-import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import isEmailExist from "../../_utils/protectors/isEmailExist";
+import verifyUsedQuota from "../../middlewares/validators/verifyUsedQuota";
+import restrict from "../../middlewares/protectors/restrict";
+import validateNewUserData from "../../middlewares/validators/validateNewUserData";
+import sanitisedData from "../../middlewares/validators/sanitisedData";
+import validateEmailConfirmation from "../../middlewares/validators/validateEmailConfirmation";
+import validateRequestParams from "../../middlewares/validators/validateRequestParams";
+import isEmailExist from "../../middlewares/protectors/isEmailExist";
 
 export const router = express.Router({ mergeParams: true });
 

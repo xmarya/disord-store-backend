@@ -2,12 +2,11 @@ import { createAssistant, deleteAssistant } from "../../_services/assistant/assi
 import { getAllDocs, getOneDocByFindOne, getOneDocById, isExist, updateDoc } from "../../_services/global";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
-import novuCreateAssistantSubscriber from "../../_utils/novu/subscribers/createSubscriber";
+import novuCreateAssistantSubscriber from "../../externals/novu/subscribers/createSubscriber";
 import StoreAssistant from "../../models/storeAssistantModel";
 import User from "../../models/userModel";
 
 export const createAssistantController = catchAsync(async (request, response, next) => {
-
   const { permissions } = request.body;
   if (!permissions) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
@@ -15,8 +14,9 @@ export const createAssistantController = catchAsync(async (request, response, ne
 
   const data = { ...request.body, permissions, storeId };
 
-  const {assistant, user} = await createAssistant(data);
+  const { assistant, user } = await createAssistant(data);
 
+  /* CHANGE LATER: publish an event */
   await novuCreateAssistantSubscriber(user, assistant.inStore, assistant.permissions);
 
   response.status(201).json({
@@ -39,7 +39,6 @@ export const getAllAssistantsController = catchAsync(async (request, response, n
 });
 
 export const getOneAssistantController = catchAsync(async (request, response, next) => {
-
   const { assistantId } = request.params;
   if (!assistantId) return next(new AppError(400, "لابد من توفير معرف المستخدم"));
 
@@ -59,12 +58,12 @@ export const updateAssistantController = catchAsync(async (request, response, ne
   const { permissions } = request.body;
   if (permissions) await updateDoc(StoreAssistant, assistantId, permissions);
 
-  const otherData:Record<string, any> = {};
-  for(const [key, value] of Object.entries(request.body)) {
-    if(typeof value === "string" && value.trim()) otherData[key] = value.trim();
+  const otherData: Record<string, any> = {};
+  for (const [key, value] of Object.entries(request.body)) {
+    if (typeof value === "string" && value.trim()) otherData[key] = value.trim();
   }
 
-  Object.keys(otherData).length && await updateDoc(User, assistantId, otherData);
+  Object.keys(otherData).length && (await updateDoc(User, assistantId, otherData));
   response.status(203).json({
     success: true,
   });

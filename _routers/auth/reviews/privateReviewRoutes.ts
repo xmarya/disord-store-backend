@@ -1,13 +1,15 @@
 import express from "express";
-import restrict from "../../../_utils/protectors/restrict";
-import checkAssistantPermissions from "../../../_utils/validators/validateAssistantPermissions";
-import validateRequestParams from "../../../_utils/validators/validateRequestParams";
+import restrict from "../../../middlewares/protectors/restrict";
+import checkAssistantPermissions from "../../../middlewares/validators/validateAssistantPermissions";
+import validateRequestParams from "../../../middlewares/validators/validateRequestParams";
 import { addStoreReply } from "../../../controllers/auth/reviews/privateReviewController";
-import canReplyToReview from "../../../_utils/protectors/canReplyToReview";
+import canReplyToReview from "../../../middlewares/protectors/canReplyToReview";
 
 export const router = express.Router();
 
-router.route("/:reviewId/storeReply").patch(restrict("storeOwner", "storeAssistant"), canReplyToReview, checkAssistantPermissions("replyToCustomers"), validateRequestParams("reviewId"), addStoreReply);
+router
+  .route("/:reviewId/storeReply")
+  .patch(restrict("storeOwner", "storeAssistant"), canReplyToReview, checkAssistantPermissions("replyToCustomers"), validateRequestParams("reviewId"), addStoreReply);
 
 /* OLD CODE (kept for reference): 
 // NOTE: this fallback middleware is necessary to not fallback to the store route /store/:storeId

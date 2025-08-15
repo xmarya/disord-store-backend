@@ -1,5 +1,5 @@
 import express from "express";
-import restrict from "../../_utils/protectors/restrict";
+import restrict from "../../middlewares/protectors/restrict";
 import { router as cartRouter } from "./cartRouter";
 import { router as invoiceRouter } from "./invoiceRoutes";
 import { router as wishlistRouter } from "./wishlistRouter";

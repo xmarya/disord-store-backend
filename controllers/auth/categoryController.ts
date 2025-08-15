@@ -3,7 +3,7 @@ import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from 
 import { CategoryBasic } from "../../_Types/Category";
 import { MongoId } from "../../_Types/MongoId";
 import { AppError } from "../../_utils/AppError";
-import { getDecompressedCacheData, setCompressedCacheData } from "../../_utils/cacheControllers/globalCache";
+import { getDecompressedCacheData, setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
 import { catchAsync } from "../../_utils/catchAsync";
 import Category from "../../models/categoryModel";
 

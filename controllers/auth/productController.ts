@@ -4,7 +4,7 @@ import { createDoc, deleteDoc, getOneDocById } from "../../_services/global";
 import { updateProduct } from "../../_services/product/productServices";
 import { CategoryDocument } from "../../_Types/Category";
 import { AppError } from "../../_utils/AppError";
-import { deleteFromCache, setCompressedCacheData } from "../../_utils/cacheControllers/globalCache";
+import { deleteFromCache, setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
 import { catchAsync } from "../../_utils/catchAsync";
 import Product from "../../models/productModel";
 import { categoriesInCache } from "./categoryController";
