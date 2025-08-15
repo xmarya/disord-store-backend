@@ -27,7 +27,6 @@ import assignPlanIdToRequest from "../middlewares/requestModifiers/assignPlanIdT
 
 export const router = express.Router();
 
-router.get("/logout", logout); // NOTE: keep this before the validateJwtToken and getUserFromPayload middlewares
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
 router.use("/admin", adminRouter);
@@ -50,6 +49,7 @@ router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
+router.get("/logout", logout);
 
 // TODOs:
 // 1- check the StoreAndPlan in the cache again ✅
