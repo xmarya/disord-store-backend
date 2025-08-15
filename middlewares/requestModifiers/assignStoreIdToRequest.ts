@@ -1,7 +1,8 @@
 import { getOneDocByFindOne } from "../../_services/global";
+import { AppError } from "../../_utils/AppError";
+import { catchAsync } from "../../_utils/catchAsync";
 import StoreAssistant from "../../models/storeAssistantModel";
-import { AppError } from "../AppError";
-import { catchAsync } from "../catchAsync";
+
 
 export const assignStoreIdToRequest = catchAsync(async (request, response, next) => {
   // console.log("assignStoreIdToRequest");
