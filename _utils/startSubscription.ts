@@ -6,7 +6,7 @@ import { updatePlanMonthlyStats } from "../_services/plan/planService";
 import { createNewSubscription } from "../_services/user/userService";
 import { addDays } from "date-fns";
 import { PlanDocument, SubscriptionTypes } from "../_Types/Plan";
-import cacheUser from "./cacheControllers/user";
+import cacheUser from "../externals/redis/cacheControllers/user";
 
 export async function startSubscription(userId: MongoId, plan: PlanDocument, paidPrice: number, subscriptionType: SubscriptionTypes) {
   const { id: planId, planName } = plan;
@@ -26,17 +26,17 @@ export async function startSubscription(userId: MongoId, plan: PlanDocument, pai
   };
 
   const session = await startSession();
-  
+
   const updatedUser = await session.withTransaction(async () => {
     await updatePlanMonthlyStats(plan.planName, paidPrice, subscriptionType, session);
     const updatedUser = await createNewSubscription(userId, userData, session);
 
-    return updatedUser
+    return updatedUser;
   });
 
   await session.endSession();
 
-  updatedUser && await cacheUser(updatedUser);
+  updatedUser && (await cacheUser(updatedUser));
 
   return updatedUser;
 }

@@ -1,5 +1,5 @@
 import express from "express";
-import validateRequestParams from "../../../_utils/validators/validateRequestParams";
+import validateRequestParams from "../../../middlewares/validators/validateRequestParams";
 import {
   createPlatformReviewController,
   deletePlatformReviewController,
@@ -7,9 +7,9 @@ import {
   getOnePlatformReviewController,
   updateMyPlatformReviewController,
 } from "../../../controllers/auth/reviews/platformReviewController";
-import restrict from "../../../_utils/protectors/restrict";
-import isWriter from "../../../_utils/protectors/isWriter";
-import sanitisedData from "../../../_utils/validators/sanitisedData";
+import restrict from "../../../middlewares/protectors/restrict";
+import isWriter from "../../../middlewares/protectors/isWriter";
+import sanitisedData from "../../../middlewares/validators/sanitisedData";
 
 export const router = express.Router();
 

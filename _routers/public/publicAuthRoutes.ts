@@ -1,13 +1,13 @@
 import express from "express";
-import sanitisedData from "../../_utils/validators/sanitisedData";
-import validateNewUserData from "../../_utils/validators/validateNewUserData";
+import sanitisedData from "../../middlewares/validators/sanitisedData";
+import validateNewUserData from "../../middlewares/validators/validateNewUserData";
 import { createNewDiscordUser, createNewUserController, credentialsLogin, sendOTP, verifyOTP } from "../../controllers/public/publicAuthController";
-import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import { resetPassword } from "../../_utils/passwords/resetPassword";
-import { forgetPassword } from "../../_utils/passwords/forgetPassword";
-import confirmUserEmail from "../../_utils/email/confirmUserEmail";
+import validateRequestParams from "../../middlewares/validators/validateRequestParams";
+import { resetPassword } from "../../middlewares/resetPassword";
+import { forgetPassword } from "../../middlewares/forgetPassword";
 import { getAuthenticaBalance } from "../../_config/authentica";
-import verifyLoginPassword from "../../_utils/validators/verifyLoginPassword";
+import verifyLoginPassword from "../../middlewares/validators/verifyLoginPassword";
+import confirmUserEmail from "../../middlewares/validators/confirmUserEmail";
 
 export const router = express.Router();
 
@@ -24,5 +24,3 @@ router.post("/forgetPassword", forgetPassword("User"));
 router.post("/administrator-login", credentialsLogin, verifyLoginPassword("admin"), getAuthenticaBalance, sendOTP);
 router.post("/administrator-forgetPassword", forgetPassword("Admin"));
 router.route("/resetPassword/:randomToken").patch(validateRequestParams("randomToken"), resetPassword("Admin"));
-
-

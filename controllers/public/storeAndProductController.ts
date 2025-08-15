@@ -1,7 +1,7 @@
 import { startSession } from "mongoose";
 import { getAllDocs, getOneDocById } from "../../_services/global";
 import { AppError } from "../../_utils/AppError";
-import { setCompressedCacheData } from "../../_utils/cacheControllers/globalCache";
+import { setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
 import { catchAsync } from "../../_utils/catchAsync";
 import Product from "../../models/productModel";
 import Store from "../../models/storeModel";
@@ -36,11 +36,11 @@ export const getStoreWithProductsController = catchAsync(async (request, respons
   const { storeId } = request.params;
 
   const session = await startSession();
-  const {store, products} = await session.withTransaction(async() => {
-    const store = await getOneDocById(Store, storeId, {session});
-    const products = await getAllDocs(Product, request, {condition: {store: storeId}});
+  const { store, products } = await session.withTransaction(async () => {
+    const store = await getOneDocById(Store, storeId, { session });
+    const products = await getAllDocs(Product, request, { condition: { store: storeId } });
 
-    return {store, products};
+    return { store, products };
   });
   // NOTE: how to get the ratings/rankings of all the products? + how to allow filtering them?
 

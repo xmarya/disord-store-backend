@@ -11,7 +11,7 @@ import { catchAsync } from "../../_utils/catchAsync";
 import Invoice from "../../models/invoiceModel";
 import Order from "../../models/orderModel";
 import { updateStoreStatsController } from "./storeStatsController";
-import addJob from "../../_utils/bullmqOperations/jobs/addJob";
+import addJob from "../../externals/bullmq/jobs/addJob";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -132,8 +132,8 @@ export async function createNewInvoiceController(data: InvoiceDataBody) {
 
   // STEP 3) in case of failure, save it directly to the db.
   if (!success) createNewInvoices(fullData);
-    // NOTE: no need to await this too. let it do its job in the background;
-    // the most important part is to show the profits ASAP in the store's dashboard.
+  // NOTE: no need to await this too. let it do its job in the background;
+  // the most important part is to show the profits ASAP in the store's dashboard.
 
   return fullData;
 }
@@ -150,7 +150,6 @@ export const getOneInvoiceController = catchAsync(async (request, response, next
 });
 
 export const testInvoiceController = catchAsync(async (request, response, next) => {
-
   const { paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees } = request.body as InvoiceDataBody;
   if (!paymentMethod?.trim() || !productsPerStore.length || !status || !invoiceTotal) throw new AppError(400, "some invoice data are missing");
 
@@ -166,13 +165,12 @@ export const testInvoiceController = catchAsync(async (request, response, next) 
   await updateStoreStatsController(data, operationType);
 
   // STEP 2) save the data in the cache be batched and to be handled later by bullmq:
-  const success = await addJob("Invoice",invoiceId, data);
+  const success = await addJob("Invoice", invoiceId, data);
 
   // STEP 3) in case of failure, save it directly to the db.
   if (!success) createNewInvoices(data);
-    // NOTE: no need to await this too. let it do its job in the background;
-    // the most important part is to show the profits ASAP in the store's dashboard.
-
+  // NOTE: no need to await this too. let it do its job in the background;
+  // the most important part is to show the profits ASAP in the store's dashboard.
 
   response.status(201).json({
     success: true,

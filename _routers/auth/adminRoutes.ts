@@ -1,11 +1,11 @@
 import express from "express";
-import restrict from "../../_utils/protectors/restrict";
-import getDateQuery from "../../_utils/queryModifiers/getDateQuery";
-import sanitisedData from "../../_utils/validators/sanitisedData";
-import { validateChangePassword } from "../../_utils/validators/validateChangePassword";
-import validateNewUserData from "../../_utils/validators/validateNewUserData";
-import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import validateUnlimitedUserData from "../../_utils/validators/validateUnlimitedUserData";
+import restrict from "../../middlewares/protectors/restrict";
+import getDateQuery from "../../middlewares/getDateQuery";
+import sanitisedData from "../../middlewares/validators/sanitisedData";
+import { validateChangePassword } from "../../middlewares/validators/validateChangePassword";
+import validateNewUserData from "../../middlewares/validators/validateNewUserData";
+import validateRequestParams from "../../middlewares/validators/validateRequestParams";
+import validateUnlimitedUserData from "../../middlewares/validators/validateUnlimitedUserData";
 import { confirmAdminChangePassword, getAdminProfile, updateAdminProfile } from "../../controllers/auth/admin/adminAuthController";
 import { getAllPlanController, getMonthlyPlansStatsController, getPlanController, getPlansStatsReportController, updatePlanController } from "../../controllers/auth/admin/adminPlansController";
 import { displayReviewInHomePage } from "../../controllers/auth/admin/adminReviewsController";
@@ -42,7 +42,6 @@ router
   .route("/users/:userId")
   .get(validateRequestParams("userId"), getOneUserController) /*✅*/
   .delete(validateRequestParams("userId"), deleteUserAccountController);
-
 
 /* PLANS 
     1- get route for plans stats ✅

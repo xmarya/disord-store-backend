@@ -1,13 +1,13 @@
 import express from "express";
 import { router as reviewRouter } from "./reviews/privateReviewRoutes";
 import { router as invoiceRouter } from "./invoiceRoutes";
-import hasAuthorization from "../../_utils/protectors/hasAuthorization";
-import restrict from "../../_utils/protectors/restrict";
-import getDateQuery from "../../_utils/queryModifiers/getDateQuery";
-import sanitisedData from "../../_utils/validators/sanitisedData";
-import checkAssistantPermissions from "../../_utils/validators/validateAssistantPermissions";
-import validateEmailConfirmation from "../../_utils/validators/validateEmailConfirmation";
-import validateRequestParams from "../../_utils/validators/validateRequestParams";
+import hasAuthorization from "../../middlewares/protectors/hasAuthorization";
+import restrict from "../../middlewares/protectors/restrict";
+import getDateQuery from "../../middlewares/getDateQuery";
+import sanitisedData from "../../middlewares/validators/sanitisedData";
+import checkAssistantPermissions from "../../middlewares/validators/validateAssistantPermissions";
+import validateEmailConfirmation from "../../middlewares/validators/validateEmailConfirmation";
+import validateRequestParams from "../../middlewares/validators/validateRequestParams";
 import { deleteMyStoreController, getMyStoreController, updateMyStoreController, updateMyStoreStatus } from "../../controllers/auth/storeControllers";
 import { getStoreStatsController } from "../../controllers/auth/storeStatsController";
 

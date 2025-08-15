@@ -1,16 +1,17 @@
 import type { Request, Response } from "express";
+import eventBus from "../../_config/EventBus";
 import { getOneDocById, updateDoc } from "../../_services/global";
 import { deleteRegularUser, deleteStoreOwner } from "../../_services/user/deleteUserService";
+import { UserDeletedEvent, UserUpdatedEvent } from "../../_Types/events/UserEvents";
 import { UserDocument } from "../../_Types/User";
 import { AppError } from "../../_utils/AppError";
-import { deleteFromCache } from "../../_utils/cacheControllers/globalCache";
-import cacheUser from "../../_utils/cacheControllers/user";
+import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import { catchAsync } from "../../_utils/catchAsync";
 import jwtSignature from "../../_utils/jwtToken/generateSignature";
 import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
 import { comparePasswords } from "../../_utils/passwords/comparePasswords";
 import formatSubscriptionsLogs from "../../_utils/queryModifiers/formatSubscriptionsLogs";
-import { deleteRedisHash } from "../../_utils/redisOperations/redisHash";
+import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
 import User from "../../models/userModel";
 
 export const getUserProfile = catchAsync(async (request, response, next) => {
@@ -71,8 +72,18 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
 
   const updatedUser = await updateDoc(User, userId, request.body);
 
-  // update the cached data:
-  updatedUser && (await cacheUser(updatedUser));
+  // publish (emit) the event:
+  if (updatedUser) {
+    const event: UserUpdatedEvent = {
+      type: "user.updated",
+      payload: { userId, user: updatedUser },
+      occurredAt: new Date(),
+    };
+
+    eventBus.publish(event);
+  }
+  // await cacheUser(updatedUser);
+  // await novuUpdateSubscriber(userId, updatedUser);
   response.status(203).json({
     success: true,
     updatedUser,
@@ -83,14 +94,22 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
 
 export const deleteUserAccountController = catchAsync(async (request, response, next) => {
   const { userId } = request.params;
-  
+
   const user = await getOneDocById(User, userId, { select: ["userType", "myStore"] });
-  
+
   if (!user) return next(new AppError(404, "no user with this id"));
   if (user.userType === "storeAssistant") return next(new AppError(400, "this route is not for deleting a storeAssistant"));
 
-  if (user.userType === "storeOwner") await deleteStoreOwner(userId,user.myStore);
-  else  await deleteRegularUser(userId);
+  if (user.userType === "storeOwner") await deleteStoreOwner(userId, user.myStore);
+  else await deleteRegularUser(userId);
+
+  const event: UserDeletedEvent = {
+    type: "user.deleted",
+    payload: { userId },
+    occurredAt: new Date(),
+  };
+
+  eventBus.publish(event);
 
   response.status(204).json({
     success: true,

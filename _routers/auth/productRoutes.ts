@@ -1,11 +1,11 @@
 import express from "express";
-import hasAuthorization from "../../_utils/protectors/hasAuthorization";
-import restrict from "../../_utils/protectors/restrict";
-import sanitisedData from "../../_utils/validators/sanitisedData";
-import checkAssistantPermissions from "../../_utils/validators/validateAssistantPermissions";
-import { validateProductBody } from "../../_utils/validators/validateProductBody";
-import validateRequestParams from "../../_utils/validators/validateRequestParams";
-import verifyUsedQuota from "../../_utils/validators/verifyUsedQuota";
+import hasAuthorization from "../../middlewares/protectors/hasAuthorization";
+import restrict from "../../middlewares/protectors/restrict";
+import sanitisedData from "../../middlewares/validators/sanitisedData";
+import checkAssistantPermissions from "../../middlewares/validators/validateAssistantPermissions";
+import { validateProductBody } from "../../middlewares/validators/validateProductBody";
+import validateRequestParams from "../../middlewares/validators/validateRequestParams";
+import verifyUsedQuota from "../../middlewares/validators/verifyUsedQuota";
 import { createProductController, deleteProductController, getOneProductController, updateProductController } from "../../controllers/auth/productController";
 import { router as reviewRouter } from "./reviews/privateReviewRoutes";
 import { getProductsListController } from "../../controllers/public/storeAndProductController";

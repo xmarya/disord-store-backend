@@ -9,8 +9,8 @@ import { getSubscriptionType } from "../../_utils/getSubscriptionType";
 import { startSubscription } from "../../_utils/startSubscription";
 import Plan from "../../models/planModel";
 import User from "../../models/userModel";
-import cacheUser from "../../_utils/cacheControllers/user";
-import cacheStoreAndPlan from "../../_utils/cacheControllers/storeAndPlan";
+import cacheUser from "../../externals/redis/cacheControllers/user";
+import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPlan";
 
 export const createNewSubscribeController = catchAsync(async (request, response, next) => {
   /*✅*/
@@ -29,7 +29,6 @@ export const createNewSubscribeController = catchAsync(async (request, response,
 });
 
 export const renewalSubscriptionController = catchAsync(async (request, response, next) => {
-
   const { planId, paidPrice } = request.body;
   if (!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
 
@@ -75,7 +74,6 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
 
   updatedUser && cacheUser(updatedUser);
 
-  
   request.planExpiryDate = new Date();
   request.isPlanPaid = false;
   request.plan = "";

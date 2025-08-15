@@ -1,9 +1,9 @@
 import express from "express";
 import { createCoupon, updateCoupon, GetCouponById } from "../../controllers/auth/couponController";
-import restrict from "../../_utils/protectors/restrict";
-import hasAuthorization from "../../_utils/protectors/hasAuthorization";
-import sanitisedData from "../../_utils/validators/sanitisedData";
-import validateRequestParams from "../../_utils/validators/validateRequestParams";
+import restrict from "../../middlewares/protectors/restrict";
+import hasAuthorization from "../../middlewares/protectors/hasAuthorization";
+import sanitisedData from "../../middlewares/validators/sanitisedData";
+import validateRequestParams from "../../middlewares/validators/validateRequestParams";
 
 export const router = express.Router({ mergeParams: true });
 

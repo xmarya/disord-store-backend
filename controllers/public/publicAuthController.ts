@@ -1,6 +1,8 @@
 import authentica from "../../_config/authentica";
+import eventBus from "../../_config/EventBus";
 import { createDoc } from "../../_services/global";
 import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "../../_Types/AuthenticaOTP";
+import { UserCreatedEvent } from "../../_Types/events/UserEvents";
 import { UserDocument, UserTypes } from "../../_Types/User";
 import { CredentialsLoginDataBody } from "../../_Types/UserCredentials";
 import { AppError } from "../../_utils/AppError";
@@ -9,7 +11,6 @@ import generateEmailConfirmationToken from "../../_utils/email/generateEmailConf
 import jwtSignature from "../../_utils/jwtToken/generateSignature";
 import jwtVerify from "../../_utils/jwtToken/jwtVerify";
 import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
-import novuSendWelcome from "../../_utils/novu/workflowTriggers/welcomeEmail";
 import User from "../../models/userModel";
 
 
@@ -19,12 +20,19 @@ export const createNewUserController = (userType:Extract<UserTypes, "user" |"sto
   const data = { firstName, lastName, email, signMethod: "credentials", userType, credentials: { password } };
   const newUser = await createDoc<UserDocument>(User, data);
 
-  const workflowId = userType === "storeOwner" ? "welcome-store-owner" : "welcome-general";
   const confirmUrl = await generateEmailConfirmationToken(newUser, request);
-  await novuSendWelcome(workflowId, newUser, confirmUrl);
+
   newUser.credentials!.password = "";
   newUser.credentials!.emailConfirmationToken = "";
   newUser.credentials!.emailConfirmationExpires = null;
+
+  const event:UserCreatedEvent = {
+    type: "user.created",
+    payload: {user: newUser, confirmUrl},
+    occurredAt: new Date(),
+  }
+
+  eventBus.publish(event);
 
   response.status(201).json({
     success: true,
@@ -143,7 +151,13 @@ export const createNewDiscordUser = catchAsync(async (request, response, next) =
     "credentials.emailConfirmed": true,
   });
 
-  await novuSendWelcome("welcome-general", newDiscordUser);
+  const event:UserCreatedEvent = {
+    type: "user.created",
+    payload:{user: newDiscordUser},
+    occurredAt: new Date()
+  }
+
+  eventBus.publish(event);
 
   response.status(201).json({
     success: true,
