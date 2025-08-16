@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import type { Request } from "express";
-import { QueryOptions } from "../_Types/QueryOptions";
-import { MongoId } from "../_Types/MongoId";
-import { buildQuery } from "../_utils/queryModifiers/buildRequestQuery";
+import { QueryOptions } from "@Types/QueryOptions";
+import { MongoId } from "@Types/MongoId";
+import { buildQuery } from "@utils/queryModifiers/buildRequestQuery";
 
 export async function createDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, data: any, /*locals?: any*/): Promise<T> {
   const newDoc = await Model.create(data);
