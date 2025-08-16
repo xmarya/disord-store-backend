@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 import { UserCreditCardDocument } from "../_Types/UserCreditCard";
-import { HASHING_SALT } from "../_data/constants";
 import bcrypt from "bcryptjs";
 import { AppError } from "../_utils/AppError";
 
@@ -21,9 +20,9 @@ export const creditCardSchema = new Schema<UserCreditCardDocument>(
     },
     cardExpireIn: { type: String, required: [true, "the cardExpireIn field is required"] },
     isDefault: {
-      type:Boolean,
-      default: false
-    }
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -38,7 +37,7 @@ creditCardSchema.index({ cardNumber: 1, cardName: 1 }, { unique: true });
 
 // this pre(save) hook for checking on isDefault + updating the related user doc
 creditCardSchema.pre("save", async function (next) {
-  if(!this.isModified("isDefault")) return next();
+  if (!this.isModified("isDefault")) return next();
 
   next();
 });

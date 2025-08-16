@@ -1,5 +1,5 @@
 import { startSession } from "mongoose";
-import { SUBSCRIPTION_PERIOD } from "../_data/constants";
+import { SUBSCRIPTION_PERIOD } from "../_constants/ttl";
 import { MongoId } from "../_Types/MongoId";
 import { StoreOwner } from "../_Types/User";
 import { updatePlanMonthlyStats } from "../_services/plan/planService";

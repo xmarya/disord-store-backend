@@ -1,4 +1,4 @@
-import { ttl } from "../../../_data/constants";
+import { ttl } from "../../../_constants/ttl";
 import { RedisTTL } from "../../../_Types/RedisCache";
 import { compressJSON, decompressJSON } from "../../../_utils/compression";
 import { getRedisKeyValuePair, deleteRedisKeyValuePair, setRedisKeyValuePair } from "../redisOperations/redisBasicFormat";

@@ -1,5 +1,5 @@
 import bullmq from "../../../_config/bullmq";
-import { ms } from "../../../_data/constants";
+import { ms } from "../../../_constants/numbers";
 
 const { queue } = await bullmq("Cart", cartWriteProcessor);
 
