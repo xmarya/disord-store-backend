@@ -1,4 +1,4 @@
-import { ms } from "../../../_data/constants";
+import { ms } from "../../../_constants/numbers";
 import { createNewInvoices } from "../../../_services/invoice/invoiceService";
 import { InvoiceDocument } from "../../../_Types/Invoice";
 import bullmq from "../../../_config/bullmq";

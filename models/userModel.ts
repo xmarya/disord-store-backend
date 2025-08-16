@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { formatDistanceStrict, lightFormat } from "date-fns";
 import { arSA } from "date-fns/locale/ar-SA";
 import mongoose, { Schema } from "mongoose";
-import { HASHING_SALT } from "../_data/constants";
+import { HASHING_SALT } from "../_constants/numbers";
 import { UserDocument } from "../_Types/User";
 import "./storeModel"; // ✅ Make sure Store is registered before User
 
@@ -228,7 +228,6 @@ userSchema.virtual("planExpiresInDays").get(function () {
   // we'll take it and convert it into a day by dividing by dividing by (1000 * 60 * 60 * 24) .
 });
 
-
 /* OLD CODE (kept for reference): 
     userSchema.pre("save", function (next) {
       // mongoose documents require an explicit cast when dealing with nested objects (credential subdocument) inside hooks.
@@ -261,7 +260,6 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
-
 
 const User = mongoose.model<UserDocument, UserModel, UserVirtual>("User", userSchema);
 

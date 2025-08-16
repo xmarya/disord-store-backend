@@ -1,5 +1,5 @@
 import redis from "../../../_config/redis";
-import { ttl } from "../../../_data/constants";
+import { ttl } from "../../../_constants/ttl";
 import { RedisTTL } from "../../../_Types/RedisCache";
 
 /*TODO:
