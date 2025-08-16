@@ -1,4 +1,4 @@
-import { getOneDocById } from "../../_services/global";
+import { getOneDocById } from "../../_repositories/global";
 import Store from "../../models/storeModel";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";

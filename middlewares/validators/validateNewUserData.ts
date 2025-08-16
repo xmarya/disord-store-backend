@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { AppError } from "../../_utils/AppError";
 import User from "../../models/userModel";
-import { getOneDocByFindOne } from "../../_services/global";
+import { getOneDocByFindOne } from "../../_repositories/global";
 
 export default async function validateNewUserData(request: Request, response: Response, next: NextFunction) {
   const { email, password, passwordConfirm, firstName, lastName } = request.body;

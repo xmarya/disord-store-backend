@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Order from "../../models/orderModel";
 import Coupon from "../../models/couponModel";
-import { validateCoupon } from "../coupon/couponService";
+import { validateCoupon } from "../coupon/couponRepo";
 import { RoundToTwo } from "../../_utils/common";
 import { CreateOrderParams, IOrder, IOrderItem, IOrderItemCheck, Address } from "../../_Types/Order";
 import Product from "../../models/productModel";

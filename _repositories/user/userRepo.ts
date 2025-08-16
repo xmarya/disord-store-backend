@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 import { MongoId } from "../../_Types/MongoId";
 import { StoreOwner } from "../../_Types/User";
 import User from "../../models/userModel";
+import { startSession } from "mongoose";
+import { deleteStorePermanently } from "../../controllers/auth/storeControllers";
+import Cart from "../../models/cartModel";
+import Wishlist from "../../models/wishlistModel";
+import { deleteDoc } from "../global";
 
 export async function createNewUnlimitedUser(data: StoreOwner, session: mongoose.ClientSession) {
   const aNewUser = await User.findOneAndUpdate({ email: data.email }, { ...data }, { runValidators: true, new: true, upsert: true, setDefaultsOnInsert: true }).session(session);
@@ -108,4 +113,25 @@ export async function confirmUserEmail(bulkOps: any) {
   //   .select("credentials");
 
   await User.bulkWrite(bulkOps);
+}
+
+export async function deleteStoreOwner(ownerId: MongoId, storeId: MongoId) {
+  const session = await startSession();
+
+  await session.withTransaction(async () => {
+    await deleteStorePermanently(storeId, session);
+    await deleteDoc(User, ownerId, { session });
+  });
+  await session.endSession();
+}
+
+export async function deleteRegularUser(userId: MongoId) {
+  const session = await startSession();
+
+  await session.withTransaction(async () => {
+    await Wishlist.deleteMany({ user: userId }).session(session);
+    await Cart.deleteMany({ user: userId }).session(session);
+    await deleteDoc(User, userId, { session });
+  });
+  await session.endSession();
 }

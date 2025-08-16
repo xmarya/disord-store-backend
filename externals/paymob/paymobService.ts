@@ -12,17 +12,13 @@ const CARD_INTEGRATION_ID = paymobConfig.cardIntegrationId;
 const WALLET_INTEGRATION_ID = paymobConfig.walletIntegrationId;
 const WEBHOOK_URL = paymobConfig.webhookUrl;
 
-async function createPaymentIntention(
-  orderData: PaymobOrderData,
-  billingData: PaymobBillingData,
-  paymentType?: "card" | "wallet"
-): Promise<{ clientSecret: string; paymobOrderId: string }> {
+async function createPaymentIntention(orderData: PaymobOrderData, billingData: PaymobBillingData, paymentType?: "card" | "wallet"): Promise<{ clientSecret: string; paymobOrderId: string }> {
   try {
     const payload = {
       amount: Math.round(orderData.totalPrice * 100),
       currency: "EGP",
       payment_methods: [CARD_INTEGRATION_ID, WALLET_INTEGRATION_ID],
-      items: orderData.items.map(item => ({
+      items: orderData.items.map((item) => ({
         name: item.name,
         amount: item.amount,
         description: item.description || "",
@@ -43,8 +39,8 @@ async function createPaymentIntention(
         postal_code: billingData.postalCode,
       },
       // TODO: Switch back to merchant_order_id if Paymob ever supports it
-      // Current workaround: special_reference confirmed working 
-      special_reference: orderData.orderId,  //merchant_order_id
+      // Current workaround: special_reference confirmed working
+      special_reference: orderData.orderId, //merchant_order_id
       notification_url: WEBHOOK_URL,
     };
     const response = await axios.post(`${PAYMOB_BASE_URL}/v1/intention/`, payload, {
@@ -60,9 +56,7 @@ async function createPaymentIntention(
     };
   } catch (error) {
     if (error instanceof AxiosError) {
-      throw new Error(
-        `Paymob API error: ${error.response?.status} - ${JSON.stringify(error.response?.data)}`
-      );
+      throw new Error(`Paymob API error: ${error.response?.status} - ${JSON.stringify(error.response?.data)}`);
     }
     throw error;
   }
@@ -75,10 +69,7 @@ export async function ProcessPaymobPayment(
   billingAddress: Address,
   paymentType?: "card" | "wallet"
 ): Promise<{ checkoutUrl: string; paymobOrderId: string }> {
-  const totalItemPriceBeforeDiscount = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const totalItemPriceBeforeDiscount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const totalPriceCents = Math.round(totalPrice * 100);
   const totalItemPriceBeforeDiscountCents = Math.round(totalItemPriceBeforeDiscount * 100);
@@ -87,25 +78,19 @@ export async function ProcessPaymobPayment(
 
   let adjustedItems = items.map((item) => ({
     name: item.name,
-    amount: Math.round((item.price * 100) * priceRatio),
+    amount: Math.round(item.price * 100 * priceRatio),
     quantity: item.quantity,
     productType: item.productType,
-    description: item.description || ``, 
+    description: item.description || ``,
   }));
 
-  let sumOfItemsCents = adjustedItems.reduce(
-    (sum, item) => sum + item.amount * item.quantity,
-    0
-  );
+  let sumOfItemsCents = adjustedItems.reduce((sum, item) => sum + item.amount * item.quantity, 0);
 
   if (sumOfItemsCents !== totalPriceCents && adjustedItems.length > 0) {
     const difference = totalPriceCents - sumOfItemsCents;
     const lastItem = adjustedItems[adjustedItems.length - 1];
     lastItem.amount += difference / lastItem.quantity;
-    sumOfItemsCents = adjustedItems.reduce(
-      (sum, item) => sum + item.amount * item.quantity,
-      0
-    );
+    sumOfItemsCents = adjustedItems.reduce((sum, item) => sum + item.amount * item.quantity, 0);
   }
 
   if (sumOfItemsCents !== totalPriceCents) {

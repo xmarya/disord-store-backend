@@ -1,4 +1,4 @@
-import { getOneDocByFindOne, getOneDocById, updateDoc } from "../../../_services/global";
+import { getOneDocByFindOne, getOneDocById, updateDoc } from "../../../_repositories/global";
 import { AppError } from "../../../_utils/AppError";
 import cacheUser from "../../../externals/redis/cacheControllers/user";
 import { catchAsync } from "../../../_utils/catchAsync";

@@ -5,8 +5,8 @@ import { ms } from "../../../_constants/numbers";
 import { AdminDocument } from "../../../_Types/admin/AdminUser";
 import { UserDocument } from "../../../_Types/User";
 import { getAllCachedData } from "../../redis/cacheControllers/globalCache";
-import { confirmUserEmail } from "../../../_services/user/userService";
-import { confirmAdminEmail } from "../../../_services/admin/adminService";
+import { confirmUserEmail } from "../../../_repositories/user/userRepo";
+import { confirmAdminEmail } from "../../../_repositories/admin/adminRepo";
 
 const { queue } = await bullmq("EmailConfirm", confirmEmailProcessor);
 

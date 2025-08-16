@@ -1,11 +1,9 @@
-import { updateDoc } from "../../../_services/global";
+import { updateDoc } from "../../../_repositories/global";
 import { AppError } from "../../../_utils/AppError";
 import { catchAsync } from "../../../_utils/catchAsync";
 import Review from "../../../models/reviewModel";
 
-
 export const addStoreReply = catchAsync(async (request, response, next) => {
-
   const { storeReply } = request.body;
 
   if (!storeReply?.trim()) return next(new AppError(400, "please write a replay to the customer"));
@@ -17,4 +15,3 @@ export const addStoreReply = catchAsync(async (request, response, next) => {
     updatedReview,
   });
 });
-

@@ -1,5 +1,5 @@
-import { getAllProductCategories } from "../../_services/category/categoryService";
-import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from "../../_services/global";
+import { getAllProductCategories } from "../../_repositories/category/categoryRepo";
+import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from "../../_repositories/global";
 import { CategoryBasic } from "../../_Types/Category";
 import { MongoId } from "../../_Types/MongoId";
 import { AppError } from "../../_utils/AppError";

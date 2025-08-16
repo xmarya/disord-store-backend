@@ -1,11 +1,11 @@
-import { getOneDocByFindOne } from "../../_services/global";
+import { getOneDocByFindOne } from "../../_repositories/global";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import StoreAssistant from "../../models/storeAssistantModel";
 
 export const assignStoreIdToRequest = catchAsync(async (request, response, next) => {
   // console.log("assignStoreIdToRequest");
-  
+
   // if the store is exist from the previous cache middleware
   if (request.store) return next();
 

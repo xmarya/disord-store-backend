@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import { getOneDocByFindOne, getOneDocById } from "../../_services/global";
+import { getOneDocByFindOne, getOneDocById } from "../../_repositories/global";
 import { AdminDocument } from "../../_Types/admin/AdminUser";
 import { UserDocument } from "../../_Types/User";
 import User from "../../models/userModel";

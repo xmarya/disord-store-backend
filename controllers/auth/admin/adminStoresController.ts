@@ -1,6 +1,6 @@
 import { startSession } from "mongoose";
-import { getAllDocs, getOneDocById, updateDoc } from "../../../_services/global";
-import { getAllStoresStats, getOneStoreStats } from "../../../_services/store/storeStatsService";
+import { getAllDocs, getOneDocById, updateDoc } from "../../../_repositories/global";
+import { getAllStoresStats, getOneStoreStats } from "../../../_repositories/store/storeStatsRepo";
 import { AppError } from "../../../_utils/AppError";
 import { catchAsync } from "../../../_utils/catchAsync";
 import Store from "../../../models/storeModel";
