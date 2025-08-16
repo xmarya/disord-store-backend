@@ -1,4 +1,4 @@
-import { updateDoc } from "../../../_services/global";
+import { updateDoc } from "../../../_repositories/global";
 import { AppError } from "../../../_utils/AppError";
 import { catchAsync } from "../../../_utils/catchAsync";
 import PlatformReview from "../../../models/platformReviewModel";

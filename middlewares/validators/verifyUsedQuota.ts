@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { PlanQuota } from "../../_Types/Plan";
-import { getOneDocById } from "../../_services/global";
+import { getOneDocById } from "../../_repositories/global";
 import Category from "../../models/categoryModel";
 import Plan from "../../models/planModel";
 import StoreAssistant from "../../models/storeAssistantModel";

@@ -2,7 +2,7 @@ import { lightFormat } from "date-fns";
 import { AppError } from "../_utils/AppError";
 import { catchAsync } from "../_utils/catchAsync";
 import { buildDateFilter } from "../_utils/queryModifiers/formatDateQuery";
-import { SUPPORTED_DATE_FORMATS } from "../_data/constants";
+import { SUPPORTED_DATE_FORMATS } from "../_constants/dataStructures";
 
 const getDateQuery = catchAsync(async (request, response, next) => {
   const { dates, sortBy, sortOrder } = request.body;

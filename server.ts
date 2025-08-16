@@ -1,7 +1,10 @@
 import dotenv from "dotenv";
 import { dbStartConnection } from "./_config/db";
 import app from "./app";
-import initiateBullMQJobs from "./externals/bullmq/jobs/initialJobProsessors";
+import initiateBullMQJobs from "./externals/bullmq/jobs/initialJobProcessors";
+import "./eventListeners/userEvents/userCreated"
+import "./eventListeners/userEvents/userUpdated"
+import "./eventListeners/userEvents/userDeleted"
 dotenv.config({ path: "./.env" });
 
 const port = process.env.PORT || 3000;

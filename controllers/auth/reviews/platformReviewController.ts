@@ -1,17 +1,16 @@
-import { createDoc, deleteDoc, getAllDocs, getOneDocById, updateDoc } from "../../../_services/global";
+import { createDoc, deleteDoc, getAllDocs, getOneDocById, updateDoc } from "../../../_repositories/global";
 import { PlatformReviewDataBody } from "../../../_Types/Review";
 import { AppError } from "../../../_utils/AppError";
 import { catchAsync } from "../../../_utils/catchAsync";
 import PlatformReview from "../../../models/platformReviewModel";
 
 export const createPlatformReviewController = catchAsync(async (request, response, next) => {
-
   const { reviewBody }: PlatformReviewDataBody = request.body;
   if (!reviewBody?.trim()) return next(new AppError(400, "الرجاء إضافة تعليق قبل الإرسال"));
 
-  const {id, firstName, lastName, userType, image} = request.user;
+  const { id, firstName, lastName, userType, image } = request.user;
 
-  const data:PlatformReviewDataBody = { reviewBody, writer:id, firstName, lastName, userType, image };
+  const data: PlatformReviewDataBody = { reviewBody, writer: id, firstName, lastName, userType, image };
   const newReview = await createDoc(PlatformReview, data);
   if (!newReview.id) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
 

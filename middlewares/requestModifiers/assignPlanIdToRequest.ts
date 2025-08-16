@@ -1,10 +1,9 @@
-import { getOneDocById } from "../../_services/global";
+import { getOneDocById } from "../../_repositories/global";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPlan";
 import Store from "../../models/storeModel";
 import User from "../../models/userModel";
-
 
 const assignPlanIdToRequest = catchAsync(async (request, response, next) => {
   // console.log("assignPlanIdToRequest");
@@ -20,7 +19,6 @@ const assignPlanIdToRequest = catchAsync(async (request, response, next) => {
   if (request.plan) return next();
   // NOTE: I'm only checking using the plan, as it the only value that tells me if the user has
   // a running subscription or not. inside cancelSubscriptionController I'm setting the plan to empty string which is a false value.
-
 
   const storeId = request.store;
   const store = await getOneDocById(Store, storeId, { select: ["owner"] });

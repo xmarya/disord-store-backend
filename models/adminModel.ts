@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { AdminDocument } from "../_Types/admin/AdminUser";
 import { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
-import { HASHING_SALT } from "../_data/constants";
+import { HASHING_SALT } from "../_constants/numbers";
 
 type AdminModel = mongoose.Model<AdminDocument>;
 const adminSchema = new Schema<AdminDocument>(
@@ -26,11 +26,11 @@ const adminSchema = new Schema<AdminDocument>(
       maxlength: [13, "the phone number should be 11 to 12 digits"],
       default: undefined,
       validate: {
-        validator: function(value:string) {
+        validator: function (value: string) {
           return value.startsWith("+966");
         },
-        message: props => `${props.value} isn't a valid phone number. it must starts with +966`
-      }
+        message: (props) => `${props.value} isn't a valid phone number. it must starts with +966`,
+      },
     },
     credentials: {
       password: {
@@ -43,7 +43,7 @@ const adminSchema = new Schema<AdminDocument>(
         default: false,
       },
       emailConfirmationToken: String,
-      emailConfirmationExpires:Date,
+      emailConfirmationExpires: Date,
       passwordResetToken: String,
       passwordResetExpires: Date,
       passwordChangedAt: Date,

@@ -1,8 +1,8 @@
 import { addDays, isPast } from "date-fns";
 import { startSession } from "mongoose";
-import { PLAN_TRIAL_PERIOD } from "../../_data/constants";
-import { getOneDocById, updateDoc } from "../../_services/global";
-import { updatePlanMonthlyStats } from "../../_services/plan/planService";
+import { PLAN_TRIAL_PERIOD } from "../../_constants/ttl";
+import { getOneDocById, updateDoc } from "../../_repositories/global";
+import { updatePlanMonthlyStats } from "../../_repositories/plan/planRepo";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import { getSubscriptionType } from "../../_utils/getSubscriptionType";

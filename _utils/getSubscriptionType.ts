@@ -1,5 +1,5 @@
-import planTiers from "../_data/planTiers";
-import { getOneDocById } from "../_services/global";
+import { planTiers } from "../_constants/dataStructures";
+import { getOneDocById } from "../_repositories/global";
 import { MongoId } from "../_Types/MongoId";
 import { SubscriptionTypes } from "../_Types/Plan";
 import Plan from "../models/planModel";

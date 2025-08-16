@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import eventBus from "../../_config/EventBus";
-import { getOneDocById, updateDoc } from "../../_services/global";
-import { deleteRegularUser, deleteStoreOwner } from "../../_services/user/deleteUserService";
+import { getOneDocById, updateDoc } from "../../_repositories/global";
+import { deleteRegularUser, deleteStoreOwner } from "../../_repositories/user/deleteUserService";
 import { UserDeletedEvent, UserUpdatedEvent } from "../../_Types/events/UserEvents";
 import { UserDocument } from "../../_Types/User";
 import { AppError } from "../../_utils/AppError";

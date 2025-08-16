@@ -1,6 +1,6 @@
 import authentica from "../../_config/authentica";
 import eventBus from "../../_config/EventBus";
-import { createDoc } from "../../_services/global";
+import { createDoc } from "../../_repositories/global";
 import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "../../_Types/AuthenticaOTP";
 import { UserCreatedEvent } from "../../_Types/events/UserEvents";
 import { UserDocument, UserTypes } from "../../_Types/User";
@@ -13,33 +13,32 @@ import jwtVerify from "../../_utils/jwtToken/jwtVerify";
 import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
 import User from "../../models/userModel";
 
+export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
+  catchAsync(async (request, response, next) => {
+    const { firstName, lastName, email, password } = request.body;
 
-export const createNewUserController = (userType:Extract<UserTypes, "user" |"storeOwner">) => catchAsync(async (request, response, next) => {
-  const { firstName, lastName, email, password } = request.body;
+    const data = { firstName, lastName, email, signMethod: "credentials", userType, credentials: { password } };
+    const newUser = await createDoc<UserDocument>(User, data);
 
-  const data = { firstName, lastName, email, signMethod: "credentials", userType, credentials: { password } };
-  const newUser = await createDoc<UserDocument>(User, data);
+    const confirmUrl = await generateEmailConfirmationToken(newUser, request);
 
-  const confirmUrl = await generateEmailConfirmationToken(newUser, request);
+    newUser.credentials!.password = "";
+    newUser.credentials!.emailConfirmationToken = "";
+    newUser.credentials!.emailConfirmationExpires = null;
 
-  newUser.credentials!.password = "";
-  newUser.credentials!.emailConfirmationToken = "";
-  newUser.credentials!.emailConfirmationExpires = null;
+    const event: UserCreatedEvent = {
+      type: "user.created",
+      payload: { user: newUser, confirmUrl },
+      occurredAt: new Date(),
+    };
 
-  const event:UserCreatedEvent = {
-    type: "user.created",
-    payload: {user: newUser, confirmUrl},
-    occurredAt: new Date(),
-  }
+    eventBus.publish(event);
 
-  eventBus.publish(event);
-
-  response.status(201).json({
-    success: true,
-    newUser,
+    response.status(201).json({
+      success: true,
+      newUser,
+    });
   });
-});
-
 
 export const credentialsLogin = catchAsync(async (request, response, next) => {
   // STEP 1) getting the provided email/phone and password from the request body to start checking:
@@ -151,11 +150,11 @@ export const createNewDiscordUser = catchAsync(async (request, response, next) =
     "credentials.emailConfirmed": true,
   });
 
-  const event:UserCreatedEvent = {
+  const event: UserCreatedEvent = {
     type: "user.created",
-    payload:{user: newDiscordUser},
-    occurredAt: new Date()
-  }
+    payload: { user: newDiscordUser },
+    occurredAt: new Date(),
+  };
 
   eventBus.publish(event);
 

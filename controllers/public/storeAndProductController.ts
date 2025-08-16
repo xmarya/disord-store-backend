@@ -1,5 +1,5 @@
 import { startSession } from "mongoose";
-import { getAllDocs, getOneDocById } from "../../_services/global";
+import { getAllDocs, getOneDocById } from "../../_repositories/global";
 import { AppError } from "../../_utils/AppError";
 import { setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
 import { catchAsync } from "../../_utils/catchAsync";

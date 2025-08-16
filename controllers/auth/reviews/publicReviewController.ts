@@ -2,9 +2,9 @@ import { startSession } from "mongoose";
 import { Model } from "../../../_Types/Model";
 import { MongoId } from "../../../_Types/MongoId";
 import { ReviewDataBody } from "../../../_Types/Review";
-import { createDoc, deleteDoc, getAllDocs, updateDoc } from "../../../_services/global";
-import { setRanking } from "../../../_services/ranking/rankingService";
-import { calculateRatingsAverage } from "../../../_services/review/reviewService";
+import { createDoc, deleteDoc, getAllDocs, updateDoc } from "../../../_repositories/global";
+import { setRanking } from "../../../_repositories/ranking/rankingRepo";
+import { calculateRatingsAverage } from "../../../_repositories/review/reviewRepo";
 import { AppError } from "../../../_utils/AppError";
 import { catchAsync } from "../../../_utils/catchAsync";
 import PlatformReview from "../../../models/platformReviewModel";
@@ -28,7 +28,6 @@ async function updateResourceRatingController(Model: Extract<Model, "Store" | "P
 }
 
 export const createReviewController = catchAsync(async (request, response, next) => {
-
   const storeOrProduct = request.path.includes("store") ? "Store" : "Product";
   const reviewedResourceId = request.params.resourceId;
 
@@ -36,7 +35,7 @@ export const createReviewController = catchAsync(async (request, response, next)
   const { reviewBody, rating }: ReviewDataBody = request.body;
   if (!reviewBody?.trim() || !rating) return next(new AppError(400, "الرجاء التأكد من كتابة جميع البيانات قبل الإرسال"));
 
-  const {id, firstName, lastName, userType, image} = request.user;
+  const { id, firstName, lastName, userType, image } = request.user;
   const data: ReviewDataBody = { reviewedResourceId, storeOrProduct, reviewBody, rating, writer: id, firstName, lastName, userType, image };
   const newReview = await createDoc(Review, data);
 
@@ -63,19 +62,18 @@ export const getAllReviewsController = catchAsync(async (request, response, next
 
 export const getMyReviewsController = catchAsync(async (request, response, next) => {
   const [reviews, platformReviews] = await Promise.all([
-    getAllDocs(Review,request, {condition:{writer:request.user._id}}),
-    getAllDocs(PlatformReview, request, {condition: {writer: request.user._id}}),
+    getAllDocs(Review, request, { condition: { writer: request.user._id } }),
+    getAllDocs(PlatformReview, request, { condition: { writer: request.user._id } }),
   ]);
 
   response.status(200).json({
     success: true,
     reviews,
-    platformReviews
+    platformReviews,
   });
 });
 
 export const updateMyReviewController = catchAsync(async (request, response, next) => {
-
   //NOTE: only allow the updating of the rating and the body, the userId and the reviewedResource can't be changed
   const { reviewBody, rating }: ReviewDataBody = request.body;
   if (!reviewBody?.trim() && !rating) return next(new AppError(400, "الرجاء إضافة تعليق وتقييم قبل الإرسال"));
