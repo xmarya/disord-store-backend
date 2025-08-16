@@ -1,9 +1,9 @@
 import { addDays } from "date-fns";
 import { startSession } from "mongoose";
 import { SUBSCRIPTION_PERIOD } from "../../../_constants/ttl";
-import { createDoc, getAllDocs, getOneDocById, updateDoc } from "../../../_services/global";
-import { createUnlimitedPlan, updatePlanMonthlyStats } from "../../../_services/plan/planService";
-import { createNewUnlimitedUser } from "../../../_services/user/userService";
+import { createDoc, getAllDocs, getOneDocById, updateDoc } from "../../../_repositories/global";
+import { createUnlimitedPlan, updatePlanMonthlyStats } from "../../../_repositories/plan/planRepo";
+import { createNewUnlimitedUser } from "../../../_repositories/user/userRepo";
 import { MongoId } from "../../../_Types/MongoId";
 import { UnlimitedPlanDataBody } from "../../../_Types/Plan";
 import { AppError } from "../../../_utils/AppError";

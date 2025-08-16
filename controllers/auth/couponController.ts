@@ -1,32 +1,22 @@
 import { Request, Response } from "express";
 import Coupon from "../../models/couponModel";
 import Store from "../../models/storeModel";
-import { couponSchema } from "../../_services/coupon/zodSchemas/couponSchemas";
+import { couponSchema } from "../../_repositories/coupon/zodSchemas/couponSchemas";
 import { HandleErrorResponse } from "../../_utils/common";
 
 export const createCoupon = async (req: Request, res: Response): Promise<void> => {
   try {
-    const {
-      code,
-      discountType,
-      discountValue,
-      minOrderAmount,
-      maxDiscountAmount,
-      validUntil,
-      maxUses,
-      storeId,
-      isActive
-    } = couponSchema.parse(req.body);
+    const { code, discountType, discountValue, minOrderAmount, maxDiscountAmount, validUntil, maxUses, storeId, isActive } = couponSchema.parse(req.body);
 
     const store = await Store.findById(storeId);
     if (!store) {
-        res.status(404).json({
+      res.status(404).json({
         status: "failed",
         message: "Store not found",
       });
-      return
+      return;
     }
-    
+
     const newCoupon = await Coupon.create({
       code: code.toUpperCase().trim(),
       discountType,
@@ -42,28 +32,19 @@ export const createCoupon = async (req: Request, res: Response): Promise<void> =
 
     res.status(201).json({
       status: "success",
-      coupon: newCoupon
+      coupon: newCoupon,
     });
   } catch (error) {
     HandleErrorResponse(error, res);
   }
 };
 
-// Update coupon 
+// Update coupon
 export const updateCoupon = async (req: Request, res: Response): Promise<void> => {
   try {
     const { couponId } = req.params;
     const data = couponSchema.partial().parse(req.body);
-    const {
-      code,
-      discountType,
-      discountValue,
-      minOrderAmount,
-      maxDiscountAmount,
-      validUntil,
-      maxUses,
-      isActive
-    } = data;
+    const { code, discountType, discountValue, minOrderAmount, maxDiscountAmount, validUntil, maxUses, isActive } = data;
 
     const coupon = await Coupon.findById(couponId);
     if (!coupon) throw new Error("Coupon not found");
@@ -86,12 +67,12 @@ export const updateCoupon = async (req: Request, res: Response): Promise<void> =
 };
 // getc coupon by id
 export const GetCouponById = async (req: Request, res: Response): Promise<void> => {
-  const {couponId} = req.params;
-  try{
-    const coupon = await Coupon.findById(couponId)
+  const { couponId } = req.params;
+  try {
+    const coupon = await Coupon.findById(couponId);
     if (!coupon) throw new Error("Coupon not found");
     res.status(200).json({ status: "success", coupon });
-  }catch(error) {
+  } catch (error) {
     HandleErrorResponse(error, res);
   }
-}
+};

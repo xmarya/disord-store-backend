@@ -1,4 +1,4 @@
-import { getOneDocByFindOne } from "../../_services/global";
+import { getOneDocByFindOne } from "../../_repositories/global";
 import User from "../../models/userModel";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";

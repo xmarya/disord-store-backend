@@ -1,5 +1,5 @@
-import { getAllDocs } from "../../_services/global";
-import { deleteWishlist, updateWishlist } from "../../_services/wishlist/wishlistService";
+import { getAllDocs } from "../../_repositories/global";
+import { deleteWishlist, updateWishlist } from "../../_repositories/wishlist/wishlistRepo";
 import { WishlistDataBody } from "../../_Types/Wishlist";
 import { catchAsync } from "../../_utils/catchAsync";
 import Wishlist from "../../models/wishlistModel";
@@ -12,7 +12,7 @@ export const updateWishlistController = catchAsync(async (request, response, nex
 
   response.status(203).json({
     success: true,
-    wishlist:products
+    wishlist: products,
   });
 });
 export const getWishlistController = catchAsync(async (request, response, next) => {

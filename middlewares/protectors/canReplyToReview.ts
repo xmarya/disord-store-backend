@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { getOneDocByFindOne, getOneDocById } from "../../_services/global";
+import { getOneDocByFindOne, getOneDocById } from "../../_repositories/global";
 import Review from "../../models/reviewModel";
 import { catchAsync } from "../../_utils/catchAsync";
 import { AppError } from "../../_utils/AppError";

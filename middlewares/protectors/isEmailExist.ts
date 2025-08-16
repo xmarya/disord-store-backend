@@ -1,5 +1,5 @@
 import { NextFunction } from "express";
-import { isExist } from "../../_services/global";
+import { isExist } from "../../_repositories/global";
 import User from "../../models/userModel";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";

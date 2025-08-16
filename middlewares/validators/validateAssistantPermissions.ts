@@ -11,7 +11,7 @@
 
 import { type Request, type Response, type NextFunction, request } from "express";
 import { AssistantPermissions } from "../../_Types/StoreAssistant";
-import { getAssistantPermissions } from "../../_services/assistant/assistantService";
+import { getAssistantPermissions } from "../../_repositories/assistant/assistantRepo";
 import { AppError } from "../../_utils/AppError";
 
 const checkAssistantPermissions = (permissionKey: keyof AssistantPermissions) => {

@@ -8,7 +8,7 @@
 */
 
 import { startSession } from "mongoose";
-import { getOneStoreStats, updateStoreStats } from "../../_services/store/storeStatsService";
+import { getOneStoreStats, updateStoreStats } from "../../_repositories/store/storeStatsRepo";
 import { InvoiceDataBody } from "../../_Types/Invoice";
 import { MongoId } from "../../_Types/MongoId";
 import { AppError } from "../../_utils/AppError";
@@ -20,7 +20,6 @@ type StatsPerStore = Array<{
   products: Array<{ productId: MongoId; quantity: number }>;
 }>;
 export async function updateStoreStatsController(data: Pick<InvoiceDataBody, "productsPerStore">, operationType: "new-purchase" | "cancellation") {
-
   const { productsPerStore } = data;
   const statsPerStore: StatsPerStore = productsPerStore.map(({ storeId, products }) => ({
     storeId,

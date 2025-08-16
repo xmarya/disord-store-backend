@@ -1,4 +1,4 @@
-import { getOneDocById } from "../_services/global";
+import { getOneDocById } from "../_repositories/global";
 import Admin from "../models/adminModel";
 import User from "../models/userModel";
 import { AppError } from "../_utils/AppError";

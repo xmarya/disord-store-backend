@@ -1,4 +1,4 @@
-import { addProductToCart, deleteProductFromCart, getUserCart } from "../../_services/cart/cartServices";
+import { addProductToCart, deleteProductFromCart, getUserCart } from "../../_repositories/cart/cartRepo";
 import { CartDataBody } from "../../_Types/Cart";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";

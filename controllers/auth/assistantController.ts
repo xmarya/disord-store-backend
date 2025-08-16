@@ -1,5 +1,5 @@
-import { createAssistant, deleteAssistant } from "../../_services/assistant/assistantService";
-import { getAllDocs, getOneDocByFindOne, getOneDocById, isExist, updateDoc } from "../../_services/global";
+import { createAssistant, deleteAssistant } from "../../_repositories/assistant/assistantRepo";
+import { getAllDocs, getOneDocByFindOne, getOneDocById, isExist, updateDoc } from "../../_repositories/global";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 import novuCreateAssistantSubscriber from "../../externals/novu/subscribers/createSubscriber";

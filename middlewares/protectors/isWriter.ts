@@ -1,4 +1,4 @@
-import { confirmReviewAuthorisation } from "../../_services/review/reviewService";
+import { confirmReviewAuthorisation } from "../../_repositories/review/reviewRepo";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 

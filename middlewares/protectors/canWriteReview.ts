@@ -1,4 +1,4 @@
-import { confirmAuthorization } from "../../_services/store/storeService";
+import { confirmAuthorization } from "../../_repositories/store/storeRepo";
 import { AppError } from "../../_utils/AppError";
 import { catchAsync } from "../../_utils/catchAsync";
 

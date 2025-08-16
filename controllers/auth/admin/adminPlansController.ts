@@ -1,5 +1,5 @@
-import { getAllDocs, getOneDocById, updateDoc } from "../../../_services/global";
-import { checkPlanName, getMonthlyPlansStats, getPlansStatsReport } from "../../../_services/plan/planService";
+import { getAllDocs, getOneDocById, updateDoc } from "../../../_repositories/global";
+import { checkPlanName, getMonthlyPlansStats, getPlansStatsReport } from "../../../_repositories/plan/planRepo";
 import { PlanDataBody } from "../../../_Types/Plan";
 import { AppError } from "../../../_utils/AppError";
 import { catchAsync } from "../../../_utils/catchAsync";

@@ -1,17 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import { ApplyCoupon, CreateOrder, ProcessOrderItems, updateCouponUsage } from "../../_services/order/orderService";
+import { ApplyCoupon, CreateOrder, ProcessOrderItems, updateCouponUsage } from "../../_repositories/order/orderRepo";
 import Order from "../../models/orderModel";
 import { generateOrderNumber } from "../../_utils/genrateOrderNumber";
-import { CreateOrderInput, createOrderSchema } from "../../_services/order/zodSchemas/orderSchemas";
+import { CreateOrderInput, createOrderSchema } from "../../_repositories/order/zodSchemas/orderSchemas";
 import { HandleErrorResponse } from "../../_utils/common";
-import { ProcessPaymobPayment } from "../../_services/payment/paymobService";
 import { AxiosError } from "axios";
-import { processPaymobWebhook, getPaymentSuccessHtml } from "../../_services/payment/paymnetServices";
 import Product from "../../models/productModel";
 import { catchAsync } from "../../_utils/catchAsync";
-import { getOneDocById } from "../../_services/global";
+import { getOneDocById } from "../../_repositories/global";
 import { AppError } from "../../_utils/AppError";
+import { getPaymentSuccessHtml, processPaymobWebhook } from "../../externals/paymob/paymnetProcessor";
+import { ProcessPaymobPayment } from "../../externals/paymob/paymobService";
 
 export const validateOrderInput = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -170,14 +170,13 @@ export const GetUserOrders = async (req: Request, res: Response): Promise<any> =
   }
 };
 
-export const getOneOrder = catchAsync(async(request, response, next) => {
-
-  const {orderId} = request.params;
+export const getOneOrder = catchAsync(async (request, response, next) => {
+  const { orderId } = request.params;
   const order = await getOneDocById(Order, orderId);
-  if(!order) return next(new AppError(400, "no order was found with this orderId"));
+  if (!order) return next(new AppError(400, "no order was found with this orderId"));
   response.status(200).json({
     success: true,
-    order
+    order,
   });
 });
 
