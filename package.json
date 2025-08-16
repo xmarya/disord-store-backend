@@ -7,10 +7,14 @@
   "_moduleAliases": {
     "@models/*": "./models/*",
     "@services/*": "./_services/*",
+    "@routers/*": "./_routers/*",
     "@repositories/*": "./_repositories/*",
     "@middlewares/*": "./_middlewares/*",
     "@utils/*": "./_utils/*",
-    "@Types/*": "./_Types/*"
+    "@externals/*": "./_externals/*",
+    "@Types/*": "./_Types/*",
+    "@constants/*": "./_constants/*",
+    "@config/*": "./_config/*"
   },
   "scripts": {
     "start": "node ./dist/index.cjs",
