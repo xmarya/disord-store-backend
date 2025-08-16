@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import { ApplyCoupon, CreateOrder, ProcessOrderItems, updateCouponUsage } from "../../_repositories/order/orderRepo";
-import Order from "../../models/orderModel";
-import { generateOrderNumber } from "../../_utils/genrateOrderNumber";
-import { CreateOrderInput, createOrderSchema } from "../../_repositories/order/zodSchemas/orderSchemas";
-import { HandleErrorResponse } from "../../_utils/common";
+import { ApplyCoupon, CreateOrder, ProcessOrderItems, updateCouponUsage } from "@repositories/order/orderRepo";
+import Order from "@models/orderModel";
+import { generateOrderNumber } from "@utils/genrateOrderNumber";
+import { CreateOrderInput, createOrderSchema } from "@repositories/order/zodSchemas/orderSchemas";
+import { HandleErrorResponse } from "@utils/common";
 import { AxiosError } from "axios";
-import Product from "../../models/productModel";
-import { catchAsync } from "../../_utils/catchAsync";
-import { getOneDocById } from "../../_repositories/global";
-import { AppError } from "../../_utils/AppError";
+import Product from "@models/productModel";
+import { catchAsync } from "@utils/catchAsync";
+import { getOneDocById } from "@repositories/global";
+import { AppError } from "@utils/AppError";
 import { getPaymentSuccessHtml, processPaymobWebhook } from "../../externals/paymob/paymnetProcessor";
 import { ProcessPaymobPayment } from "../../externals/paymob/paymobService";
 

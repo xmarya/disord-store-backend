@@ -1,4 +1,4 @@
-import { CategoryDocument } from "../_Types/Category";
+import { CategoryDocument } from "@Types/Category";
 import mongoose, { Schema } from "mongoose";
 import Product from "./productModel";
 
@@ -16,15 +16,15 @@ export const categorySchema = new Schema<CategoryDocument>({
   createdBy: {
     name: String,
     id: Schema.Types.ObjectId,
-    date:{
-      type:Date,
-      default: Date.now
-    }
+    date: {
+      type: Date,
+      default: Date.now,
+    },
   },
   updatedBy: {
     name: String,
     id: Schema.Types.ObjectId,
-    date:Date,
+    date: Date,
   },
   store: Schema.Types.ObjectId,
   products: [Schema.Types.ObjectId],

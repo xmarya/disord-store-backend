@@ -1,7 +1,7 @@
 import crypto from "crypto";
-import { Model } from "../_Types/Model";
-import { catchAsync } from "../_utils/catchAsync";
-import { AppError } from "../_utils/AppError";
+import { Model } from "@Types/Model";
+import { catchAsync } from "@utils/catchAsync";
+import { AppError } from "@utils/AppError";
 import mongoose from "mongoose";
 
 export const resetPassword = (Model: Extract<Model, "Admin" | "User">) =>

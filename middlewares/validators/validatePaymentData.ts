@@ -9,9 +9,9 @@
 */
 
 import { isPast, isValid } from "date-fns";
-import { UserCreditCardDataBody } from "../../_Types/UserCreditCard";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { UserCreditCardDataBody } from "@Types/UserCreditCard";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 const validatePaymentData = catchAsync(async (request, response, next) => {
   const { cardName, cardNumber, cardExpireIn, CVV } = request.body as UserCreditCardDataBody;

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { AdminDocument } from "../_Types/admin/AdminUser";
+import { AdminDocument } from "@Types/admin/AdminUser";
 import { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import { HASHING_SALT } from "../_constants/numbers";

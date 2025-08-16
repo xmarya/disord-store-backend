@@ -1,6 +1,6 @@
-import { confirmAuthorization } from "../../_repositories/store/storeRepo";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { confirmAuthorization } from "@repositories/store/storeRepo";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 const hasAuthorization = catchAsync(async (request, response, next) => {
   const userId = request.user.id;

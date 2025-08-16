@@ -1,8 +1,8 @@
-import { createDoc, deleteDoc, getAllDocs, getOneDocById, updateDoc } from "../../../_repositories/global";
-import { PlatformReviewDataBody } from "../../../_Types/Review";
-import { AppError } from "../../../_utils/AppError";
-import { catchAsync } from "../../../_utils/catchAsync";
-import PlatformReview from "../../../models/platformReviewModel";
+import { createDoc, deleteDoc, getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
+import { PlatformReviewDataBody } from "@Types/Review";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import PlatformReview from "@models/platformReviewModel";
 
 export const createPlatformReviewController = catchAsync(async (request, response, next) => {
   const { reviewBody }: PlatformReviewDataBody = request.body;

@@ -1,7 +1,7 @@
-import { updateDoc } from "../../../_repositories/global";
-import { AppError } from "../../../_utils/AppError";
-import { catchAsync } from "../../../_utils/catchAsync";
-import Review from "../../../models/reviewModel";
+import { updateDoc } from "@repositories/global";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import Review from "@models/reviewModel";
 
 export const addStoreReply = catchAsync(async (request, response, next) => {
   const { storeReply } = request.body;

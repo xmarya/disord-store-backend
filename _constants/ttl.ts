@@ -1,4 +1,4 @@
-import { TTLMap } from "../_Types/RedisCache";
+import { TTLMap } from "@Types/RedisCache";
 
 export const SUBSCRIPTION_PERIOD = 30;
 export const PLAN_TRIAL_PERIOD = 10;

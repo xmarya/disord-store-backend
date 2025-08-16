@@ -1,9 +1,9 @@
 import mongoose, { startSession } from "mongoose";
-import { MongoId } from "../../_Types/MongoId";
-import { StoreDataBody } from "../../_Types/Store";
-import { AppError } from "../../_utils/AppError";
-import Store from "../../models/storeModel";
-import User from "../../models/userModel";
+import { MongoId } from "@Types/MongoId";
+import { StoreDataBody } from "@Types/Store";
+import { AppError } from "@utils/AppError";
+import Store from "@models/storeModel";
+import User from "@models/userModel";
 
 export async function createStore(data: StoreDataBody) {
   const { storeName, description, owner, inPlan, logo } = data;

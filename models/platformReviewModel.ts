@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { PlatformReviewDocument } from "../_Types/Review";
+import { PlatformReviewDocument } from "@Types/Review";
 
 type PlatFormReviewModel = mongoose.Model<PlatformReviewDocument>;
 const platformReviewSchema = new mongoose.Schema<PlatformReviewDocument>(
@@ -8,7 +8,7 @@ const platformReviewSchema = new mongoose.Schema<PlatformReviewDocument>(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "the user filed is required"],
-      unique: true
+      unique: true,
     },
     reviewBody: {
       type: String,
@@ -29,8 +29,8 @@ const platformReviewSchema = new mongoose.Schema<PlatformReviewDocument>(
     },
     image: String,
     displayInHomePage: {
-      type:Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -42,5 +42,5 @@ const platformReviewSchema = new mongoose.Schema<PlatformReviewDocument>(
   }
 );
 
-const PlatformReview = mongoose.model<PlatformReviewDocument,PlatFormReviewModel>("PlatformReview", platformReviewSchema);
+const PlatformReview = mongoose.model<PlatformReviewDocument, PlatFormReviewModel>("PlatformReview", platformReviewSchema);
 export default PlatformReview;

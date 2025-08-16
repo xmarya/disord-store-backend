@@ -1,14 +1,14 @@
 import { startSession } from "mongoose";
-import { Model } from "../../../_Types/Model";
-import { MongoId } from "../../../_Types/MongoId";
-import { ReviewDataBody } from "../../../_Types/Review";
-import { createDoc, deleteDoc, getAllDocs, updateDoc } from "../../../_repositories/global";
-import { setRanking } from "../../../_repositories/ranking/rankingRepo";
-import { calculateRatingsAverage } from "../../../_repositories/review/reviewRepo";
-import { AppError } from "../../../_utils/AppError";
-import { catchAsync } from "../../../_utils/catchAsync";
-import PlatformReview from "../../../models/platformReviewModel";
-import Review from "../../../models/reviewModel";
+import { Model } from "@Types/Model";
+import { MongoId } from "@Types/MongoId";
+import { ReviewDataBody } from "@Types/Review";
+import { createDoc, deleteDoc, getAllDocs, updateDoc } from "@repositories/global";
+import { setRanking } from "@repositories/ranking/rankingRepo";
+import { calculateRatingsAverage } from "@repositories/review/reviewRepo";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import PlatformReview from "@models/platformReviewModel";
+import Review from "@models/reviewModel";
 
 async function updateResourceRatingController(Model: Extract<Model, "Store" | "Product">, resourceId: MongoId) {
   const session = await startSession();

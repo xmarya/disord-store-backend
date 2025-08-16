@@ -1,6 +1,5 @@
-import Admin from "../../models/adminModel";
-
+import Admin from "@models/adminModel";
 
 export async function confirmAdminEmail(bulkOps: any) {
-      await Admin.bulkWrite(bulkOps);
+  await Admin.bulkWrite(bulkOps);
 }

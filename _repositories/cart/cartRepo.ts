@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { CartDataBody } from "../../_Types/Cart";
-import { MongoId } from "../../_Types/MongoId";
+import { CartDataBody } from "@Types/Cart";
+import { MongoId } from "@Types/MongoId";
 import Cart from "../../models/cartModel";
 
 export async function addProductToCart(data: CartDataBody) {
@@ -67,7 +67,7 @@ export async function getUserCart(user: MongoId) {
       },
     },
 
-    // STEP 3) $sort stage to keep the same order in which products were added to the cart. 
+    // STEP 3) $sort stage to keep the same order in which products were added to the cart.
     //NOTE: the $sort stage must be before the $group, in order for $push to respect the order
     { $sort: { createdAt: 1 } },
 
@@ -116,8 +116,8 @@ export async function getUserCart(user: MongoId) {
   return cart;
 }
 
-export async function deleteProductFromCart(user:MongoId, product:MongoId) {
-  await Cart.deleteOne({user, product});
+export async function deleteProductFromCart(user: MongoId, product: MongoId) {
+  await Cart.deleteOne({ user, product });
 }
 
 /* OLD CODE (kept for reference): 

@@ -1,10 +1,10 @@
-import { createAssistant, deleteAssistant } from "../../_repositories/assistant/assistantRepo";
-import { getAllDocs, getOneDocByFindOne, getOneDocById, isExist, updateDoc } from "../../_repositories/global";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { createAssistant, deleteAssistant } from "@repositories/assistant/assistantRepo";
+import { getAllDocs, getOneDocByFindOne, getOneDocById, isExist, updateDoc } from "@repositories/global";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 import novuCreateAssistantSubscriber from "../../externals/novu/subscribers/createSubscriber";
-import StoreAssistant from "../../models/storeAssistantModel";
-import User from "../../models/userModel";
+import StoreAssistant from "@models/storeAssistantModel";
+import User from "@models/userModel";
 
 export const createAssistantController = catchAsync(async (request, response, next) => {
   const { permissions } = request.body;

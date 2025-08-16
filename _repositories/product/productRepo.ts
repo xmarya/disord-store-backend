@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { MongoId } from "../../_Types/MongoId";
-import { ProductDocument } from "../../_Types/Product";
-import Product from "../../models/productModel";
+import { MongoId } from "@Types/MongoId";
+import { ProductDocument } from "@Types/Product";
+import Product from "@models/productModel";
 
 export async function updateProduct(storeId: MongoId, productId: MongoId, data: ProductDocument) {
   /*✅*/
@@ -31,7 +31,7 @@ export async function updateProduct(storeId: MongoId, productId: MongoId, data: 
       */
     },
     { runValidators: true, new: true } // ensures validation still runs
-  ).populate({path:"categories", select:"name colour createdBy updatedBy"});
+  ).populate({ path: "categories", select: "name colour createdBy updatedBy" });
 
   return updatedProduct;
 }

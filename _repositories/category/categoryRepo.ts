@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import { CategoryBasic } from "../../_Types/Category";
-import { MongoId } from "../../_Types/MongoId";
-import Category from "../../models/categoryModel";
+import { CategoryBasic } from "@Types/Category";
+import { MongoId } from "@Types/MongoId";
+import Category from "@models/categoryModel";
 
-export async function getAllProductCategories(productId:MongoId):Promise<CategoryBasic[]> {
-  const categories = await Category.find({products: productId}, "name colour createdBy updatedBy");
+export async function getAllProductCategories(productId: MongoId): Promise<CategoryBasic[]> {
+  const categories = await Category.find({ products: productId }, "name colour createdBy updatedBy");
 
   return categories;
 }
@@ -15,14 +15,14 @@ export async function assignProductToCategory(categories:Array<CategoryBasic>, p
 }
 */
 
-export async function updateProductInCategories(categories:Array<CategoryBasic>, productId:MongoId) {
-    const operations = [];
-    // STEP 1) Add productId to provided categories (addToSet)
+export async function updateProductInCategories(categories: Array<CategoryBasic>, productId: MongoId) {
+  const operations = [];
+  // STEP 1) Add productId to provided categories (addToSet)
   operations.push({
     updateMany: {
       filter: { _id: { $in: categories } },
-      update: { $addToSet: { products: productId } }
-    }
+      update: { $addToSet: { products: productId } },
+    },
   });
 
   // STEP 2) Remove productId from categories NOT in the list but that contain the productId (pull)
@@ -30,23 +30,23 @@ export async function updateProductInCategories(categories:Array<CategoryBasic>,
     updateMany: {
       filter: {
         _id: { $nin: categories },
-        products: productId
+        products: productId,
       },
-      update: { $pull: { products: productId } }
-    }
+      update: { $pull: { products: productId } },
+    },
   });
 
   await Category.bulkWrite(operations);
 }
 
 // NOTE: this is going to be called when deleting a product permanently.
-export async function deleteProductFromCategory(categories:Array<CategoryBasic>, productId:MongoId, session:mongoose.ClientSession) {
-  await Category.updateMany({_id: {$in: categories}}, {$pull: { products: productId }}).session(session);
+export async function deleteProductFromCategory(categories: Array<CategoryBasic>, productId: MongoId, session: mongoose.ClientSession) {
+  await Category.updateMany({ _id: { $in: categories } }, { $pull: { products: productId } }).session(session);
   // get all the cats that have this product id,
   // remove the one that is not in the new cats array
   // await Category.find({products: "684ac7b49e4ba6351f4fa89d"});
 }
 
-export async function deleteAllCategories(storeId:MongoId, session:mongoose.ClientSession){
-  await Category.deleteMany({store: storeId}).session(session);
+export async function deleteAllCategories(storeId: MongoId, session: mongoose.ClientSession) {
+  await Category.deleteMany({ store: storeId }).session(session);
 }

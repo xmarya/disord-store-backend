@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import Coupon from "../../models/couponModel";
-import Store from "../../models/storeModel";
-import { couponSchema } from "../../_repositories/coupon/zodSchemas/couponSchemas";
-import { HandleErrorResponse } from "../../_utils/common";
+import Coupon from "@models/couponModel";
+import Store from "@models/storeModel";
+import { couponSchema } from "@repositories/coupon/zodSchemas/couponSchemas";
+import { HandleErrorResponse } from "@utils/common";
 
 export const createCoupon = async (req: Request, res: Response): Promise<void> => {
   try {

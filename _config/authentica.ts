@@ -1,4 +1,4 @@
-import { AuthenticaBalance, AuthenticaFullRequest, AuthenticaRequestEndpoint, AuthenticaResponse } from "../_Types/AuthenticaOTP";
+import { AuthenticaBalance, AuthenticaFullRequest, AuthenticaRequestEndpoint, AuthenticaResponse } from "@Types/AuthenticaOTP";
 import { catchAsync } from "../_utils/catchAsync";
 
 const API_URL = (requestEndpoint: AuthenticaRequestEndpoint) => `https://api.authentica.sa/api/v2${requestEndpoint}`;
@@ -21,7 +21,7 @@ async function authentica({ requestEndpoint, body }: AuthenticaFullRequest) {
     body: JSON.stringify(body),
   });
 
-  const data = (await response.json());
+  const data = await response.json();
 
   return data;
 }
@@ -44,9 +44,9 @@ export const getAuthenticaBalance = catchAsync(async (request, response, next) =
   const { data } = (await result.json()) as AuthenticaBalance;
 
   console.log(data.balance, !!data.balance);
-  if(data.balance) return next(); // enough balance ? move to send the otp via email or SMS
+  if (data.balance) return next(); // enough balance ? move to send the otp via email or SMS
 
-  request.loginMethod = {"email": ""}
+  request.loginMethod = { email: "" };
   console.log("loginMethod changed to default ");
   next();
 });

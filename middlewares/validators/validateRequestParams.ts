@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { AppError } from "../../_utils/AppError";
+import { AppError } from "@utils/AppError";
 import mongoose from "mongoose";
 
 const validateRequestParams = (paramsName: string) => {

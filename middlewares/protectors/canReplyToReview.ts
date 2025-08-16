@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import { getOneDocByFindOne, getOneDocById } from "../../_repositories/global";
-import Review from "../../models/reviewModel";
-import { catchAsync } from "../../_utils/catchAsync";
-import { AppError } from "../../_utils/AppError";
-import Product from "../../models/productModel";
+import { getOneDocByFindOne, getOneDocById } from "@repositories/global";
+import Review from "@models/reviewModel";
+import { catchAsync } from "@utils/catchAsync";
+import { AppError } from "@utils/AppError";
+import Product from "@models/productModel";
 
 const canReplyToReview = catchAsync(async (request, response, next) => {
   const { reviewId } = request.params;

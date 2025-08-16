@@ -1,13 +1,13 @@
-import { getOneDocById } from "../../_repositories/global";
-import { AdminDocument } from "../../_Types/admin/AdminUser";
-import { MongoId } from "../../_Types/MongoId";
-import { UserDocument } from "../../_Types/User";
-import Admin from "../../models/adminModel";
-import User from "../../models/userModel";
-import { AppError } from "../../_utils/AppError";
+import { getOneDocById } from "@repositories/global";
+import { AdminDocument } from "@Types/admin/AdminUser";
+import { MongoId } from "@Types/MongoId";
+import { UserDocument } from "@Types/User";
+import Admin from "@models/adminModel";
+import User from "@models/userModel";
+import { AppError } from "@utils/AppError";
 import { getDecompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
-import { catchAsync } from "../../_utils/catchAsync";
-import jwtVerify from "../../_utils/jwtToken/jwtVerify";
+import { catchAsync } from "@utils/catchAsync";
+import jwtVerify from "@utils/jwtToken/jwtVerify";
 
 const getUserFromPayload = catchAsync(async (request, response, next) => {
   let user: UserDocument | AdminDocument | null;

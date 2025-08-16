@@ -1,8 +1,8 @@
-import { getAllDocs } from "../../_repositories/global";
-import { deleteWishlist, updateWishlist } from "../../_repositories/wishlist/wishlistRepo";
-import { WishlistDataBody } from "../../_Types/Wishlist";
-import { catchAsync } from "../../_utils/catchAsync";
-import Wishlist from "../../models/wishlistModel";
+import { getAllDocs } from "@repositories/global";
+import { deleteWishlist, updateWishlist } from "@repositories/wishlist/wishlistRepo";
+import { WishlistDataBody } from "@Types/Wishlist";
+import { catchAsync } from "@utils/catchAsync";
+import Wishlist from "@models/wishlistModel";
 
 export const updateWishlistController = catchAsync(async (request, response, next) => {
   const { products }: WishlistDataBody = request.body;

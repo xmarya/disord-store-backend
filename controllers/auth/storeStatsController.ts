@@ -8,11 +8,11 @@
 */
 
 import { startSession } from "mongoose";
-import { getOneStoreStats, updateStoreStats } from "../../_repositories/store/storeStatsRepo";
-import { InvoiceDataBody } from "../../_Types/Invoice";
-import { MongoId } from "../../_Types/MongoId";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { getOneStoreStats, updateStoreStats } from "@repositories/store/storeStatsRepo";
+import { InvoiceDataBody } from "@Types/Invoice";
+import { MongoId } from "@Types/MongoId";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 type StatsPerStore = Array<{
   storeId: MongoId;

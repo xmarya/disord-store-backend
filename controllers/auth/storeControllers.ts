@@ -1,18 +1,18 @@
 import mongoose, { startSession } from "mongoose";
-import { deleteAllAssistants } from "../../_repositories/assistant/assistantRepo";
-import { deleteAllCategories } from "../../_repositories/category/categoryRepo";
-import { getOneDocById, updateDoc } from "../../_repositories/global";
-import { deleteAllProducts } from "../../_repositories/product/productRepo";
-import { deleteAllResourceReviews } from "../../_repositories/review/reviewRepo";
-import { createStore, deleteStore } from "../../_repositories/store/storeRepo";
-import { resetStoreOwnerToDefault } from "../../_repositories/user/userRepo";
-import { MongoId } from "../../_Types/MongoId";
-import { StoreOwner } from "../../_Types/User";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
-import Store from "../../models/storeModel";
-import { StoreDataBody, StoreDocument } from "./../../_Types/Store";
-import { deleteStoreStats } from "../../_repositories/store/storeStatsRepo";
+import { deleteAllAssistants } from "@repositories/assistant/assistantRepo";
+import { deleteAllCategories } from "@repositories/category/categoryRepo";
+import { getOneDocById, updateDoc } from "@repositories/global";
+import { deleteAllProducts } from "@repositories/product/productRepo";
+import { deleteAllResourceReviews } from "@repositories/review/reviewRepo";
+import { createStore, deleteStore } from "@repositories/store/storeRepo";
+import { resetStoreOwnerToDefault } from "@repositories/user/userRepo";
+import { MongoId } from "@Types/MongoId";
+import { StoreOwner } from "@Types/User";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import Store from "@models/storeModel";
+import { StoreDataBody, StoreDocument } from "./@Types/Store";
+import { deleteStoreStats } from "@repositories/store/storeStatsRepo";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   // TODO: complete the store data

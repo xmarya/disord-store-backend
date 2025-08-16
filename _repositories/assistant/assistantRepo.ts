@@ -1,10 +1,10 @@
 import mongoose, { startSession } from "mongoose";
-import User from "../../models/userModel";
-import StoreAssistant from "../../models/storeAssistantModel";
-import Store from "../../models/storeModel";
-import { AppError } from "../../_utils/AppError";
-import { AssistantRegisterData } from "../../_Types/StoreAssistant";
-import { MongoId } from "../../_Types/MongoId";
+import User from "@models/userModel";
+import StoreAssistant from "@models/storeAssistantModel";
+import Store from "@models/storeModel";
+import { AppError } from "@utils/AppError";
+import { AssistantRegisterData } from "@Types/StoreAssistant";
+import { MongoId } from "@Types/MongoId";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
     tha reason is because this is a service layer function, not the controller that always returns response,
@@ -56,10 +56,10 @@ export async function createAssistant(data: AssistantRegisterData) {
     // (since th transactions should be as short as possible):
     await Store.findByIdAndUpdate(storeId, { $addToSet: { storeAssistants: user[0].id } }); // it should have be linked to the user, not the assistant, it could have be also assistant[0].assistant
 
-    return {assistant: assistant[0], user:user[0]};
+    return { assistant: assistant[0], user: user[0] };
   } catch (error) {
     await session.abortTransaction();
-    const message = (error as AppError).message || "لم تتم العملية بنجاح. حاول مجددًا"
+    const message = (error as AppError).message || "لم تتم العملية بنجاح. حاول مجددًا";
     throw new AppError(500, message);
   } finally {
     await session.endSession();
@@ -82,36 +82,34 @@ export async function deleteAssistant(storeId: MongoId, assistantId: string) {
   const session = await startSession();
   session.startTransaction();
   try {
+    await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: assistantId } }, { session });
+    await User.findByIdAndDelete(assistantId, { session });
+    await StoreAssistant.deleteOne({ assistant: assistantId }, { session });
 
-    await Store.findByIdAndUpdate(storeId, {$pull: { storeAssistants: assistantId}}, {session});
-    await User.findByIdAndDelete(assistantId, {session});
-    await StoreAssistant.deleteOne({assistant: assistantId}, {session})
-    
     await session.commitTransaction();
   } catch (error) {
     await session.abortTransaction();
-    const message = (error as AppError).message || "لم تتم العملية بنجاح. حاول مجددًا"
+    const message = (error as AppError).message || "لم تتم العملية بنجاح. حاول مجددًا";
     throw new AppError(500, message);
-    
   } finally {
     await session.endSession();
   }
 }
 
-export async function getAssistantPermissions(storeId:MongoId, assistantId:string) {
-    const assistant = await StoreAssistant.findOne({assistant: assistantId, inStore:storeId});
+export async function getAssistantPermissions(storeId: MongoId, assistantId: string) {
+  const assistant = await StoreAssistant.findOne({ assistant: assistantId, inStore: storeId });
 
-    return assistant;
+  return assistant;
 }
 
 export async function deleteAllAssistants(storeId: MongoId, session: mongoose.ClientSession) {
   //STEP 1) get all the assistants ids based on the storeId to delete them from assistants collection:
-  const assistantsId = await StoreAssistant.find({inStore: storeId}).select("assistant"); // this is going to have the mongodb default _id and the assistant field
-  if(!assistantsId) return;
-  
-  await StoreAssistant.deleteMany({inStore: storeId}).session(session);
+  const assistantsId = await StoreAssistant.find({ inStore: storeId }).select("assistant"); // this is going to have the mongodb default _id and the assistant field
+  if (!assistantsId) return;
+
+  await StoreAssistant.deleteMany({ inStore: storeId }).session(session);
 
   //STEP 2) delete them using the same assistants ids from users collection:
-  const userIds = assistantsId.map(a => a.assistant); // to only extract the assistant filed that holds a reference to the User
+  const userIds = assistantsId.map((a) => a.assistant); // to only extract the assistant filed that holds a reference to the User
   await User.deleteMany({ _id: { $in: userIds }, userType: "storeAssistant" }).session(session);
 }

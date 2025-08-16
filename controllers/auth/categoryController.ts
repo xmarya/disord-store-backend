@@ -1,11 +1,11 @@
-import { getAllProductCategories } from "../../_repositories/category/categoryRepo";
-import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from "../../_repositories/global";
-import { CategoryBasic } from "../../_Types/Category";
-import { MongoId } from "../../_Types/MongoId";
-import { AppError } from "../../_utils/AppError";
+import { getAllProductCategories } from "@repositories/category/categoryRepo";
+import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from "@repositories/global";
+import { CategoryBasic } from "@Types/Category";
+import { MongoId } from "@Types/MongoId";
+import { AppError } from "@utils/AppError";
 import { getDecompressedCacheData, setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
-import { catchAsync } from "../../_utils/catchAsync";
-import Category from "../../models/categoryModel";
+import { catchAsync } from "@utils/catchAsync";
+import Category from "@models/categoryModel";
 
 // protected
 export const createCategoryController = catchAsync(async (request, response, next) => {

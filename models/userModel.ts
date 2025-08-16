@@ -3,7 +3,7 @@ import { formatDistanceStrict, lightFormat } from "date-fns";
 import { arSA } from "date-fns/locale/ar-SA";
 import mongoose, { Schema } from "mongoose";
 import { HASHING_SALT } from "../_constants/numbers";
-import { UserDocument } from "../_Types/User";
+import { UserDocument } from "@Types/User";
 import "./storeModel"; // ✅ Make sure Store is registered before User
 
 interface UserVirtual {

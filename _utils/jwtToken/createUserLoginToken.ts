@@ -1,13 +1,13 @@
 import type { Response } from "express";
-import { getOneDocByFindOne, getOneDocById } from "../../_repositories/global";
-import { AdminDocument } from "../../_Types/admin/AdminUser";
-import { UserDocument } from "../../_Types/User";
-import User from "../../models/userModel";
+import { getOneDocByFindOne, getOneDocById } from "@repositories/global";
+import { AdminDocument } from "@Types/admin/AdminUser";
+import { UserDocument } from "@Types/User";
+import User from "@models/userModel";
 import cacheUser from "../../externals/redis/cacheControllers/user";
 import createNovuSubscriber from "../../externals/novu/subscribers/createSubscriber";
 import jwtSignature from "./generateSignature";
 import tokenWithCookies from "./tokenWithCookies";
-import Admin from "../../models/adminModel";
+import Admin from "@models/adminModel";
 import { AppError } from "../AppError";
 
 async function createUserLoginToken(response: Response, condition: Record<string, string | undefined>) {

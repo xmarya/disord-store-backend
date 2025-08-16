@@ -1,15 +1,14 @@
-import { PlanDocument } from "../../_Types/Plan";
-import { UserPlan } from "../../_Types/User";
+import { PlanDocument } from "@Types/Plan";
+import { UserPlan } from "@Types/User";
 
+function formatSubscriptionsLogs(subscribedPlanDetails: UserPlan, planExpiresInDays: string) {
+  // const currentSubscription ,currentSubscriptionDetails, pastSubscriptions
+  const { paidPrice, subscribeStarts, subscribeEnds, planId } = subscribedPlanDetails;
+  const { planName, price, quota } = planId as unknown as PlanDocument;
+  const currentSubscription = { planName, paidPrice, planExpiresInDays };
+  const currentSubscriptionDetails = { subscribeStarts, subscribeEnds, originalPrice: price?.riyal, quota };
 
-function formatSubscriptionsLogs(subscribedPlanDetails:UserPlan, planExpiresInDays:string) {
-    // const currentSubscription ,currentSubscriptionDetails, pastSubscriptions
-    const {paidPrice, subscribeStarts, subscribeEnds, planId} = subscribedPlanDetails;
-    const {planName, price, quota} = planId as unknown as PlanDocument;
-    const currentSubscription = {planName, paidPrice, planExpiresInDays};
-    const currentSubscriptionDetails = {subscribeStarts, subscribeEnds, originalPrice: price?.riyal, quota};
-
-    return {currentSubscription, currentSubscriptionDetails}
+  return { currentSubscription, currentSubscriptionDetails };
 }
 
 export default formatSubscriptionsLogs;

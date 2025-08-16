@@ -1,11 +1,11 @@
 import { startSession } from "mongoose";
-import { getAllDocs, getOneDocById, updateDoc } from "../../../_repositories/global";
-import { getAllStoresStats, getOneStoreStats } from "../../../_repositories/store/storeStatsRepo";
-import { AppError } from "../../../_utils/AppError";
-import { catchAsync } from "../../../_utils/catchAsync";
-import Store from "../../../models/storeModel";
+import { getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
+import { getAllStoresStats, getOneStoreStats } from "@repositories/store/storeStatsRepo";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import Store from "@models/storeModel";
 import { deleteStorePermanently } from "../storeControllers";
-import Product from "../../../models/productModel";
+import Product from "@models/productModel";
 
 export const getAllStoresInfo = catchAsync(async (request, response, next) => {
   const { sortBy, sortOrder, plan, verified } = request.body;

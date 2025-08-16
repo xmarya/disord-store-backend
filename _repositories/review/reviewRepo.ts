@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { Model } from "../../_Types/Model";
-import { MongoId } from "../../_Types/MongoId";
-import Review from "../../models/reviewModel";
+import { Model } from "@Types/Model";
+import { MongoId } from "@Types/MongoId";
+import Review from "@models/reviewModel";
 
 export async function confirmReviewAuthorisation(reviewId: string, userId: string): Promise<boolean> {
   const authorised = await Review.exists({ _id: reviewId, writer: userId });
@@ -10,7 +10,6 @@ export async function confirmReviewAuthorisation(reviewId: string, userId: strin
 }
 
 export async function calculateRatingsAverage(Model: Extract<Model, "Store" | "Product">, resourceId: MongoId, session: mongoose.ClientSession) {
-
   /* OLD CODE (kept for reference):  
     const collection = resourceName.concat(`s-${modelId}`);
     const doc = await mongoose.connection.collection(collection).findOne({_id: new mongoose.Types.ObjectId(modelId)}) as ProductDocument; // this is what I want, it asks the db directly about the existing collections
@@ -47,6 +46,6 @@ export async function calculateRatingsAverage(Model: Extract<Model, "Store" | "P
   await doc.save({ validateBeforeSave: false, session }); // Mongoose internally manages sessions for save() calls, because of that, it conflicts with the session inside setRanking. so I'll create one session inside the controller and pass it to both services
 }
 
-export async function deleteAllResourceReviews(resourceId:MongoId, session: mongoose.ClientSession) {
-  await Review.deleteMany({reviewedResourceId:resourceId}).session(session);
+export async function deleteAllResourceReviews(resourceId: MongoId, session: mongoose.ClientSession) {
+  await Review.deleteMany({ reviewedResourceId: resourceId }).session(session);
 }

@@ -1,9 +1,9 @@
-import { getAllDocs, getOneDocById, updateDoc } from "../../../_repositories/global";
-import { checkPlanName, getMonthlyPlansStats, getPlansStatsReport } from "../../../_repositories/plan/planRepo";
-import { PlanDataBody } from "../../../_Types/Plan";
-import { AppError } from "../../../_utils/AppError";
-import { catchAsync } from "../../../_utils/catchAsync";
-import Plan from "../../../models/planModel";
+import { getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
+import { checkPlanName, getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/planRepo";
+import { PlanDataBody } from "@Types/Plan";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import Plan from "@models/planModel";
 
 export const getAllPlanController = catchAsync(async (request, response, next) => {
   const plans = await getAllDocs(Plan, request);

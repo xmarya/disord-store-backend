@@ -1,6 +1,6 @@
 import type { Request } from "express";
-import { AdminDocument } from "../../_Types/admin/AdminUser";
-import { UserDocument } from "../../_Types/User";
+import { AdminDocument } from "@Types/admin/AdminUser";
+import { UserDocument } from "@Types/User";
 import { generateRandomToken } from "../generateRandomToken";
 import { createRedisHash } from "../../externals/redis/redisOperations/redisHash";
 

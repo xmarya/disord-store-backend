@@ -5,7 +5,7 @@ import { createNewDiscordUser, createNewUserController, credentialsLogin, sendOT
 import validateRequestParams from "../../middlewares/validators/validateRequestParams";
 import { resetPassword } from "../../middlewares/resetPassword";
 import { forgetPassword } from "../../middlewares/forgetPassword";
-import { getAuthenticaBalance } from "../../_config/authentica";
+import { getAuthenticaBalance } from "@config/authentica";
 import verifyLoginPassword from "../../middlewares/validators/verifyLoginPassword";
 import confirmUserEmail from "../../middlewares/validators/confirmUserEmail";
 

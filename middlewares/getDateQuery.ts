@@ -1,7 +1,7 @@
 import { lightFormat } from "date-fns";
-import { AppError } from "../_utils/AppError";
-import { catchAsync } from "../_utils/catchAsync";
-import { buildDateFilter } from "../_utils/queryModifiers/formatDateQuery";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import { buildDateFilter } from "@utils/queryModifiers/formatDateQuery";
 import { SUPPORTED_DATE_FORMATS } from "../_constants/dataStructures";
 
 const getDateQuery = catchAsync(async (request, response, next) => {

@@ -1,14 +1,14 @@
 import { startSession } from "mongoose";
-import { deleteProductFromCategory, updateProductInCategories } from "../../_repositories/category/categoryRepo";
-import { createDoc, deleteDoc, getOneDocById } from "../../_repositories/global";
-import { updateProduct } from "../../_repositories/product/productRepo";
-import { CategoryDocument } from "../../_Types/Category";
-import { AppError } from "../../_utils/AppError";
+import { deleteProductFromCategory, updateProductInCategories } from "@repositories/category/categoryRepo";
+import { createDoc, deleteDoc, getOneDocById } from "@repositories/global";
+import { updateProduct } from "@repositories/product/productRepo";
+import { CategoryDocument } from "@Types/Category";
+import { AppError } from "@utils/AppError";
 import { deleteFromCache, setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
-import { catchAsync } from "../../_utils/catchAsync";
-import Product from "../../models/productModel";
+import { catchAsync } from "@utils/catchAsync";
+import Product from "@models/productModel";
 import { categoriesInCache } from "./categoryController";
-import { deleteAllResourceReviews } from "../../_repositories/review/reviewRepo";
+import { deleteAllResourceReviews } from "@repositories/review/reviewRepo";
 
 export const createProductController = catchAsync(async (request, response, next) => {
   const { categories } = request.body;

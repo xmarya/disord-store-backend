@@ -1,6 +1,6 @@
 import crypto from "crypto";
-import { paymobWebhookSchema } from "../externals/paymob/zodSchemas/paymnetSchema";
-import { paymobConfig } from "../_config/config";
+import { paymobWebhookSchema } from "@externals/paymob/zodSchemas/paymnetSchema";
+import { paymobConfig } from "@config/config";
 
 const PAYMOB_HMAC_KEY = paymobConfig.hmacKey;
 

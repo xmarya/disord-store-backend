@@ -1,10 +1,10 @@
 import { startSession } from "mongoose";
-import { getAllDocs, getOneDocById } from "../../_repositories/global";
-import { AppError } from "../../_utils/AppError";
+import { getAllDocs, getOneDocById } from "@repositories/global";
+import { AppError } from "@utils/AppError";
 import { setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
-import { catchAsync } from "../../_utils/catchAsync";
-import Product from "../../models/productModel";
-import Store from "../../models/storeModel";
+import { catchAsync } from "@utils/catchAsync";
+import Product from "@models/productModel";
+import Store from "@models/storeModel";
 
 export const getStoresListController = catchAsync(async (request, response, next) => {
   const storesList = await getAllDocs(Store, request, { select: ["storeName", "logo", "description", "ranking", "ratingsAverage", "ratingsQuantity", "verified"] });

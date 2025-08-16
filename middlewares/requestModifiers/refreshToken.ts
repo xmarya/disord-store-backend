@@ -1,8 +1,8 @@
 import { differenceInMinutes, fromUnixTime } from "date-fns";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { catchAsync } from "../../_utils/catchAsync";
-import jwtSignature from "../../_utils/jwtToken/generateSignature";
-import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
+import { catchAsync } from "@utils/catchAsync";
+import jwtSignature from "@utils/jwtToken/generateSignature";
+import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 
 const refreshToken = catchAsync(async (request, response, next) => {
   const { token, user } = request;

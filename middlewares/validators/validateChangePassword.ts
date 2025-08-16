@@ -1,5 +1,5 @@
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 export const validateChangePassword = catchAsync(async (request, response, next) => {
   const { currentPassword, newPassword, confirmNewPassword } = request.body;

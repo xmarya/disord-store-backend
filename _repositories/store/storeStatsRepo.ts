@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import StoreStats from "../../models/storeStatModel";
+import StoreStats from "@models/storeStatModel";
 import { endOfDay, startOfDay } from "date-fns";
-import { MongoId } from "../../_Types/MongoId";
-import { StoreStatsDocument } from "../../_Types/StoreStats";
-import { PlansNames } from "../../_Types/Plan";
+import { MongoId } from "@Types/MongoId";
+import { StoreStatsDocument } from "@Types/StoreStats";
+import { PlansNames } from "@Types/Plan";
 
 export async function getAllStoresStats(
   sortBy: "totalProfits" | "createdAt" = "totalProfits",
@@ -63,8 +63,12 @@ export async function getAllStoresStats(
 
   return allStats; // return the profits OAT only => [{storeName: "1", totalProfit: 123}, {storeName: "2", totalProfit: 123}]
 }
-export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $gte: Date; $lte: Date } }, sortBy: "date" | "totalProfits" | "totalSoldProducts" = "date", sortOrder: "desc" | "asc" = "desc") {
-
+export async function getOneStoreStats(
+  storeId: MongoId,
+  dateFilter: { date: { $gte: Date; $lte: Date } },
+  sortBy: "date" | "totalProfits" | "totalSoldProducts" = "date",
+  sortOrder: "desc" | "asc" = "desc"
+) {
   // NOTE: THIS IS FOR STORE OWNER
   const stats = await StoreStats.aggregate([
     {
@@ -120,7 +124,7 @@ export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $
 ]
   */
 
-  const formattedStats: Array<{ date: Date; totalProfits:number, totalSoldProducts: Record<string /*productId*/, number /*quantity*/> }> = stats.map((item) => {
+  const formattedStats: Array<{ date: Date; totalProfits: number; totalSoldProducts: Record<string /*productId*/, number /*quantity*/> }> = stats.map((item) => {
     const totalForEachProduct: Record<string, number> = {};
 
     item.totalSoldProducts.forEach((soldMap: Map<string, number>) => {
@@ -134,7 +138,7 @@ export async function getOneStoreStats(storeId: MongoId, dateFilter: { date: { $
 
     return {
       date: item.date,
-      totalProfits:item.totalProfits,
+      totalProfits: item.totalProfits,
       totalSoldProducts: totalForEachProduct,
     };
   });
@@ -149,9 +153,8 @@ export async function updateStoreStats(
   products: Array<{ productId: MongoId; quantity: number }>,
   operationType: "new-purchase" | "cancellation",
   session: mongoose.ClientSession,
-  operationDate?:{$gte: Date;$lte: Date;},
+  operationDate?: { $gte: Date; $lte: Date }
 ) {
-
   // const now = new Date();
   // const dayStart = startOfDay(now);
   // const dayEnd = endOfDay(now);
@@ -164,8 +167,8 @@ export async function updateStoreStats(
   let soldProductsUpdate: mongoose.UpdateQuery<StoreStatsDocument> = {};
 
   for (const { productId, quantity } of products) {
-    const key = `soldProducts.${productId}`;// this is a must #2 about Maps in mongoose; without the prefix, mongoose gonna try to update the
-    //  top-level field named after the `productId` instead of a nested key inside soldProducts. 
+    const key = `soldProducts.${productId}`; // this is a must #2 about Maps in mongoose; without the prefix, mongoose gonna try to update the
+    //  top-level field named after the `productId` instead of a nested key inside soldProducts.
     // so basically mongoose gonna thought there's something after/inside/nested after the `productId` if the key was only this.
     // IN SHORT: I want to update A FIELD WITHIN soldProducts.
     soldProductsUpdate.$inc ??= {};
@@ -197,29 +200,29 @@ soldProductsUpdate.$inc =>  {
   const now = new Date();
   const $gte = operationDate?.$gte ?? startOfDay(now);
   const $lte = operationDate?.$lte ?? endOfDay(now);
-  
- try {
-   updatedStats = await StoreStats.findOneAndUpdate(
-    { store: storeId, date: { $gte, $lte } },
-    {
-      $inc: {
-        ...soldProductsUpdate.$inc,
-        profits,
-        numOfPurchases: purchase,
-        numOfCancellations: cancellation,
-      },
-      $setOnInsert: {
-        store: storeId,
-        date: now,
-      },
-    },
-    { new: true, upsert: true, runValidators: true, session }
-  );
- } catch (error) {
-  console.log(error);
- }
 
- if (updatedStats) await updatedStats.validate(); // manually trigger validation; since runValidator option doesn't get triggered with $inc or $setOnInsert
+  try {
+    updatedStats = await StoreStats.findOneAndUpdate(
+      { store: storeId, date: { $gte, $lte } },
+      {
+        $inc: {
+          ...soldProductsUpdate.$inc,
+          profits,
+          numOfPurchases: purchase,
+          numOfCancellations: cancellation,
+        },
+        $setOnInsert: {
+          store: storeId,
+          date: now,
+        },
+      },
+      { new: true, upsert: true, runValidators: true, session }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+
+  if (updatedStats) await updatedStats.validate(); // manually trigger validation; since runValidator option doesn't get triggered with $inc or $setOnInsert
 
   // clean up any quantity with 0 or minus value:
   let cleanedStats;
@@ -239,6 +242,6 @@ soldProductsUpdate.$inc =>  {
   return cleanedStats ?? updatedStats;
 }
 
-export async function deleteStoreStats(storeId:MongoId, session:mongoose.ClientSession) {
-  await StoreStats.deleteOne({store: storeId}).session(session);
+export async function deleteStoreStats(storeId: MongoId, session: mongoose.ClientSession) {
+  await StoreStats.deleteOne({ store: storeId }).session(session);
 }

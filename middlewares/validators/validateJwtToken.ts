@@ -1,5 +1,5 @@
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 const validateJwtToken = catchAsync(async (request, response, next) => {
   let token: string;

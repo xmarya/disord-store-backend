@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import { MongoId } from "../../_Types/MongoId";
-import { StoreOwner } from "../../_Types/User";
-import User from "../../models/userModel";
+import { MongoId } from "@Types/MongoId";
+import { StoreOwner } from "@Types/User";
+import User from "@models/userModel";
 import { startSession } from "mongoose";
 import { deleteStorePermanently } from "../../controllers/auth/storeControllers";
-import Cart from "../../models/cartModel";
-import Wishlist from "../../models/wishlistModel";
+import Cart from "@models/cartModel";
+import Wishlist from "@models/wishlistModel";
 import { deleteDoc } from "../global";
 
 export async function createNewUnlimitedUser(data: StoreOwner, session: mongoose.ClientSession) {

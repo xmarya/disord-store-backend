@@ -1,7 +1,7 @@
 // import mongoose from "mongoose";
-// import { IStoreAddress } from "../../_Types/Store";
-// import { IOrderItem } from "../../_Types/Order";
-// import { Address } from "../../_Types/Order"; // Import the new Address type
+// import { IStoreAddress } from "@Types/Store";
+// import { IOrderItem } from "@Types/Order";
+// import { Address } from "@Types/Order"; // Import the new Address type
 
 // export const CreateShipment = async (
 //   orderId: mongoose.Types.ObjectId,
@@ -15,7 +15,7 @@
 //   session: mongoose.ClientSession,
 // ): Promise<string> => {
 //   try {
-//     // Mock API call 
+//     // Mock API call
 //     console.log("Sending shipment request:", {
 //         orderId,
 //         warehouseAddress,

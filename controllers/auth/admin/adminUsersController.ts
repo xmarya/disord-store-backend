@@ -1,18 +1,18 @@
 import { addDays } from "date-fns";
 import { startSession } from "mongoose";
 import { SUBSCRIPTION_PERIOD } from "../../../_constants/ttl";
-import { createDoc, getAllDocs, getOneDocById, updateDoc } from "../../../_repositories/global";
-import { createUnlimitedPlan, updatePlanMonthlyStats } from "../../../_repositories/plan/planRepo";
-import { createNewUnlimitedUser } from "../../../_repositories/user/userRepo";
-import { MongoId } from "../../../_Types/MongoId";
-import { UnlimitedPlanDataBody } from "../../../_Types/Plan";
-import { AppError } from "../../../_utils/AppError";
-import { catchAsync } from "../../../_utils/catchAsync";
-import Admin from "../../../models/adminModel";
-import Plan from "../../../models/planModel";
-import User from "../../../models/userModel";
+import { createDoc, getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
+import { createUnlimitedPlan, updatePlanMonthlyStats } from "@repositories/plan/planRepo";
+import { createNewUnlimitedUser } from "@repositories/user/userRepo";
+import { MongoId } from "@Types/MongoId";
+import { UnlimitedPlanDataBody } from "@Types/Plan";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import Admin from "@models/adminModel";
+import Plan from "@models/planModel";
+import User from "@models/userModel";
 import novuSendWelcome from "../../../externals/novu/workflowTriggers/welcomeEmail";
-import generateEmailConfirmationToken from "../../../_utils/email/generateEmailConfirmationToken";
+import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
 
 export const createAdminController = catchAsync(async (request, response, next) => {
   const data = { ...request.body, credentials: { password: request.body.password } };

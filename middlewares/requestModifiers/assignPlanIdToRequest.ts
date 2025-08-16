@@ -1,9 +1,9 @@
-import { getOneDocById } from "../../_repositories/global";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { getOneDocById } from "@repositories/global";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPlan";
-import Store from "../../models/storeModel";
-import User from "../../models/userModel";
+import Store from "@models/storeModel";
+import User from "@models/userModel";
 
 const assignPlanIdToRequest = catchAsync(async (request, response, next) => {
   // console.log("assignPlanIdToRequest");

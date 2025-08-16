@@ -1,67 +1,70 @@
-import { PlanDocument } from "../_Types/Plan";
+import { PlanDocument } from "@Types/Plan";
 import { Model, Schema, model } from "mongoose";
 
 // This schema is ONLY for storing the plans and the users for the unlimited plan
 
 type PlanModel = Model<PlanDocument>;
-const planSchema = new Schema({
-  planName: {
-    type: String,
-    enum: ["basic", "plus", "unlimited"],
-    required: [true, "the name field is required"],
+const planSchema = new Schema(
+  {
+    planName: {
+      type: String,
+      enum: ["basic", "plus", "unlimited"],
+      required: [true, "the name field is required"],
+    },
+    price: {
+      riyal: {
+        type: Number,
+        required: [true, "the price field is required"],
+      },
+      dollar: {
+        type: Number,
+        required: [true, "the price field is required"],
+      },
+    },
+    features: [String],
+    quota: {
+      ofProducts: {
+        type: Number,
+        required: [true, "the quota ofProducts is required"],
+      },
+      ofCategories: {
+        type: Number,
+        required: [true, "the quota ofCategories is required"],
+      },
+      ofStoreAssistants: {
+        type: Number,
+        required: [true, "the quota ofStoreAssistants is required"],
+      },
+      ofColourThemes: {
+        type: Number,
+        required: [true, "the quota ofColourThemes is required"],
+      },
+      ofCommission: {
+        type: Number, // in riyals
+        required: [true, "the quota ofCommission is required"],
+      },
+      ofShipmentCompanies: {
+        type: Number,
+        required: [true, "the quota ofShipmentCompanies is required"],
+      },
+    },
+    discount: {
+      type: Number,
+      default: 0.0,
+    },
+    unlimitedUser: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
-  price: {
-    riyal: {
-      type: Number,
-      required: [true, "the price field is required"],
-    },
-    dollar: {
-      type: Number,
-      required: [true, "the price field is required"],
-    },
-  },
-  features: [String],
-  quota: {
-    ofProducts: {
-      type: Number,
-      required: [true, "the quota ofProducts is required"],
-    },
-    ofCategories: {
-      type: Number,
-      required: [true, "the quota ofCategories is required"],
-    },
-    ofStoreAssistants: {
-      type: Number,
-      required: [true, "the quota ofStoreAssistants is required"],
-    },
-    ofColourThemes: {
-      type: Number,
-      required: [true, "the quota ofColourThemes is required"],
-    },
-    ofCommission: {
-      type: Number, // in riyals
-      required: [true, "the quota ofCommission is required"],
-    },
-    ofShipmentCompanies: {
-      type: Number,
-      required: [true, "the quota ofShipmentCompanies is required"],
-    },
-  },
-  discount: {
-    type: Number,
-    default: 0.0,
-  },
-  unlimitedUser: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-  },
-},{
-  timestamps:true,
-  strict:true,
-  strictQuery:true,
-  toObject: {virtuals: true},
-  toJSON: {virtuals: true}
-});
+  {
+    timestamps: true,
+    strict: true,
+    strictQuery: true,
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true },
+  }
+);
 
 const Plan = model<PlanDocument, PlanModel>("Plan", planSchema);
 

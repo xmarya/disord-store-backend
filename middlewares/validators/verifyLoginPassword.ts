@@ -1,10 +1,10 @@
-import { getOneDocByFindOne } from "../../_repositories/global";
-import { CredentialsLoginDataBody } from "../../_Types/UserCredentials";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
-import { comparePasswords } from "../../_utils/passwords/comparePasswords";
-import User from "../../models/userModel";
-import Admin from "../../models/adminModel";
+import { getOneDocByFindOne } from "@repositories/global";
+import { CredentialsLoginDataBody } from "@Types/UserCredentials";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import { comparePasswords } from "@utils/passwords/comparePasswords";
+import User from "@models/userModel";
+import Admin from "@models/adminModel";
 
 const verifyLoginPassword = (loginUser: "user" | "admin") =>
   catchAsync(async (request, response, next) => {

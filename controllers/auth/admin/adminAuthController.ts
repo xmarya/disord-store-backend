@@ -1,12 +1,12 @@
-import { getOneDocByFindOne, getOneDocById, updateDoc } from "../../../_repositories/global";
-import { AppError } from "../../../_utils/AppError";
+import { getOneDocByFindOne, getOneDocById, updateDoc } from "@repositories/global";
+import { AppError } from "@utils/AppError";
 import cacheUser from "../../../externals/redis/cacheControllers/user";
-import { catchAsync } from "../../../_utils/catchAsync";
-import jwtSignature from "../../../_utils/jwtToken/generateSignature";
-import tokenWithCookies from "../../../_utils/jwtToken/tokenWithCookies";
+import { catchAsync } from "@utils/catchAsync";
+import jwtSignature from "@utils/jwtToken/generateSignature";
+import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import novuUpdateSubscriber from "../../../externals/novu/subscribers/updateSubscriber";
-import { comparePasswords } from "../../../_utils/passwords/comparePasswords";
-import Admin from "../../../models/adminModel";
+import { comparePasswords } from "@utils/passwords/comparePasswords";
+import Admin from "@models/adminModel";
 
 /* OLD CODE (kept for reference): 
 export const adminLoginController = catchAsync(async (request, response, next) => {

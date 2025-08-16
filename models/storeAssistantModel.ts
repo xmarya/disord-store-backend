@@ -1,4 +1,4 @@
-import { StoreAssistantDocument } from "../_Types/StoreAssistant";
+import { StoreAssistantDocument } from "@Types/StoreAssistant";
 import { Model, Schema, model } from "mongoose";
 
 type StoreAssistantModel = Model<StoreAssistantDocument>;
@@ -9,7 +9,7 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: [true, "make sure this assistant id is not registered for another store"]
+      unique: [true, "make sure this assistant id is not registered for another store"],
     },
     inStore: {
       type: Schema.Types.ObjectId,
@@ -65,12 +65,8 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
   }
 );
 
-storeAssistantSchema.index({inStore: 1});
+storeAssistantSchema.index({ inStore: 1 });
 
-const StoreAssistant =
-  model<StoreAssistantDocument, StoreAssistantModel>(
-    "StoreAssistant",
-    storeAssistantSchema
-  );
+const StoreAssistant = model<StoreAssistantDocument, StoreAssistantModel>("StoreAssistant", storeAssistantSchema);
 
 export default StoreAssistant;

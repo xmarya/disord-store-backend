@@ -1,7 +1,7 @@
-import { UserTypes } from "../../_Types/User";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
-import addJob from "../../externals/bullmq/jobs/addJob";
+import { UserTypes } from "@Types/User";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import addJob from "../../externals/bullmq/addJob";
 import { deleteRedisHash, getRedisHash } from "../../externals/redis/redisOperations/redisHash";
 
 const confirmUserEmail = catchAsync(async (request, response, next) => {

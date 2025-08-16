@@ -1,8 +1,8 @@
 import { NextFunction } from "express";
-import { isExist } from "../../_repositories/global";
-import User from "../../models/userModel";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { isExist } from "@repositories/global";
+import User from "@models/userModel";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 const isEmailExist = catchAsync(async (request, response, next) => {
   let { email } = request.body;

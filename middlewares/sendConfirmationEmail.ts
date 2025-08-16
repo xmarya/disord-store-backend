@@ -1,9 +1,9 @@
-import { getOneDocById } from "../_repositories/global";
-import Admin from "../models/adminModel";
-import User from "../models/userModel";
-import { AppError } from "../_utils/AppError";
-import { catchAsync } from "../_utils/catchAsync";
-import generateEmailConfirmationToken from "../_utils/email/generateEmailConfirmationToken";
+import { getOneDocById } from "@repositories/global";
+import Admin from "@models/adminModel";
+import User from "@models/userModel";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
 
 export const sendConfirmationEmail = catchAsync(async (request, response, next) => {
   const { userType } = request.user;

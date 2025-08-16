@@ -1,11 +1,11 @@
 import { startSession } from "mongoose";
 import { SUBSCRIPTION_PERIOD } from "../_constants/ttl";
-import { MongoId } from "../_Types/MongoId";
-import { StoreOwner } from "../_Types/User";
-import { updatePlanMonthlyStats } from "../_repositories/plan/planRepo";
-import { createNewSubscription } from "../_repositories/user/userRepo";
+import { MongoId } from "@Types/MongoId";
+import { StoreOwner } from "@Types/User";
+import { updatePlanMonthlyStats } from "@repositories/plan/planRepo";
+import { createNewSubscription } from "@repositories/user/userRepo";
 import { addDays } from "date-fns";
-import { PlanDocument, SubscriptionTypes } from "../_Types/Plan";
+import { PlanDocument, SubscriptionTypes } from "@Types/Plan";
 import cacheUser from "../externals/redis/cacheControllers/user";
 
 export async function startSubscription(userId: MongoId, plan: PlanDocument, paidPrice: number, subscriptionType: SubscriptionTypes) {

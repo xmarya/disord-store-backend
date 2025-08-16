@@ -1,12 +1,12 @@
-import { ColourThemeDocument } from "../_Types/ColourTheme";
+import { ColourThemeDocument } from "@Types/ColourTheme";
 import { Model, Schema, model } from "mongoose";
 import Store from "./storeModel";
 
 type ColourThemeModel = Model<ColourThemeDocument>;
 const colourThemeSchema = new Schema<ColourThemeDocument>({
-  store:{
+  store: {
     type: Schema.Types.ObjectId,
-    ref:"Store",
+    ref: "Store",
   },
   primary: {
     type: String,
@@ -25,27 +25,27 @@ const colourThemeSchema = new Schema<ColourThemeDocument>({
     required: [true, "the fontColour field is required"],
   },
   themeType: {
-    type:String,
+    type: String,
     enum: ["default", "custom"], // platform default OR store customisation
-    default: "default"
+    default: "default",
   },
   isStoreDefault: {
-    type:Boolean,
-    default:false
-  }
+    type: Boolean,
+    default: false,
+  },
 });
 
 // pre(save) hook to set the themType to custom is the store field was exist
-colourThemeSchema.pre("save", function(next) {
-  if(!this?.store) return next();
+colourThemeSchema.pre("save", function (next) {
+  if (!this?.store) return next();
   this.themeType = "custom";
   next();
 });
 
 // this post(save) for setting the default theme to the store model
 colourThemeSchema.post("save", async function (doc) {
-  if(doc?.store && doc?.isStoreDefault) {
-    await Store.findByIdAndUpdate({id:doc.store}, {colourTheme: doc._id});
+  if (doc?.store && doc?.isStoreDefault) {
+    await Store.findByIdAndUpdate({ id: doc.store }, { colourTheme: doc._id });
   }
 });
 

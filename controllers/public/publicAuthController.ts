@@ -1,17 +1,17 @@
-import authentica from "../../_config/authentica";
-import eventBus from "../../_config/EventBus";
-import { createDoc } from "../../_repositories/global";
-import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "../../_Types/AuthenticaOTP";
-import { UserCreatedEvent } from "../../_Types/events/UserEvents";
-import { UserDocument, UserTypes } from "../../_Types/User";
-import { CredentialsLoginDataBody } from "../../_Types/UserCredentials";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
-import generateEmailConfirmationToken from "../../_utils/email/generateEmailConfirmationToken";
-import jwtSignature from "../../_utils/jwtToken/generateSignature";
-import jwtVerify from "../../_utils/jwtToken/jwtVerify";
-import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
-import User from "../../models/userModel";
+import authentica from "@config/authentica";
+import eventBus from "@config/EventBus";
+import { createDoc } from "@repositories/global";
+import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/AuthenticaOTP";
+import { UserCreatedEvent } from "@Types/events/UserEvents";
+import { UserDocument, UserTypes } from "@Types/User";
+import { CredentialsLoginDataBody } from "@Types/UserCredentials";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
+import jwtSignature from "@utils/jwtToken/generateSignature";
+import jwtVerify from "@utils/jwtToken/jwtVerify";
+import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
+import User from "@models/userModel";
 
 export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
   catchAsync(async (request, response, next) => {

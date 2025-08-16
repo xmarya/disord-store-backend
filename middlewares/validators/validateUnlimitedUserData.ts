@@ -1,7 +1,7 @@
-import { getOneDocByFindOne } from "../../_repositories/global";
-import User from "../../models/userModel";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { getOneDocByFindOne } from "@repositories/global";
+import User from "@models/userModel";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 const validateUnlimitedUserData = catchAsync(async (request, response, next) => {
   const { subscriptionType } = request.body.user;

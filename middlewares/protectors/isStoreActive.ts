@@ -1,7 +1,7 @@
-import { getOneDocById } from "../../_repositories/global";
-import Store from "../../models/storeModel";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { getOneDocById } from "@repositories/global";
+import Store from "@models/storeModel";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 const isStoreActive = catchAsync(async (request, response, next) => {
   const { storeId } = request.params;

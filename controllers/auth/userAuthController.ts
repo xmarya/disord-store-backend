@@ -1,18 +1,18 @@
 import type { Request, Response } from "express";
-import eventBus from "../../_config/EventBus";
-import { getOneDocById, updateDoc } from "../../_repositories/global";
-import { deleteRegularUser, deleteStoreOwner } from "../../_repositories/user/deleteUserService";
-import { UserDeletedEvent, UserUpdatedEvent } from "../../_Types/events/UserEvents";
-import { UserDocument } from "../../_Types/User";
-import { AppError } from "../../_utils/AppError";
+import eventBus from "@config/EventBus";
+import { getOneDocById, updateDoc } from "@repositories/global";
+import { deleteRegularUser, deleteStoreOwner } from "@repositories/user/userRepo";
+import { UserDeletedEvent, UserUpdatedEvent } from "@Types/events/UserEvents";
+import { UserDocument } from "@Types/User";
+import { AppError } from "@utils/AppError";
 import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
-import { catchAsync } from "../../_utils/catchAsync";
-import jwtSignature from "../../_utils/jwtToken/generateSignature";
-import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
-import { comparePasswords } from "../../_utils/passwords/comparePasswords";
-import formatSubscriptionsLogs from "../../_utils/queryModifiers/formatSubscriptionsLogs";
+import { catchAsync } from "@utils/catchAsync";
+import jwtSignature from "@utils/jwtToken/generateSignature";
+import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
+import { comparePasswords } from "@utils/passwords/comparePasswords";
+import formatSubscriptionsLogs from "@utils/queryModifiers/formatSubscriptionsLogs";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
-import User from "../../models/userModel";
+import User from "@models/userModel";
 
 export const getUserProfile = catchAsync(async (request, response, next) => {
   const userId = request.user.id;

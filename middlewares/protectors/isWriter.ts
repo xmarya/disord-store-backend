@@ -1,6 +1,6 @@
-import { confirmReviewAuthorisation } from "../../_repositories/review/reviewRepo";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { confirmReviewAuthorisation } from "@repositories/review/reviewRepo";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 const isWriter = catchAsync(async (request, response, next) => {
   // STEP 3) get the last piece which is the userId and pass them to get checked:

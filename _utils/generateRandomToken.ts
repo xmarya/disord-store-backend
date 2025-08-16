@@ -1,10 +1,9 @@
 import crypto from "crypto";
 import { addMinutes } from "date-fns";
-import { UserDocument } from "../_Types/User";
-import { AdminDocument } from "../_Types/admin/AdminUser";
+import { UserDocument } from "@Types/User";
+import { AdminDocument } from "@Types/admin/AdminUser";
 
 export async function generateRandomToken(doc: UserDocument | AdminDocument, tokenFor: "forgetPassword" | "emailConfirmation") {
-
   // STEP 1) Generate the token:
   const randomToken = crypto.randomBytes(32).toString("hex");
   const hashedToken = crypto.createHash("sha256").update(randomToken).digest("hex");
@@ -16,10 +15,7 @@ export async function generateRandomToken(doc: UserDocument | AdminDocument, tok
     //STEP 3) store the token after hashing/expiring time in credentials:
     doc.credentials.passwordResetToken = hashedToken;
     doc.credentials.passwordResetExpires = addMinutes(new Date(), 15);
-  }
-
-  else {
-
+  } else {
     doc.credentials.emailConfirmationToken = hashedToken;
     doc.credentials.emailConfirmationExpires = addMinutes(new Date(), 60);
   }

@@ -1,6 +1,6 @@
-import { DigitalProduct, PhysicalProduct, ProductDataBody } from "../../_Types/Product";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { DigitalProduct, PhysicalProduct, ProductDataBody } from "@Types/Product";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 export const validateProductBody = catchAsync(async (request, response, next) => {
   const { productType, name, price, description }: ProductDataBody = request.body;

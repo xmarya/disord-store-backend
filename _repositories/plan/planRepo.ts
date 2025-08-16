@@ -1,9 +1,9 @@
 import { endOfMonth, startOfMonth } from "date-fns";
 import mongoose from "mongoose";
-import { PlansNames, SubscriptionTypes, UnlimitedPlanDataBody } from "../../_Types/Plan";
-import Plan from "../../models/planModel";
-import PlanStats from "../../models/planStatsModel";
-import { MongoId } from "../../_Types/MongoId";
+import { PlansNames, SubscriptionTypes, UnlimitedPlanDataBody } from "@Types/Plan";
+import Plan from "@models/planModel";
+import PlanStats from "@models/planStatsModel";
+import { MongoId } from "@Types/MongoId";
 
 export async function createUnlimitedPlan(data: UnlimitedPlanDataBody, session: mongoose.ClientSession) {
   /*✅*/
@@ -33,7 +33,7 @@ export async function getMonthlyPlansStats(dateFilter: { date: { $gte: Date; $lt
         profits: { $sum: "$monthly.profits" },
       },
     },
-    {$sort:{ [sortBy]: sortOrder === "desc" ? -1 : 1}},
+    { $sort: { [sortBy]: sortOrder === "desc" ? -1 : 1 } },
     {
       $project: {
         _id: 0,

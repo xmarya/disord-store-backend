@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import Coupon from "../../models/couponModel";
-import { IOrderItem } from "../../_Types/Order";
+import Coupon from "@models/couponModel";
+import { IOrderItem } from "@Types/Order";
 
 export const validateCoupon = async (
   couponCode: string,
@@ -13,7 +13,7 @@ export const validateCoupon = async (
   eligibleSubtotal: number;
 }> => {
   const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() }).session(session).lean();
-  
+
   if (!coupon) throw new Error("Invalid coupon code");
   if (!coupon.isActive) throw new Error("Coupon is not active");
   if (coupon.validFrom > new Date()) throw new Error("Coupon not yet valid");
@@ -22,7 +22,7 @@ export const validateCoupon = async (
     throw new Error("Coupon usage limit reached");
   }
 
-  const eligibleItems = items.filter(item => item.storeId.toString() === coupon.storeId.toString());
+  const eligibleItems = items.filter((item) => item.storeId.toString() === coupon.storeId.toString());
   if (eligibleItems.length === 0) {
     throw new Error("Coupon is not applicable to any items in this order");
   }
