@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 import { dbStartConnection } from "./_config/db";
 import app from "./app";
+// register the path aliases in the application
+import "module-alias/register";
 import initiateBullMQJobs from "./externals/bullmq/jobs/initialJobProcessors";
 import "./eventListeners/userEvents/userCreated"
 import "./eventListeners/userEvents/userUpdated"
