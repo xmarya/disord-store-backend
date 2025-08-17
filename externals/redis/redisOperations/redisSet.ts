@@ -1,4 +1,4 @@
-import redis from "../../../_config/redis";
+import redis from "@config/redis";
 
 export async function createRedisSet(name: string, data: string | number) {
   const result = Boolean(await redis.sadd(name, data));

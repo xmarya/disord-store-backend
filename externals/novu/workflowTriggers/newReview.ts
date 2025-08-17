@@ -1,16 +1,13 @@
-import novu from "../../../_config/novu";
-
+import novu from "@config/novu";
 
 async function novuNewReview() {
-    await novu.trigger({
-        to:{type: "Topic", topicKey: "new-review"},
-        workflowId: "new-reviews"
-    });
+  await novu.trigger({
+    to: { type: "Topic", topicKey: "new-review" },
+    workflowId: "new-reviews",
+  });
 }
 
 export default novuNewReview;
-
- 
 
 /* SOLILOQUY:
     1- a review is created

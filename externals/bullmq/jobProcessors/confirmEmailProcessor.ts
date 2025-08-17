@@ -1,12 +1,12 @@
 import crypto from "crypto";
 import mongoose from "mongoose";
-import bullmq from "../../../_config/bullmq";
+import bullmq from "@config/bullmq";
 import { ms } from "../../../_constants/numbers";
-import { AdminDocument } from "../../../_Types/admin/AdminUser";
-import { UserDocument } from "../../../_Types/User";
+import { AdminDocument } from "@Types/admin/AdminUser";
+import { UserDocument } from "@Types/User";
 import { getAllCachedData } from "../../redis/cacheControllers/globalCache";
-import { confirmUserEmail } from "../../../_repositories/user/userRepo";
-import { confirmAdminEmail } from "../../../_repositories/admin/adminRepo";
+import { confirmUserEmail } from "@repositories/user/userRepo";
+import { confirmAdminEmail } from "@repositories/admin/adminRepo";
 
 const { queue } = await bullmq("EmailConfirm", confirmEmailProcessor);
 

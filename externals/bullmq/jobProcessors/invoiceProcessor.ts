@@ -1,7 +1,7 @@
 import { ms } from "../../../_constants/numbers";
-import { createNewInvoices } from "../../../_repositories/invoice/invoiceRepo";
-import { InvoiceDocument } from "../../../_Types/Invoice";
-import bullmq from "../../../_config/bullmq";
+import { createNewInvoices } from "@repositories/invoice/invoiceRepo";
+import { InvoiceDocument } from "@Types/Invoice";
+import bullmq from "@config/bullmq";
 import { getAllCachedData } from "../../redis/cacheControllers/globalCache";
 
 const { queue } = await bullmq("Invoice", invoiceWriteProcessor);

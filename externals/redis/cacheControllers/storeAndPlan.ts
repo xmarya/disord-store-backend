@@ -1,4 +1,4 @@
-import { MongoId } from "../../../_Types/MongoId";
+import { MongoId } from "@Types/MongoId";
 import { createRedisHash } from "../redisOperations/redisHash";
 
 async function cacheStoreAndPlan(store: MongoId, plan: MongoId, isPaid: boolean, planExpiryDate: Date) {

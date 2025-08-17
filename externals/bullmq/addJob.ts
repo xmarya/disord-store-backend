@@ -1,5 +1,5 @@
-import { setCompressedCacheData } from "../../redis/cacheControllers/globalCache";
-import { createRedisSet } from "../../redis/redisOperations/redisSet";
+import { setCompressedCacheData } from "../redis/cacheControllers/globalCache";
+import { createRedisSet } from "../redis/redisOperations/redisSet";
 
 async function addJob<T extends object>(resourceName: string, id: string, data: T) {
   // STEP 1) create a set to holds the ids:

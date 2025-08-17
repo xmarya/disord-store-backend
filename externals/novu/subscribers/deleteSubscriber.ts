@@ -1,10 +1,9 @@
-import novu from "../../../_config/novu";
+import novu from "@config/novu";
 
+async function novuDeleteSubscriber(subscriberId: string) {
+  const result = await novu.subscribers.delete(subscriberId);
 
-async function novuDeleteSubscriber(subscriberId:string) {
-    const result = await novu.subscribers.delete(subscriberId);
-
-    console.log("novuDeleteSubscriber", result);
+  console.log("novuDeleteSubscriber", result);
 }
 
 export default novuDeleteSubscriber;

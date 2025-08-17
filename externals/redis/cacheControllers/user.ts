@@ -1,5 +1,5 @@
-import { AdminDocument } from "../../../_Types/admin/AdminUser";
-import { UserDocument } from "../../../_Types/User";
+import { AdminDocument } from "@Types/admin/AdminUser";
+import { UserDocument } from "@Types/User";
 import { setCompressedCacheData } from "./globalCache";
 
 async function cacheUser(user: UserDocument | AdminDocument) {

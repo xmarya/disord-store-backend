@@ -1,6 +1,6 @@
-import redis from "../../../_config/redis";
-import { ttl } from "../../../_constants/ttl";
-import { RedisTTL } from "../../../_Types/RedisCache";
+import redis from "@config/redis";
+import { ttl } from "@constants/ttl";
+import { RedisTTL } from "@Types/RedisCache";
 
 export async function createRedisSortedSet(name: string, member: string, score: string | number, TTL: RedisTTL) {
   const result = await redis.zadd(name, score, member);

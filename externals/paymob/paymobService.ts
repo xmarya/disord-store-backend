@@ -1,8 +1,8 @@
 import axios, { AxiosError } from "axios";
-import { Address } from "../../_Types/Order";
-import { PaymobOrderData, PaymobBillingData } from "../../_Types/Paymob";
+import { Address } from "@Types/Order";
+import { PaymobOrderData, PaymobBillingData } from "@Types/Paymob";
 import { paymobIntentionResponseSchema } from "./zodSchemas/paymnetSchema";
-import { paymobConfig } from "../../_config/config";
+import { paymobConfig } from "@config/config";
 
 // Paymob API configuration
 const PAYMOB_SECRET_KEY = paymobConfig.secretKey;

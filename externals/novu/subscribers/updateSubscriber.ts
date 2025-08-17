@@ -1,5 +1,5 @@
-import novu from "../../../_config/novu";
-import { AssistantPermissions } from "../../../_Types/StoreAssistant";
+import novu from "@config/novu";
+import { AssistantPermissions } from "@Types/StoreAssistant";
 
 type NovuUpdatedData = {
   email?: string;
