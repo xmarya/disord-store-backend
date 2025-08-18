@@ -1,0 +1,16 @@
+import { UserTypes } from "./User"
+
+export type CredentialsSignupData = {
+    userType:UserTypes,
+    firstName:string,
+    lastName:string,
+    email:string,
+    password:string
+}
+
+export type DiscordSignupData = {
+    email:string,
+    id:string,
+    name:string,
+    image:string
+}
