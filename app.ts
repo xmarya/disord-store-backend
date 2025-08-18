@@ -1,28 +1,21 @@
-import cookieParser from "cookie-parser";
-import cors from "cors";
 import express, { ErrorRequestHandler } from "express";
-import mongoSanitize from "express-mongo-sanitize";
-import ratelimit from "express-rate-limit";
 import { dbStartConnection } from "@config/db";
-import { router as publicAuthRouter } from "./_routers/public/publicAuthRoutes";
-import { router as resourcesPublicRouter } from "./_routers/public/resourcesPublicRoutes";
-import { router as dashboardRouter } from "./_routers/dashboard";
-import errorController from "./controllers/errorController";
 import routerLoader from "loaders/routers";
 import expressLoader from "loaders/express";
 import initiateBullMQJobs from "loaders/bullmqJobs";
+import "loaders/subscribers";
 
 const app = express();
 async function startApp() {
   
   await expressLoader(app);
   await routerLoader(app);
+  await dbStartConnection();
   await initiateBullMQJobs();
 
-  await dbStartConnection();
 }
 
-startApp(); // should be awaited?
+await startApp();
 /*
 // app.set("trust proxy", true);
 const limiter = ratelimit({

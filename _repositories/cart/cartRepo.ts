@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { CartDataBody } from "@Types/Cart";
 import { MongoId } from "@Types/MongoId";
-import Cart from "../../models/cartModel";
+import Cart from "@models/cartModel";
 
 export async function addProductToCart(data: CartDataBody) {
   const { user, store, product, quantity } = data;
