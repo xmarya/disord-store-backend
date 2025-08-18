@@ -1,41 +1,25 @@
 import authentica from "@config/authentica";
-import eventBus from "@config/EventBus";
-import { createDoc } from "@repositories/global";
+import createNewDiscordUser from "@services/usersServices/createNewDiscordUser";
+import createNewUser from "@services/usersServices/createNewUser";
 import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/AuthenticaOTP";
-import { UserCreatedEvent } from "@Types/events/UserEvents";
-import { UserDocument, UserTypes } from "@Types/User";
+import { UserTypes } from "@Types/User";
 import { CredentialsLoginDataBody } from "@Types/UserCredentials";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
 import jwtSignature from "@utils/jwtToken/generateSignature";
 import jwtVerify from "@utils/jwtToken/jwtVerify";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
-import User from "@models/userModel";
 
 export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
   catchAsync(async (request, response, next) => {
     const { firstName, lastName, email, password } = request.body;
 
-    const data = { firstName, lastName, email, signMethod: "credentials", userType, credentials: { password } };
-    const newUser = await createDoc<UserDocument>(User, data);
-
-    const confirmUrl = await generateEmailConfirmationToken(newUser, request);
-
-    newUser.credentials!.password = "";
-    newUser.credentials!.emailConfirmationToken = "";
-    newUser.credentials!.emailConfirmationExpires = null;
-
-    const event: UserCreatedEvent = {
-      type: "user.created",
-      payload: { user: newUser, confirmUrl },
-      occurredAt: new Date(),
-    };
-
-    eventBus.publish(event);
+    const tokenGenerator = { hostname: request.hostname, protocol: request.protocol };
+    const newUser = await createNewUser({ firstName, lastName, email, password, userType }, tokenGenerator);
 
     response.status(201).json({
       success: true,
+      message: "new user has been created successfully",
       newUser,
     });
   });
@@ -137,29 +121,17 @@ export const verifyOTP = catchAsync(async (request, response, next) => {
   });
 });
 
-export const createNewDiscordUser = catchAsync(async (request, response, next) => {
-  const newDiscordUser = await createDoc(User, {
-    signMethod: "discord",
-    email: request.body.email,
-    image: request.body.image,
-    firstName: request.body.name,
-    discord: {
-      discordId: request.body.id,
-      username: request.body.name,
-    },
-    "credentials.emailConfirmed": true,
-  });
+export const createNewDiscordUserController = catchAsync(async (request, response, next) => {
+  const { email, id, name, image } = request.body;
 
-  const event: UserCreatedEvent = {
-    type: "user.created",
-    payload: { user: newDiscordUser },
-    occurredAt: new Date(),
-  };
+  if (!email || !id || !name || !image) return next(new AppError(400, "some data are missing. make sure to provide the user email, id, name, and image"));
 
-  eventBus.publish(event);
+  const newDiscordUser = await createNewDiscordUser({ email, name, id, image });
+  // TODO: give the user immediate access by generating the login token
 
   response.status(201).json({
     success: true,
+    message: "new user has been created successfully",
     newDiscordUser,
   });
 });
