@@ -7,3 +7,8 @@ export const planTiers = {
     "unlimited":3
 };
 
+export const TokenSlicer = {
+    from:0,
+    to:12
+}
+

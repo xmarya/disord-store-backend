@@ -3,17 +3,21 @@ import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import addJob from "../../externals/bullmq/addJob";
 import { deleteRedisHash, getRedisHash } from "../../externals/redis/redisOperations/redisHash";
+import { TokenSlicer } from "@constants/dataStructures";
 
 const confirmUserEmail = catchAsync(async (request, response, next) => {
+  console.log("confirmUserEmail");
   const { randomToken } = request.params;
-  const data: { id: string; userType: UserTypes } | null = await getRedisHash(`Email:${randomToken.slice(0, 12)}`);
+
+  const slicedToken = randomToken.slice(TokenSlicer.from, TokenSlicer.to);
+  const data: { id: string; userType: UserTypes } | null = await getRedisHash(`Email:${slicedToken}`);
 
   if (!data) return next(new AppError(400, "انتهت المدة المسموحة لرابط التفعيل"));
 
   const Model = ["user", "storeOwner"].includes(data.userType) ? "User" : "Admin";
 
   // delete the hash
-  await deleteRedisHash(`Email:${randomToken.slice(0, 12)}`);
+  await deleteRedisHash(`Email:${slicedToken}`);
 
   // add the data as worker's job
   addJob("EmailConfirm", data.id, { Model, id: data.id, randomToken });
