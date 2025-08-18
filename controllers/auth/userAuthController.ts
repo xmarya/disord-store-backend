@@ -13,6 +13,7 @@ import { comparePasswords } from "@utils/passwords/comparePasswords";
 import formatSubscriptionsLogs from "@utils/queryModifiers/formatSubscriptionsLogs";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
 import User from "@models/userModel";
+import deleteUser from "@services/usersServices/deleteUser";
 
 export const getUserProfile = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -95,24 +96,13 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
 export const deleteUserAccountController = catchAsync(async (request, response, next) => {
   const { userId } = request.params;
 
-  const user = await getOneDocById(User, userId, { select: ["userType", "myStore"] });
+  const result = await deleteUser(userId);
 
-  if (!user) return next(new AppError(404, "no user with this id"));
-  if (user.userType === "storeAssistant") return next(new AppError(400, "this route is not for deleting a storeAssistant"));
-
-  if (user.userType === "storeOwner") await deleteStoreOwner(userId, user.myStore);
-  else await deleteRegularUser(userId);
-
-  const event: UserDeletedEvent = {
-    type: "user.deleted",
-    payload: { userId },
-    occurredAt: new Date(),
-  };
-
-  eventBus.publish(event);
-
+  if(result.isErr()) return next(new AppError(400, result.error));
+  
   response.status(204).json({
     success: true,
+    message: result.value
   });
 });
 
