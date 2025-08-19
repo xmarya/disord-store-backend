@@ -14,13 +14,17 @@ import formatSubscriptionsLogs from "@utils/queryModifiers/formatSubscriptionsLo
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
 import User from "@models/userModel";
 import deleteUser from "@services/usersServices/deleteUser";
+import getUserProfile from "@services/usersServices/getUserProfile";
 
-export const getUserProfile = catchAsync(async (request, response, next) => {
+export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
-  const userProfile = await getOneDocById(User, userId, { select: ["firstName", "lastName", "email", "image", "phoneNumber"] });
+  const result = await getUserProfile(userId);
 
-  if (!userProfile) return next(new AppError(400, "لم يتم العثور على بيانات المستخدم"));
 
+  if(result.isErr()) return next(new AppError(400, result.error.message));
+
+  const userProfile = result.value;
+  
   response.status(200).json({
     success: true,
     userProfile,
@@ -65,7 +69,7 @@ export const confirmUserChangePassword = catchAsync(async (request, response, ne
   });
 });
 
-export const updateUserProfile = catchAsync(async (request, response, next) => {
+export const updateUserProfileController = catchAsync(async (request, response, next) => {
   /*✅*/
   const userId = request.user.id;
   let { firstName, lastName }: Pick<UserDocument, "firstName" | "lastName"> = request.body;
