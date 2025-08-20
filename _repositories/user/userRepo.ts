@@ -13,14 +13,6 @@ export async function createNewUnlimitedUser(data: StoreOwner, session: mongoose
   return aNewUser;
 }
 
-/* OLD CODE (kept for reference): 
-export const getUserByEmail = async (email: string) => {
-  console.log("getUserByEmail");
-  
-  const user = await User.findOne({ email });
-  return user;
-};
-*/
 
 export async function resetStoreOwnerToDefault(storeId: MongoId, session: mongoose.ClientSession) {
   // await User.updateOne({_id: userId}, {
@@ -101,17 +93,6 @@ export async function getUserSubscriptionsLog(userId: MongoId) {
   return logs;
 }
 export async function confirmUserEmail(bulkOps: any) {
-  // let user: UserDocument | AdminDocument = await mongoose
-  //   .model(Model)
-  //   .findOne({
-  //     _id: id,
-  //     "credentials.emailConfirmationToken": hashedToken,
-  //     // "credentials.emailConfirmationExpires": { $gt: new Date() },
-  //     // NOTE: no longer need for this condition, since I'm checking the availability of
-  //     // the token expiration time in confirmUserEmail depending if the data is still in the cache or not.
-  //   })
-  //   .select("credentials");
-
   await User.bulkWrite(bulkOps);
 }
 
