@@ -24,3 +24,11 @@ declare global {
     }
   }
 }
+
+export type QueryParams = {
+  sort?: string;
+  field?: string;
+  page?: string;
+  limit?: string;
+  [key: string]: any; // for extra filtering fields
+};

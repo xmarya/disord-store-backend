@@ -1,14 +1,9 @@
 import type { Request } from "express";
 import mongoose from "mongoose";
 import { DOCS_PER_PAGE } from "../../_constants/numbers";
+import { QueryParams } from "@Types/Request";
 
-type QueryParams = {
-  sort?: string;
-  field?: string;
-  page?: string;
-  limit?: string;
-  [key: string]: any; // for extra filtering fields
-};
+
 export function buildQuery<T extends mongoose.Document>(request: Request<{}, {}, {}, QueryParams>, Model: mongoose.Model<T>) {
   // STEP 1) convert the query from JSON object to a normal JavaScript object in order to manipulate it:
   const rawQuery = { ...request.query };
