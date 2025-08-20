@@ -3,23 +3,22 @@ import { UserCreatedEvent } from "@Types/events/UserEvents";
 import novuSendWelcome from "../../externals/novu/workflowTriggers/welcomeEmail";
 import { createRedisHash } from "@externals/redis/redisOperations/redisHash";
 import { TokenSlicer } from "@constants/dataStructures";
-import { fromPromise } from "neverthrow";
+import { fromPromise, ResultAsync } from "neverthrow";
 
 // Novu Listener
 eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
-  console.log("novueventlistener");
   const user = event.payload.user;
   const confirmUrl = event.payload.confirmUrl;
   const { userType } = user;
   const workflowId = userType === "storeOwner" ? "welcome-store-owner" : "welcome-general";
-  const novuTrigger = novuSendWelcome(workflowId, user, confirmUrl);
-  const result = fromPromise(novuTrigger, (error) => ({ error, message: "couldn't create a Novu subscriber" }));
-  console.log("whatnovulistenerresult", result);
+
+  const safeNovuTrigger = ResultAsync.fromThrowable(() => novuSendWelcome(workflowId, user, confirmUrl), () => new Error("couldn't create a Novu subscriber"));
+  safeNovuTrigger();
+  
 });
 
 // Redis Listener
 eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
-  console.log("rediseventlistener");
   const { user } = event.payload;
   const cacheData = {
     id: user.id,
@@ -29,8 +28,7 @@ eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
   const slicedTokenKey = user.credentials.emailConfirmationToken.slice(TokenSlicer.from, TokenSlicer.to);
   const key = `Email:${slicedTokenKey}`;
 
-  const storeInCache = createRedisHash(key, cacheData, "one-hour");
-  const result = fromPromise(storeInCache, (error) => ({ error, message: "couldn't store the in the Cache" }));
+  const safeCreateRedisHash = ResultAsync.fromThrowable(()=> createRedisHash(key, cacheData, "one-hour"), () => new Error("couldn't store the in the Cache" ));
+  safeCreateRedisHash();
 
-  console.log("whatredislistenerresult", result);
 });
