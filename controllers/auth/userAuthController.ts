@@ -1,8 +1,9 @@
+import eventBus from "@config/EventBus";
 import User from "@models/userModel";
 import { getOneDocById } from "@repositories/global";
 import deleteUser from "@services/usersServices/deleteUser";
 import getUserProfile from "@services/usersServices/getUserProfile";
-import updateUser from "@services/usersServices/updateUser";
+import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
@@ -13,6 +14,8 @@ import formatSubscriptionsLogs from "@utils/queryModifiers/formatSubscriptionsLo
 import type { Request, Response } from "express";
 import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
+import updateUser from "@services/usersServices/updateUser";
+import isErr from "@utils/isErr";
 
 export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -70,7 +73,7 @@ export const updateUserProfileController = catchAsync(async (request, response, 
   const userId = request.user.id;
   const result = await updateUser(userId, request.body);
 
-  if ("isErr" in result) return next(new AppError(400, result.error));
+  if (isErr(result)) return next(new AppError(400, result.error));
 
   if (!result.ok) return next(new AppError(400, `${result.reason}: ${result.message}`));
   const { result: updatedUser } = result;
