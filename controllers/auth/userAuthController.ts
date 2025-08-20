@@ -1,30 +1,26 @@
-import type { Request, Response } from "express";
-import eventBus from "@config/EventBus";
-import { getOneDocById, updateDoc } from "@repositories/global";
-import { deleteRegularUser, deleteStoreOwner } from "@repositories/user/userRepo";
-import { UserDeletedEvent, UserUpdatedEvent } from "@Types/events/UserEvents";
+import User from "@models/userModel";
+import { getOneDocById } from "@repositories/global";
+import deleteUser from "@services/usersServices/deleteUser";
+import getUserProfile from "@services/usersServices/getUserProfile";
+import updateUser from "@services/usersServices/updateUser";
 import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
-import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import { catchAsync } from "@utils/catchAsync";
 import jwtSignature from "@utils/jwtToken/generateSignature";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import { comparePasswords } from "@utils/passwords/comparePasswords";
 import formatSubscriptionsLogs from "@utils/queryModifiers/formatSubscriptionsLogs";
+import type { Request, Response } from "express";
+import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
-import User from "@models/userModel";
-import deleteUser from "@services/usersServices/deleteUser";
-import getUserProfile from "@services/usersServices/getUserProfile";
 
 export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
   const result = await getUserProfile(userId);
 
+  if (!result.ok) return next(new AppError(400, `${result.reason}: ${result.message}`));
+  const { result: userProfile } = result;
 
-  if(result.isErr()) return next(new AppError(400, result.error.message));
-
-  const userProfile = result.value;
-  
   response.status(200).json({
     success: true,
     userProfile,
@@ -72,23 +68,12 @@ export const confirmUserChangePassword = catchAsync(async (request, response, ne
 export const updateUserProfileController = catchAsync(async (request, response, next) => {
   /*✅*/
   const userId = request.user.id;
-  let { firstName, lastName }: Pick<UserDocument, "firstName" | "lastName"> = request.body;
-  if (firstName?.trim() === "" && lastName?.trim() === "") return next(new AppError(400, "الرجاء تعبئة حقول الاسم بالكامل"));
+  const result = await updateUser(userId, request.body);
 
-  const updatedUser = await updateDoc(User, userId, request.body);
+  if ("isErr" in result) return next(new AppError(400, result.error));
 
-  // publish (emit) the event:
-  if (updatedUser) {
-    const event: UserUpdatedEvent = {
-      type: "user.updated",
-      payload: { userId, user: updatedUser },
-      occurredAt: new Date(),
-    };
-
-    eventBus.publish(event);
-  }
-  // await cacheUser(updatedUser);
-  // await novuUpdateSubscriber(userId, updatedUser);
+  if (!result.ok) return next(new AppError(400, `${result.reason}: ${result.message}`));
+  const { result: updatedUser } = result;
   response.status(203).json({
     success: true,
     updatedUser,
@@ -102,11 +87,11 @@ export const deleteUserAccountController = catchAsync(async (request, response, 
 
   const result = await deleteUser(userId);
 
-  if(result.isErr()) return next(new AppError(400, result.error));
-  
+  if (result.isErr()) return next(new AppError(400, result.error));
+
   response.status(204).json({
     success: true,
-    message: result.value
+    message: result.value,
   });
 });
 
