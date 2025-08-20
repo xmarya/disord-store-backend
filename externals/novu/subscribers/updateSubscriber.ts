@@ -25,9 +25,8 @@ async function novuUpdateSubscriber(subscriberId: string, data: NovuUpdatedData)
 
   if (Object.keys(moreData).length) payload.data = moreData;
 
-  const result = await novu.subscribers.patch(payload, subscriberId);
+  await novu.subscribers.patch(payload, subscriberId);
 
-  console.log("whatnovuUpdateSubscriber", result);
 }
 
 export default novuUpdateSubscriber;
