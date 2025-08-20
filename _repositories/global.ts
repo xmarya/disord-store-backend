@@ -3,6 +3,7 @@ import type { Request } from "express";
 import { QueryOptions } from "@Types/QueryOptions";
 import { MongoId } from "@Types/MongoId";
 import { buildQuery } from "@utils/queryModifiers/buildRequestQuery";
+import { QueryParams } from "@Types/Request";
 
 export async function createDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, data: any, /*locals?: any*/): Promise<T> {
   const newDoc = await Model.create(data);
@@ -16,13 +17,13 @@ export async function createDoc<T extends mongoose.Document>(Model: mongoose.Mod
   return newDoc;
 }
 
-export async function getAllDocs<T extends mongoose.Document>(Model: mongoose.Model<T>, request: Request, options?:QueryOptions<T>): Promise<T[]> {
-  const query = buildQuery(request, Model); /*✅*/
+export async function getAllDocs<T extends mongoose.Document>(Model: mongoose.Model<T>, query: QueryParams, options?:QueryOptions<T>): Promise<T[]> {
+  const formattedQuery = buildQuery(query, Model); /*✅*/
 
   const fields = options?.select ? options.select.join(" ") : ""; /*✅*/
   const filter = options?.condition ?? {};
 
-  const docs = await query.find(filter).select(fields);
+  const docs = await formattedQuery.find(filter).select(fields);
   // return Array.isArray(docs) ? docs : [];
   return docs;
 }
