@@ -9,7 +9,7 @@ export interface UserCreatedEvent extends DomainEvent {
 
 export interface UserUpdatedEvent extends DomainEvent {
   type: "user.updated";
-  payload: {userId:string, user: UserDocument};
+  payload: {user: UserDocument};
   occurredAt: Date;
 }
 
