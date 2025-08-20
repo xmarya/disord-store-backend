@@ -13,6 +13,7 @@ import Plan from "@models/planModel";
 import User from "@models/userModel";
 import novuSendWelcome from "../../../externals/novu/workflowTriggers/welcomeEmail";
 import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
+import getOneUser from "@services/admin/getOneUser";
 
 export const createAdminController = catchAsync(async (request, response, next) => {
   const data = { ...request.body, credentials: { password: request.body.password } };
@@ -101,8 +102,12 @@ export const getAllUsersController = catchAsync(async (request, response, next) 
 });
 
 export const getOneUserController = catchAsync(async (request, response, next) => {
-  const user = await getOneDocById(User, request.params.userId);
-  if (!user) return next(new AppError(404, "couldn't find a user with this id"));
+
+  const {userId} = request.params;
+  const result = await getOneUser(userId);
+  if (!result.ok) return next(new AppError(404, `${result.reason}: ${result.message}`));
+
+  const {result:user} = result;
   response.status(200).json({
     success: true,
     user,
