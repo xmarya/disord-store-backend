@@ -1,9 +1,7 @@
-import eventBus from "@config/EventBus";
 import User from "@models/userModel";
 import { getOneDocById } from "@repositories/global";
 import deleteUser from "@services/usersServices/deleteUser";
 import getUserProfile from "@services/usersServices/getUserProfile";
-import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
@@ -21,7 +19,10 @@ export const getUserProfileController = catchAsync(async (request, response, nex
   const userId = request.user.id;
   const result = await getUserProfile(userId);
 
-  if (!result.ok) return next(new AppError(400, `${result.reason}: ${result.message}`));
+  if (!result.ok) {
+    const statusCode = result.reason === "not-found" ? 404 : 500;
+    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
+  }
   const { result: userProfile } = result;
 
   response.status(200).json({
