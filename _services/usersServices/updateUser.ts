@@ -7,6 +7,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import { err } from "neverthrow";
 
+//ENHANCE the return type
 async function updateUser(userId: string, updatedData: Partial<UserDocument>) {
   updatedData?.userType && delete updatedData.userType;
 
