@@ -7,15 +7,11 @@ declare global {
     interface Request {
       loginMethod: Record<"email", string> | Record<"phoneNumber", string>;
       token: string;
-      user: UserDocument | AdminDocument; // NOTE: this might cause a type narrowing errors
+      user: UserDocument | AdminDocument;
       store: MongoId;
       plan: MongoId;
       isPlanPaid: boolean;
       planExpiryDate: Date;
-      /* OLD CODE (kept for reference): 
-      Model: mongoose.Model<mongoose.Document>;
-      validatedModelId: string,
-      */
       dateQuery: {
         dateFilter: { date: { $gte: Date; $lte: Date } };
         sortBy: any;
