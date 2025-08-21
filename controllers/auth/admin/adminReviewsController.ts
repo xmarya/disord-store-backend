@@ -1,7 +1,7 @@
-import { updateDoc } from "../../../_services/global";
-import { AppError } from "../../../_utils/AppError";
-import { catchAsync } from "../../../_utils/catchAsync";
-import PlatformReview from "../../../models/platformReviewModel";
+import { updateDoc } from "@repositories/global";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import PlatformReview from "@models/platformReviewModel";
 
 export const displayReviewInHomePage = catchAsync(async (request, response, next) => {
   const { reviewId } = request.params;
@@ -10,6 +10,6 @@ export const displayReviewInHomePage = catchAsync(async (request, response, next
 
   response.status(201).json({
     success: true,
-    selectedReview,
+    data: {selectedReview},
   });
 });

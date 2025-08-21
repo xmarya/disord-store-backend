@@ -15,8 +15,12 @@ declare global {
       REDIS_PASSWORD: string;
       REDIS_TLS: string;
       RESEND_KEY: string;
-      AUTHENTICA_API_KEY:string
-      AUTHENTICA_API_KEY_TEST:string
+      AUTHENTICA_API_KEY: string;
+      AUTHENTICA_API_KEY_TEST: string;
+      NOVU_DEVELOPMENT_KEY: string;
+      NOVU_DEVELOPMENT_APPLICATION_IDENTIFIER: string;
+      NOVU_PRODUCTION_KEY: string;
+      NOVU_PRODUCTION_APPLICATION_IDENTIFIER: string;
     }
   }
 }

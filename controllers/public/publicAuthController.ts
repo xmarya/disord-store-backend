@@ -1,40 +1,53 @@
-import authentica from "../../_config/authentica";
-import { createDoc, getOneDocByFindOne } from "../../_services/global";
-import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody, AuthenticaVerifyOTPResponse } from "../../_Types/AuthenticaOTP";
-import { UserDocument } from "../../_Types/User";
-import { CredentialsLoginDataBody } from "../../_Types/UserCredentials";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
-import { comparePasswords } from "../../_utils/passwords/comparePasswords";
-import User from "../../models/userModel";
+import authentica from "@config/authentica";
+import createNewDiscordUser from "@services/usersServices/createNewDiscordUser";
+import createNewUser from "@services/usersServices/createNewUser";
+import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/AuthenticaOTP";
+import { UserTypes } from "@Types/User";
+import { CredentialsLoginDataBody } from "@Types/UserCredentials";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import jwtSignature from "@utils/jwtToken/generateSignature";
+import jwtVerify from "@utils/jwtToken/jwtVerify";
+import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 
-export const createNewStoreOwnerController = catchAsync(async (request, response, next) => {
-  /*✅*/
-  const { firstName, lastName, email, password } = request.body;
-  const data = { firstName, lastName, email, signMethod: "credentials", userType: "storeOwner", credentials: { password } };
-  const newOwner = await createDoc<UserDocument>(User, data);
-  newOwner.credentials!.password = "";
-  response.status(201).json({
-    success: true,
-    newOwner,
+
+export const noOTPLogin = catchAsync(async (request, response, next) => {
+
+  const token = jwtSignature("68a33f1fd8d6fe6df8bfe713", "1h");
+  tokenWithCookies(response, token);
+
+  response.status(200).json({
+    success: true
   });
 });
+export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
+  catchAsync(async (request, response, next) => {
+    const { firstName, lastName, email, password } = request.body;
 
-export const createNewUserController = catchAsync(async (request, response, next) => {
-  /*✅*/
-  const { firstName, lastName, email, password } = request.body;
-  const data = { firstName, lastName, email, signMethod: "credentials", userType: "user", credentials: { password } };
-  const newUser = await createDoc<UserDocument>(User, data);
-  newUser.credentials!.password = "";
+    const tokenGenerator = { hostname: request.hostname, protocol: request.protocol };
+    const newUser = await createNewUser({ firstName, lastName, email, password, userType }, tokenGenerator);
 
-  response.status(201).json({
-    success: true,
-    newUser,
+    response.status(201).json({
+      success: true,
+      message: "new user has been created successfully",
+      data: {newUser},
+    });
   });
-});
 
 export const credentialsLogin = catchAsync(async (request, response, next) => {
   // STEP 1) getting the provided email/phone and password from the request body to start checking:
+  const { password, emailOrPhoneNumber }: CredentialsLoginDataBody = request.body;
+  if (!emailOrPhoneNumber?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
+
+  const isEmail = emailOrPhoneNumber.includes("@");
+  request.loginMethod = isEmail ? { email: emailOrPhoneNumber } : { phoneNumber: emailOrPhoneNumber };
+
+  next();
+});
+
+/* OLD CODE (kept for reference): 
+export const credentialsLoginOld = catchAsync(async (request, response, next) => {
+  // S 1) getting the provided email/phone and password from the request body to start checking:
   const { password, emailOrPhoneNumber }: CredentialsLoginDataBody = request.body;
   if (!emailOrPhoneNumber?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
@@ -48,7 +61,7 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   });
   if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
-  // STEP 2) checking the password:
+  // S 2) checking the password:
   if (!(await comparePasswords(password, user.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
   const plainUser = user.toObject();
@@ -60,13 +73,15 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   next();
 });
 
-export const sendOTP = catchAsync(async (request, response, next) => {
-  const isEmail = request.body.isEmail;
-  const user:UserDocument = request.body.user;
-  const method = isEmail ? "email" : "sms";
+*/
 
+export const sendOTP = catchAsync(async (request, response, next) => {
+  const user = request.user;
+  const isEmail = request.loginMethod.hasOwnProperty("email");
+
+  const method = isEmail ? "email" : "sms";
   const body: AuthenticaSendOTPDataBody<typeof method> = isEmail
-    ? { method: "email", email: "shhmanager1@gmail.com" }
+    ? { method: "email", email: user.email }
     : {
         method: "sms",
         phone: user.phoneNumber,
@@ -75,20 +90,27 @@ export const sendOTP = catchAsync(async (request, response, next) => {
         fallback_email: user.email,
       };
   // STEP 4) send an OTP
-  const {success, message} = (await authentica({ requestEndpoint: "/send-otp", body })) as AuthenticaResponse<"/send-otp">;
+  const { success, message } = (await authentica({ requestEndpoint: "/send-otp", body })) as AuthenticaResponse<"/send-otp">;
 
-  const statusCode = success ? 200 : 400;
-  response.status(statusCode).json({
-    success: !!success,
-    message: message,
+  if (!success) return next(new AppError(400, message));
+
+  const temporeToken = jwtSignature(user.id, "1m");
+  response.status(200).json({
+    success: true,
+    message: `${message} to ${Object.values(request.loginMethod)[0]}`,
+    data: {temporeToken},
   });
 });
 
 export const verifyOTP = catchAsync(async (request, response, next) => {
-  const { otp, email, phone }: AuthenticaVerifyOTPDataBody = request.body;
+  const { temporeToken, otp, email, phone }: AuthenticaVerifyOTPDataBody = request.body;
   if (!otp?.trim()) return next(new AppError(400, "الرجاء ادخال رمز التحقق المرسل."));
   if (!email?.trim() && !phone?.trim()) return next(new AppError(400, "الرجاء ادخال معلومات تسجيل الدخول المستخدمة"));
 
+  // STEP 1) validate the token:
+  const payload = await jwtVerify(temporeToken, process.env.JWT_SALT!);
+
+  // STEP 2) validate the OTP:
   const { message, status } = (await authentica({
     requestEndpoint: "/verify-otp",
     body: {
@@ -98,27 +120,28 @@ export const verifyOTP = catchAsync(async (request, response, next) => {
     },
   })) as AuthenticaResponse<"/verify-otp">;
 
-  const statusCode = status === true ? 200 : 400;
-  response.status(statusCode).json({
+  if (!status || !payload.id) return next(new AppError(400, "OTP or temporeToken has expired"));
+
+  const token = jwtSignature(payload.id, "1h");
+  tokenWithCookies(response, token);
+
+  response.status(200).json({
     success: status,
     message: message,
   });
 });
 
-export const createNewDiscordUser = catchAsync(async (request, response, next) => {
-  const newDiscordUser = await createDoc(User, {
-    signMethod: "discord",
-    email: request.body.email,
-    image: request.body.image,
-    firstName: request.body.name,
-    discord: {
-      discordId: request.body.id,
-      username: request.body.name,
-    },
-  });
+export const createNewDiscordUserController = catchAsync(async (request, response, next) => {
+  const { email, id, name, image } = request.body;
+
+  if (!email || !id || !name || !image) return next(new AppError(400, "some data are missing. make sure to provide the user email, id, name, and image"));
+
+  const newDiscordUser = await createNewDiscordUser({ email, name, id, image });
+  // TODO: give the user immediate access by generating the login token
 
   response.status(201).json({
     success: true,
-    newDiscordUser,
+    message: "new user has been created successfully",
+    data: {newDiscordUser},
   });
 });

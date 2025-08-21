@@ -1,8 +1,8 @@
-import { getAllDocs } from "../../_services/global";
-import { deleteWishlist, updateWishlist } from "../../_services/wishlist/wishlistService";
-import { WishlistDataBody } from "../../_Types/Wishlist";
-import { catchAsync } from "../../_utils/catchAsync";
-import Wishlist from "../../models/wishlistModel";
+import { getAllDocs } from "@repositories/global";
+import { deleteWishlist, updateWishlist } from "@repositories/wishlist/wishlistRepo";
+import { WishlistDataBody } from "@Types/Wishlist";
+import { catchAsync } from "@utils/catchAsync";
+import Wishlist from "@models/wishlistModel";
 
 export const updateWishlistController = catchAsync(async (request, response, next) => {
   const { products }: WishlistDataBody = request.body;
@@ -12,7 +12,7 @@ export const updateWishlistController = catchAsync(async (request, response, nex
 
   response.status(203).json({
     success: true,
-    wishlist:products
+    data: {products},
   });
 });
 export const getWishlistController = catchAsync(async (request, response, next) => {
@@ -20,6 +20,6 @@ export const getWishlistController = catchAsync(async (request, response, next) 
   const wishlist = await getAllDocs(Wishlist, request, { condition: { user } });
   response.status(200).json({
     success: true,
-    wishlist,
+    data: {wishlist},
   });
 });

@@ -13,7 +13,6 @@ const createWorker = (queueName: string, processor: any) => {
   return new Worker(
     queueName,
     async (job) => {
-      console.log("job.data", job.data);
       await processor(job.data); // the data is whatever passed when initialising/using queue.add()
     },
     { connection }

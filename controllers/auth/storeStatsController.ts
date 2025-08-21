@@ -1,18 +1,10 @@
-/*
-    1- accept the invoice data
-    2- handle it per store
-    3- check the redis if the hash of profits:storeId exists
-        yes? get the hash, increment/decrement the value, return it to the user
-        no? create a new hash
-    **after storeowner login, get the store profits, cache
-*/
 
 import { startSession } from "mongoose";
-import { getOneStoreStats, updateStoreStats } from "../../_services/store/storeStatsService";
-import { InvoiceDataBody } from "../../_Types/Invoice";
-import { MongoId } from "../../_Types/MongoId";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
+import { getOneStoreStats, updateStoreStats } from "@repositories/store/storeStatsRepo";
+import { InvoiceDataBody } from "@Types/Invoice";
+import { MongoId } from "@Types/MongoId";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 type StatsPerStore = Array<{
   storeId: MongoId;
@@ -20,7 +12,6 @@ type StatsPerStore = Array<{
   products: Array<{ productId: MongoId; quantity: number }>;
 }>;
 export async function updateStoreStatsController(data: Pick<InvoiceDataBody, "productsPerStore">, operationType: "new-purchase" | "cancellation") {
-
   const { productsPerStore } = data;
   const statsPerStore: StatsPerStore = productsPerStore.map(({ storeId, products }) => ({
     storeId,
@@ -59,7 +50,7 @@ export const getStoreStatsController = catchAsync(async (request, response, next
 
   response.status(200).json({
     success: true,
-    stats,
+    data: {stats},
   });
 
   /* the response => 

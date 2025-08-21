@@ -1,4 +1,4 @@
-import { ReviewDocument } from "../_Types/Review";
+import { ReviewDocument } from "@Types/Review";
 import mongoose, { Schema } from "mongoose";
 
 type ReviewModel = mongoose.Model<ReviewDocument>;

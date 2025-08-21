@@ -1,8 +1,8 @@
-import planTiers from "../_data/planTiers";
-import { getOneDocById } from "../_services/global";
-import { MongoId } from "../_Types/MongoId";
-import { SubscriptionTypes } from "../_Types/Plan";
-import Plan from "../models/planModel";
+import { planTiers } from "../_constants/dataStructures";
+import { getOneDocById } from "@repositories/global";
+import { MongoId } from "@Types/MongoId";
+import { SubscriptionTypes } from "@Types/Plan";
+import Plan from "@models/planModel";
 
 export async function getSubscriptionType(currentPlanId: MongoId, newPlanId: MongoId): Promise<Exclude<SubscriptionTypes, "new"> | null> {
   // 1- make both tostring to comparison:

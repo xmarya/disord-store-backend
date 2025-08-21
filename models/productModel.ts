@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { ProductDocument } from "../_Types/Product";
+import { ProductDocument } from "@Types/Product";
 
 type ProductModel = mongoose.Model<ProductDocument>;
 
@@ -98,8 +98,7 @@ productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
   next();
 });
 
-
-// TODO: pre hook for deleting all the reviews when deleting one/many product/s 
+// TODO: pre hook for deleting all the reviews when deleting one/many product/s
 
 const Product = mongoose.model<ProductDocument, ProductModel>("Product", productSchema);
 

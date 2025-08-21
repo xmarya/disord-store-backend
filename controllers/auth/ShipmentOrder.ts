@@ -1,59 +1,61 @@
 import { Request, Response } from "express";
-import { IOrderItem } from "../../_Types/Order"; // Add IOrderItem
-import Order from "../../models/orderModel";
-import { HandleErrorResponse } from "../../_utils/common";
-import { IStoreAddress } from "../../_Types/Store";
+import { IOrderItem } from "@Types/Order"; // Add IOrderItem
+import Order from "@models/orderModel";
+import { HandleErrorResponse } from "@utils/common";
+import { IStoreAddress } from "@Types/Store";
 
 export const GetShipmentData = async (req: Request, res: Response): Promise<void> => {
-    try {
+  try {
     const { orderId } = req.params;
 
     const order = await Order.findById(orderId)
-        .populate<{
+      .populate<{
         storeId: { address: IStoreAddress };
         items: IOrderItem[];
-        }>({
+      }>({
         path: "storeId items",
         select: "address name image",
-        })
-        .select("shippingAddress trackingNumber shipmentCompany isDigital storeId totalWeight items");
+      })
+      .select("shippingAddress trackingNumber shipmentCompany isDigital storeId totalWeight items");
 
     if (!order) {
-        res.status(404).json({
+      res.status(404).json({
         status: "failed",
         message: "Order not found",
-        });
-        return;
+      });
+      return;
     }
 
     if (order.isDigital) {
-        res.status(400).json({
+      res.status(400).json({
         status: "failed",
         message: "No shipment data for digital orders",
-        });
-        return;
+      });
+      return;
     }
 
     if (!order.shippingAddress || !order.storeId?.address) {
-        res.status(400).json({
+      res.status(400).json({
         status: "failed",
         message: "Missing address information",
-        });
-        return;
+      });
+      return;
     }
 
     res.status(200).json({
-        status: "success",
+      status: "success",
+      data: {
         shipmentData: {
-        warehouseAddress: order.storeId.address,
-        userAddress: order.shippingAddress,
-        totalWeight: order.totalWeight,
-        trackingNumber: order.trackingNumber || "Not yet assigned",
-        shipmentCompany: order.shipmentCompany || "Not specified",
-        items: order.items.map((item) => ({ name: item.name, image: item.image })),
+          warehouseAddress: order.storeId.address,
+          userAddress: order.shippingAddress,
+          totalWeight: order.totalWeight,
+          trackingNumber: order.trackingNumber || "Not yet assigned",
+          shipmentCompany: order.shipmentCompany || "Not specified",
+          items: order.items.map((item) => ({ name: item.name, image: item.image })),
         },
+      },
     });
-    } catch (error) {
+  } catch (error) {
     HandleErrorResponse(error, res);
-    }
+  }
 };

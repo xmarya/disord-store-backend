@@ -1,9 +1,9 @@
-import { getAllDocs, getOneDocById, updateDoc } from "../../../_services/global";
-import { checkPlanName, getMonthlyPlansStats, getPlansStatsReport } from "../../../_services/plan/planService";
-import { PlanDataBody } from "../../../_Types/Plan";
-import { AppError } from "../../../_utils/AppError";
-import { catchAsync } from "../../../_utils/catchAsync";
-import Plan from "../../../models/planModel";
+import { getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
+import { checkPlanName, getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/planRepo";
+import { PlanDataBody } from "@Types/Plan";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import Plan from "@models/planModel";
 
 export const getAllPlanController = catchAsync(async (request, response, next) => {
   const plans = await getAllDocs(Plan, request);
@@ -11,7 +11,7 @@ export const getAllPlanController = catchAsync(async (request, response, next) =
 
   response.status(200).json({
     success: true,
-    plans,
+    data: {plans},
   });
 });
 
@@ -21,7 +21,7 @@ export const getPlanController = catchAsync(async (request, response, next) => {
   if (!plan) return next(new AppError(404, "no plan was found with this id"));
   response.status(200).json({
     success: true,
-    plan,
+    data: {plan},
   });
 });
 
@@ -39,7 +39,7 @@ export const updatePlanController = catchAsync(async (request, response, next) =
 
   response.status(201).json({
     success: true,
-    updatedPlan,
+    data: {updatedPlan},
   });
 });
 
@@ -51,7 +51,7 @@ export const getMonthlyPlansStatsController = catchAsync(async (request, respons
 
   response.status(200).json({
     success: true,
-    allPlansStats,
+    data: {allPlansStats},
   });
 });
 
@@ -63,6 +63,6 @@ export const getPlansStatsReportController = catchAsync(async (request, response
 
   response.status(200).json({
     success: true,
-    reports,
+    data: {reports},
   });
 });

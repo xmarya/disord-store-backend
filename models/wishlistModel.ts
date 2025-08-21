@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { WishlistDocument } from "../_Types/Wishlist";
+import { WishlistDocument } from "@Types/Wishlist";
 
 type WishListModel = Model<WishlistDocument>;
 const wishlistSchema = new Schema<WishlistDocument>(
@@ -24,11 +24,11 @@ const wishlistSchema = new Schema<WishlistDocument>(
   }
 );
 
-wishlistSchema.index({user:1, product:1}, {unique: true});
+wishlistSchema.index({ user: 1, product: 1 }, { unique: true });
 
 // this pre(find) hook is for populating specific field from the product model
-wishlistSchema.pre("find", function(next){ /*REQUIRES TESTING*/
-  this.populate({path: "product", select: "name store price image productType stock numberOfPurchases ranking ratingsAverage ratingsQuantity"});
+wishlistSchema.pre("find", function (next) {
+  /*REQUIRES TESTING*/ this.populate({ path: "product", select: "name store price image productType stock numberOfPurchases ranking ratingsAverage ratingsQuantity" });
   next();
 });
 

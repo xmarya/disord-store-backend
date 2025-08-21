@@ -3,7 +3,7 @@ export type Credentials = {
   passwordConfirm: string;
   emailConfirmed: boolean;
   emailConfirmationToken:string
-  emailConfirmationExpires:Date
+  emailConfirmationExpires:Date | null,
   passwordResetToken: string;
   passwordResetExpires: Date;
   passwordChangedAt: Date;

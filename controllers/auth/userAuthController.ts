@@ -1,27 +1,32 @@
+import eventBus from "@config/EventBus";
+import User from "@models/userModel";
+import { getOneDocById } from "@repositories/global";
+import deleteUser from "@services/usersServices/deleteUser";
+import getUserProfile from "@services/usersServices/getUserProfile";
+import { UserUpdatedEvent } from "@Types/events/UserEvents";
+import { UserDocument } from "@Types/User";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import jwtSignature from "@utils/jwtToken/generateSignature";
+import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
+import { comparePasswords } from "@utils/passwords/comparePasswords";
+import formatSubscriptionsLogs from "@utils/queryModifiers/formatSubscriptionsLogs";
 import type { Request, Response } from "express";
-import { getOneDocById, updateDoc } from "../../_services/global";
-import { deleteRegularUser, deleteStoreOwner } from "../../_services/user/deleteUserService";
-import { UserDocument } from "../../_Types/User";
-import { AppError } from "../../_utils/AppError";
-import { deleteFromCache } from "../../_utils/cacheControllers/globalCache";
-import cacheUser from "../../_utils/cacheControllers/user";
-import { catchAsync } from "../../_utils/catchAsync";
-import jwtSignature from "../../_utils/jwtToken/generateSignature";
-import tokenWithCookies from "../../_utils/jwtToken/tokenWithCookies";
-import { comparePasswords } from "../../_utils/passwords/comparePasswords";
-import formatSubscriptionsLogs from "../../_utils/queryModifiers/formatSubscriptionsLogs";
-import { deleteRedisHash } from "../../_utils/redisOperations/redisHash";
-import User from "../../models/userModel";
+import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
+import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
+import updateUser from "@services/usersServices/updateUser";
+import isErr from "@utils/isErr";
 
-export const getUserProfile = catchAsync(async (request, response, next) => {
+export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
-  const userProfile = await getOneDocById(User, userId, { select: ["firstName", "lastName", "email", "image", "phoneNumber"] });
+  const result = await getUserProfile(userId);
 
-  if (!userProfile) return next(new AppError(400, "لم يتم العثور على بيانات المستخدم"));
+  if (!result.ok) return next(new AppError(400, `${result.reason}: ${result.message}`));
+  const { result: userProfile } = result;
 
   response.status(200).json({
     success: true,
-    userProfile,
+    data: {userProfile},
   });
 });
 
@@ -35,8 +40,10 @@ export const getMySubscriptionsLogController = catchAsync(async (request, respon
 
   response.status(200).json({
     success: true,
-    currentSubscription,
-    subscriptionsLog,
+    data: {
+      currentSubscription,
+      subscriptionsLog,
+    },
   });
 });
 
@@ -63,19 +70,18 @@ export const confirmUserChangePassword = catchAsync(async (request, response, ne
   });
 });
 
-export const updateUserProfile = catchAsync(async (request, response, next) => {
+export const updateUserProfileController = catchAsync(async (request, response, next) => {
   /*✅*/
   const userId = request.user.id;
-  let { firstName, lastName }: Pick<UserDocument, "firstName" | "lastName"> = request.body;
-  if (firstName?.trim() === "" && lastName?.trim() === "") return next(new AppError(400, "الرجاء تعبئة حقول الاسم بالكامل"));
+  const result = await updateUser(userId, request.body);
 
-  const updatedUser = await updateDoc(User, userId, request.body);
+  if (isErr(result)) return next(new AppError(400, result.error));
 
-  // update the cached data:
-  updatedUser && (await cacheUser(updatedUser));
+  if (!result.ok) return next(new AppError(400, `${result.reason}: ${result.message}`));
+  const { result: updatedUser } = result;
   response.status(203).json({
     success: true,
-    updatedUser,
+    data: {updatedUser},
   });
 });
 
@@ -83,17 +89,14 @@ export const updateUserProfile = catchAsync(async (request, response, next) => {
 
 export const deleteUserAccountController = catchAsync(async (request, response, next) => {
   const { userId } = request.params;
-  
-  const user = await getOneDocById(User, userId, { select: ["userType", "myStore"] });
-  
-  if (!user) return next(new AppError(404, "no user with this id"));
-  if (user.userType === "storeAssistant") return next(new AppError(400, "this route is not for deleting a storeAssistant"));
 
-  if (user.userType === "storeOwner") await deleteStoreOwner(userId,user.myStore);
-  else  await deleteRegularUser(userId);
+  const result = await deleteUser(userId);
+
+  if (result.isErr()) return next(new AppError(400, result.error));
 
   response.status(204).json({
     success: true,
+    message: result.value,
   });
 });
 

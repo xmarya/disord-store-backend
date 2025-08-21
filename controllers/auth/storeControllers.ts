@@ -1,18 +1,18 @@
 import mongoose, { startSession } from "mongoose";
-import { deleteAllAssistants } from "../../_services/assistant/assistantService";
-import { deleteAllCategories } from "../../_services/category/categoryService";
-import { getOneDocById, updateDoc } from "../../_services/global";
-import { deleteAllProducts } from "../../_services/product/productServices";
-import { deleteAllResourceReviews } from "../../_services/review/reviewService";
-import { createStore, deleteStore } from "../../_services/store/storeService";
-import { resetStoreOwnerToDefault } from "../../_services/user/userService";
-import { MongoId } from "../../_Types/MongoId";
-import { StoreOwner } from "../../_Types/User";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
-import Store from "../../models/storeModel";
-import { StoreDataBody, StoreDocument } from "./../../_Types/Store";
-import { deleteStoreStats } from "../../_services/store/storeStatsService";
+import { deleteAllAssistants } from "@repositories/assistant/assistantRepo";
+import { deleteAllCategories } from "@repositories/category/categoryRepo";
+import { getOneDocById, updateDoc } from "@repositories/global";
+import { deleteAllProducts } from "@repositories/product/productRepo";
+import { deleteAllResourceReviews } from "@repositories/review/reviewRepo";
+import { createStore, deleteStore } from "@repositories/store/storeRepo";
+import { resetStoreOwnerToDefault } from "@repositories/user/userRepo";
+import { MongoId } from "@Types/MongoId";
+import { StoreOwner } from "@Types/User";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import Store from "@models/storeModel";
+import { StoreDataBody, StoreDocument } from "@Types/Store";
+import { deleteStoreStats } from "@repositories/store/storeStatsRepo";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   // TODO: complete the store data
@@ -25,7 +25,7 @@ export const createStoreController = catchAsync(async (request, response, next) 
 
   response.status(201).json({
     success: true,
-    newStore,
+    data: {newStore},
   });
 });
 
@@ -41,7 +41,7 @@ export const updateMyStoreController = catchAsync(async (request, response, next
 
   response.status(201).json({
     success: true,
-    updatedStore,
+    data: {updatedStore},
   });
 });
 
@@ -58,7 +58,7 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
 
   response.status(201).json({
     success: true,
-    updatedStore,
+    data: {updatedStore},
   });
 });
 
@@ -101,11 +101,10 @@ export async function deleteStorePermanently(storeId: MongoId, session: mongoose
 
 export const getMyStoreController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
-  // const { store } = await getStoreWithProducts(storeId);
   const store = await getOneDocById(Store, storeId);
 
   response.status(200).json({
     success: true,
-    store,
+    data: {store},
   });
 });

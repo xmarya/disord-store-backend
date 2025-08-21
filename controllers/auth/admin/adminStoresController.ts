@@ -1,11 +1,11 @@
 import { startSession } from "mongoose";
-import { getAllDocs, getOneDocById, updateDoc } from "../../../_services/global";
-import { getAllStoresStats, getOneStoreStats } from "../../../_services/store/storeStatsService";
-import { AppError } from "../../../_utils/AppError";
-import { catchAsync } from "../../../_utils/catchAsync";
-import Store from "../../../models/storeModel";
+import { getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
+import { getAllStoresStats, getOneStoreStats } from "@repositories/store/storeStatsRepo";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import Store from "@models/storeModel";
 import { deleteStorePermanently } from "../storeControllers";
-import Product from "../../../models/productModel";
+import Product from "@models/productModel";
 
 export const getAllStoresInfo = catchAsync(async (request, response, next) => {
   const { sortBy, sortOrder, plan, verified } = request.body;
@@ -16,7 +16,7 @@ export const getAllStoresInfo = catchAsync(async (request, response, next) => {
   response.status(200).json({
     success: true,
     result: storesStats.length,
-    storesStats,
+    data: {storesStats},
   });
 });
 
@@ -36,9 +36,11 @@ export const getOneStoreInfo = catchAsync(async (request, response, next) => {
 
   response.status(200).json({
     success: true,
-    store,
+    data: {
+      store,
     products,
     stats,
+    }
   });
 });
 
@@ -60,6 +62,6 @@ export const deleteStore = catchAsync(async (request, response, next) => {
   //TODO: create a new adminLog
   response.status(204).json({
     success: true,
-    deletedStore,
+    data: {deletedStore},
   });
 });

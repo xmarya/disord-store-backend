@@ -1,12 +1,12 @@
-import { createAssistant, deleteAssistant } from "../../_services/assistant/assistantService";
-import { getAllDocs, getOneDocByFindOne, getOneDocById, isExist, updateDoc } from "../../_services/global";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
-import StoreAssistant from "../../models/storeAssistantModel";
-import User from "../../models/userModel";
+import { createAssistant, deleteAssistant } from "@repositories/assistant/assistantRepo";
+import { getAllDocs, getOneDocByFindOne, getOneDocById, isExist, updateDoc } from "@repositories/global";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import novuCreateAssistantSubscriber from "../../externals/novu/subscribers/createSubscriber";
+import StoreAssistant from "@models/storeAssistantModel";
+import User from "@models/userModel";
 
 export const createAssistantController = catchAsync(async (request, response, next) => {
-
   const { permissions } = request.body;
   if (!permissions) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
@@ -14,11 +14,14 @@ export const createAssistantController = catchAsync(async (request, response, ne
 
   const data = { ...request.body, permissions, storeId };
 
-  const assistant = await createAssistant(data);
+  const { assistant, user } = await createAssistant(data);
+
+  /* CHANGE LATER: publish an event */
+  await novuCreateAssistantSubscriber(user, assistant.inStore, assistant.permissions);
 
   response.status(201).json({
     success: true,
-    assistant,
+    data: {assistant},
   });
 });
 
@@ -31,12 +34,11 @@ export const getAllAssistantsController = catchAsync(async (request, response, n
 
   response.status(200).json({
     success: true,
-    assistants,
+    data: {assistants},
   });
 });
 
 export const getOneAssistantController = catchAsync(async (request, response, next) => {
-
   const { assistantId } = request.params;
   if (!assistantId) return next(new AppError(400, "لابد من توفير معرف المستخدم"));
 
@@ -46,7 +48,7 @@ export const getOneAssistantController = catchAsync(async (request, response, ne
 
   response.status(200).json({
     success: true,
-    assistant,
+    data: {assistant},
   });
 });
 
@@ -56,12 +58,12 @@ export const updateAssistantController = catchAsync(async (request, response, ne
   const { permissions } = request.body;
   if (permissions) await updateDoc(StoreAssistant, assistantId, permissions);
 
-  const otherData:Record<string, any> = {};
-  for(const [key, value] of Object.entries(request.body)) {
-    if(typeof value === "string" && value.trim()) otherData[key] = value.trim();
+  const otherData: Record<string, any> = {};
+  for (const [key, value] of Object.entries(request.body)) {
+    if (typeof value === "string" && value.trim()) otherData[key] = value.trim();
   }
 
-  Object.keys(otherData).length && await updateDoc(User, assistantId, otherData);
+  Object.keys(otherData).length && (await updateDoc(User, assistantId, otherData));
   response.status(203).json({
     success: true,
   });

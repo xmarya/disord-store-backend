@@ -1,13 +1,11 @@
 import dotenv from "dotenv";
-import { dbStartConnection } from "./_config/db";
 import app from "./app";
-import initiateBullMQJobs from "./_utils/bullmqOperations/jobs/initialJobProsessors";
+// register the path aliases in the application
+import "module-alias/register";
 dotenv.config({ path: "./.env" });
 
 const port = process.env.PORT || 3000;
 
-await dbStartConnection();
-// await initiateBullMQJobs();
 const server = app.listen(port, () => {
   console.log(`the server is running on port ${port}...`);
 });

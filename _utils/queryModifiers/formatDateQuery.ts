@@ -1,5 +1,5 @@
 import { endOfDay, endOfMonth, endOfWeek, formatISO, isValid, parse, startOfDay, startOfMonth, startOfWeek } from "date-fns";
-import { SUPPORTED_DATE_FORMATS } from "../../_data/constants";
+import { SUPPORTED_DATE_FORMATS } from "../../_constants/dataStructures";
 
 function getParsedDate(date: string): Date | null {
   for (const format of SUPPORTED_DATE_FORMATS) {
@@ -11,9 +11,9 @@ function getParsedDate(date: string): Date | null {
 
 export function buildDateFilter(dates: Array<string>) {
   // STEP 1) validate the format and the type:
-  const validDates = dates.map(getParsedDate).filter((date): date is Date => date !== null); 
+  const validDates = dates.map(getParsedDate).filter((date): date is Date => date !== null);
   // NOTE: I could have done it without the filter(). However, using it saves a lot of time because I would not have to narrowing the type and ensuring the element is a Date. it guarantees the remaining items' types and telling TS that they are real Date objects.
-  
+
   if (validDates.length === 0) return null;
 
   //  STEP 2) set the start and the end:
@@ -35,13 +35,12 @@ export function buildDateFilter(dates: Array<string>) {
   const firstDate = startOfDay(start);
   const lastDate = endOfDay(end);
 
-
   const filter = {
     date: {
       $gte: firstDate,
       $lte: lastDate,
     },
-  }
+  };
 
   return filter;
 }

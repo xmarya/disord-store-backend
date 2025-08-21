@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs";
 import { formatDistanceStrict, lightFormat } from "date-fns";
 import { arSA } from "date-fns/locale/ar-SA";
 import mongoose, { Schema } from "mongoose";
-import { HASHING_SALT } from "../_data/constants";
-import { UserDocument } from "../_Types/User";
+import { HASHING_SALT } from "../_constants/numbers";
+import { UserDocument } from "@Types/User";
 import "./storeModel"; // ✅ Make sure Store is registered before User
 
 interface UserVirtual {
@@ -37,8 +37,8 @@ const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
         type: Boolean,
         default: false,
       },
-      emailConfirmationToken: String,
-      emailConfirmationExpires: Date,
+      emailConfirmationToken: { type: String, select: false },
+      emailConfirmationExpires: { type: Date, select: false, default: null },
       // passwordConfirm: String, // NOTE: zod will be use to validate this filed
       // on the front-end + the field itself won't be saved in the db.
       // it's only use inside the pre hook to check the password
@@ -72,11 +72,11 @@ const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
       maxlength: [13, "the phone number should be 11 to 12 digits"],
       default: undefined,
       validate: {
-        validator: function(value:string) {
+        validator: function (value: string) {
           return value.startsWith("+966");
         },
-        message: props => `${props.value} isn't a valid phone number. it must starts with +966`
-      }
+        message: (props) => `${props.value} isn't a valid phone number. it must starts with +966`,
+      },
     },
     userType: {
       type: String,
@@ -228,11 +228,6 @@ userSchema.virtual("planExpiresInDays").get(function () {
   // we'll take it and convert it into a day by dividing by dividing by (1000 * 60 * 60 * 24) .
 });
 
-// userSchema.pre(/^find/, function (this: Query<any, any>, next) {
-//   this.populate("myStore").select("_id");
-//   next();
-// });
-
 /* OLD CODE (kept for reference): 
     userSchema.pre("save", function (next) {
       // mongoose documents require an explicit cast when dealing with nested objects (credential subdocument) inside hooks.
@@ -251,9 +246,7 @@ userSchema.virtual("planExpiresInDays").get(function () {
 userSchema.pre("save", async function (next) {
   // STEP 1) check if the user isNew and the signMethod is credentials: (the condition this.credentials is for getting rid ot possibly undefined error)
   if (this.isNew && this.signMethod === "credentials" && this.credentials) {
-
     this.credentials.password = await bcrypt.hash(this.credentials.password, HASHING_SALT);
-
   }
   next();
 });
@@ -267,38 +260,6 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
-
-/* OLD CODE (kept for reference): 
-userSchema.methods.comparePasswords = async function (providedPassword: string, userPassword: string) {
-  instanced methods are available on the document, 
-  so, `this` keyword points to the current document. then why we're not using this.password?
-  actually in this case, since we have set the password to select false, 
-  this.password will not be available. So we will pass it from the controllerAuth since we've got it there.
- const result = await bcrypt.compare(providedPassword, userPassword);
- console.log(result);
- return result;
-};
-*/
-
-/* OLD CODE (kept for reference): 
-userSchema.methods.generateRandomToken = async function () {
-  //STEP 1) generate the token:
-  const randomToken = crypto.randomBytes(32).toString("hex");
-  
-  //STEP 2) start an expiring time for the GRT:
-  const tokenExpiresIn = new Date(Date.now() + 5 * 60 * 1000); // lasts for 5 minutes
-  
-  //STEP 3) store the token after hashing/expiring time in credentials:
-  this.credentials.passwordResetToken = crypto.createHash("sha256").update(randomToken).digest("hex");
-  this.credentials.passwordResetExpires = tokenExpiresIn;
-  
-  //STEP 4) saving the changes:
-  await this.save({ validateBeforeSave: false });
-  console.log({ randomToken }, this.credentials.passwordResetExpires);
-  
-  return randomToken;
-};
-*/
 
 const User = mongoose.model<UserDocument, UserModel, UserVirtual>("User", userSchema);
 

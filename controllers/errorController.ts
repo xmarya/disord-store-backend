@@ -1,5 +1,5 @@
 import { ErrorRequestHandler } from "express";
-import { AppError } from "../_utils/AppError";
+import { AppError } from "@utils/AppError";
 
 function formatErrorResponse(error: AppError & { code: number | undefined }): { statusCode: number; message: string } {
   const { name, statusCode, code } = error;

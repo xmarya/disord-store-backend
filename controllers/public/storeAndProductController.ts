@@ -1,13 +1,13 @@
 import { startSession } from "mongoose";
-import { getAllDocs, getOneDocById } from "../../_services/global";
-import { AppError } from "../../_utils/AppError";
-import { setCompressedCacheData } from "../../_utils/cacheControllers/globalCache";
-import { catchAsync } from "../../_utils/catchAsync";
-import Product from "../../models/productModel";
-import Store from "../../models/storeModel";
+import { getAllDocs, getOneDocById } from "@repositories/global";
+import { AppError } from "@utils/AppError";
+import { setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
+import { catchAsync } from "@utils/catchAsync";
+import Product from "@models/productModel";
+import Store from "@models/storeModel";
 
 export const getStoresListController = catchAsync(async (request, response, next) => {
-  const storesList = await getAllDocs(Store, request, { select: ["storeName", "logo", "description", "ranking", "ratingsAverage", "ratingsQuantity", "verified"] });
+  const storesList = await getAllDocs(Store, request.query, { select: ["storeName", "logo", "description", "ranking", "ratingsAverage", "ratingsQuantity", "verified"] });
   if (!storesList) return next(new AppError(404, "لم يتم العثور على أية متاجر"));
 
   await setCompressedCacheData(`Store:${JSON.stringify(request.query)}`, storesList, "fifteen-minutes");
@@ -15,7 +15,7 @@ export const getStoresListController = catchAsync(async (request, response, next
   response.status(200).json({
     success: true,
     result: storesList.length,
-    storesList,
+    data: {storesList},
   });
 });
 
@@ -28,7 +28,7 @@ export const getProductsListController = catchAsync(async (request, response, ne
   response.status(200).json({
     success: true,
     result: productsList.length,
-    productsList,
+    data: {productsList},
   });
 });
 
@@ -36,11 +36,11 @@ export const getStoreWithProductsController = catchAsync(async (request, respons
   const { storeId } = request.params;
 
   const session = await startSession();
-  const {store, products} = await session.withTransaction(async() => {
-    const store = await getOneDocById(Store, storeId, {session});
-    const products = await getAllDocs(Product, request, {condition: {store: storeId}});
+  const { store, products } = await session.withTransaction(async () => {
+    const store = await getOneDocById(Store, storeId, { session });
+    const products = await getAllDocs(Product, request, { condition: { store: storeId } });
 
-    return {store, products};
+    return { store, products };
   });
   // NOTE: how to get the ratings/rankings of all the products? + how to allow filtering them?
 
@@ -48,7 +48,6 @@ export const getStoreWithProductsController = catchAsync(async (request, respons
 
   response.status(200).json({
     success: true,
-    store,
-    products,
+    data: { store, products },
   });
 });

@@ -1,11 +1,9 @@
-import { updateDoc } from "../../../_services/global";
-import { AppError } from "../../../_utils/AppError";
-import { catchAsync } from "../../../_utils/catchAsync";
-import Review from "../../../models/reviewModel";
-
+import { updateDoc } from "@repositories/global";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import Review from "@models/reviewModel";
 
 export const addStoreReply = catchAsync(async (request, response, next) => {
-
   const { storeReply } = request.body;
 
   if (!storeReply?.trim()) return next(new AppError(400, "please write a replay to the customer"));
@@ -14,7 +12,6 @@ export const addStoreReply = catchAsync(async (request, response, next) => {
 
   response.status(203).json({
     success: true,
-    updatedReview,
+    data: {updatedReview},
   });
 });
-

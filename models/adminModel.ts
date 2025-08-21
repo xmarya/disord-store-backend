@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { AdminDocument } from "../_Types/admin/AdminUser";
+import { AdminDocument } from "@Types/admin/AdminUser";
 import { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
-import { HASHING_SALT } from "../_data/constants";
+import { HASHING_SALT } from "../_constants/numbers";
 
 type AdminModel = mongoose.Model<AdminDocument>;
 const adminSchema = new Schema<AdminDocument>(
@@ -19,14 +19,31 @@ const adminSchema = new Schema<AdminDocument>(
       type: String,
       required: [true, "the email field is required"],
     },
+    phoneNumber: {
+      type: String,
+      // the format must be +9665xxxxxxxx
+      minlength: [13, "the phone number should be 11 to 12 digits"],
+      maxlength: [13, "the phone number should be 11 to 12 digits"],
+      default: undefined,
+      validate: {
+        validator: function (value: string) {
+          return value.startsWith("+966");
+        },
+        message: (props) => `${props.value} isn't a valid phone number. it must starts with +966`,
+      },
+    },
     credentials: {
+      password: {
+        type: String,
+        minLength: [8, "your password must be at least 8 characters"],
+        select: false,
+      },
       emailConfirmed: {
         type: Boolean,
         default: false,
       },
       emailConfirmationToken: String,
-      emailConfirmationExpires:Date,
-      password: String,
+      emailConfirmationExpires: Date,
       passwordResetToken: String,
       passwordResetExpires: Date,
       passwordChangedAt: Date,

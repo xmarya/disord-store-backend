@@ -3,15 +3,15 @@ import { Request, Response } from "express";
 import { dirname, join } from "path";
 import PDFDocument from "pdfkit";
 import { fileURLToPath } from "url";
-import { getOneDocByFindOne } from "../../_services/global";
-import { createNewInvoices } from "../../_services/invoice/invoiceService";
-import { InvoiceDataBody } from "../../_Types/Invoice";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
-import Invoice from "../../models/invoiceModel";
-import Order from "../../models/orderModel";
+import { getOneDocByFindOne } from "@repositories/global";
+import { createNewInvoices } from "@repositories/invoice/invoiceRepo";
+import { InvoiceDataBody } from "@Types/Invoice";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import Invoice from "@models/invoiceModel";
+import Order from "@models/orderModel";
 import { updateStoreStatsController } from "./storeStatsController";
-import addJob from "../../_utils/bullmqOperations/jobs/addJob";
+import addJob from "../../externals/bullmq/addJob";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -132,8 +132,8 @@ export async function createNewInvoiceController(data: InvoiceDataBody) {
 
   // STEP 3) in case of failure, save it directly to the db.
   if (!success) createNewInvoices(fullData);
-    // NOTE: no need to await this too. let it do its job in the background;
-    // the most important part is to show the profits ASAP in the store's dashboard.
+  // NOTE: no need to await this too. let it do its job in the background;
+  // the most important part is to show the profits ASAP in the store's dashboard.
 
   return fullData;
 }
@@ -145,12 +145,11 @@ export const getOneInvoiceController = catchAsync(async (request, response, next
   const invoice = await getOneDocByFindOne(Invoice, { condition: { orderId } });
   response.status(200).json({
     success: true,
-    invoice,
+    data: {invoice},
   });
 });
 
 export const testInvoiceController = catchAsync(async (request, response, next) => {
-
   const { paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees } = request.body as InvoiceDataBody;
   if (!paymentMethod?.trim() || !productsPerStore.length || !status || !invoiceTotal) throw new AppError(400, "some invoice data are missing");
 
@@ -166,16 +165,15 @@ export const testInvoiceController = catchAsync(async (request, response, next) 
   await updateStoreStatsController(data, operationType);
 
   // STEP 2) save the data in the cache be batched and to be handled later by bullmq:
-  const success = await addJob("Invoice",invoiceId, data);
+  const success = await addJob("Invoice", invoiceId, data);
 
   // STEP 3) in case of failure, save it directly to the db.
   if (!success) createNewInvoices(data);
-    // NOTE: no need to await this too. let it do its job in the background;
-    // the most important part is to show the profits ASAP in the store's dashboard.
-
+  // NOTE: no need to await this too. let it do its job in the background;
+  // the most important part is to show the profits ASAP in the store's dashboard.
 
   response.status(201).json({
     success: true,
-    data,
+    data: {invoice: data},
   });
 });

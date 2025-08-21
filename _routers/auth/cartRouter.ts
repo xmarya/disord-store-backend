@@ -1,6 +1,6 @@
 import express from "express";
-import {  addToCartController, getMyCartController, deleteFromCart } from "../../controllers/auth/cartController";
-import validateRequestParams from "../../_utils/validators/validateRequestParams";
+import { addToCartController, getMyCartController, deleteFromCart } from "../../controllers/auth/cartController";
+import validateRequestParams from "../../middlewares/validators/validateRequestParams";
 
 export const router = express.Router();
 

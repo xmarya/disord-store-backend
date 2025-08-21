@@ -1,5 +1,5 @@
 import NodeCache from 'node-cache';
-import { CACHE_TTL } from '../_config/cache.config';
+import { CACHE_TTL } from '@config/cache.config';
 
 class CacheService {
   private cache: NodeCache;

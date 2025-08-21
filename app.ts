@@ -1,15 +1,22 @@
-import cookieParser from "cookie-parser";
-import cors from "cors";
 import express, { ErrorRequestHandler } from "express";
-import mongoSanitize from "express-mongo-sanitize";
-import ratelimit from "express-rate-limit";
-import {router as publicAuthRouter} from "./_routers/public/publicAuthRoutes";
-import {router as resourcesPublicRouter} from "./_routers/public/resourcesPublicRoutes";
-import { router as dashboardRouter } from "./_routers/dashboard";
-import errorController from "./controllers/errorController";
-
+import { dbStartConnection } from "@config/db";
+import routerLoader from "loaders/routers";
+import expressLoader from "loaders/express";
+import initiateBullMQJobs from "loaders/bullmqJobs";
+import "loaders/subscribers";
 
 const app = express();
+async function startApp() {
+  
+  await expressLoader(app);
+  await routerLoader(app);
+  await dbStartConnection();
+  await initiateBullMQJobs();
+
+}
+
+await startApp();
+/*
 // app.set("trust proxy", true);
 const limiter = ratelimit({
         max: 100, // #requests per hour.
@@ -31,12 +38,13 @@ app.use(express.urlencoded({ limit: "1.5mb", extended:true})); // parsing HTML f
 app.use(cookieParser()); // the above line parsers the data from the body, this line parses the data from the cookies .
 app.use(mongoSanitize());
 app.use(cors());
+*/
 
+/*
 app.use("/api/v1/public", resourcesPublicRouter);
 app.use("/api/v1/auth", publicAuthRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use(errorController);
-/*
 app.use(((error, request, response, next) => {
   
   response.status(error.statusCode).json({
@@ -48,4 +56,3 @@ app.use(((error, request, response, next) => {
 
 */
 export default app;
-

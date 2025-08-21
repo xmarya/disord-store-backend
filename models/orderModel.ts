@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { IOrder } from "../_Types/Order";
+import { IOrder } from "@Types/Order";
 
 export const OrderSchema = new Schema<IOrder>(
   {

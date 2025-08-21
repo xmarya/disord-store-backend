@@ -1,16 +1,16 @@
 import { addDays, isPast } from "date-fns";
 import { startSession } from "mongoose";
-import { PLAN_TRIAL_PERIOD } from "../../_data/constants";
-import { getOneDocById, updateDoc } from "../../_services/global";
-import { updatePlanMonthlyStats } from "../../_services/plan/planService";
-import { AppError } from "../../_utils/AppError";
-import { catchAsync } from "../../_utils/catchAsync";
-import { getSubscriptionType } from "../../_utils/getSubscriptionType";
-import { startSubscription } from "../../_utils/startSubscription";
-import Plan from "../../models/planModel";
-import User from "../../models/userModel";
-import cacheUser from "../../_utils/cacheControllers/user";
-import cacheStoreAndPlan from "../../_utils/cacheControllers/storeAndPlan";
+import { PLAN_TRIAL_PERIOD } from "../../_constants/ttl";
+import { getOneDocById, updateDoc } from "@repositories/global";
+import { updatePlanMonthlyStats } from "@repositories/plan/planRepo";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import { getSubscriptionType } from "@utils/getSubscriptionType";
+import { startSubscription } from "@utils/startSubscription";
+import Plan from "@models/planModel";
+import User from "@models/userModel";
+import cacheUser from "../../externals/redis/cacheControllers/user";
+import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPlan";
 
 export const createNewSubscribeController = catchAsync(async (request, response, next) => {
   /*✅*/
@@ -24,12 +24,11 @@ export const createNewSubscribeController = catchAsync(async (request, response,
 
   response.status(203).json({
     success: true,
-    updatedUserSubscription: updatedUser?.subscribedPlanDetails,
+    data: {newSubscription: updatedUser?.subscribedPlanDetails,}
   });
 });
 
 export const renewalSubscriptionController = catchAsync(async (request, response, next) => {
-
   const { planId, paidPrice } = request.body;
   if (!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
 
@@ -44,7 +43,7 @@ export const renewalSubscriptionController = catchAsync(async (request, response
 
   response.status(203).json({
     success: true,
-    updatedUserSubscription: updatedUser?.subscribedPlanDetails,
+    data: {updatedUserSubscription: updatedUser?.subscribedPlanDetails,}
   });
 });
 
@@ -75,16 +74,14 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
 
   updatedUser && cacheUser(updatedUser);
 
-  
   request.planExpiryDate = new Date();
   request.isPlanPaid = false;
   request.plan = "";
 
-  // TODO: update the hash of StoreAndPlan
   await cacheStoreAndPlan(request.store, request.plan, request.isPlanPaid, request.planExpiryDate);
 
   response.status(200).json({
     success: true,
-    updatedUser,
+    data: {updatedUser},
   });
 });

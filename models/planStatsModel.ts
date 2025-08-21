@@ -1,6 +1,6 @@
 import { endOfYear, startOfYear } from "date-fns";
 import { model, Schema } from "mongoose";
-import { PlanStatsDocument, PlanStatsModel } from "../_Types/Plan";
+import { PlanStatsDocument, PlanStatsModel } from "@Types/Plan";
 
 const planStatsSchema = new Schema<PlanStatsDocument>(
   {
@@ -125,7 +125,7 @@ planStatsSchema.statics.getAnnualStatsReport = async function (sortBy: "year" | 
   ]);
 
   if (specificYear) {
-    const match = results.find((res) => res.year === +(specificYear)); // this condition had a bug resulted in an empty data because I was doing a comparison between a string and a number
+    const match = results.find((res) => res.year === +specificYear); // this condition had a bug resulted in an empty data because I was doing a comparison between a string and a number
     return match || { [specificYear]: {} };
   }
 
@@ -136,7 +136,6 @@ planStatsSchema.statics.getAnnualStatsReport = async function (sortBy: "year" | 
 };
 
 planStatsSchema.statics.getPlansTotalsReport = async function () {
-
   // aggregate, group them by the planName, return as an object {planName: {subscribers, profits}}
   const pipeline = [
     {
@@ -158,8 +157,8 @@ planStatsSchema.statics.getPlansTotalsReport = async function () {
         profits: 1,
         newSubscribers: 1,
         renewals: 1,
-        upgrades:1,
-        downgrades:1
+        upgrades: 1,
+        downgrades: 1,
       },
     },
   ];
