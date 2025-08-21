@@ -11,6 +11,7 @@ export default function tokenWithCookies(response:Response, token:string) {
         // we're going to create a route for logout and send back via it a cookie with the exact same name but without the token
         // and that is going to overwrite the current cookie in the browser .
         secure: true,
+        sameSite: "none"
     }
     response.cookie("jwt", token, cookieOpt);
 }
