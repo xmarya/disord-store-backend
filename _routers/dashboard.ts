@@ -29,6 +29,7 @@ export const router = express.Router();
 
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
+router.get("/logout", logout);
 router.use("/admin", adminRouter);
 router.use("/me", meRouter);
 router.use("/settings", settingsRouter);
@@ -49,7 +50,6 @@ router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
-router.get("/logout", logout);
 
 // TODOs:
 // 1- check the StoreAndPlan in the cache again ✅
