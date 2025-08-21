@@ -44,13 +44,15 @@ export const GetShipmentData = async (req: Request, res: Response): Promise<void
 
     res.status(200).json({
       status: "success",
-      shipmentData: {
-        warehouseAddress: order.storeId.address,
-        userAddress: order.shippingAddress,
-        totalWeight: order.totalWeight,
-        trackingNumber: order.trackingNumber || "Not yet assigned",
-        shipmentCompany: order.shipmentCompany || "Not specified",
-        items: order.items.map((item) => ({ name: item.name, image: item.image })),
+      data: {
+        shipmentData: {
+          warehouseAddress: order.storeId.address,
+          userAddress: order.shippingAddress,
+          totalWeight: order.totalWeight,
+          trackingNumber: order.trackingNumber || "Not yet assigned",
+          shipmentCompany: order.shipmentCompany || "Not specified",
+          items: order.items.map((item) => ({ name: item.name, image: item.image })),
+        },
       },
     });
   } catch (error) {

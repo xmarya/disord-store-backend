@@ -10,6 +10,6 @@ export const displayReviewInHomePage = catchAsync(async (request, response, next
 
   response.status(201).json({
     success: true,
-    selectedReview,
+    data: {selectedReview},
   });
 });

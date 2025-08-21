@@ -16,7 +16,7 @@ export const createPlatformReviewController = catchAsync(async (request, respons
 
   response.status(201).json({
     success: true,
-    newReview,
+    data: {newReview},
   });
 });
 
@@ -26,7 +26,7 @@ export const getAllPlatformReviewsController = catchAsync(async (request, respon
 
   response.status(200).json({
     success: true,
-    reviews,
+    data: {reviews},
   });
 });
 
@@ -37,7 +37,7 @@ export const getOnePlatformReviewController = catchAsync(async (request, respons
 
   response.status(200).json({
     success: true,
-    review,
+    data: {review},
   });
 });
 
@@ -49,7 +49,7 @@ export const updateMyPlatformReviewController = catchAsync(async (request, respo
 
   response.status(201).json({
     success: true,
-    updatedReview,
+    data: {updatedReview},
   });
 });
 

@@ -21,7 +21,7 @@ export const createAssistantController = catchAsync(async (request, response, ne
 
   response.status(201).json({
     success: true,
-    assistant,
+    data: {assistant},
   });
 });
 
@@ -34,7 +34,7 @@ export const getAllAssistantsController = catchAsync(async (request, response, n
 
   response.status(200).json({
     success: true,
-    assistants,
+    data: {assistants},
   });
 });
 
@@ -48,7 +48,7 @@ export const getOneAssistantController = catchAsync(async (request, response, ne
 
   response.status(200).json({
     success: true,
-    assistant,
+    data: {assistant},
   });
 });
 

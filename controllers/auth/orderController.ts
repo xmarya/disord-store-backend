@@ -127,7 +127,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({
       status: "success",
       message: "Order created successfully",
-      order: orderResponse,
+      data: {order: orderResponse},
     });
   } catch (error) {
     console.error("Transaction failed:", error);
@@ -163,7 +163,7 @@ export const GetUserOrders = async (req: Request, res: Response): Promise<any> =
 
     return res.status(200).json({
       status: "success",
-      orders: formattedOrders,
+      data: {order: formattedOrders},
     });
   } catch (error) {
     HandleErrorResponse(error, res);
@@ -176,7 +176,7 @@ export const getOneOrder = catchAsync(async (request, response, next) => {
   if (!order) return next(new AppError(400, "no order was found with this orderId"));
   response.status(200).json({
     success: true,
-    order,
+    data: {order},
   });
 });
 
@@ -186,8 +186,10 @@ export const handlePaymobWebhook = async (req: Request, res: Response) => {
 
     res.status(200).json({
       status: "success",
-      order: result.orderNumber,
+      data: {
+        order: result.orderNumber,
       transaction: result.transaction_id,
+      }
     });
   } catch (error) {
     HandleErrorResponse(error, res);

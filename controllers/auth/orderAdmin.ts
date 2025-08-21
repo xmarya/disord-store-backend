@@ -14,12 +14,14 @@ export const getAllOrders = async (req: Request, res: Response) => {
     const total = await Order.countDocuments();
     res.status(200).json({
       status: "success",
-      orders,
+      data: {
+        orders,
       pagination: {
         total,
         page,
         pages: Math.ceil(total / limit),
       },
+      }
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -38,7 +40,7 @@ export const GetOrderById = async (req: Request, res: Response): Promise<any> =>
     if (!order) {
       return res.status(404).json({ status: "failed", message: "Order not found" });
     }
-    res.status(200).json({ success: true, order });
+    res.status(200).json({ success: true, data: {order} });
   } catch (error) {
     console.error("Error Order Not Found", error);
     res.status(500).json({ status: "failed", message: "Failed To Find Order" });
@@ -61,8 +63,10 @@ export const getTotalRevenue = async (req: Request, res: Response): Promise<any>
       return res.json({
         status: "success",
         fromCache: true,
-        ...cached,
+        data: {
+          ...cached,
         lastUpdated: new Date(cached.lastUpdated),
+        }
       });
     }
 
@@ -93,8 +97,10 @@ export const getTotalRevenue = async (req: Request, res: Response): Promise<any>
     res.json({
       status: "success",
       fromCache: false,
-      ...responseData,
+      data: {
+        ...responseData,
       lastUpdated: new Date(responseData.lastUpdated),
+      }
     });
   } catch (error) {
     console.error("Revenue error:", error);

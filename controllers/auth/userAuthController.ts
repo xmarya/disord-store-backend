@@ -26,7 +26,7 @@ export const getUserProfileController = catchAsync(async (request, response, nex
 
   response.status(200).json({
     success: true,
-    userProfile,
+    data: {userProfile},
   });
 });
 
@@ -40,8 +40,10 @@ export const getMySubscriptionsLogController = catchAsync(async (request, respon
 
   response.status(200).json({
     success: true,
-    currentSubscription,
-    subscriptionsLog,
+    data: {
+      currentSubscription,
+      subscriptionsLog,
+    },
   });
 });
 
@@ -79,7 +81,7 @@ export const updateUserProfileController = catchAsync(async (request, response, 
   const { result: updatedUser } = result;
   response.status(203).json({
     success: true,
-    updatedUser,
+    data: {updatedUser},
   });
 });
 

@@ -32,7 +32,7 @@ export const createCoupon = async (req: Request, res: Response): Promise<void> =
 
     res.status(201).json({
       status: "success",
-      coupon: newCoupon,
+      data: {newCoupon},
     });
   } catch (error) {
     HandleErrorResponse(error, res);
@@ -60,7 +60,7 @@ export const updateCoupon = async (req: Request, res: Response): Promise<void> =
 
     await coupon.save();
 
-    res.status(200).json({ status: "success", coupon });
+    res.status(200).json({ status: "success", data: {coupon} });
   } catch (error) {
     HandleErrorResponse(error, res);
   }
@@ -71,7 +71,7 @@ export const GetCouponById = async (req: Request, res: Response): Promise<void> 
   try {
     const coupon = await Coupon.findById(couponId);
     if (!coupon) throw new Error("Coupon not found");
-    res.status(200).json({ status: "success", coupon });
+    res.status(200).json({ status: "success", data: {coupon} });
   } catch (error) {
     HandleErrorResponse(error, res);
   }

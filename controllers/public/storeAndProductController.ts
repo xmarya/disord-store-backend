@@ -7,7 +7,7 @@ import Product from "@models/productModel";
 import Store from "@models/storeModel";
 
 export const getStoresListController = catchAsync(async (request, response, next) => {
-  const storesList = await getAllDocs(Store, request, { select: ["storeName", "logo", "description", "ranking", "ratingsAverage", "ratingsQuantity", "verified"] });
+  const storesList = await getAllDocs(Store, request.query, { select: ["storeName", "logo", "description", "ranking", "ratingsAverage", "ratingsQuantity", "verified"] });
   if (!storesList) return next(new AppError(404, "لم يتم العثور على أية متاجر"));
 
   await setCompressedCacheData(`Store:${JSON.stringify(request.query)}`, storesList, "fifteen-minutes");
@@ -15,7 +15,7 @@ export const getStoresListController = catchAsync(async (request, response, next
   response.status(200).json({
     success: true,
     result: storesList.length,
-    storesList,
+    data: {storesList},
   });
 });
 
@@ -28,7 +28,7 @@ export const getProductsListController = catchAsync(async (request, response, ne
   response.status(200).json({
     success: true,
     result: productsList.length,
-    productsList,
+    data: {productsList},
   });
 });
 
@@ -48,7 +48,6 @@ export const getStoreWithProductsController = catchAsync(async (request, respons
 
   response.status(200).json({
     success: true,
-    store,
-    products,
+    data: { store, products },
   });
 });

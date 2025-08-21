@@ -145,7 +145,7 @@ export const getOneInvoiceController = catchAsync(async (request, response, next
   const invoice = await getOneDocByFindOne(Invoice, { condition: { orderId } });
   response.status(200).json({
     success: true,
-    invoice,
+    data: {invoice},
   });
 });
 
@@ -174,6 +174,6 @@ export const testInvoiceController = catchAsync(async (request, response, next) 
 
   response.status(201).json({
     success: true,
-    data,
+    data: {invoice: data},
   });
 });

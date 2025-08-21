@@ -43,7 +43,7 @@ export const createReviewController = catchAsync(async (request, response, next)
 
   response.status(201).json({
     success: true,
-    newReview,
+    dat: {newReview},
   });
 });
 
@@ -56,7 +56,7 @@ export const getAllReviewsController = catchAsync(async (request, response, next
 
   response.status(200).json({
     success: true,
-    reviews,
+    data: {reviews},
   });
 });
 
@@ -68,8 +68,10 @@ export const getMyReviewsController = catchAsync(async (request, response, next)
 
   response.status(200).json({
     success: true,
-    reviews,
+    data: {
+      reviews,
     platformReviews,
+    }
   });
 });
 
@@ -86,6 +88,7 @@ export const updateMyReviewController = catchAsync(async (request, response, nex
 
   response.status(203).json({
     success: true,
+    data: {updatedReview}
   });
 });
 

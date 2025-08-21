@@ -24,7 +24,7 @@ export const createNewSubscribeController = catchAsync(async (request, response,
 
   response.status(203).json({
     success: true,
-    updatedUserSubscription: updatedUser?.subscribedPlanDetails,
+    data: {newSubscription: updatedUser?.subscribedPlanDetails,}
   });
 });
 
@@ -43,7 +43,7 @@ export const renewalSubscriptionController = catchAsync(async (request, response
 
   response.status(203).json({
     success: true,
-    updatedUserSubscription: updatedUser?.subscribedPlanDetails,
+    data: {updatedUserSubscription: updatedUser?.subscribedPlanDetails,}
   });
 });
 
@@ -78,11 +78,10 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
   request.isPlanPaid = false;
   request.plan = "";
 
-  // TODO: update the hash of StoreAndPlan
   await cacheStoreAndPlan(request.store, request.plan, request.isPlanPaid, request.planExpiryDate);
 
   response.status(200).json({
     success: true,
-    updatedUser,
+    data: {updatedUser},
   });
 });

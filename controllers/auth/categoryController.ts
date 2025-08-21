@@ -21,7 +21,7 @@ export const createCategoryController = catchAsync(async (request, response, nex
 
   response.status(201).json({
     success: true,
-    newCategory,
+    data: {newCategory},
   });
 });
 
@@ -32,7 +32,7 @@ export const getAllCategoriesController = catchAsync(async (request, response, n
   response.status(200).json({
     success: true,
     results: categories.length,
-    categories,
+    data: {categories},
   });
 });
 
@@ -45,7 +45,7 @@ export const getCategoryController = catchAsync(async (request, response, next) 
 
   response.status(200).json({
     success: true,
-    category,
+    data: {category},
   });
 });
 
@@ -59,7 +59,7 @@ export const updateCategoryController = catchAsync(async (request, response, nex
 
   response.status(201).json({
     success: true,
-    updatedCategory,
+    data: {updatedCategory},
   });
 });
 export const deleteCategoryController = catchAsync(async (request, response, next) => {
@@ -70,12 +70,6 @@ export const deleteCategoryController = catchAsync(async (request, response, nex
   });
 });
 
-/* OLD CODE (kept for reference): 
-export async function updateProductInCategoryController(categories: Array<CategoryBasic>, productId: MongoId, operationType: "assign" | "delete") {
-  if (operationType === "assign") await assignProductToCategory(categories, productId);
-  else deleteProductFromCategory(categories, productId);
-}
-*/
 
 export async function categoriesInCache(productId: MongoId): Promise<CategoryBasic[]> {
   let categories;
@@ -93,24 +87,3 @@ export async function categoriesInCache(productId: MongoId): Promise<CategoryBas
   return categories;
 }
 
-/* OLD CODE (kept for reference): 
-export async function updateProductInCategoryController(modelId:string, categories:Array<CategoryDocument>,  productId:MongoId, operationType: "assign" | "delete") {
-  console.log("updateProductInCategoryController", operationType);
-  const Model = await getDynamicModel<CategoryDocument>("Category", modelId);
-  if(operationType === "assign" )await assignProductToCategory(Model, categories, productId);
-  else await deleteProductFromCategory(Model, categories, productId);
-}
-export async function deleteCategoriesCollectionController (storeId:MongoId) {
-  // STEP 1) stringify the Object.id:
-  const stringifiedId = JSON.parse(JSON.stringify(storeId));
-
-  // STEP 2) check if the DyMo is existing before deletion:
-  const isExist = await isDynamicModelExist(`Category-${stringifiedId}`);
-  console.log("isexist", isExist);
-  if(!isExist) return;
-  console.log("did it return??");
-  await deleteMongoCollection(`category-${stringifiedId}`); 
-  lruCache.delete(`Product-${stringifiedId}`);
-  console.log("test lru", lruCache.get(`Category-${stringifiedId}`));
-}
-*/

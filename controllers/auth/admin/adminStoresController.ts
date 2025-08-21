@@ -16,7 +16,7 @@ export const getAllStoresInfo = catchAsync(async (request, response, next) => {
   response.status(200).json({
     success: true,
     result: storesStats.length,
-    storesStats,
+    data: {storesStats},
   });
 });
 
@@ -36,9 +36,11 @@ export const getOneStoreInfo = catchAsync(async (request, response, next) => {
 
   response.status(200).json({
     success: true,
-    store,
+    data: {
+      store,
     products,
     stats,
+    }
   });
 });
 
@@ -60,6 +62,6 @@ export const deleteStore = catchAsync(async (request, response, next) => {
   //TODO: create a new adminLog
   response.status(204).json({
     success: true,
-    deletedStore,
+    data: {deletedStore},
   });
 });

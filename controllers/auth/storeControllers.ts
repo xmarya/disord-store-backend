@@ -11,7 +11,7 @@ import { StoreOwner } from "@Types/User";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import Store from "@models/storeModel";
-import { StoreDataBody, StoreDocument } from "./@Types/Store";
+import { StoreDataBody, StoreDocument } from "@Types/Store";
 import { deleteStoreStats } from "@repositories/store/storeStatsRepo";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
@@ -25,7 +25,7 @@ export const createStoreController = catchAsync(async (request, response, next) 
 
   response.status(201).json({
     success: true,
-    newStore,
+    data: {newStore},
   });
 });
 
@@ -41,7 +41,7 @@ export const updateMyStoreController = catchAsync(async (request, response, next
 
   response.status(201).json({
     success: true,
-    updatedStore,
+    data: {updatedStore},
   });
 });
 
@@ -58,7 +58,7 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
 
   response.status(201).json({
     success: true,
-    updatedStore,
+    data: {updatedStore},
   });
 });
 
@@ -101,11 +101,10 @@ export async function deleteStorePermanently(storeId: MongoId, session: mongoose
 
 export const getMyStoreController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
-  // const { store } = await getStoreWithProducts(storeId);
   const store = await getOneDocById(Store, storeId);
 
   response.status(200).json({
     success: true,
-    store,
+    data: {store},
   });
 });

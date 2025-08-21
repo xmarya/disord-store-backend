@@ -10,6 +10,16 @@ import jwtSignature from "@utils/jwtToken/generateSignature";
 import jwtVerify from "@utils/jwtToken/jwtVerify";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 
+
+export const noOTPLogin = catchAsync(async (request, response, next) => {
+
+  const token = jwtSignature("68a33f1fd8d6fe6df8bfe713", "1h");
+  tokenWithCookies(response, token);
+
+  response.status(200).json({
+    success: true
+  });
+});
 export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
   catchAsync(async (request, response, next) => {
     const { firstName, lastName, email, password } = request.body;
@@ -20,7 +30,7 @@ export const createNewUserController = (userType: Extract<UserTypes, "user" | "s
     response.status(201).json({
       success: true,
       message: "new user has been created successfully",
-      newUser,
+      data: {newUser},
     });
   });
 
@@ -88,7 +98,7 @@ export const sendOTP = catchAsync(async (request, response, next) => {
   response.status(200).json({
     success: true,
     message: `${message} to ${Object.values(request.loginMethod)[0]}`,
-    temporeToken,
+    data: {temporeToken},
   });
 });
 
@@ -132,6 +142,6 @@ export const createNewDiscordUserController = catchAsync(async (request, respons
   response.status(201).json({
     success: true,
     message: "new user has been created successfully",
-    newDiscordUser,
+    data: {newDiscordUser},
   });
 });

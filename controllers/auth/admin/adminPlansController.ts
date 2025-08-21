@@ -11,7 +11,7 @@ export const getAllPlanController = catchAsync(async (request, response, next) =
 
   response.status(200).json({
     success: true,
-    plans,
+    data: {plans},
   });
 });
 
@@ -21,7 +21,7 @@ export const getPlanController = catchAsync(async (request, response, next) => {
   if (!plan) return next(new AppError(404, "no plan was found with this id"));
   response.status(200).json({
     success: true,
-    plan,
+    data: {plan},
   });
 });
 
@@ -39,7 +39,7 @@ export const updatePlanController = catchAsync(async (request, response, next) =
 
   response.status(201).json({
     success: true,
-    updatedPlan,
+    data: {updatedPlan},
   });
 });
 
@@ -51,7 +51,7 @@ export const getMonthlyPlansStatsController = catchAsync(async (request, respons
 
   response.status(200).json({
     success: true,
-    allPlansStats,
+    data: {allPlansStats},
   });
 });
 
@@ -63,6 +63,6 @@ export const getPlansStatsReportController = catchAsync(async (request, response
 
   response.status(200).json({
     success: true,
-    reports,
+    data: {reports},
   });
 });

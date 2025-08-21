@@ -25,7 +25,7 @@ export const createProductController = catchAsync(async (request, response, next
 
   response.status(201).json({
     success: true,
-    newProd,
+    data: {newProd},
   });
 });
 
@@ -38,7 +38,7 @@ export const getOneProductController = catchAsync(async (request, response, next
 
   response.status(200).json({
     success: true,
-    product,
+    data: {product},
   });
 });
 
@@ -50,15 +50,6 @@ export const updateProductController = catchAsync(async (request, response, next
 
   const productId = request.params.productId;
 
-  /* OLD CODE (kept for reference): 
-    if (categories && categories.length !== 0) {
-      const [_, modelId] = request.Model.modelName.split("-");
-      await updateProductInCategoryController(modelId, categories, productId, "assign");
-      updatedProduct = await updateProduct(request.Model, productId, request.body); 
-      }
-    else updatedProduct = await updateDoc(request.Model, productId, request.body);
-  */
-
   const updatedProduct = await updateProduct(request.store, productId, request.body);
   if (!updatedProduct) return next(new AppError(400, "تأكد من صحة البيانات"));
 
@@ -69,7 +60,7 @@ export const updateProductController = catchAsync(async (request, response, next
 
   response.status(203).json({
     success: true,
-    updatedProduct,
+    data: {updatedProduct},
   });
 });
 
@@ -92,23 +83,7 @@ export const deleteProductController = catchAsync(async (request, response, next
 
   response.status(204).json({
     success: true,
-    result /*REQUIRES TESTING */,
+    data: {result},
   });
 });
 
-/* OLD CODE (kept for reference): 
-export async function deleteProductsCollectionController(storeId:MongoId) {
-  console.log("storeId for delete", storeId);
-  // 1) stringify the Object.id:
-  const stringifiedId = JSON.parse(JSON.stringify(storeId));
-  
-  // 2) check if the DyMo is existing before deletion:
-  const isExist = await isDynamicModelExist(`Product-${stringifiedId}`);
-  
-  if (!isExist) return;
-  console.log("did it return??");
-  await deleteMongoCollection(`product-${stringifiedId}`);
-  lruCache.delete(`Product-${stringifiedId}`);
-  console.log("test lru", lruCache.get(`Product-${stringifiedId}`));
-}
-*/

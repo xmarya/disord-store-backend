@@ -1,11 +1,3 @@
-/*
-    1- accept the invoice data
-    2- handle it per store
-    3- check the redis if the hash of profits:storeId exists
-        yes? get the hash, increment/decrement the value, return it to the user
-        no? create a new hash
-    **after storeowner login, get the store profits, cache
-*/
 
 import { startSession } from "mongoose";
 import { getOneStoreStats, updateStoreStats } from "@repositories/store/storeStatsRepo";
@@ -58,7 +50,7 @@ export const getStoreStatsController = catchAsync(async (request, response, next
 
   response.status(200).json({
     success: true,
-    stats,
+    data: {stats},
   });
 
   /* the response => 
