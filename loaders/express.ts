@@ -6,7 +6,7 @@ import mongoSanitize from "express-mongo-sanitize";
 import ratelimit from "express-rate-limit";
 
 export default async function expressLoader(app: Application) {
-  app.set("trust proxy", true);
+  // app.set("trust proxy", true);
   const limiter = ratelimit({
     max: 100, // #requests per hour.
     windowMs: 60 * 60 * 100, // the calculation of 1 hour.
@@ -28,5 +28,5 @@ export default async function expressLoader(app: Application) {
   app.use(express.urlencoded({ limit: "1.5mb", extended: true })); // parsing HTML for submission (extended:true to allow nested objects)
   app.use(cookieParser()); // the above line parsers the data from the body, this line parses the data from the cookies .
   app.use(mongoSanitize());
-  app.use(cors());
+  app.use(cors({credentials:true}));
 };
