@@ -8,6 +8,8 @@
     "@models/*": "./models/*",
     "@services/*": "./_services/*",
     "@routers/*": "./_routers/*",
+    "@loaders/*": "./loaders/*",
+    "@eventSubscribers/*": "./eventSubscribers/*",
     "@repositories/*": "./_repositories/*",
     "@middlewares/*": "./_middlewares/*",
     "@utils/*": "./_utils/*",
