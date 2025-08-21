@@ -1,4 +1,5 @@
 import nodeExternals from "webpack-node-externals";
+import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin";
 
 const config = {
   mode: "production",
@@ -8,6 +9,7 @@ const config = {
   },
   resolve: {
     extensions: [".webpack.js", ".web.js", ".ts", ".js"],
+    plugins: [new TsconfigPathsPlugin()],
   },
   module: {
     rules: [{ test: /\.ts$/, loader: "ts-loader" }],
