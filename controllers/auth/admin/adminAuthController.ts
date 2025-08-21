@@ -1,14 +1,15 @@
-import { getOneDocByFindOne, getOneDocById, updateDoc } from "@repositories/global";
+import Admin from "@models/adminModel";
+import { getOneDocById } from "@repositories/global";
+import getAdminProfile from "@services/adminServices/getAdminProfile";
+import updateAdmin from "@services/adminServices/updateAdmin";
 import { AppError } from "@utils/AppError";
-import cacheUser from "../../../externals/redis/cacheControllers/user";
 import { catchAsync } from "@utils/catchAsync";
+import isErr from "@utils/isErr";
 import jwtSignature from "@utils/jwtToken/generateSignature";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
-import novuUpdateSubscriber from "../../../externals/novu/subscribers/updateSubscriber";
 import { comparePasswords } from "@utils/passwords/comparePasswords";
-import Admin from "@models/adminModel";
 
-export const confirmAdminChangePassword = catchAsync(async (request, response, next) => {
+export const confirmAdminChangePasswordController = catchAsync(async (request, response, next) => {
   const adminId = request.user.id;
   const { currentPassword, newPassword } = request.body;
   const admin = await getOneDocById(Admin, adminId, { select: ["credentials"] });
@@ -31,38 +32,35 @@ export const confirmAdminChangePassword = catchAsync(async (request, response, n
   });
 });
 
-export const getAdminProfile = catchAsync(async (request, response, next) => {
+export const getAdminProfileController = catchAsync(async (request, response, next) => {
   const adminId = request.user.id;
-  const adminProfile = await getOneDocById(Admin, adminId, { select: ["firstName", "lastName", "email", "image"] });
+  const result = await getAdminProfile(adminId);
 
-  if (!adminProfile) return next(new AppError(404, "لم يتم العثور على بيانات المستخدم"));
+  if(!result.ok) {
+    const statusCode = result.reason === "not-found" ? 404 : 500;
+    return next(new AppError(statusCode, `${result.reason}: ${result.message}`))
+  }
 
+  const {result: adminProfile} = result;
   response.status(200).json({
     success: true,
-    data: {adminProfile},
+    data: { adminProfile },
   });
 });
-export const updateAdminProfile = catchAsync(async (request, response, next) => {
+export const updateAdminProfileController = catchAsync(async (request, response, next) => {
   const adminId = request.user.id;
-  const { email, firstName, lastName } = request.body;
+  const result = await updateAdmin(adminId, request.body);
 
-  if (email) {
-    const isEmailExist = await getOneDocByFindOne(Admin, { condition: { email } }); /*✅*/
+  if(isErr(result)) return next(new AppError(400, result.error));
 
-    if (isEmailExist) return next(new AppError(400, "لا يمكن استخدام هذا البريد الإلكتروني"));
+  if(!result.ok) {
+    const statusCode = result.reason === "not-found" ? 404 : 500;
+    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
   }
 
-  if (firstName?.trim() === "" && lastName?.trim() === "") return next(new AppError(400, "الرجاء تعبئة حقول الاسم بالكامل"));
-
-  const updatedAdmin = await updateDoc(Admin, adminId, request.body);
-
-  if (updatedAdmin) {
-    await cacheUser(updatedAdmin);
-    await novuUpdateSubscriber(adminId, updatedAdmin);
-  }
-
+  const {result: updatedAdmin} = result;
   response.status(201).json({
     success: true,
-    data: {updatedAdmin},
+    data: { updatedAdmin },
   });
 });

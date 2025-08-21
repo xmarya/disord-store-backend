@@ -6,7 +6,7 @@ import { validateChangePassword } from "../../middlewares/validators/validateCha
 import validateNewUserData from "../../middlewares/validators/validateNewUserData";
 import validateRequestParams from "../../middlewares/validators/validateRequestParams";
 import validateUnlimitedUserData from "../../middlewares/validators/validateUnlimitedUserData";
-import { confirmAdminChangePassword, getAdminProfile, updateAdminProfile } from "../../controllers/auth/admin/adminAuthController";
+import { confirmAdminChangePasswordController, getAdminProfileController, updateAdminProfileController } from "../../controllers/auth/admin/adminAuthController";
 import { getAllPlanController, getMonthlyPlansStatsController, getPlanController, getPlansStatsReportController, updatePlanController } from "../../controllers/auth/admin/adminPlansController";
 import { displayReviewInHomePage } from "../../controllers/auth/admin/adminReviewsController";
 import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
@@ -17,9 +17,9 @@ import { deleteUserAccountController } from "../../controllers/auth/userAuthCont
 export const router = express.Router();
 
 router.use(restrict("admin"));
-router.route("/").get(getAdminProfile).patch(updateAdminProfile); /*✅*/
+router.route("/").get(getAdminProfileController).patch(updateAdminProfileController); /*✅*/
 router.post("/administratorUser", sanitisedData, validateNewUserData, createAdminController); /*✅*/
-router.route("/changePassword").patch(validateChangePassword, confirmAdminChangePassword); /*✅*/
+router.route("/changePassword").patch(validateChangePassword, confirmAdminChangePasswordController); /*✅*/
 
 /* STORES 
     1- patch route for suspend store

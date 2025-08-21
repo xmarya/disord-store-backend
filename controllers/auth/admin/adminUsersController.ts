@@ -1,29 +1,24 @@
-import Admin from "@models/adminModel";
 import Plan from "@models/planModel";
-import { createDoc, updateDoc } from "@repositories/global";
+import { updateDoc } from "@repositories/global";
 import { createUnlimitedPlan, updatePlanMonthlyStats } from "@repositories/plan/planRepo";
 import { createNewUnlimitedUser } from "@repositories/user/userRepo";
+import createNewAdmin from "@services/adminServices/createNewAdmin";
+import getAllUsersForAdmin from "@services/adminServices/getAllUsersForAdmin";
+import getOneUserForAdmin from "@services/adminServices/getOneUserForAdmin";
 import { MongoId } from "@Types/MongoId";
 import { UnlimitedPlanDataBody } from "@Types/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
 import { addDays } from "date-fns";
 import { startSession } from "mongoose";
 import { SUBSCRIPTION_PERIOD } from "../../../_constants/ttl";
-import novuSendWelcome from "../../../externals/novu/workflowTriggers/welcomeEmail";
-import getAllUsersForAdmin from "@services/adminServices/getAllUsersForAdmin";
-import getOneUserForAdmin from "@services/adminServices/getOneUserForAdmin";
 
 export const createAdminController = catchAsync(async (request, response, next) => {
-  const data = { ...request.body, credentials: { password: request.body.password } };
-  const admin = await createDoc(Admin, data);
-
-  const confirmUrl = await generateEmailConfirmationToken(admin, request);
-  await novuSendWelcome("welcome-admin", admin, confirmUrl);
+  await createNewAdmin(request.body, { hostname: request.hostname, protocol: request.protocol });
 
   response.status(201).json({
     success: true,
+    message: "a new admin was successfully created"
   });
 });
 
