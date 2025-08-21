@@ -24,8 +24,10 @@ export const forgetPassword = (Model: Extract<Model, "Admin" | "User">) =>
     //STEP 3) return the GRT to the front-end to send it vie email using Resend:
     response.status(200).json({
       success: true,
-      randomToken,
-      resetURL,
       message: "You will receive the password reset token to your email if it is stored in our records.make sure to look into the junk folder in your email",
+      data: {
+        randomToken,
+        resetURL,
+      },
     });
   });

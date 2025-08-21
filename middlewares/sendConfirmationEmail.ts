@@ -19,6 +19,6 @@ export const sendConfirmationEmail = catchAsync(async (request, response, next) 
 
   response.status(200).json({
     success: true,
-    confirmUrl,
+    data: {confirmUrl},
   });
 });
