@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import type { Request } from "express";
 import { QueryOptions } from "@Types/QueryOptions";
 import { MongoId } from "@Types/MongoId";
 import { buildQuery } from "@utils/queryModifiers/buildRequestQuery";
@@ -18,45 +17,25 @@ export async function createDoc<T extends mongoose.Document>(Model: mongoose.Mod
 }
 
 export async function getAllDocs<T extends mongoose.Document>(Model: mongoose.Model<T>, query: QueryParams, options?:QueryOptions<T>): Promise<T[]> {
-  const formattedQuery = buildQuery(query, Model); /*✅*/
+  const formattedQuery = buildQuery(query, Model, options?.select);
 
-  const fields = options?.select ? options.select.join(" ") : ""; /*✅*/
   const filter = options?.condition ?? {};
 
-  const docs = await formattedQuery.find(filter).select(fields);
-  // return Array.isArray(docs) ? docs : [];
+  const docs = await formattedQuery.find(filter);
   return docs;
 }
 export async function getOneDocById<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, options?:QueryOptions<T>): Promise<T | null> {
-  // console.log("getOneDocById", Model);
-  const fields = options?.select ? options.select.join(" ") : "";/*✅*/
+  const fields = options?.select ? options.select.join(" ") : "";
   const session = options?.session ?? null;
   const doc = await Model.findById(id).select(fields).session(session);
   return doc;
 }
 
 export async function getOneDocByFindOne<T extends mongoose.Document>(Model:mongoose.Model<T>, options?:QueryOptions<T>):Promise<T | null> {
-  const fields = options?.select ? options.select.join(" ") : ""; /*✅*/
-  // console.log("options?.condition!", options?.condition!);
+  const fields = options?.select ? options.select.join(" ") : "";
   const doc = await Model.findOne(options?.condition!, fields);
   return doc;
 }
-// export async function updateDoc<T extends mongoose.Document>(
-//   Model: mongoose.Model<T>,
-//   id: MongoId,
-//   data: any,
-//   updateOptions: { locals?: any; session?: mongoose.ClientSession } = {}
-// ): Promise<T | null> {
-//   /* OLD CODE (kept for reference): 
-//   const updatedDoc = await Model.findByIdAndUpdate(id, data).setOptions(locals);
-//   */
-//  console.log("updateDoc service");
-//   const { locals, session } = updateOptions;
-//   const query = Model.findByIdAndUpdate(id, data, { runValidators: true, new: true, session });
-//   if (locals) query.setOptions(locals); 
-//   const updatedDoc = await query;
-//   return updatedDoc;
-// }
 
 export async function updateDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, id: MongoId, data: any, options?:QueryOptions<T>): Promise<T | null> {
   const session = options?.session ?? null;
@@ -74,10 +53,4 @@ export async function isExist<T extends mongoose.Document>(Model: mongoose.Model
   return !!result;
 }
 
-/* OLD CODE (kept for reference): 
-export async function deleteMongoCollection(collection: string) {
-  console.log("deleteProductsCollection", collection);
-  await mongoose.connection.db?.dropCollection(collection);
-}
-   */
 

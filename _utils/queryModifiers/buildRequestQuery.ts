@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 import { DOCS_PER_PAGE } from "../../_constants/numbers";
 import { QueryParams } from "@Types/Request";
+import { QueryOptions } from "@Types/QueryOptions";
 
 
-export function buildQuery<T extends mongoose.Document>(requestQuery: QueryParams, Model: mongoose.Model<T>) {
+export function buildQuery<T extends mongoose.Document>(requestQuery: QueryParams, Model: mongoose.Model<T>, internalAppSelect?:QueryOptions<T>["select"]) {
   // STEP 1) convert the query from JSON object to a normal JavaScript object in order to manipulate it:
   const rawQuery = { ...requestQuery };
   let stringifiedQuery: any = JSON.stringify(rawQuery);
@@ -21,14 +22,18 @@ export function buildQuery<T extends mongoose.Document>(requestQuery: QueryParam
   }
 
   // STEP 4) LIMITING FIELDS:
-  if (typeof requestQuery.fields === "string") {
+  if (typeof requestQuery.fields === "string" && !internalAppSelect) {
     const limitFields = requestQuery.fields?.split(",").join(" ");
     console.log("limitFields", limitFields);
-    query.select(limitFields); //FIX doesn't works
+    query.select(limitFields);
+  }
+
+  if(internalAppSelect) {
+    const fields = internalAppSelect.join(" ");
+    query.select(fields);
   }
 
   // STEP 5) PAGINATION AND LIMITATION:
-
   const page = +(requestQuery.page ?? 1);
   const limitResultPerPage = +(requestQuery?.limit ?? DOCS_PER_PAGE);
   // if I want page 3 (from element 31 - 46),
