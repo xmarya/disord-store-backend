@@ -1,3 +1,3 @@
-import "_subscribers/userEvents/userCreated";
-import "_subscribers/userEvents/userUpdated";
-import "_subscribers/userEvents/userDeleted";
+import "@eventSubscribers/userEvents/userCreated";
+import "@eventSubscribers/userEvents/userUpdated";
+import "@eventSubscribers/userEvents/userDeleted";

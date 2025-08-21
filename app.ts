@@ -1,9 +1,9 @@
-import express, { ErrorRequestHandler } from "express";
 import { dbStartConnection } from "@config/db";
-import routerLoader from "loaders/routers";
-import expressLoader from "loaders/express";
-import initiateBullMQJobs from "loaders/bullmqJobs";
-import "loaders/subscribers";
+import initiateBullMQJobs from "@loaders/bullmqJobs";
+import expressLoader from "@loaders/express";
+import routerLoader from "@loaders/routers";
+import express from "express";
+
 
 const app = express();
 async function startApp() {
