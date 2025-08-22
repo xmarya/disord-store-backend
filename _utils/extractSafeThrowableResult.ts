@@ -1,11 +1,11 @@
 import { ResultAsync } from "neverthrow";
 
-type SafeThrowableResult<T> = { ok: true; result: T } | { ok: false; reason: "not-found"; message:"couldn't find the specific resource"  } | { ok: false; reason: "error"; message: string };
+type SafeThrowableResult<T> = { ok: true; result: T } | { ok: false; reason: "not-found"; message:"لا يوجد بيانات لعرضها"  } | { ok: false; reason: "error"; message: string };
 
 function extractSafeThrowableResult<T>(safeResult: () => ResultAsync<T | null, Error>) {
   const result = safeResult().match<SafeThrowableResult<T>>(
     (result) => {
-      if (!result) return { ok: false, reason: "not-found", message: `couldn't find the specific resource` };
+      if (!result) return { ok: false, reason: "not-found", message: "لا يوجد بيانات لعرضها" };
       return { ok: true, result };
     },
     (error) => {
