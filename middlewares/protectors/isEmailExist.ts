@@ -1,17 +1,17 @@
-import { NextFunction } from "express";
-import { isExist } from "@repositories/global";
-import User from "@models/userModel";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
+import emailChecker from "@services/_sharedServices/emailChecker";
+import isErr from "@utils/isErr";
 
 const isEmailExist = catchAsync(async (request, response, next) => {
   let { email } = request.body;
-  if (!email) return next();
+  if (!email?.trim()) return next();
 
-  email = email.trim();
+  const result = await emailChecker(request.user.id, request.user.userType, email.trim());
 
-  const emailExists = await isExist(User, { email, id: { $ne: request.user.id } });
-  if (emailExists) return next(new AppError(400, "لا يمكن استخدام هذا البريد الإلكتروني"));
+  if(isErr(result)) return next(new AppError(400, result.error));
+
+  next();
 });
 
 export default isEmailExist;

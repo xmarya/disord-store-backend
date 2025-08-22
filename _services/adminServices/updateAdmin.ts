@@ -10,12 +10,6 @@ import { err } from "neverthrow";
 async function updateAdmin(adminId: string, updatedData: Partial<AdminDocument>) {
   const { email, firstName, lastName, image, phoneNumber } = updatedData;
 
-  //   if (email) {
-  //     const isEmailExist = await getOneDocByFindOne(Admin, { condition: { email } }); /*✅*/
-
-  //     if (isEmailExist) return next(new AppError(400, "لا يمكن استخدام هذا البريد الإلكتروني"));
-  //   }
-
   if (firstName?.trim() === "" || lastName?.trim() === "") return err("الرجاء تعبئة حقول الاسم بالكامل");
 
   const safeUpdatedAdmin = safeThrowable(
