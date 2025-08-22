@@ -128,6 +128,9 @@ export const verifyOTP = catchAsync(async (request, response, next) => {
   response.status(200).json({
     success: status,
     message: message,
+    data: {
+      token /* CHANGE LATER: this is in the body for testing purposes */
+    }
   });
 });
 

@@ -7,7 +7,6 @@ import { UserDocument } from "@Types/User";
 import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
 
 async function createNewUser(signupData: CredentialsSignupData, emailTokenGenerator: { hostname: string; protocol: string }) {
-    console.log(createNewUser);
   const { firstName, lastName, email, password, userType } = signupData;
   const data = { firstName, lastName, email, signMethod: "credentials", userType, credentials: { password } };
 
@@ -23,13 +22,10 @@ async function createNewUser(signupData: CredentialsSignupData, emailTokenGenera
 
   eventBus.publish(event);
 
-  console.log("newuser before", newUser.credentials.emailConfirmationToken);
-
   newUser.credentials!.password = "";
   newUser.credentials!.emailConfirmationToken = "";
   newUser.credentials!.emailConfirmationExpires = null;
 
-  console.log("newuser after", newUser.credentials.emailConfirmationToken);
   return newUser;
 }
 

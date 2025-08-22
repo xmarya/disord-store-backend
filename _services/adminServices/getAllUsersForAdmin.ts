@@ -5,7 +5,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 
-async function getAllUsers(query: QueryParams) {
+async function getAllUsersForAdmin(query: QueryParams) {
   const safeGetAllUsers = safeThrowable(
     () => getAllDocs(User, query ,{ select: ["firstName", "lastName", "email", "image", "userType"] }),
     () => new Error("something went wrong. please try again")
@@ -16,4 +16,4 @@ async function getAllUsers(query: QueryParams) {
   return formattedResult;
 }
 
-export default getAllUsers; 
+export default getAllUsersForAdmin; 

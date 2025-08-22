@@ -3,7 +3,7 @@ import { getOneDocById } from "@repositories/global";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-async function getOneUser(userId: string) {
+async function getOneUserForAdmin(userId: string) {
   const safeGetOneUser = safeThrowable(
     () => getOneDocById(User, userId),
     () => new Error("something went wrong. please try again")
@@ -14,4 +14,4 @@ async function getOneUser(userId: string) {
   return formattedResult;
 }
 
-export default getOneUser;
+export default getOneUserForAdmin;

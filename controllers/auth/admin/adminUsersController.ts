@@ -1,29 +1,24 @@
-import Admin from "@models/adminModel";
 import Plan from "@models/planModel";
-import { createDoc, updateDoc } from "@repositories/global";
+import { updateDoc } from "@repositories/global";
 import { createUnlimitedPlan, updatePlanMonthlyStats } from "@repositories/plan/planRepo";
 import { createNewUnlimitedUser } from "@repositories/user/userRepo";
-import getAllUsers from "@services/adminServices/getAllUsers";
-import getOneUser from "@services/adminServices/getOneUser";
+import createNewAdmin from "@services/adminServices/createNewAdmin";
+import getAllUsersForAdmin from "@services/adminServices/getAllUsersForAdmin";
+import getOneUserForAdmin from "@services/adminServices/getOneUserForAdmin";
 import { MongoId } from "@Types/MongoId";
 import { UnlimitedPlanDataBody } from "@Types/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
 import { addDays } from "date-fns";
 import { startSession } from "mongoose";
 import { SUBSCRIPTION_PERIOD } from "../../../_constants/ttl";
-import novuSendWelcome from "../../../externals/novu/workflowTriggers/welcomeEmail";
 
 export const createAdminController = catchAsync(async (request, response, next) => {
-  const data = { ...request.body, credentials: { password: request.body.password } };
-  const admin = await createDoc(Admin, data);
-
-  const confirmUrl = await generateEmailConfirmationToken(admin, request);
-  await novuSendWelcome("welcome-admin", admin, confirmUrl);
+  await createNewAdmin(request.body, { hostname: request.hostname, protocol: request.protocol });
 
   response.status(201).json({
     success: true,
+    message: "a new admin was successfully created"
   });
 });
 
@@ -80,9 +75,9 @@ export const createUnlimitedUserController = catchAsync(async (request, response
       success: true,
       data: {
         email: newUser.email,
-      subscribedPlanDetails: newUser.subscribedPlanDetails,
-      invoiceLink,
-      }
+        subscribedPlanDetails: newUser.subscribedPlanDetails,
+        invoiceLink,
+      },
     });
   } catch (error) {
     console.log(error);
@@ -94,8 +89,8 @@ export const createUnlimitedUserController = catchAsync(async (request, response
 });
 
 export const getAllUsersController = catchAsync(async (request, response, next) => {
-  const {query} = request;
-  const result = await getAllUsers(query);
+  const { query } = request;
+  const result = await getAllUsersForAdmin(query);
   if (!result.ok) {
     const statusCode = result.reason === "not-found" ? 404 : 500;
     return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
@@ -104,18 +99,21 @@ export const getAllUsersController = catchAsync(async (request, response, next) 
   const { result: users } = result;
   response.status(200).json({
     success: true,
-    data: {users},
+    data: { users },
   });
 });
 
 export const getOneUserController = catchAsync(async (request, response, next) => {
   const { userId } = request.params;
-  const result = await getOneUser(userId);
-  if (!result.ok) return next(new AppError(404, `${result.reason}: ${result.message}`));
+  const result = await getOneUserForAdmin(userId);
+  if (!result.ok) {
+    const statusCode = result.reason === "not-found" ? 404 : 500;
+    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
+  }
 
   const { result: user } = result;
   response.status(200).json({
     success: true,
-    data: {user},
+    data: { user },
   });
 });
