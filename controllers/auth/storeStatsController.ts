@@ -30,7 +30,7 @@ export async function updateStoreStatsController(data: Pick<InvoiceDataBody, "pr
   } catch (error) {
     await session.abortTransaction();
     console.log(error);
-    return new AppError(500, "something went wrong, please try again");
+    return new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا");
   } finally {
     await session.endSession();
   }

@@ -9,12 +9,12 @@ async function getAdminProfile(adminId: string) {
   const fields: QueryOptions<AdminDocument>["select"] = ["firstName", "lastName", "email", "image"];
   const safeGetAdminProfile = safeThrowable(
     () => getOneDocById(Admin, adminId, { select: fields }),
-    () => new Error("something went wrong, please try again")
+    () => new Error("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
   );
 
   const adminProfile = await extractSafeThrowableResult(() => safeGetAdminProfile);
 
-  return adminProfile
+  return adminProfile;
 }
 
 export default getAdminProfile;

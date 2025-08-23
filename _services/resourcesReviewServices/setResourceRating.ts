@@ -15,7 +15,7 @@ async function setResourceRating(Model: Extract<Model, "Store" | "Product">, res
     await session.commitTransaction();
   } catch (error) {
     await session.abortTransaction();
-    err("something went wrong, please try again");
+    err("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
   } finally {
     await session.endSession();
   }

@@ -16,7 +16,7 @@ async function updateUser(userId: string, updatedData: Partial<UserDocument>) {
 
   const safeUpdateUser = safeThrowable(
     () => updateDoc(User, userId, { firstName, lastName, image }),
-    () => new Error("something went wrong. please try again")
+    () => new Error("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
   );
 
   const extractedResult = await extractSafeThrowableResult<UserDocument>(() => safeUpdateUser);

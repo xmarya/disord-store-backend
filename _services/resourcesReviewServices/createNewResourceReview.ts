@@ -9,7 +9,7 @@ async function createNewResourceReview(data: ReviewDataBody) {
   const { storeOrProduct, reviewedResourceId } = data;
   const safeCreateReview = safeThrowable(
     () => createDoc(Review, data),
-    () => new Error("something went wrong, please try again")
+    () => new Error("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
   );
   const newReview = await extractSafeThrowableResult(() => safeCreateReview);
 

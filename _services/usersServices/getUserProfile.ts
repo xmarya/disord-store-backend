@@ -11,7 +11,7 @@ async function getUserProfile(userId: string) {
 
   const safeGetProfile = safeThrowable(
     () => getOneDocById(User, userId, { select: queryFields }),
-    () => new Error("something went wrong. please try again")
+    () => new Error("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
   );
 
   const extractedResult = await extractSafeThrowableResult<UserDocument>(() => safeGetProfile);

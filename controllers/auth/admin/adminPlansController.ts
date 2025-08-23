@@ -35,7 +35,7 @@ export const updatePlanController = catchAsync(async (request, response, next) =
   if (!planName?.trim() && !price && !discount && !features.length && !quota) return next(new AppError(400, "no data was provided to update"));
 
   const updatedPlan = await updateDoc(Plan, request.params.planId, request.body);
-  if (!updatedPlan) return next(new AppError(500, "something went wrong, pleas try again"));
+  if (!updatedPlan) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
 
   response.status(201).json({
     success: true,
@@ -59,7 +59,7 @@ export const getPlansStatsReportController = catchAsync(async (request, response
   const { sortBy, sortOrder, year } = request.body;
   const reports = await getPlansStatsReport(sortBy, sortOrder, year);
 
-  if (!reports) return next(new AppError(500, "something went wrong, try again later"));
+  if (!reports) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
 
   response.status(200).json({
     success: true,

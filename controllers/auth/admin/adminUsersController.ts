@@ -82,7 +82,7 @@ export const createUnlimitedUserController = catchAsync(async (request, response
   } catch (error) {
     console.log(error);
     await session.abortTransaction();
-    throw new AppError(500, "something went wrong, Please try again.");
+    throw new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا");
   } finally {
     await session.endSession();
   }

@@ -14,17 +14,17 @@ async function updateAdmin(adminId: string, updatedData: Partial<AdminDocument>)
 
   const safeUpdatedAdmin = safeThrowable(
     () => updateDoc(Admin, adminId, { email, firstName, lastName, image, phoneNumber }),
-    () => new Error("something went wrong, please try again")
+    () => new Error("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
   );
 
   const updatedAdmin = await extractSafeThrowableResult(() => safeUpdatedAdmin);
 
   if (updatedAdmin.ok) {
-    const event:UserUpdatedEvent = {
-        type: "user.updated",
-        payload: {user: updatedAdmin.result},
-        occurredAt: new Date(),
-    }
+    const event: UserUpdatedEvent = {
+      type: "user.updated",
+      payload: { user: updatedAdmin.result },
+      occurredAt: new Date(),
+    };
 
     eventBus.publish(event);
   }

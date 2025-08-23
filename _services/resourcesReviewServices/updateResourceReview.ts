@@ -8,7 +8,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 async function updateResourceReview(reviewId: string, updatedDate: Partial<ReviewDataBody>) {
   const safeUpdateReview = safeThrowable(
     () => updateDoc(Review, reviewId, updatedDate),
-    () => new Error("something went wrong, please try again")
+    () => new Error("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
   );
   const updatedReview = await extractSafeThrowableResult(() => safeUpdateReview);
   if (updatedReview.ok) await setResourceRating(updatedReview.result.storeOrProduct, updatedReview.result.reviewedResourceId);

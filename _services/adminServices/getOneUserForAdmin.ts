@@ -6,7 +6,7 @@ import safeThrowable from "@utils/safeThrowable";
 async function getOneUserForAdmin(userId: string) {
   const safeGetOneUser = safeThrowable(
     () => getOneDocById(User, userId),
-    () => new Error("something went wrong. please try again")
+    () => new Error("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
   );
 
   const formattedResult = await extractSafeThrowableResult(() => safeGetOneUser);
