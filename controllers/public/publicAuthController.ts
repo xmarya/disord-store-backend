@@ -1,4 +1,6 @@
 import authentica from "@config/authentica";
+import User from "@models/userModel";
+import { getOneDocByFindOne } from "@repositories/global";
 import createNewDiscordUser from "@services/usersServices/createNewDiscordUser";
 import createNewUser from "@services/usersServices/createNewUser";
 import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/AuthenticaOTP";
@@ -9,17 +11,32 @@ import { catchAsync } from "@utils/catchAsync";
 import jwtSignature from "@utils/jwtToken/generateSignature";
 import jwtVerify from "@utils/jwtToken/jwtVerify";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
+import { comparePasswords } from "@utils/passwords/comparePasswords";
 
 
 export const noOTPLogin = catchAsync(async (request, response, next) => {
+  /*✅*/
+  // STEP 1) getting the provided email and password from the request body to check the email:
+  const { email, password } = request.body;
 
-  const token = jwtSignature("68a33f1fd8d6fe6df8bfe713", "1h");
+  if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
+
+  const user = await getOneDocByFindOne(User, { condition: { email }, select: ["credentials"] });
+  if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
+
+  // STEP 2) checking the password:
+  if (!(await comparePasswords(password, user.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
+
+  //STEP 3) create the token:
+  const token = jwtSignature(user.id, "1h");
   tokenWithCookies(response, token);
 
   response.status(200).json({
-    success: true
+    success: true,
+    token,
   });
 });
+
 export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
   catchAsync(async (request, response, next) => {
     const { firstName, lastName, email, password } = request.body;
