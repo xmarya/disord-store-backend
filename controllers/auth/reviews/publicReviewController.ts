@@ -25,7 +25,7 @@ export const createReviewController = catchAsync(async (request, response, next)
 
   response.status(201).json({
     success: true,
-    dat: { newReview },
+    data: { newReview },
   });
 });
 
