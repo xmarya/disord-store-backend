@@ -6,7 +6,7 @@ import { validateChangePassword } from "../../middlewares/validators/validateCha
 import validateNewUserData from "../../middlewares/validators/validateNewUserData";
 import validateRequestParams from "../../middlewares/validators/validateRequestParams";
 import validateUnlimitedUserData from "../../middlewares/validators/validateUnlimitedUserData";
-import { confirmAdminChangePasswordController, getAdminProfileController, updateAdminProfileController } from "../../controllers/auth/admin/adminAuthController";
+import {getAdminProfileController } from "../../controllers/auth/admin/adminAuthController";
 import { getAllPlanController, getMonthlyPlansStatsController, getPlanController, getPlansStatsReportController, updatePlanController } from "../../controllers/auth/admin/adminPlansController";
 import { displayReviewInHomePage } from "../../controllers/auth/admin/adminReviewsController";
 import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
@@ -14,13 +14,14 @@ import { createAdminController, createUnlimitedUserController, getAllUsersContro
 import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviews/platformReviewController";
 import { deleteUserAccountController } from "../../controllers/auth/userAuthController";
 import isEmailExist from "middlewares/protectors/isEmailExist";
+import { confirmChangePasswordController, updateProfileController } from "controllers/auth/authSettingsController";
 
 export const router = express.Router();
 
 router.use(restrict("admin"));
-router.route("/").get(getAdminProfileController).patch(isEmailExist, updateAdminProfileController); /*✅*/
+router.route("/").get(getAdminProfileController).patch(isEmailExist, updateProfileController); /*✅*/
 router.post("/administratorUser", sanitisedData, validateNewUserData, createAdminController); /*✅*/
-router.route("/changePassword").patch(validateChangePassword, confirmAdminChangePasswordController); /*✅*/
+router.route("/changePassword").patch(validateChangePassword, confirmChangePasswordController); /*✅*/
 
 /* STORES 
     1- patch route for suspend store

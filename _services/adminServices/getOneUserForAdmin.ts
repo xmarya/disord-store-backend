@@ -1,3 +1,4 @@
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import User from "@models/userModel";
 import { getOneDocById } from "@repositories/global";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
@@ -6,7 +7,7 @@ import safeThrowable from "@utils/safeThrowable";
 async function getOneUserForAdmin(userId: string) {
   const safeGetOneUser = safeThrowable(
     () => getOneDocById(User, userId),
-    () => new Error("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
+    () => new Error(INTERNAL_ERROR_MESSAGE)
   );
 
   const formattedResult = await extractSafeThrowableResult(() => safeGetOneUser);

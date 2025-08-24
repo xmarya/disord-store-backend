@@ -1,3 +1,4 @@
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import Admin from "@models/adminModel";
 import { getOneDocById } from "@repositories/global";
 import { AdminDocument } from "@Types/admin/AdminUser";
@@ -9,7 +10,7 @@ async function getAdminProfile(adminId: string) {
   const fields: QueryOptions<AdminDocument>["select"] = ["firstName", "lastName", "email", "image"];
   const safeGetAdminProfile = safeThrowable(
     () => getOneDocById(Admin, adminId, { select: fields }),
-    () => new Error("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
+    () => new Error(INTERNAL_ERROR_MESSAGE)
   );
 
   const adminProfile = await extractSafeThrowableResult(() => safeGetAdminProfile);

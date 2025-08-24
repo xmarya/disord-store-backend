@@ -5,15 +5,10 @@ import getUserProfile from "@services/usersServices/getUserProfile";
 import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import jwtSignature from "@utils/jwtToken/generateSignature";
-import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
-import { comparePasswords } from "@utils/passwords/comparePasswords";
 import formatSubscriptionsLogs from "@utils/queryModifiers/formatSubscriptionsLogs";
 import type { Request, Response } from "express";
 import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
-import updateUser from "@services/usersServices/updateUser";
-import isErr from "@utils/isErr";
 
 export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -45,44 +40,6 @@ export const getMySubscriptionsLogController = catchAsync(async (request, respon
       currentSubscription,
       subscriptionsLog,
     },
-  });
-});
-
-export const confirmUserChangePassword = catchAsync(async (request, response, next) => {
-  const userId = request.user.id;
-  const { currentPassword, newPassword } = request.body;
-  const user = await getOneDocById(User, userId, { select: ["credentials"] });
-
-  if (!user) return next(new AppError(404, "هذا المستخدم غير موجود"));
-
-  //STEP 3) is the provided password matching our record?
-  if (!(await comparePasswords(currentPassword, user.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
-
-  //STEP 4) allow changing the password:
-  user.credentials.password = newPassword;
-  await user.save();
-
-  // STEP 5) generate a new token:
-  const token = jwtSignature(userId, "1h");
-  tokenWithCookies(response, token);
-
-  response.status(203).json({
-    success: true,
-  });
-});
-
-export const updateUserProfileController = catchAsync(async (request, response, next) => {
-  /*✅*/
-  const userId = request.user.id;
-  const result = await updateUser(userId, request.body);
-
-  if (isErr(result)) return next(new AppError(400, result.error));
-
-  if (!result.ok) return next(new AppError(400, `${result.reason}: ${result.message}`));
-  const { result: updatedUser } = result;
-  response.status(203).json({
-    success: true,
-    data: {updatedUser},
   });
 });
 
