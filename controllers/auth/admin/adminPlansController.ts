@@ -4,6 +4,7 @@ import { PlanDataBody } from "@Types/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import Plan from "@models/planModel";
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 
 export const getAllPlanController = catchAsync(async (request, response, next) => {
   const plans = await getAllDocs(Plan, request);
@@ -11,7 +12,7 @@ export const getAllPlanController = catchAsync(async (request, response, next) =
 
   response.status(200).json({
     success: true,
-    data: {plans},
+    data: { plans },
   });
 });
 
@@ -21,7 +22,7 @@ export const getPlanController = catchAsync(async (request, response, next) => {
   if (!plan) return next(new AppError(404, "no plan was found with this id"));
   response.status(200).json({
     success: true,
-    data: {plan},
+    data: { plan },
   });
 });
 
@@ -35,11 +36,11 @@ export const updatePlanController = catchAsync(async (request, response, next) =
   if (!planName?.trim() && !price && !discount && !features.length && !quota) return next(new AppError(400, "no data was provided to update"));
 
   const updatedPlan = await updateDoc(Plan, request.params.planId, request.body);
-  if (!updatedPlan) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
+  if (!updatedPlan) return next(new AppError(500, INTERNAL_ERROR_MESSAGE));
 
   response.status(201).json({
     success: true,
-    data: {updatedPlan},
+    data: { updatedPlan },
   });
 });
 
@@ -51,7 +52,7 @@ export const getMonthlyPlansStatsController = catchAsync(async (request, respons
 
   response.status(200).json({
     success: true,
-    data: {allPlansStats},
+    data: { allPlansStats },
   });
 });
 
@@ -59,10 +60,10 @@ export const getPlansStatsReportController = catchAsync(async (request, response
   const { sortBy, sortOrder, year } = request.body;
   const reports = await getPlansStatsReport(sortBy, sortOrder, year);
 
-  if (!reports) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
+  if (!reports) return next(new AppError(500, INTERNAL_ERROR_MESSAGE));
 
   response.status(200).json({
     success: true,
-    data: {reports},
+    data: { reports },
   });
 });

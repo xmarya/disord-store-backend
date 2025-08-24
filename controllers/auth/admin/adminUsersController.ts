@@ -12,13 +12,14 @@ import { catchAsync } from "@utils/catchAsync";
 import { addDays } from "date-fns";
 import { startSession } from "mongoose";
 import { SUBSCRIPTION_PERIOD } from "../../../_constants/ttl";
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 
 export const createAdminController = catchAsync(async (request, response, next) => {
   await createNewAdmin(request.body, { hostname: request.hostname, protocol: request.protocol });
 
   response.status(201).json({
     success: true,
-    message: "a new admin was successfully created"
+    message: "a new admin was successfully created",
   });
 });
 
@@ -82,7 +83,7 @@ export const createUnlimitedUserController = catchAsync(async (request, response
   } catch (error) {
     console.log(error);
     await session.abortTransaction();
-    throw new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا");
+    throw new AppError(500, INTERNAL_ERROR_MESSAGE);
   } finally {
     await session.endSession();
   }

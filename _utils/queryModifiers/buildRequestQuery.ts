@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { DOCS_PER_PAGE } from "../../_constants/numbers";
+import { DOCS_PER_PAGE } from "../../_constants/primitives";
 import { QueryParams } from "@Types/Request";
 import { QueryOptions } from "@Types/QueryOptions";
 
@@ -28,7 +28,7 @@ export function buildQuery<T extends mongoose.Document>(requestQuery: QueryParam
     query.select(limitFields);
   }
 
-  if(internalAppSelect) {
+  if (internalAppSelect) {
     const fields = internalAppSelect.join(" ");
     query.select(fields);
   }
