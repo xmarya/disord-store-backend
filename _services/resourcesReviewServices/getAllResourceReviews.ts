@@ -1,3 +1,4 @@
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import Review from "@models/reviewModel";
 import { getAllDocs } from "@repositories/global";
 import { QueryOptions } from "@Types/QueryOptions";
@@ -10,7 +11,7 @@ async function getAllResourceReviews(storeOrProduct: "Store" | "Product", review
   const condition: QueryOptions<ReviewDocument>["condition"] = { storeOrProduct, reviewedResourceId };
   const safeGetAllReviews = safeThrowable(
     () => getAllDocs(Review, query, { condition }),
-    () => new Error("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
+    () => new Error(INTERNAL_ERROR_MESSAGE)
   );
   const reviews = await extractSafeThrowableResult(() => safeGetAllReviews);
 

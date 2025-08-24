@@ -1,3 +1,4 @@
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import { setRanking } from "@repositories/ranking/rankingRepo";
 import { calculateRatingsAverage } from "@repositories/review/reviewRepo";
 import { Model } from "@Types/Model";
@@ -15,7 +16,7 @@ async function setResourceRating(Model: Extract<Model, "Store" | "Product">, res
     await session.commitTransaction();
   } catch (error) {
     await session.abortTransaction();
-    err("حدث خطأ أثناء معالجة العملية. حاول مجددًا")
+    err(INTERNAL_ERROR_MESSAGE);
   } finally {
     await session.endSession();
   }

@@ -9,6 +9,7 @@ import { catchAsync } from "@utils/catchAsync";
 import Product from "@models/productModel";
 import { categoriesInCache } from "./categoryController";
 import { deleteAllResourceReviews } from "@repositories/review/reviewRepo";
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 
 export const createProductController = catchAsync(async (request, response, next) => {
   const { categories } = request.body;
@@ -25,7 +26,7 @@ export const createProductController = catchAsync(async (request, response, next
 
   response.status(201).json({
     success: true,
-    data: {newProd},
+    data: { newProd },
   });
 });
 
@@ -38,7 +39,7 @@ export const getOneProductController = catchAsync(async (request, response, next
 
   response.status(200).json({
     success: true,
-    data: {product},
+    data: { product },
   });
 });
 
@@ -60,7 +61,7 @@ export const updateProductController = catchAsync(async (request, response, next
 
   response.status(203).json({
     success: true,
-    data: {updatedProduct},
+    data: { updatedProduct },
   });
 });
 
@@ -71,7 +72,7 @@ export const deleteProductController = catchAsync(async (request, response, next
 
   const result = await session.withTransaction(async () => {
     const deletedProduct = await deleteDoc(Product, productId, { session });
-    if (!deletedProduct) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
+    if (!deletedProduct) return next(new AppError(500, INTERNAL_ERROR_MESSAGE));
 
     await deleteProductFromCategory(deletedProduct.categories, productId, session); /*✅*/
     await deleteAllResourceReviews(productId, session);
@@ -83,7 +84,6 @@ export const deleteProductController = catchAsync(async (request, response, next
 
   response.status(204).json({
     success: true,
-    data: {result},
+    data: { result },
   });
 });
-

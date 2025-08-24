@@ -1,10 +1,10 @@
-
 import { startSession } from "mongoose";
 import { getOneStoreStats, updateStoreStats } from "@repositories/store/storeStatsRepo";
 import { InvoiceDataBody } from "@Types/Invoice";
 import { MongoId } from "@Types/MongoId";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 
 type StatsPerStore = Array<{
   storeId: MongoId;
@@ -30,7 +30,7 @@ export async function updateStoreStatsController(data: Pick<InvoiceDataBody, "pr
   } catch (error) {
     await session.abortTransaction();
     console.log(error);
-    return new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا");
+    return new AppError(500, INTERNAL_ERROR_MESSAGE);
   } finally {
     await session.endSession();
   }
@@ -50,7 +50,7 @@ export const getStoreStatsController = catchAsync(async (request, response, next
 
   response.status(200).json({
     success: true,
-    data: {stats},
+    data: { stats },
   });
 
   /* the response => 
