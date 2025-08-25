@@ -7,7 +7,7 @@ import safeThrowable from "@utils/safeThrowable";
 
 
 async function getUserProfile(userId: string) {
-  const queryFields: QueryOptions<UserDocument>["select"] = ["firstName", "lastName", "email", "image", "phoneNumber"];
+  const queryFields: QueryOptions<UserDocument>["select"] = ["firstName", "lastName", "email", "image", "phoneNumber", "userType"];
 
   const safeGetProfile = safeThrowable(
     () => getOneDocById(User, userId, { select: queryFields }),
