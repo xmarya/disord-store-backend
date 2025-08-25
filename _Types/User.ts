@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Address } from "./UserAddress";
-import { PlansNames } from "./Plan";
+import { PlansNames, SubscriptionTypes } from "./Plan";
 import { MongoId } from "./MongoId";
 import { Credentials } from "./UserCredentials";
 
@@ -47,6 +47,16 @@ export interface StoreOwner extends RegularUser {
   subscribedPlanDetails: UserPlan;
   subscriptionsLog: Map<string, { planName: string; price: number }>;
 }
+
+export type UnlimitedStoreOwnerData = {
+  userType: Extract<UserTypes, "storeOwner">;
+  email: string;
+  subscriptionType: Exclude<SubscriptionTypes, "downgrade">;
+  firstName?: string;
+  lastName?: string;
+  password?: string;
+  signMethod?: "credentials";
+};
 
 /* OLD CODE (kept for reference): 
   export interface UserMethods {
