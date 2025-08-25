@@ -13,7 +13,7 @@ import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 
 export const noOTPLogin = catchAsync(async (request, response, next) => {
 
-  const token = jwtSignature("68a33f1fd8d6fe6df8bfe713", "1h");
+  const token = jwtSignature("688335b7efca4bcf89ccd0c4", "1h");
   tokenWithCookies(response, token);
 
   response.status(200).json({

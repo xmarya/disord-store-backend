@@ -11,10 +11,11 @@ import confirmUserEmail from "../../middlewares/validators/confirmUserEmail";
 
 export const router = express.Router();
 
+router.post("/login", noOTPLogin);
 router.use(sanitisedData);
 router.post("/user-signup", validateNewUserData, createNewUserController("user"));
 router.post("/storeOwner-signup", validateNewUserData, createNewUserController("storeOwner"));
-router.post("/login", credentialsLogin, verifyLoginPassword("user"), getAuthenticaBalance, sendOTP);
+// router.post("/login", credentialsLogin, verifyLoginPassword("user"), getAuthenticaBalance, sendOTP);
 router.post("/otpVerify", verifyOTP);
 router.post("/discord", createNewDiscordUserController);
 router.patch("/confirmEmail/:randomToken", validateRequestParams("randomToken"), confirmUserEmail);
