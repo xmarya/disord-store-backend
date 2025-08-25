@@ -1,10 +1,12 @@
 import { getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
-import { checkPlanName, getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/planRepo";
+import { getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/planRepo";
 import { PlanDataBody } from "@Types/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import Plan from "@models/planModel";
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
+import getOnePlan from "@services/planServices/getOnePlan";
+import updatePlan from "@services/planServices/updatePlan";
 
 export const getAllPlanController = catchAsync(async (request, response, next) => {
   const plans = await getAllDocs(Plan, request);
@@ -17,9 +19,14 @@ export const getAllPlanController = catchAsync(async (request, response, next) =
 });
 
 export const getPlanController = catchAsync(async (request, response, next) => {
-  const plan = await getOneDocById(Plan, request.params.planId);
+  const result = await getOnePlan(request.params.planId);
 
-  if (!plan) return next(new AppError(404, "no plan was found with this id"));
+  if (!result.ok) {
+    const statusCode = result.reason === "not-found" ? 404 : 500;
+    return next(new AppError(statusCode, result.message));
+  }
+
+  const {result: plan} = result;
   response.status(200).json({
     success: true,
     data: { plan },
@@ -27,17 +34,17 @@ export const getPlanController = catchAsync(async (request, response, next) => {
 });
 
 export const updatePlanController = catchAsync(async (request, response, next) => {
-  // const { planId } = request.params;
-  // const isUnlimited = await checkPlanName(planId);
-  // if (!isUnlimited) return next(new AppError(403, "this is unlimited plan, you cant edit its data"));
-
   //NOTE: what can be updated are: name, price, discount, quota, features
   const { planName, price, discount, features, quota }: PlanDataBody = request.body;
   if (!planName?.trim() && !price && !discount && !features.length && !quota) return next(new AppError(400, "no data was provided to update"));
 
-  const updatedPlan = await updateDoc(Plan, request.params.planId, request.body);
-  if (!updatedPlan) return next(new AppError(500, INTERNAL_ERROR_MESSAGE));
+  const result = await updatePlan(request.params.planId, request.body);
+  if (!result.ok) {
+    const statusCode = result.reason === "not-found" ? 404 : 500;
+    return next(new AppError(statusCode, result.message));
+  }
 
+  const {result:updatedPlan} = result;
   response.status(201).json({
     success: true,
     data: { updatedPlan },
