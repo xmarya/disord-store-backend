@@ -39,7 +39,6 @@ const validateUnlimitedUserData = catchAsync(async (request, response, next) => 
     user = {
       email,
       subscriptionType,
-      // BUG: the inPlan property of a store should be updated along with the upgrade. may I'll use hook
     };
   }
 
