@@ -55,7 +55,7 @@ export const getOnePlatformReviewController = catchAsync(async (request, respons
 export const updateMyPlatformReviewController = catchAsync(async (request, response, next) => {
   const { reviewBody }: PlatformReviewDataBody = request.body;
   if (!reviewBody?.trim()) return next(new AppError(400, "الرجاء إضافة تعليق قبل الإرسال"));
-  const result = await updatePlatformReview(request.params.reviewId, reviewBody);
+  const result = await updatePlatformReview(request.params.reviewId, {reviewBody});
 
   if (!result.ok) return next(returnError(result));
 

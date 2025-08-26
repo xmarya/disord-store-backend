@@ -1,15 +1,16 @@
-import { updateDoc } from "@repositories/global";
-import { AppError } from "@utils/AppError";
+import updatePlatformReview from "@services/platformReviewServices/updatePlatformReview";
 import { catchAsync } from "@utils/catchAsync";
-import PlatformReview from "@models/platformReviewModel";
+import returnError from "@utils/returnError";
 
-export const displayReviewInHomePage = catchAsync(async (request, response, next) => {
+export const displayReviewInHomePageController = catchAsync(async (request, response, next) => {
   const { reviewId } = request.params;
-  const selectedReview = await updateDoc(PlatformReview, reviewId, { displayInHomePage: true });
-  if (!selectedReview) return next(new AppError(500, "حدث خطأ أثناء معالجة البيانات. الرجاء المحاولة مجددًا"));
+  const result = await updatePlatformReview(reviewId, {displayInHomePage: true});
+  
+  if (!result.ok) return next(returnError(result));
 
+  const {result: updatedReview} = result;
   response.status(201).json({
     success: true,
-    data: {selectedReview},
+    data: {updatedReview},
   });
 });

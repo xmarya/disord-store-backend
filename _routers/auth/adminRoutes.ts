@@ -8,7 +8,7 @@ import validateRequestParams from "../../middlewares/validators/validateRequestP
 import validateUnlimitedUserData from "../../middlewares/validators/validateUnlimitedUserData";
 import {getAdminProfileController } from "../../controllers/auth/admin/adminAuthController";
 import { getAllPlanController, getMonthlyPlansStatsController, getPlanController, getPlansStatsReportController, updatePlanController } from "../../controllers/auth/admin/adminPlansController";
-import { displayReviewInHomePage } from "../../controllers/auth/admin/adminReviewsController";
+import { displayReviewInHomePageController } from "../../controllers/auth/admin/adminReviewsController";
 import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
 import { createAdminController, createUnlimitedUserController, getAllUsersController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
 import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviews/platformReviewController";
@@ -65,4 +65,4 @@ router
     2- select reviews to display in the home page
 */
 router.get("/platform/reviews", getAllPlatformReviewsController);
-router.route("/platform/reviews/:reviewId").patch(validateRequestParams("reviewId"), displayReviewInHomePage).delete(validateRequestParams("reviewId"), deletePlatformReviewController);
+router.route("/platform/reviews/:reviewId").patch(validateRequestParams("reviewId"), displayReviewInHomePageController).delete(validateRequestParams("reviewId"), deletePlatformReviewController);
