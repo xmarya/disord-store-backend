@@ -20,7 +20,10 @@ export interface StoreDataBody {
   storeName: string;
   description: string;
   logo?: string;
-  inPlan: MongoId;
+}
+
+export interface FullStoreDataBody extends StoreDataBody {
+    inPlan: MongoId;
   owner: MongoId;
 }
 
