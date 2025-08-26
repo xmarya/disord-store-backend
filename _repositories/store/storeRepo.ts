@@ -4,6 +4,7 @@ import { StoreDataBody } from "@Types/Store";
 import { AppError } from "@utils/AppError";
 import Store from "@models/storeModel";
 import User from "@models/userModel";
+import { PlansNames } from "@Types/Plan";
 
 export async function createStore(data: StoreDataBody) {
   const { storeName, description, owner, inPlan, logo } = data;
@@ -57,6 +58,10 @@ export async function confirmAuthorization(userId: string, storeId: MongoId): Pr
   return !!userIdExist;
 }
 
+
+export async function updateStoreInPlan(storeOwnerId:string, planName:PlansNames) {
+  await Store.findOneAndUpdate({owner: storeOwnerId}, {inPlan: planName})
+}
 export async function deleteStore(storeId: MongoId, session: mongoose.ClientSession) {
   const deletedStore = await Store.findByIdAndDelete(storeId, { session });
 
