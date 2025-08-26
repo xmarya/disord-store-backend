@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { MongoId } from "@Types/MongoId";
-import { StoreOwner } from "@Types/User";
+import { StoreOwner, UnlimitedStoreOwnerData } from "@Types/User";
 import User from "@models/userModel";
 import { startSession } from "mongoose";
 import { deleteStorePermanently } from "../../controllers/auth/storeControllers";
@@ -8,7 +8,7 @@ import Cart from "@models/cartModel";
 import Wishlist from "@models/wishlistModel";
 import { deleteDoc } from "../global";
 
-export async function createNewUnlimitedUser(data: StoreOwner, session: mongoose.ClientSession) {
+export async function createNewUnlimitedUser(data: UnlimitedStoreOwnerData, session: mongoose.ClientSession) {
   const aNewUser = await User.findOneAndUpdate({ email: data.email }, { ...data }, { runValidators: true, new: true, upsert: true, setDefaultsOnInsert: true }).session(session);
   return aNewUser;
 }
