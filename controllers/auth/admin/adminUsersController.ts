@@ -6,6 +6,7 @@ import getOneUserForAdmin from "@services/adminServices/getOneUserForAdmin";
 import { UnlimitedPlanDataBody } from "@Types/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
+import returnError from "@utils/returnError";
 
 export const createAdminController = catchAsync(async (request, response, next) => {
   await createNewAdmin(request.body, { hostname: request.hostname, protocol: request.protocol });
@@ -42,10 +43,7 @@ export const createUnlimitedUserController = catchAsync(async (request, response
 export const getAllUsersController = catchAsync(async (request, response, next) => {
   const { query } = request;
   const result = await getAllUsersForAdmin(query);
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500;
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
+  if (!result.ok) return next(returnError(result));
 
   const { result: users } = result;
   response.status(200).json({
@@ -57,10 +55,7 @@ export const getAllUsersController = catchAsync(async (request, response, next) 
 export const getOneUserController = catchAsync(async (request, response, next) => {
   const { userId } = request.params;
   const result = await getOneUserForAdmin(userId);
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500;
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
+  if (!result.ok) return next(returnError(result));
 
   const { result: user } = result;
   response.status(200).json({

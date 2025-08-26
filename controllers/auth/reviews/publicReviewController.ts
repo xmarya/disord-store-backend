@@ -6,6 +6,7 @@ import updateReview from "@services/resourcesReviewServices/updateResourceReview
 import getAllUserReviews from "@services/usersServices/getAllUserReviews";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
+import returnError from "@utils/returnError";
 
 export const createReviewController = catchAsync(async (request, response, next) => {
   const storeOrProduct = request.path.includes("store") ? "Store" : "Product";
@@ -19,7 +20,7 @@ export const createReviewController = catchAsync(async (request, response, next)
   const data: ReviewDataBody = { reviewedResourceId, storeOrProduct, reviewBody, rating, writer: id, firstName, lastName, userType, image };
   const result = await createNewReview(data);
 
-  if (!result.ok) return next(new AppError(500, `${result.reason}: ${result.message}`));
+  if (!result.ok) return next(returnError(result));
 
   const { result: newReview } = result;
 
@@ -33,11 +34,7 @@ export const getAllReviewsController = catchAsync(async (request, response, next
   const storeOrProduct = request.path.includes("store") ? "Store" : "Product";
   const reviewedResourceId = request.params[`${storeOrProduct.toLowerCase()}Id`];
   const result = await getAllResourceReviews(storeOrProduct, reviewedResourceId, request.query);
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500;
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
-
+  if (!result.ok) return next(returnError(result));
   const { result: reviews } = result;
 
   response.status(200).json({
@@ -67,10 +64,7 @@ export const updateMyReviewController = catchAsync(async (request, response, nex
   if (!reviewBody?.trim() && !rating) return next(new AppError(400, "الرجاء إضافة تعليق وتقييم قبل الإرسال"));
 
   const result = await updateReview(request.params.reviewId, { reviewBody, rating });
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500;
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
+if (!result.ok) return next(returnError(result));
 
   const { result: updatedReview } = result;
 
@@ -82,10 +76,7 @@ export const updateMyReviewController = catchAsync(async (request, response, nex
 
 export const deleteMyReviewController = catchAsync(async (request, response, next) => {
   const result = await deleteReview(request.params.reviewId);
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500;
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
+  if (!result.ok) return next(returnError(result));
 
   response.status(204).json({
     success: true,

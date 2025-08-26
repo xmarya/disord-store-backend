@@ -7,6 +7,7 @@ import { PlatformReviewDataBody } from "@Types/Review";
 import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
+import returnError from "@utils/returnError";
 
 export const createPlatformReviewController = catchAsync(async (request, response, next) => {
   const { reviewBody }: PlatformReviewDataBody = request.body;
@@ -14,8 +15,7 @@ export const createPlatformReviewController = catchAsync(async (request, respons
 
   const result = await createNewPlatformReview(request.user as UserDocument, reviewBody);
 
-  if (!result.ok) return next(new AppError(500, `${result.reason}: ${result.message}`));
-
+  if (!result.ok) return next(returnError(result));
   const { result: newReview } = result;
 
   response.status(201).json({
@@ -26,30 +26,25 @@ export const createPlatformReviewController = catchAsync(async (request, respons
 
 export const getAllPlatformReviewsController = catchAsync(async (request, response, next) => {
   const result = await getAllPlatformReviews(request.query);
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
 
-  const {result:reviews } = result;
+  if (!result.ok) return next(returnError(result));
+
+  const { result: reviews } = result;
   response.status(200).json({
     success: true,
-    data: { 
+    data: {
       result: reviews.length,
-      reviews 
+      reviews,
     },
   });
 });
 
 export const getOnePlatformReviewController = catchAsync(async (request, response, next) => {
-  const result = await getOnePlatformReview(request.params.reviewId)
+  const result = await getOnePlatformReview(request.params.reviewId);
 
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
+  if (!result.ok) return next(returnError(result));
 
-  const {result:review } = result;
+  const { result: review } = result;
 
   response.status(200).json({
     success: true,
@@ -62,12 +57,9 @@ export const updateMyPlatformReviewController = catchAsync(async (request, respo
   if (!reviewBody?.trim()) return next(new AppError(400, "الرجاء إضافة تعليق قبل الإرسال"));
   const result = await updatePlatformReview(request.params.reviewId, reviewBody);
 
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
+  if (!result.ok) return next(returnError(result));
 
-  const {result:updatedReview } = result;
+  const { result: updatedReview } = result;
 
   response.status(201).json({
     success: true,
@@ -78,12 +70,10 @@ export const updateMyPlatformReviewController = catchAsync(async (request, respo
 export const deletePlatformReviewController = catchAsync(async (request, response, next) => {
   const result = await deletePlatformReview(request.params.reviewId);
 
-if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500;
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
+  if (!result.ok) return next(returnError(result));
+
   response.status(204).json({
     success: true,
-    message: "review deleted successfully"
+    message: "review deleted successfully",
   });
 });

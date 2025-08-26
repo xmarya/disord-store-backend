@@ -1,6 +1,7 @@
 import addStoreReplayToResourceReview from "@services/storeServices/addStoreReplayToResourceReview";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
+import returnError from "@utils/returnError";
 
 export const addStoreReply = catchAsync(async (request, response, next) => {
   const { storeReply } = request.body;
@@ -9,10 +10,7 @@ export const addStoreReply = catchAsync(async (request, response, next) => {
 
   const result = await addStoreReplayToResourceReview(request.params.reviewId, storeReply);
 
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500;
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
+  if (!result.ok) return next(returnError(result));
 
   const { result: updatedReview } = result;
 

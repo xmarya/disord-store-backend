@@ -1,12 +1,13 @@
-import { getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
+import Plan from "@models/planModel";
+import { getAllDocs } from "@repositories/global";
 import { getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/planRepo";
+import getOnePlan from "@services/planServices/getOnePlan";
+import updatePlan from "@services/planServices/updatePlan";
 import { PlanDataBody } from "@Types/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import Plan from "@models/planModel";
-import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
-import getOnePlan from "@services/planServices/getOnePlan";
-import updatePlan from "@services/planServices/updatePlan";
+import returnError from "@utils/returnError";
 
 export const getAllPlanController = catchAsync(async (request, response, next) => {
   const plans = await getAllDocs(Plan, request);
@@ -39,10 +40,7 @@ export const updatePlanController = catchAsync(async (request, response, next) =
   if (!planName?.trim() && !price && !discount && !features.length && !quota) return next(new AppError(400, "no data was provided to update"));
 
   const result = await updatePlan(request.params.planId, request.body);
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500;
-    return next(new AppError(statusCode, result.message));
-  }
+  if (!result.ok) return next(returnError(result));
 
   const {result:updatedPlan} = result;
   response.status(201).json({
