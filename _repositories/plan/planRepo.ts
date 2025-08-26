@@ -53,7 +53,7 @@ export async function getPlansStatsReport(sortBy: "year" | "profits" | "subscrib
   return { annualReport, totalsReport };
 }
 
-export async function updatePlanMonthlyStats(planName: PlansNames, profit: number, operationType: SubscriptionTypes | "cancellation", session: mongoose.ClientSession) {
+export async function updatePlanMonthlyStats(planName: PlansNames, profit: number, operationType: SubscriptionTypes | "cancellation", /*session: mongoose.ClientSession*/) {
   /*✅*/
   /* OLD CODE (kept for reference): 
         const firstDayOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1); // =< year-month-1st day
@@ -92,7 +92,7 @@ export async function updatePlanMonthlyStats(planName: PlansNames, profit: numbe
       },
     },
     { new: true, upsert: true, setDefaultsOnInsert: true } // options
-  ).session(session);
+  )/*.session(session)*/;
 }
 
 // subscription Timeline:
