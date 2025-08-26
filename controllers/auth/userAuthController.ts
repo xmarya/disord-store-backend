@@ -9,15 +9,13 @@ import formatSubscriptionsLogs from "@utils/queryModifiers/formatSubscriptionsLo
 import type { Request, Response } from "express";
 import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
+import returnError from "@utils/returnError";
 
 export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
   const result = await getUserProfile(userId);
 
-  if (!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500;
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
+  if (!result.ok) return next(returnError(result));
   const { result: userProfile } = result;
 
   response.status(200).json({

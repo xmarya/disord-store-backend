@@ -4,6 +4,7 @@ import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import isErr from "@utils/isErr";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
+import returnError from "@utils/returnError";
 
 export const confirmChangePasswordController = catchAsync(async (request, response, next) => {
   const {user}  = request;
@@ -11,7 +12,7 @@ export const confirmChangePasswordController = catchAsync(async (request, respon
   const result = await confirmChangedPassword({user, currentPassword, newPassword});
 
   if (isErr(result)) return next(new AppError(401, "هذا المستخدم غير موجود"));
-  if(typeof result !== "string") return next(new AppError(500, result.message));
+  if(typeof result !== "string") return next(returnError(result));
 
   const token = result;
   tokenWithCookies(response, token);
@@ -28,10 +29,7 @@ export const updateProfileController = catchAsync(async (request, response, next
 
   if(isErr(result)) return next(new AppError(400, result.error));
 
-  if(!result.ok) {
-    const statusCode = result.reason === "not-found" ? 404 : 500;
-    return next(new AppError(statusCode, `${result.reason}: ${result.message}`));
-  }
+  if (!result.ok) return next(returnError(result));
 
   const {result: updatedProfile} = result;
   response.status(201).json({
