@@ -16,7 +16,6 @@ export interface IShipmentCompany {
 }
 
 export interface StoreDataBody {
-  [x: string]: any;
   storeName: string;
   description: string;
   logo?: string;
