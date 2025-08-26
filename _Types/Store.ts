@@ -26,7 +26,7 @@ export interface FullStoreDataBody extends StoreDataBody {
   owner: MongoId;
 }
 
-export interface StoreBasic extends StoreDataBody {
+export interface StoreBasic extends FullStoreDataBody {
   status: "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
   verified: boolean;
   ratingsAverage: number;
