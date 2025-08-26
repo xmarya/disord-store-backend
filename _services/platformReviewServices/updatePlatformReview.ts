@@ -4,9 +4,13 @@ import { updateDoc } from "@repositories/global";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-async function updatePlatformReview(reviewId: string, reviewBody: string) {
+type UpdatedData = {
+  reviewBody?: string
+  displayInHomePage?:boolean
+}
+async function updatePlatformReview(reviewId: string, updatedData:UpdatedData) {
   const safeUpdateReview = safeThrowable(
-    () => updateDoc(PlatformReview, reviewId, reviewBody),
+    () => updateDoc(PlatformReview, reviewId, updatedData),
     () => new Error(INTERNAL_ERROR_MESSAGE)
   );
 
