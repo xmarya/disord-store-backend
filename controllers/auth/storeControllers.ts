@@ -1,24 +1,14 @@
-import mongoose, { startSession } from "mongoose";
-import { deleteAllAssistants } from "@repositories/assistant/assistantRepo";
-import { deleteAllCategories } from "@repositories/category/categoryRepo";
-import { getOneDocById, updateDoc } from "@repositories/global";
-import { deleteAllProducts } from "@repositories/product/productRepo";
-import { deleteAllResourceReviews } from "@repositories/review/reviewRepo";
-import { deleteStore } from "@repositories/store/storeRepo";
-import { resetStoreOwnerToDefault } from "@repositories/user/userRepo";
-import { MongoId } from "@Types/MongoId";
-import { StoreOwner, UserDocument } from "@Types/User";
+import createNewStore from "@services/storeServices/createNewStore";
+import deleteStorePermanently from "@services/storeServices/deleteStorePermanently";
+import getStoreForAuthorisedUser from "@services/storeServices/getStoreForAuthorisedUser";
+import updateStore from "@services/storeServices/updateStore";
+import updateStoreStatus from "@services/storeServices/updateStoreStatus";
+import { StoreDataBody, StoreDocument } from "@Types/Store";
+import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import Store from "@models/storeModel";
-import { StoreDataBody, StoreDocument } from "@Types/Store";
-import { deleteStoreStats } from "@repositories/store/storeStatsRepo";
-import createNewStore from "@services/storeServices/createNewStore";
-import returnError from "@utils/returnError";
-import updateStore from "@services/storeServices/updateStore";
-import getStoreForAuthorisedUser from "@services/storeServices/getStoreForAuthorisedUser";
-import updateStoreStatus from "@services/storeServices/updateStoreStatus";
 import isErr from "@utils/isErr";
+import returnError from "@utils/returnError";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   // TODO: complete the store data
@@ -90,12 +80,8 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
 
 export const deleteMyStoreController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
-  const session = await startSession();
-  await session.withTransaction(async () => {
-    await deleteStorePermanently(storeId, session);
-  });
-
-  await session.endSession();
+  
+  await deleteStorePermanently(storeId);
 
   response.status(204).json({
     success: true,
@@ -103,24 +89,3 @@ export const deleteMyStoreController = catchAsync(async (request, response, next
   });
 });
 
-export async function deleteStorePermanently(storeId: MongoId, session: mongoose.ClientSession) {
-  // NOTE: this function MUST run within a transaction
-  //STEP 1) change userType and remove myStore:
-  await resetStoreOwnerToDefault(storeId, session);
-  //STEP 2) delete corresponding storeAssistant:
-  await deleteAllAssistants(storeId, session);
-  //STEP:3) delete products:
-  await deleteAllProducts(storeId, session);
-  //STEP:4) delete categories:
-  await deleteAllCategories(storeId, session);
-  //STEP:5) delete reviews:
-  await deleteAllResourceReviews(storeId, session);
-  //STEP:5) delete stats records:
-  await deleteStoreStats(storeId, session);
-
-  /*TODO: what about all of the store's products' reviews? should I write a post(deleteMany) hook and call the ranking service from??*/
-  //STEP 7) delete the store:
-  await deleteStore(storeId, session);
-
-  //TODO: add the deleted data to the AdminLog
-}
