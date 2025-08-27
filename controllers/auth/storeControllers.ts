@@ -17,6 +17,8 @@ import createNewStore from "@services/storeServices/createNewStore";
 import returnError from "@utils/returnError";
 import updateStore from "@services/storeServices/updateStore";
 import getStoreForAuthorisedUser from "@services/storeServices/getStoreForAuthorisedUser";
+import updateStoreStatus from "@services/storeServices/updateStoreStatus";
+import isErr from "@utils/isErr";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   // TODO: complete the store data
@@ -25,15 +27,13 @@ export const createStoreController = catchAsync(async (request, response, next) 
 
   const result = await createNewStore(request.user as UserDocument, request.body);
 
-  if(!(result as StoreDocument)?.id) return next(result);
-
+  if (!(result as StoreDocument)?.id) return next(result);
 
   response.status(201).json({
     success: true,
-    data: { newStore:result },
+    data: { newStore: result },
   });
 });
-
 
 export const getMyStoreController = catchAsync(async (request, response, next) => {
   // const storeId = request.store;
@@ -42,16 +42,15 @@ export const getMyStoreController = catchAsync(async (request, response, next) =
   const userId = request.user.id;
   const result = await getStoreForAuthorisedUser(userId);
 
-  if(!result.ok) return next(returnError(result));
+  if (!result.ok) return next(returnError(result));
 
-  const {result:store} = result;
+  const { result: store } = result;
 
   response.status(200).json({
     success: true,
     data: { store },
   });
 });
-
 
 export const updateMyStoreController = catchAsync(async (request, response, next) => {
   console.log("updateMyStoreController");
@@ -75,10 +74,13 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
   const { status } = request.body;
   if (!status?.trim()) return next(new AppError(400, "please provide a status"));
 
-  const allowedStatuses = ["active", "maintenance"];
-  if (!allowedStatuses.includes(status)) return next(new AppError(400, "the status must be active or maintenance"));
+  const result = await updateStoreStatus(storeId, status);
 
-  const updatedStore = await updateDoc<StoreDocument>(Store, storeId, { status });
+  if(isErr(result)) return next(returnError({reason:"bad-request", message: result.error}));
+  
+  if(!result.ok) return next(returnError(result));
+
+  const {result:updatedStore } = result;
 
   response.status(201).json({
     success: true,
