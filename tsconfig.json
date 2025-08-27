@@ -29,18 +29,19 @@
     // "moduleResolution": "node10",                     /* Specify how TypeScript looks up a file from a given module specifier. */
     "baseUrl": "./" /* Specify the base directory to resolve non-relative module names. */,
     "paths": {
+      "@config/*": ["./_config/*"],
+      "@constants/*": ["./_constants/*"],
+      "@Types/*": ["./_Types/*"],
       "@models/*": ["./models/*"],
-      "@services/*": ["./_services/*"],
-      "@routers/*": ["./_routers/*"],
-      "@loaders/*": ["./loaders/*"],
-      "@eventSubscribers/*": ["./eventSubscribers/*"],
       "@repositories/*": ["./_repositories/*"],
-      "@middlewares/*": ["./_middlewares/*"],
+      "@services/*": ["./_services/*"],
+      "@loaders/*": ["./loaders/*"],
+      "@routers/*": ["./_routers/*"],
+      "@middlewares/*": ["./middlewares/*"],
+      "@controllers/*": ["./controllers/*"],
+      "@eventSubscribers/*": ["./eventSubscribers/*"],
       "@utils/*": ["./_utils/*"],
       "@externals/*": ["./externals/*"],
-      "@Types/*": ["./_Types/*"],
-      "@constants/*": ["./_constants/*"],
-      "@config/*": ["./_config/*"]
     } /* Specify a set of entries that re-map imports to additional lookup locations. */,
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
