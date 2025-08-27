@@ -3,7 +3,6 @@ import { MongoId } from "@Types/MongoId";
 import { StoreOwner, UnlimitedStoreOwnerData } from "@Types/User";
 import User from "@models/userModel";
 import { startSession } from "mongoose";
-import { deleteStorePermanently } from "../../controllers/auth/storeControllers";
 import Cart from "@models/cartModel";
 import Wishlist from "@models/wishlistModel";
 import { deleteDoc } from "../global";
@@ -94,16 +93,6 @@ export async function getUserSubscriptionsLog(userId: MongoId) {
 }
 export async function confirmUserEmail(bulkOps: any) {
   await User.bulkWrite(bulkOps);
-}
-
-export async function deleteStoreOwner(ownerId: MongoId, storeId: MongoId) {
-  const session = await startSession();
-
-  await session.withTransaction(async () => {
-    await deleteStorePermanently(storeId, session);
-    await deleteDoc(User, ownerId, { session });
-  });
-  await session.endSession();
 }
 
 export async function deleteRegularUser(userId: MongoId) {
