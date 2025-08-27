@@ -16,6 +16,7 @@ import { deleteStoreStats } from "@repositories/store/storeStatsRepo";
 import createNewStore from "@services/storeServices/createNewStore";
 import returnError from "@utils/returnError";
 import updateStore from "@services/storeServices/updateStore";
+import getStoreForAuthorisedUser from "@services/storeServices/getStoreForAuthorisedUser";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   // TODO: complete the store data
@@ -32,6 +33,25 @@ export const createStoreController = catchAsync(async (request, response, next) 
     data: { newStore:result },
   });
 });
+
+
+export const getMyStoreController = catchAsync(async (request, response, next) => {
+  // const storeId = request.store;
+  // const store = await getOneDocById(Store, storeId);
+
+  const userId = request.user.id;
+  const result = await getStoreForAuthorisedUser(userId);
+
+  if(!result.ok) return next(returnError(result));
+
+  const {result:store} = result;
+
+  response.status(200).json({
+    success: true,
+    data: { store },
+  });
+});
+
 
 export const updateMyStoreController = catchAsync(async (request, response, next) => {
   console.log("updateMyStoreController");
@@ -102,13 +122,3 @@ export async function deleteStorePermanently(storeId: MongoId, session: mongoose
 
   //TODO: add the deleted data to the AdminLog
 }
-
-export const getMyStoreController = catchAsync(async (request, response, next) => {
-  const storeId = request.store;
-  const store = await getOneDocById(Store, storeId);
-
-  response.status(200).json({
-    success: true,
-    data: { store },
-  });
-});
