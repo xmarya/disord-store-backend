@@ -1,8 +1,9 @@
 import createNewStore from "@services/storeServices/createNewStore";
-import deleteStorePermanently from "@services/storeServices/deleteStorePermanently";
+import deleteStorePermanently from "@services/storeServices/deleteStoreAndItsRelatedResourcePermanently";
 import getStoreForAuthorisedUser from "@services/storeServices/getStoreForAuthorisedUser";
 import updateStore from "@services/storeServices/updateStore";
 import updateStoreStatus from "@services/storeServices/updateStoreStatus";
+import deleteMyStore from "@services/usersServices/storeOwnerServices.ts/deleteMyStore";
 import { StoreDataBody, StoreDocument } from "@Types/Store";
 import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
@@ -66,11 +67,11 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
 
   const result = await updateStoreStatus(storeId, status);
 
-  if(isErr(result)) return next(returnError({reason:"bad-request", message: result.error}));
-  
-  if(!result.ok) return next(returnError(result));
+  if (isErr(result)) return next(returnError({ reason: "bad-request", message: result.error }));
 
-  const {result:updatedStore } = result;
+  if (!result.ok) return next(returnError(result));
+
+  const { result: updatedStore } = result;
 
   response.status(201).json({
     success: true,
@@ -80,12 +81,11 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
 
 export const deleteMyStoreController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
-  
-  await deleteStorePermanently(storeId);
+
+  await deleteMyStore(storeId);
 
   response.status(204).json({
     success: true,
     message: "the store and all its related resources are deleted.",
   });
 });
-
