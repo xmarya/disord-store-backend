@@ -1,6 +1,6 @@
 import type { Application } from "express";
 import {router as publicAuthRouter} from "@routers/public/publicAuthRoutes";
-import {router as resourcesPublicRouter} from "@routers/public/resourcesPublicRoutes";
+import {router as resourcesPublicRouter} from "@routers/public/publicResourcesRoutes";
 import { router as dashboardRouter } from "@routers/dashboard";
 import errorController from "controllers/errorController";
 
