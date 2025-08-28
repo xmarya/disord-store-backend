@@ -1,4 +1,6 @@
 import authentica from "@config/authentica";
+import User from "@models/userModel";
+import { getOneDocByFindOne } from "@repositories/global";
 import createNewDiscordUser from "@services/usersServices/createNewDiscordUser";
 import createNewUser from "@services/usersServices/createNewUser";
 import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/AuthenticaOTP";
@@ -9,17 +11,9 @@ import { catchAsync } from "@utils/catchAsync";
 import jwtSignature from "@utils/jwtToken/generateSignature";
 import jwtVerify from "@utils/jwtToken/jwtVerify";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
+import { comparePasswords } from "@utils/passwords/comparePasswords";
 
 
-export const noOTPLogin = catchAsync(async (request, response, next) => {
-
-  const token = jwtSignature("688335b7efca4bcf89ccd0c4", "1h");
-  tokenWithCookies(response, token);
-
-  response.status(200).json({
-    success: true
-  });
-});
 export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
   catchAsync(async (request, response, next) => {
     const { firstName, lastName, email, password } = request.body;
@@ -45,18 +39,14 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
   next();
 });
 
-/* OLD CODE (kept for reference): 
+
 export const credentialsLoginOld = catchAsync(async (request, response, next) => {
   // S 1) getting the provided email/phone and password from the request body to start checking:
-  const { password, emailOrPhoneNumber }: CredentialsLoginDataBody = request.body;
-  if (!emailOrPhoneNumber?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
-
-  const isEmail = emailOrPhoneNumber.includes("@");
-  const condition = isEmail ? { email: emailOrPhoneNumber } : { phoneNumber: emailOrPhoneNumber };
+  const { password, email } = request.body;
+  if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
   const user = await getOneDocByFindOne(User, {
-    // condition: { email },
-    condition,
+    condition: { email },
     select: ["credentials", "email", "firstName", "lastName", "userType", "subscribedPlanDetails", "myStore", "image", "phoneNumber"],
   });
   if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
@@ -64,16 +54,16 @@ export const credentialsLoginOld = catchAsync(async (request, response, next) =>
   // S 2) checking the password:
   if (!(await comparePasswords(password, user.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
 
-  const plainUser = user.toObject();
-  delete plainUser.credentials.password;
+  const token = jwtSignature(user.id, "1h");
+  tokenWithCookies(response, token);
 
-  request.body = {}; // remove old body to insert the new.
-  request.body.user = plainUser;
-  request.body.isEmail = isEmail;
-  next();
+  response.status(200).json({
+    success: true,
+    token
+  });
 });
 
-*/
+
 
 export const sendOTP = catchAsync(async (request, response, next) => {
   const user = request.user;
