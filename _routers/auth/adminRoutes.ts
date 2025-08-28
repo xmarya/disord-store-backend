@@ -1,18 +1,18 @@
 import express from "express";
-import restrict from "../../middlewares/protectors/restrict";
-import getDateQuery from "../../middlewares/getDateQuery";
-import sanitisedData from "../../middlewares/validators/sanitisedData";
-import { validateChangePassword } from "../../middlewares/validators/validateChangePassword";
-import validateNewUserData from "../../middlewares/validators/validateNewUserData";
-import validateRequestParams from "../../middlewares/validators/validateRequestParams";
-import validateUnlimitedUserData from "../../middlewares/validators/validateUnlimitedUserData";
 import { confirmAdminChangePasswordController, getAdminProfileController, updateAdminProfileController } from "../../controllers/auth/admin/adminAuthController";
-import { getAllPlanController, getMonthlyPlansStatsController, getPlanController, getPlansStatsReportController, updatePlanController } from "../../controllers/auth/admin/adminPlansController";
+import { getMonthlyPlansStatsController, getPlanController, getPlansStatsReportController, updatePlanController } from "../../controllers/auth/admin/adminPlansController";
 import { displayReviewInHomePage } from "../../controllers/auth/admin/adminReviewsController";
 import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
 import { createAdminController, createUnlimitedUserController, getAllUsersController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
 import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviews/platformReviewController";
 import { deleteUserAccountController } from "../../controllers/auth/userAuthController";
+import getDateQuery from "../../middlewares/getDateQuery";
+import restrict from "../../middlewares/protectors/restrict";
+import sanitisedData from "../../middlewares/validators/sanitisedData";
+import { validateChangePassword } from "../../middlewares/validators/validateChangePassword";
+import validateNewUserData from "../../middlewares/validators/validateNewUserData";
+import validateRequestParams from "../../middlewares/validators/validateRequestParams";
+import validateUnlimitedUserData from "../../middlewares/validators/validateUnlimitedUserData";
 
 export const router = express.Router();
 
@@ -48,7 +48,7 @@ router
     2- get - update route for a plan ✅
     3- get plans stats
 */
-router.get("/plans", getAllPlanController);
+
 // rule of 👍🏻: remember to keep the specific routes at the top of the routes stack, whilst keeping the general -especially that has /:params) at the bottom of the stack
 router.get("/plans/monthlyStats", getDateQuery, getMonthlyPlansStatsController); /*✅*/ // for displaying data per month (the default is this month)
 router.get("/plans/plansReports", getPlansStatsReportController); /*✅*/

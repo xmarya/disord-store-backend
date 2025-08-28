@@ -1,19 +1,9 @@
-import { getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
-import { checkPlanName, getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/planRepo";
+import Plan from "@models/planModel";
+import { getOneDocById, updateDoc } from "@repositories/global";
+import { getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/planRepo";
 import { PlanDataBody } from "@Types/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import Plan from "@models/planModel";
-
-export const getAllPlanController = catchAsync(async (request, response, next) => {
-  const plans = await getAllDocs(Plan, request);
-  if (!plans) return next(new AppError(440, "no data was found"));
-
-  response.status(200).json({
-    success: true,
-    data: {plans},
-  });
-});
 
 export const getPlanController = catchAsync(async (request, response, next) => {
   const plan = await getOneDocById(Plan, request.params.planId);
