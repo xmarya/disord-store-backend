@@ -28,7 +28,7 @@ export const createAssistantController = catchAsync(async (request, response, ne
 export const getAllAssistantsController = catchAsync(async (request, response, next) => {
   const storeId = request.store; // NOTE: myStore property is only available for the storeOwner. Only the owner who can view all the assistants
 
-  const assistants = await getAllDocs(StoreAssistant, request, { condition: { inStore: storeId } });
+  const assistants = await getAllDocs(StoreAssistant, request.query, { condition: { inStore: storeId } });
 
   if (!assistants?.length) return next(new AppError(404, "لا يوجد مساعدين في هذا المتجر"));
 

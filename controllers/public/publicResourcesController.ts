@@ -22,7 +22,7 @@ export const getStoresListController = catchAsync(async (request, response, next
 
 export const getProductsListController = catchAsync(async (request, response, next) => {
   //ENHANCE: exclude suspended / under maintenance stores' products
-  const productsList = await getAllDocs(Product, request, { select: ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"] });
+  const productsList = await getAllDocs(Product, request.query, { select: ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"] });
   if (!productsList) return next(new AppError(404, "لم يتم العثور على منتجات"));
 
   await setCompressedCacheData(`Product:${JSON.stringify(request.query)}`, productsList, "fifteen-minutes");
@@ -39,7 +39,7 @@ export const getStoreWithProductsController = catchAsync(async (request, respons
   const session = await startSession();
   const { store, products } = await session.withTransaction(async () => {
     const store = await getOneDocById(Store, storeId, { session });
-    const products = await getAllDocs(Product, request, { condition: { store: storeId } });
+    const products = await getAllDocs(Product, request.query, { condition: { store: storeId } });
 
     return { store, products };
   });

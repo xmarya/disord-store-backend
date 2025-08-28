@@ -51,7 +51,7 @@ export const getAllReviewsController = catchAsync(async (request, response, next
   // ENHANCE: make it specific! what resource's reviews should it return? for whom? ✅
   const storeOrProduct = request.path.includes("store") ? "Store" : "Product";
   const reviewedResourceId = request.params[`${storeOrProduct.toLowerCase()}Id`];
-  const reviews = await getAllDocs(Review, request, { condition: { storeOrProduct, reviewedResourceId } });
+  const reviews = await getAllDocs(Review, request.query, { condition: { storeOrProduct, reviewedResourceId } });
   if (!reviews.length) return next(new AppError(404, "لا يوجد بيانات لعرضها"));
 
   response.status(200).json({
@@ -62,8 +62,8 @@ export const getAllReviewsController = catchAsync(async (request, response, next
 
 export const getMyReviewsController = catchAsync(async (request, response, next) => {
   const [reviews, platformReviews] = await Promise.all([
-    getAllDocs(Review, request, { condition: { writer: request.user._id } }),
-    getAllDocs(PlatformReview, request, { condition: { writer: request.user._id } }),
+    getAllDocs(Review, request.query, { condition: { writer: request.user._id } }),
+    getAllDocs(PlatformReview, request.query, { condition: { writer: request.user._id } }),
   ]);
 
   response.status(200).json({

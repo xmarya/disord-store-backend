@@ -21,7 +21,7 @@ export const createPlatformReviewController = catchAsync(async (request, respons
 });
 
 export const getAllPlatformReviewsController = catchAsync(async (request, response, next) => {
-  const reviews = await getAllDocs(PlatformReview, request);
+  const reviews = await getAllDocs(PlatformReview, request.query);
   if (!reviews.length) return next(new AppError(404, "لا يوجد بيانات لعرضها"));
 
   response.status(200).json({
