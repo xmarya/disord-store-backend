@@ -9,7 +9,7 @@ import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 
-export const getAllPlanController = catchAsync(async (request, response, next) => {
+export const getAllPlansController = catchAsync(async (request, response, next) => {
   const plans = await getAllDocs(Plan, request);
   if (!plans) return next(new AppError(440, "no data was found"));
 
