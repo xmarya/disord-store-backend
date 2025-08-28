@@ -55,7 +55,7 @@ export const getStoreWithProductsController = catchAsync(async (request, respons
 
 
 export const getAllPlansController = catchAsync(async (request, response, next) => {
-  const plans = await getAllDocs(Plan, request);
+  const plans = await getAllDocs(Plan, request.query);
   if (!plans) return next(new AppError(440, "no data was found"));
 
   response.status(200).json({
