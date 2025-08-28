@@ -5,12 +5,16 @@ import { setCompressedCacheData } from "../../externals/redis/cacheControllers/g
 import { catchAsync } from "@utils/catchAsync";
 import Product from "@models/productModel";
 import Store from "@models/storeModel";
+import getAllStores from "@services/storeServices/getAllStores";
+import returnError from "@utils/returnError";
 
 export const getStoresListController = catchAsync(async (request, response, next) => {
-  const storesList = await getAllDocs(Store, request.query, { select: ["storeName", "logo", "description", "ranking", "ratingsAverage", "ratingsQuantity", "verified"] });
-  if (!storesList) return next(new AppError(404, "لم يتم العثور على أية متاجر"));
 
-  await setCompressedCacheData(`Store:${JSON.stringify(request.query)}`, storesList, "fifteen-minutes");
+  const result = await getAllStores(request.query);
+
+  if(!result.ok) return next(returnError(result));
+
+  const {result:storesList} = result;
 
   response.status(200).json({
     success: true,
@@ -20,8 +24,8 @@ export const getStoresListController = catchAsync(async (request, response, next
 });
 
 export const getProductsListController = catchAsync(async (request, response, next) => {
-  //ENHANCE: exclude suspended / under maintenance stores' products
-  const productsList = await getAllDocs(Product, request, { select: ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"] });
+  console.log("getProductsListController");
+  const productsList = await getAllDocs(Product, request.query, { select: ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"] });
   if (!productsList) return next(new AppError(404, "لم يتم العثور على منتجات"));
 
   await setCompressedCacheData(`Product:${JSON.stringify(request.query)}`, productsList, "fifteen-minutes");
