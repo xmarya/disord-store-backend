@@ -1,9 +1,8 @@
-import createNewStore from "@services/storeServices/createNewStore";
-import deleteStorePermanently from "@services/storeServices/deleteStoreAndItsRelatedResourcePermanently";
-import getStoreForAuthorisedUser from "@services/storeServices/getStoreForAuthorisedUser";
-import updateStore from "@services/storeServices/updateStore";
-import updateStoreStatus from "@services/storeServices/updateStoreStatus";
-import deleteMyStore from "@services/usersServices/storeOwnerServices.ts/deleteMyStore";
+import createNewStore from "@services/auth/storeServices/createNewStore";
+import getStoreForAuthorisedUser from "@services/auth/storeServices/getStoreForAuthorisedUser";
+import updateStore from "@services/auth/storeServices/updateStore";
+import updateStoreStatus from "@services/auth/storeServices/updateStoreStatus";
+import deleteMyStore from "@services/auth/usersServices/storeOwnerServices.ts/deleteMyStore";
 import { StoreDataBody, StoreDocument } from "@Types/Store";
 import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";

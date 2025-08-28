@@ -1,8 +1,8 @@
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
-import createNewAdmin from "@services/adminServices/createNewAdmin";
-import createUnlimitedPlanAndStoreOwner from "@services/adminServices/createUnlimitedStoreOwner";
-import getAllUsersForAdmin from "@services/adminServices/getAllUsersForAdmin";
-import getOneUserForAdmin from "@services/adminServices/getOneUserForAdmin";
+import createNewAdmin from "@services/auth/adminServices/adminAuth/createNewAdmin";
+import createUnlimitedPlanAndStoreOwner from "@services/auth/adminServices/user/createUnlimitedStoreOwner";
+import getAllUsersForAdmin from "@services/auth/adminServices/user/getAllUsersForAdmin";
+import getOneUserForAdmin from "@services/auth/adminServices/user/getOneUserForAdmin";
 import { UnlimitedPlanDataBody } from "@Types/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";

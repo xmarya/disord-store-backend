@@ -1,9 +1,9 @@
 import { ReviewDataBody } from "@Types/Review";
-import createNewReview from "@services/resourcesReviewServices/createNewResourceReview";
-import deleteReview from "@services/resourcesReviewServices/deleteResourceReview";
-import getAllResourceReviews from "@services/resourcesReviewServices/getAllResourceReviews";
-import updateReview from "@services/resourcesReviewServices/updateResourceReview";
-import getAllUserReviews from "@services/usersServices/getAllUserReviews";
+import createNewReview from "@services/auth/resourcesReviewServices/createNewResourceReview";
+import deleteReview from "@services/auth/resourcesReviewServices/deleteResourceReview";
+import getAllResourceReviews from "@services/auth/resourcesReviewServices/getAllResourceReviews";
+import updateReview from "@services/auth/resourcesReviewServices/updateResourceReview";
+import getAllUserReviews from "@services/auth/usersServices/getAllUserReviews";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
@@ -64,7 +64,7 @@ export const updateMyReviewController = catchAsync(async (request, response, nex
   if (!reviewBody?.trim() && !rating) return next(new AppError(400, "الرجاء إضافة تعليق وتقييم قبل الإرسال"));
 
   const result = await updateReview(request.params.reviewId, { reviewBody, rating });
-if (!result.ok) return next(returnError(result));
+  if (!result.ok) return next(returnError(result));
 
   const { result: updatedReview } = result;
 

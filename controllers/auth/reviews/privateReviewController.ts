@@ -1,4 +1,4 @@
-import addStoreReplayToResourceReview from "@services/storeServices/addStoreReplayToResourceReview";
+import addStoreReplayToResourceReview from "@services/auth/storeServices/addStoreReplayToResourceReview";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
@@ -16,6 +16,6 @@ export const addStoreReply = catchAsync(async (request, response, next) => {
 
   response.status(203).json({
     success: true,
-    data: {updatedReview},
+    data: { updatedReview },
   });
 });

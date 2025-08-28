@@ -1,8 +1,8 @@
-import createNewPlatformReview from "@services/platformReviewServices/createNewPlatformReview";
-import deletePlatformReview from "@services/platformReviewServices/deletePlatformReview";
-import getAllPlatformReviews from "@services/platformReviewServices/getAllPlatformReviews";
-import getOnePlatformReview from "@services/platformReviewServices/getOnePlatformReview";
-import updatePlatformReview from "@services/platformReviewServices/updatePlatformReview";
+import createNewPlatformReview from "@services/auth/platformReviewServices/createNewPlatformReview";
+import deletePlatformReview from "@services/auth/platformReviewServices/deletePlatformReview";
+import getAllPlatformReviews from "@services/auth/platformReviewServices/getAllPlatformReviews";
+import getOnePlatformReview from "@services/auth/platformReviewServices/getOnePlatformReview";
+import updatePlatformReview from "@services/auth/platformReviewServices/updatePlatformReview";
 import { PlatformReviewDataBody } from "@Types/Review";
 import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
@@ -55,7 +55,7 @@ export const getOnePlatformReviewController = catchAsync(async (request, respons
 export const updateMyPlatformReviewController = catchAsync(async (request, response, next) => {
   const { reviewBody }: PlatformReviewDataBody = request.body;
   if (!reviewBody?.trim()) return next(new AppError(400, "الرجاء إضافة تعليق قبل الإرسال"));
-  const result = await updatePlatformReview(request.params.reviewId, {reviewBody});
+  const result = await updatePlatformReview(request.params.reviewId, { reviewBody });
 
   if (!result.ok) return next(returnError(result));
 

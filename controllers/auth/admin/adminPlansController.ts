@@ -1,12 +1,11 @@
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import { getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/planRepo";
-import getOnePlan from "@services/planServices/getOnePlan";
-import updatePlan from "@services/planServices/updatePlan";
+import getOnePlan from "@services/auth/adminServices/plan/getOnePlan";
+import updatePlan from "@services/auth/adminServices/plan/updatePlan";
 import { PlanDataBody } from "@Types/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
-
 
 export const getPlanController = catchAsync(async (request, response, next) => {
   const result = await getOnePlan(request.params.planId);
@@ -16,7 +15,7 @@ export const getPlanController = catchAsync(async (request, response, next) => {
     return next(new AppError(statusCode, result.message));
   }
 
-  const {result: plan} = result;
+  const { result: plan } = result;
   response.status(200).json({
     success: true,
     data: { plan },
@@ -31,7 +30,7 @@ export const updatePlanController = catchAsync(async (request, response, next) =
   const result = await updatePlan(request.params.planId, request.body);
   if (!result.ok) return next(returnError(result));
 
-  const {result:updatedPlan} = result;
+  const { result: updatedPlan } = result;
   response.status(201).json({
     success: true,
     data: { updatedPlan },
