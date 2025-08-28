@@ -1,5 +1,5 @@
-import getAdminEmail from "@services/adminServices/getAdminEmail";
-import getUserEmail from "@services/usersServices/getUserEmail";
+import getAdminEmail from "@services/auth/adminServices/adminAuth/getAdminEmail";
+import getUserEmail from "@services/auth/usersServices/getUserEmail";
 import { MongoId } from "@Types/MongoId";
 import { UserTypes } from "@Types/User";
 import { err } from "neverthrow";

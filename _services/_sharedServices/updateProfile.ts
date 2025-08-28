@@ -1,6 +1,6 @@
 import eventBus from "@config/EventBus";
-import updateAdminProfile from "@services/adminServices/updateAdminProfile";
-import updateUserProfile from "@services/usersServices/updateUserProfile";
+import updateAdminProfile from "@services/auth/adminServices/adminAuth/updateAdminProfile";
+import updateUserProfile from "@services/auth/usersServices/updateUserProfile";
 import { AdminDocument } from "@Types/admin/AdminUser";
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { UserDocument } from "@Types/User";

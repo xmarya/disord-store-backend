@@ -1,5 +1,5 @@
-import getAdminCredentials from "@services/adminServices/getAdminCredentials";
-import getUserCredentials from "@services/usersServices/getUserCredentials";
+import getAdminCredentials from "@services/auth/adminServices/adminAuth/getAdminCredentials";
+import getUserCredentials from "@services/auth/usersServices/getUserCredentials";
 import { AdminDocument } from "@Types/admin/AdminUser";
 import { UserDocument } from "@Types/User";
 import jwtSignature from "@utils/jwtToken/generateSignature";
@@ -27,7 +27,7 @@ async function confirmChangedPassword(data: ChangedPasswordData) {
 
   if (!result.ok) return result;
 
-  const {result: user} = result;
+  const { result: user } = result;
   //STEP 3) is the provided password matching our record?
   if (!(await comparePasswords(data.currentPassword, user.credentials.password))) return err("الرجاء التحقق من البيانات المدخلة");
 
