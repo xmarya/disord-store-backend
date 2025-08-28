@@ -1,17 +1,17 @@
-import { startSession } from "mongoose";
-import { getAllDocs, getOneDocById } from "@repositories/global";
-import { AppError } from "@utils/AppError";
-import { setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
-import { catchAsync } from "@utils/catchAsync";
+import Plan from "@models/planModel";
 import Product from "@models/productModel";
 import Store from "@models/storeModel";
-import getAllStores from "@services/storeServices/getAllStores";
+import { getAllDocs, getOneDocById } from "@repositories/global";
+import getAllProductsForPublic from "@services/productServices/getAllProductsForPublic";
+import getAllStoresForPublic from "@services/storeServices/getAllStoresForPublic";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
-import Plan from "@models/planModel";
+import { startSession } from "mongoose";
 
 export const getStoresListController = catchAsync(async (request, response, next) => {
 
-  const result = await getAllStores(request.query);
+  const result = await getAllStoresForPublic(request.query);
 
   if(!result.ok) return next(returnError(result));
 
@@ -25,11 +25,10 @@ export const getStoresListController = catchAsync(async (request, response, next
 });
 
 export const getProductsListController = catchAsync(async (request, response, next) => {
-  console.log("getProductsListController");
-  const productsList = await getAllDocs(Product, request.query, { select: ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"] });
-  if (!productsList) return next(new AppError(404, "لم يتم العثور على منتجات"));
+  const result = await getAllProductsForPublic(request.query);
+  if(!result.ok) return next(returnError(result));
 
-  await setCompressedCacheData(`Product:${JSON.stringify(request.query)}`, productsList, "fifteen-minutes");
+  const {result: productsList} = result
   response.status(200).json({
     success: true,
     result: productsList.length,

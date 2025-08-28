@@ -1,12 +1,12 @@
 import eventBus from "@config/EventBus";
 import Store from "@models/storeModel";
 import { getAllDocs } from "@repositories/global";
-import { StoreListFetched } from "@Types/events/StoreEvents";
+import { QueryResultsFetched } from "@Types/events/QueryResultsFetched";
 import { QueryParams } from "@Types/Request";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-async function getAllStores(query: QueryParams) {
+async function getAllStoresForPublic(query: QueryParams) {
   const safeGetStores = safeThrowable(
     () => getAllDocs(Store, query, { select: ["storeName", "logo", "description", "ranking", "ratingsAverage", "ratingsQuantity", "verified"] }),
     (error) => new Error((error as Error).message)
@@ -14,17 +14,17 @@ async function getAllStores(query: QueryParams) {
 
   const result = await extractSafeThrowableResult(() => safeGetStores);
 
-  if(result.ok) {
-    const event:StoreListFetched = {
-        type: "storeList-fetched",
-        payload: {query: JSON.stringify(query), storesList:result.result},
-        occurredAt: new Date()
-    }
+  if (result.ok) {
+    const event: QueryResultsFetched = {
+      type: "queryResults-fetched",
+      payload: { key: `Stores:${JSON.stringify(query)}`, queryResults: result.result },
+      occurredAt: new Date(),
+    };
 
     eventBus.publish(event);
   }
 
-return result
+  return result;
 }
 
-export default getAllStores;
+export default getAllStoresForPublic;
