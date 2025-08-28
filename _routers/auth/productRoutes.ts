@@ -8,7 +8,7 @@ import validateRequestParams from "../../middlewares/validators/validateRequestP
 import verifyUsedQuota from "../../middlewares/validators/verifyUsedQuota";
 import { createProductController, deleteProductController, getOneProductController, updateProductController } from "../../controllers/auth/productController";
 import { router as reviewRouter } from "./reviews/privateReviewRoutes";
-import { getProductsListController } from "../../controllers/public/storeAndProductController";
+import { getProductsListController } from "../../controllers/public/publicResourcesController";
 
 export const router = express.Router();
 

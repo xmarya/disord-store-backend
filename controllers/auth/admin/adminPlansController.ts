@@ -1,6 +1,4 @@
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
-import Plan from "@models/planModel";
-import { getAllDocs } from "@repositories/global";
 import { getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/planRepo";
 import getOnePlan from "@services/planServices/getOnePlan";
 import updatePlan from "@services/planServices/updatePlan";
@@ -9,15 +7,6 @@ import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 
-export const getAllPlansController = catchAsync(async (request, response, next) => {
-  const plans = await getAllDocs(Plan, request);
-  if (!plans) return next(new AppError(440, "no data was found"));
-
-  response.status(200).json({
-    success: true,
-    data: { plans },
-  });
-});
 
 export const getPlanController = catchAsync(async (request, response, next) => {
   const result = await getOnePlan(request.params.planId);

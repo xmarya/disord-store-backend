@@ -7,7 +7,7 @@ import validateNewUserData from "../../middlewares/validators/validateNewUserDat
 import validateRequestParams from "../../middlewares/validators/validateRequestParams";
 import validateUnlimitedUserData from "../../middlewares/validators/validateUnlimitedUserData";
 import {getAdminProfileController } from "../../controllers/auth/admin/adminAuthController";
-import { getAllPlansController, getMonthlyPlansStatsController, getPlanController, getPlansStatsReportController, updatePlanController } from "../../controllers/auth/admin/adminPlansController";
+import { getMonthlyPlansStatsController, getPlanController, getPlansStatsReportController, updatePlanController } from "../../controllers/auth/admin/adminPlansController";
 import { displayReviewInHomePageController } from "../../controllers/auth/admin/adminReviewsController";
 import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
 import { createAdminController, createUnlimitedUserController, getAllUsersController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";

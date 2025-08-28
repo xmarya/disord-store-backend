@@ -1,8 +1,7 @@
-import express from "express";;
-import { getAllPlansController } from "@controllers/auth/admin/adminPlansController";
+import express from "express";
 import checkCache from "@externals/redis/cacheControllers/checkCache";
 import validateRequestParams from "@middlewares/validators/validateRequestParams";
-import { getProductsListController, getStoresListController, getStoreWithProductsController } from "@controllers/public/storeAndProductController";
+import { getAllPlansController, getProductsListController, getStoresListController, getStoreWithProductsController } from "@controllers/public/publicResourcesController";
 import { getOneProductController } from "@controllers/auth/productController";
 import isStoreActive from "@middlewares/protectors/isStoreActive";
 import { getAllReviewsController } from "@controllers/auth/reviews/publicReviewController";
