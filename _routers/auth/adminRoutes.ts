@@ -50,7 +50,7 @@ router
     2- get - update route for a plan ✅
     3- get plans stats
 */
-router.get("/plans", getAllPlansController);
+
 // rule of 👍🏻: remember to keep the specific routes at the top of the routes stack, whilst keeping the general -especially that has /:params) at the bottom of the stack
 router.get("/plans/monthlyStats", getDateQuery, getMonthlyPlansStatsController); /*✅*/ // for displaying data per month (the default is this month)
 router.get("/plans/plansReports", getPlansStatsReportController); /*✅*/
