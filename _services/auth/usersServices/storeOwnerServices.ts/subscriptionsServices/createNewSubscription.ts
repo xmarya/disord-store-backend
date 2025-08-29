@@ -1,7 +1,7 @@
 import getOnePlan from "@services/auth/plan/getOnePlan";
 import { MongoId } from "@Types/MongoId";
 import { err } from "neverthrow";
-import createNewSubscriptionsLog from "./createNewSubscriptionsLog";
+import createNewSubscriptionsLog from "./addNewSubscriptionsLog";
 import eventBus from "@config/EventBus";
 import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
 
