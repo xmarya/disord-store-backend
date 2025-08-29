@@ -1,9 +1,9 @@
 import eventBus from "@config/EventBus";
 import { setCompressedCacheData } from "@externals/redis/cacheControllers/globalCache";
-import { QueryResultsFetched } from "@Types/events/QueryResultsFetched";
+import { QueryResultsFetchedEvent } from "@Types/events/QueryResultsFetchedEvent";
 import safeThrowable from "@utils/safeThrowable";
 
-eventBus.ofType<QueryResultsFetched>("queryResults-fetched").subscribe((event) => {
+eventBus.ofType<QueryResultsFetchedEvent>("queryResults-fetched").subscribe((event) => {
   const { key, queryResults } = event.payload;
 
   safeThrowable(
