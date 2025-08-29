@@ -1,13 +1,15 @@
 import { PlansNames, SubscriptionTypes } from "@Types/Plan";
 import { DomainEvent } from "./DomainEvent";
+import { UserDocument } from "@Types/User";
+import { MongoId } from "@Types/MongoId";
 
 
-export interface PlanSubscriptionUpdate extends DomainEvent {
+export interface PlanSubscriptionUpdateEvent extends DomainEvent {
     type: "planSubscription.updated",
     payload: {
-        storeOwnerId:string,
+        storeOwner:UserDocument,
         planName:PlansNames,
-        planId:string,
+        planId:MongoId,
         profit:number,
         subscriptionType:SubscriptionTypes
     },
