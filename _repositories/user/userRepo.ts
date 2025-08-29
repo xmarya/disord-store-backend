@@ -31,8 +31,8 @@ export async function resetStoreOwnerToDefault(storeId: MongoId, session: mongoo
   ).session(session);
 }
 
-export async function createNewSubscription(userId: MongoId, data: Pick<StoreOwner, "subscribedPlanDetails">, session: mongoose.ClientSession) {
-  const updatedUser = await User.findByIdAndUpdate(userId, data, { session, runValidators: true, new: true });
+export async function createNewSubscription(userId: MongoId, data: Pick<StoreOwner, "subscribedPlanDetails">) {
+  const updatedUser = await User.findByIdAndUpdate(userId, data, { runValidators: true, new: true });
   return updatedUser;
 }
 
