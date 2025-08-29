@@ -1,7 +1,7 @@
 import User from "@models/userModel";
 import { getOneDocById } from "@repositories/global";
-import deleteUser from "@services/usersServices/deleteUser";
-import getUserProfile from "@services/usersServices/getUserProfile";
+import deleteUser from "@services/auth/usersServices/deleteUser";
+import getUserProfile from "@services/auth/usersServices/getUserProfile";
 import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
