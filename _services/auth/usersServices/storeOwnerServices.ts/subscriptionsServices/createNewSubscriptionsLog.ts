@@ -1,0 +1,34 @@
+import { MongoId } from "@Types/MongoId";
+import { PlanDocument, SubscriptionTypes } from "@Types/Plan";
+import { StoreOwner } from "@Types/User";
+import { createNewSubscription } from "@repositories/user/userRepo";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import getSubscriptionStartAndEndDates from "@utils/getSubscriptionStartAndEndDates";
+import safeThrowable from "@utils/safeThrowable";
+
+async function createNewSubscriptionsLog(storeOwnerId: MongoId, plan: PlanDocument, paidPrice: number, subscriptionType: SubscriptionTypes) {
+  const { id: planId, planName } = plan;
+  const { subscribeStarts, subscribeEnds } = getSubscriptionStartAndEndDates();
+
+  const userData: Pick<StoreOwner, "subscribedPlanDetails"> = {
+    subscribedPlanDetails: {
+      planId,
+      planName,
+      subscriptionType,
+      paid: true,
+      subscribeStarts,
+      subscribeEnds,
+      paidPrice,
+    },
+  };
+
+  const safeUpdateStoreOwner = safeThrowable(
+    () => createNewSubscription(storeOwnerId, userData),
+    (error) => new Error((error as Error).message)
+  );
+
+
+  return extractSafeThrowableResult(() => safeUpdateStoreOwner);
+}
+
+export default createNewSubscriptionsLog;

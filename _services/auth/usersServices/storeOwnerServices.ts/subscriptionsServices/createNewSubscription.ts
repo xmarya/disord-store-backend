@@ -1,0 +1,36 @@
+import getOnePlan from "@services/auth/plan/getOnePlan";
+import { MongoId } from "@Types/MongoId";
+import { err } from "neverthrow";
+import createNewSubscriptionsLog from "./createNewSubscriptionsLog";
+import eventBus from "@config/EventBus";
+import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
+
+async function createNewPlanSubscription(storeOwner: MongoId, planId: MongoId, paidPrice: number) {
+  const planResult = await getOnePlan(planId);
+  if (!planResult.ok && planResult.reason === "not-found") return err("لايوجد باقة بهذا المعرف");
+  if (!planResult.ok) return planResult;
+
+  const { result: plan } = planResult;
+
+  const updatedStoreOwnerResult = await createNewSubscriptionsLog(storeOwner, plan, paidPrice, "new");
+
+  if(updatedStoreOwnerResult.ok) {
+    const event:PlanSubscriptionUpdateEvent = {
+      type:"planSubscription.updated",
+      payload: {
+        storeOwner: updatedStoreOwnerResult.result,
+        planId,
+        planName: plan.planName,
+        profit: paidPrice,
+        subscriptionType: "new"
+      },
+      occurredAt: new Date()
+    }
+
+    eventBus.publish(event);
+  }
+
+  return updatedStoreOwnerResult;
+}
+
+export default createNewPlanSubscription;

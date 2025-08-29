@@ -6,25 +6,28 @@ import { updatePlanMonthlyStats } from "@repositories/plan/planRepo";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import { getSubscriptionType } from "@utils/getSubscriptionType";
-import { startSubscription } from "@utils/startSubscription";
+// import { startSubscription } from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/createNewSubscriptionsLog";
 import Plan from "@models/planModel";
 import User from "@models/userModel";
 import cacheUser from "../../externals/redis/cacheControllers/user";
 import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPlan";
+import createNewPlanSubscription from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/createNewSubscription";
+import returnError from "@utils/returnError";
+import isErr from "@utils/isErr";
 
 export const createNewSubscribeController = catchAsync(async (request, response, next) => {
-  /*✅*/
-
   const { planId, paidPrice } = request.body;
-  if (!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
-  const plan = await getOneDocById(Plan, planId);
-  if (!plan) return next(new AppError(404, "لايوجد باقة بهذا المعرف"));
+  if (!planId?.trim() || !paidPrice) return next(returnError({ reason: "bad-request", message: "الرجاء ادخال تفاصيل الباقة" }));
 
-  const updatedUser = await startSubscription(request.user.id, plan, paidPrice, "new");
+  const result = await createNewPlanSubscription(request.user.id, planId, paidPrice);
+  if (isErr(result)) return next(returnError({ reason: "bad-request", message: result.error }));
+  if (!result?.ok) return next(returnError(result));
+
+  const {result :updatedStoreOwner } = result;
 
   response.status(203).json({
     success: true,
-    data: {newSubscription: updatedUser?.subscribedPlanDetails,}
+    data: { newSubscription: updatedStoreOwner.subscribedPlanDetails },
   });
 });
 
@@ -39,11 +42,11 @@ export const renewalSubscriptionController = catchAsync(async (request, response
   const subscriptionType = await getSubscriptionType(currentPlanId, planId);
   if (!subscriptionType) return;
 
-  const updatedUser = await startSubscription(request.user.id, plan, paidPrice, subscriptionType);
+  // const updatedUser = await startSubscription(request.user.id, plan, paidPrice, subscriptionType);
 
   response.status(203).json({
     success: true,
-    data: {updatedUserSubscription: updatedUser?.subscribedPlanDetails,}
+    // data: { updatedUserSubscription: updatedUser?.subscribedPlanDetails },
   });
 });
 
@@ -62,7 +65,7 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
   const session = await startSession();
   const updatedUser = await session.withTransaction(async () => {
     //TODO: add an admin log
-    await updatePlanMonthlyStats(subscribedPlanDetails.planName, subscribedPlanDetails.paidPrice, "cancellation", session);
+    await updatePlanMonthlyStats(subscribedPlanDetails.planName, subscribedPlanDetails.paidPrice, "cancellation" /*session*/); // FIX
     const updatedUser = await updateDoc(User, userId, { $unset: { subscribedPlanDetails: "" } }, { session });
 
     return updatedUser;
@@ -82,6 +85,6 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
 
   response.status(200).json({
     success: true,
-    data: {updatedUser},
+    data: { updatedUser },
   });
 });

@@ -1,8 +1,8 @@
 import eventBus from "@config/EventBus";
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
-import createNewUnlimitedPlan from "@services/auth/adminServices/plan/createNewUnlimitedPlan";
+import createNewUnlimitedPlan from "@services/auth/plan/createNewUnlimitedPlan";
 import createUnlimitedStoreOwner from "@services/auth/usersServices/storeOwnerServices.ts/createUnlimitedStoreOwner";
-import { PlanSubscriptionUpdate } from "@Types/events/PlanSubscriptionEvents";
+import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
 import { UnlimitedPlanDataBody } from "@Types/Plan";
 import { UnlimitedStoreOwnerData } from "@Types/User";
 import { startSession } from "mongoose";
@@ -19,10 +19,10 @@ async function createUnlimitedPlanAndStoreOwner(unlimitedPlanDetails: Omit<Unlim
 
     await session.commitTransaction();
 
-    const event: PlanSubscriptionUpdate = {
+    const event: PlanSubscriptionUpdateEvent = {
       type: "planSubscription.updated",
       payload: {
-        storeOwnerId: newUnlimitedStoreOwner.id,
+        storeOwner: newUnlimitedStoreOwner,
         planId: newUnlimitedPlan.id,
         planName: newUnlimitedPlan.planName,
         subscriptionType: storeOwnerData.subscriptionType,
