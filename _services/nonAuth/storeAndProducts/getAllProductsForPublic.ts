@@ -1,7 +1,7 @@
 import eventBus from "@config/EventBus";
 import Product from "@models/productModel";
 import { getAllDocs } from "@repositories/global";
-import { QueryResultsFetched } from "@Types/events/QueryResultsFetched";
+import { QueryResultsFetchedEvent } from "@Types/events/QueryResultsFetchedEvent";
 import { MongoId } from "@Types/MongoId";
 import { ProductDocument } from "@Types/Product";
 import { QueryOptions } from "@Types/QueryOptions";
@@ -9,11 +9,11 @@ import { QueryParams } from "@Types/Request";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-async function getAllProductsForPublic(query: QueryParams, storeId?:MongoId) {
+async function getAllProductsForPublic(query: QueryParams, storeId?: MongoId) {
   const fields: QueryOptions<ProductDocument>["select"] = ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"];
 
   const safeGetProducts = safeThrowable(
-    () => getAllDocs(Product, query, { select: fields, ...(storeId && {condition: {store: storeId}}) }),
+    () => getAllDocs(Product, query, { select: fields, ...(storeId && { condition: { store: storeId } }) }),
     (error) => new Error((error as Error).message)
   );
 
@@ -21,7 +21,7 @@ async function getAllProductsForPublic(query: QueryParams, storeId?:MongoId) {
   if (result.ok) {
     /*REQUIRES TESTING*/
     const queryPart = storeId ? JSON.stringify({ store: storeId, ...query }) : JSON.stringify(query);
-    const event: QueryResultsFetched = {
+    const event: QueryResultsFetchedEvent = {
       type: "queryResults-fetched",
       payload: {
         key: `Products:${queryPart}`,

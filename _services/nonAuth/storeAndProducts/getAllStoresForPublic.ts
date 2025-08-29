@@ -1,7 +1,7 @@
 import eventBus from "@config/EventBus";
 import Store from "@models/storeModel";
 import { getAllDocs } from "@repositories/global";
-import { QueryResultsFetched } from "@Types/events/QueryResultsFetched";
+import { QueryResultsFetchedEvent } from "@Types/events/QueryResultsFetchedEvent";
 import { QueryParams } from "@Types/Request";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
@@ -15,7 +15,7 @@ async function getAllStoresForPublic(query: QueryParams) {
   const result = await extractSafeThrowableResult(() => safeGetStores);
 
   if (result.ok) {
-    const event: QueryResultsFetched = {
+    const event: QueryResultsFetchedEvent = {
       type: "queryResults-fetched",
       payload: { key: `Stores:${JSON.stringify(query)}`, queryResults: result.result },
       occurredAt: new Date(),
