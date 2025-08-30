@@ -1,10 +1,10 @@
 import getOnePlan from "@services/auth/plan/getOnePlan";
 import { MongoId } from "@Types/MongoId";
-import { getSubscriptionType } from "@utils/getSubscriptionType";
 import { err } from "neverthrow";
 import createNewSubscriptionsLog from "./addNewSubscriptionsLog";
 import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
 import eventBus from "@config/EventBus";
+import { getSubscriptionType } from "@utils/subscriptions/getSubscriptionType";
 
 async function renewalStoreOwnerSubscription(storeOwnerId:MongoId, currentPlanId:MongoId, newPlanId: MongoId, paidPrice: number) {
   const newPlanResult = await getOnePlan(newPlanId);
