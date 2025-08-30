@@ -60,5 +60,10 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
   const isRenewal = subscriptionType === "renewal";
   if (isRenewal || isUnlimitedPlan) return;
 
-  cacheStoreAndPlan(storeOwner.myStore, planId, true, planExpiryDate);
+  const isPaid = subscriptionType === "cancellation" ? false : true;
+
+  safeThrowable(
+    () => cacheStoreAndPlan(storeOwner.myStore, planId, isPaid, planExpiryDate),
+    (error) => new Error((error as Error).message)
+  );
 });
