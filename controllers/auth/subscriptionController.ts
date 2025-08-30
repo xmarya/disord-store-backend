@@ -14,6 +14,7 @@ import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPl
 import createNewPlanSubscription from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/createNewSubscription";
 import returnError from "@utils/returnError";
 import isErr from "@utils/isErr";
+import renewalStoreOwnerSubscription from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/renewalStoreOwnerSubscription";
 
 export const createNewSubscribeController = catchAsync(async (request, response, next) => {
   const { planId, paidPrice } = request.body;
@@ -33,20 +34,19 @@ export const createNewSubscribeController = catchAsync(async (request, response,
 
 export const renewalSubscriptionController = catchAsync(async (request, response, next) => {
   const { planId, paidPrice } = request.body;
-  if (!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
-
-  const plan = await getOneDocById(Plan, planId);
-  if (!plan) return next(new AppError(404, "لايوجد باقة بهذا المعرف"));
-
+  if (!planId?.trim() || !paidPrice) return next(returnError( {reason: "bad-request", message:"الرجاء ادخال تفاصيل الباقة"}));
+  
   const currentPlanId = request.plan;
-  const subscriptionType = await getSubscriptionType(currentPlanId, planId);
-  if (!subscriptionType) return;
+  const storeOwnerId = request.user.id;
+  const result = await renewalStoreOwnerSubscription(storeOwnerId, currentPlanId, planId, paidPrice);
 
-  // const updatedUser = await startSubscription(request.user.id, plan, paidPrice, subscriptionType);
+  if(isErr(result)) return next(returnError({reason: "not-found", message: result.error}));
+  if(!result.ok) return next(returnError(result));
 
+  const {result: renewalData} = result;
   response.status(203).json({
     success: true,
-    // data: { updatedUserSubscription: updatedUser?.subscribedPlanDetails },
+    data: { updatedUserSubscription: renewalData.subscribedPlanDetails },
   });
 });
 

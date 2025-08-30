@@ -1,47 +1,53 @@
 import eventBus from "@config/EventBus";
-import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
+import cacheUser from "@externals/redis/cacheControllers/user";
 import Plan from "@models/planModel";
 import { updateDoc } from "@repositories/global";
 import { updatePlanMonthlyStats } from "@repositories/plan/planRepo";
 import { updateStoreInPlan } from "@repositories/store/storeRepo";
-import { PlanSubscriptionUpdate } from "@Types/events/PlanSubscriptionEvents";
+import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
 import safeThrowable from "@utils/safeThrowable";
 
-
-// link the unlimited store owner id to the unlimited plan
-eventBus.ofType<PlanSubscriptionUpdate>("planSubscription.updated").subscribe(event=> {
-    const {storeOwnerId, planId} = event.payload;
-    // const createdAt = event.occurredAt;
-
-    safeThrowable(
-        () => updateDoc(Plan, planId, { unlimitedUser: storeOwnerId}),
-        //TODO: () => addFailedJob("key", event.payload)
-        () => new Error(INTERNAL_ERROR_MESSAGE)
-    );
-
-});
-
 // update the plans stats:
-eventBus.ofType<PlanSubscriptionUpdate>("planSubscription.updated").subscribe(event => {
-    const {planName, profit, subscriptionType,} = event.payload;
-    safeThrowable(
-        () => updatePlanMonthlyStats(planName, profit, subscriptionType),
-        //TODO: () => addFailedJob("key", event.payload)
-        () => new Error(INTERNAL_ERROR_MESSAGE)
-    );
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+  const { planName, profit, subscriptionType } = event.payload;
+  safeThrowable(
+    () => updatePlanMonthlyStats(planName, profit, subscriptionType),
+    //TODO: () => addFailedJob("key", event.payload)
+    (error) => new Error((error as Error).message)
+  );
 });
-
 
 // update the store inPlan field:
-eventBus.ofType<PlanSubscriptionUpdate>("planSubscription.updated").subscribe(event => {
-    if(event.payload.subscriptionType === "renewal") return;
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+  const { storeOwner, planName, subscriptionType } = event.payload;
+  if (subscriptionType === "renewal" || planName === "unlimited") return;
 
-    const {storeOwnerId, planName} = event.payload;
+  safeThrowable(
+    () => updateStoreInPlan(storeOwner.id, planName),
+    //TODO: () => addFailedJob("key", event.payload)
+    (error) => new Error((error as Error).message)
+  );
+});
 
-    safeThrowable(
-        () => updateStoreInPlan(storeOwnerId, planName),
-        //TODO: () => addFailedJob("key", event.payload)
-        () => new Error(INTERNAL_ERROR_MESSAGE)
-    );
+// link the unlimited store owner id to the unlimited plan
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+  const { storeOwner, planId, planName } = event.payload;
 
+  if (planName !== "unlimited") return;
+  safeThrowable(
+    () => updateDoc(Plan, planId, { unlimitedUser: storeOwner.id }),
+    //TODO: () => addFailedJob("key", event.payload)
+    (error) => new Error((error as Error).message)
+  );
+});
+
+// caching the updatedUser
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+  const { storeOwner, planName } = event.payload;
+  if (planName === "unlimited") return;
+
+  safeThrowable(
+    () => cacheUser(storeOwner),
+    (error) => new Error((error as Error).message)
+  );
 });
