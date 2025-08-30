@@ -1,15 +1,11 @@
-import User from "@models/userModel";
-import { getOneDocById } from "@repositories/global";
 import deleteUser from "@services/auth/usersServices/deleteUser";
 import getUserProfile from "@services/auth/usersServices/getUserProfile";
-import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import formatSubscriptionsLogs from "@utils/queryModifiers/formatSubscriptionsLogs";
+import returnError from "@utils/returnError";
 import type { Request, Response } from "express";
 import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
-import returnError from "@utils/returnError";
 
 export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -20,26 +16,10 @@ export const getUserProfileController = catchAsync(async (request, response, nex
 
   response.status(200).json({
     success: true,
-    data: {userProfile},
+    data: { userProfile },
   });
 });
 
-export const getMySubscriptionsLogController = catchAsync(async (request, response, next) => {
-  const userId = request.user.id;
-  const userPlansLog = await getOneDocById(User, userId, { select: ["subscribedPlanDetails", "subscriptionsLog"] });
-  if (!userPlansLog) return next(new AppError(400, "لم يتم العثور على البيانات المطلوبة"));
-
-  const { subscribedPlanDetails, subscriptionsLog, planExpiresInDays } = userPlansLog as UserDocument & { planExpiresInDays: string };
-  const currentSubscription = formatSubscriptionsLogs(subscribedPlanDetails, planExpiresInDays);
-
-  response.status(200).json({
-    success: true,
-    data: {
-      currentSubscription,
-      subscriptionsLog,
-    },
-  });
-});
 
 // TODO: bank account controller, it's separate because it needs card data validation
 
