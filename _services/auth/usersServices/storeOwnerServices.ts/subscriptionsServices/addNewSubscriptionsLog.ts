@@ -3,7 +3,7 @@ import { PlanDocument, SubscriptionTypes } from "@Types/Plan";
 import { StoreOwner } from "@Types/User";
 import { createNewSubscription } from "@repositories/user/userRepo";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
-import getSubscriptionStartAndEndDates from "@utils/getSubscriptionStartAndEndDates";
+import getSubscriptionStartAndEndDates from "@utils/subscriptions/getSubscriptionStartAndEndDates";
 import safeThrowable from "@utils/safeThrowable";
 
 async function createNewSubscriptionsLog(storeOwnerId: MongoId, newPlan: PlanDocument, paidPrice: number, subscriptionType: SubscriptionTypes) {

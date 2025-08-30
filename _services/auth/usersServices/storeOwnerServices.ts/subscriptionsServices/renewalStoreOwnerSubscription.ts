@@ -15,17 +15,19 @@ async function renewalStoreOwnerSubscription(storeOwnerId:MongoId, currentPlanId
 
   const newPlanDocument = newPlanResult.result;
 
-  const storeOwnerRenewalDetails = await createNewSubscriptionsLog(storeOwnerId, newPlanDocument, paidPrice, subscriptionType);
+  const storeOwnerRenewalResult = await createNewSubscriptionsLog(storeOwnerId, newPlanDocument, paidPrice, subscriptionType);
 
-  if(storeOwnerRenewalDetails.ok) {
+  if(storeOwnerRenewalResult.ok) {
+    const {result: storeOwnerRenewalDetails} = storeOwnerRenewalResult;
       const event:PlanSubscriptionUpdateEvent = {
     type:"planSubscription.updated",
     payload: {
-      storeOwner: storeOwnerRenewalDetails.result,
+      storeOwner: storeOwnerRenewalDetails,
       planName: newPlanDocument.planName,
       planId: newPlanDocument.id,
       profit: paidPrice,
-      subscriptionType
+      subscriptionType,
+      planExpiryDate: storeOwnerRenewalDetails.subscribedPlanDetails.subscribeEnds
     },
     occurredAt: new Date(),
   }
@@ -33,7 +35,7 @@ async function renewalStoreOwnerSubscription(storeOwnerId:MongoId, currentPlanId
   eventBus.publish(event);
   }
 
-  return storeOwnerRenewalDetails;
+  return storeOwnerRenewalResult;
 }
 
 export default renewalStoreOwnerSubscription;

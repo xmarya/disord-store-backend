@@ -27,6 +27,7 @@ async function createUnlimitedPlanAndStoreOwner(unlimitedPlanDetails: Omit<Unlim
         planName: newUnlimitedPlan.planName,
         subscriptionType: storeOwnerData.subscriptionType,
         profit: unlimitedPlanDetails.price.riyal,
+        planExpiryDate: newUnlimitedStoreOwner.subscribedPlanDetails.subscribeEnds
       },
       occurredAt: new Date(),
     };
