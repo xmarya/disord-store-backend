@@ -6,8 +6,8 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import getSubscriptionStartAndEndDates from "@utils/getSubscriptionStartAndEndDates";
 import safeThrowable from "@utils/safeThrowable";
 
-async function createNewSubscriptionsLog(storeOwnerId: MongoId, plan: PlanDocument, paidPrice: number, subscriptionType: SubscriptionTypes) {
-  const { id: planId, planName } = plan;
+async function createNewSubscriptionsLog(storeOwnerId: MongoId, newPlan: PlanDocument, paidPrice: number, subscriptionType: SubscriptionTypes) {
+  const { id: planId, planName } = newPlan;
   const { subscribeStarts, subscribeEnds } = getSubscriptionStartAndEndDates();
 
   const userData: Pick<StoreOwner, "subscribedPlanDetails"> = {
