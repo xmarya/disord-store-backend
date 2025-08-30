@@ -11,7 +11,8 @@ export interface PlanSubscriptionUpdateEvent extends DomainEvent {
         planName:PlansNames,
         planId:MongoId,
         profit:number,
-        subscriptionType:SubscriptionTypes
+        planExpiryDate:Date,
+        subscriptionType:SubscriptionTypes | "cancellation"
     },
     occurredAt: Date;
 }

@@ -1,4 +1,5 @@
 import eventBus from "@config/EventBus";
+import cacheStoreAndPlan from "@externals/redis/cacheControllers/storeAndPlan";
 import cacheUser from "@externals/redis/cacheControllers/user";
 import Plan from "@models/planModel";
 import { updateDoc } from "@repositories/global";
@@ -50,4 +51,14 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
     () => cacheUser(storeOwner),
     (error) => new Error((error as Error).message)
   );
+});
+
+// caching the store and the plan
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+  const { subscriptionType, planId, planName, planExpiryDate, storeOwner } = event.payload;
+  const isUnlimitedPlan = planName === "unlimited";
+  const isRenewal = subscriptionType === "renewal";
+  if (isRenewal || isUnlimitedPlan) return;
+
+  cacheStoreAndPlan(storeOwner.myStore, planId, true, planExpiryDate);
 });
