@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { formatDistanceStrict, lightFormat } from "date-fns";
 import { arSA } from "date-fns/locale/ar-SA";
 import mongoose, { Schema } from "mongoose";
-import { HASHING_SALT } from "../_constants/numbers";
+import { HASHING_SALT } from "../_constants/primitives";
 import { UserDocument } from "@Types/User";
 import "./storeModel"; // ✅ Make sure Store is registered before User
 

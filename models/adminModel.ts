@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { AdminDocument } from "@Types/admin/AdminUser";
 import { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
-import { HASHING_SALT } from "../_constants/numbers";
+import { HASHING_SALT } from "../_constants/primitives";
 
 type AdminModel = mongoose.Model<AdminDocument>;
 const adminSchema = new Schema<AdminDocument>(

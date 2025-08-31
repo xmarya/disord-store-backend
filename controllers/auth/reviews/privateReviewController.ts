@@ -1,17 +1,21 @@
-import { updateDoc } from "@repositories/global";
+import addStoreReplayToResourceReview from "@services/auth/storeServices/addStoreReplayToResourceReview";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import Review from "@models/reviewModel";
+import returnError from "@utils/returnError";
 
 export const addStoreReply = catchAsync(async (request, response, next) => {
   const { storeReply } = request.body;
 
   if (!storeReply?.trim()) return next(new AppError(400, "please write a replay to the customer"));
 
-  const updatedReview = await updateDoc(Review, request.params.reviewId, { storeReply });
+  const result = await addStoreReplayToResourceReview(request.params.reviewId, storeReply);
+
+  if (!result.ok) return next(returnError(result));
+
+  const { result: updatedReview } = result;
 
   response.status(203).json({
     success: true,
-    data: {updatedReview},
+    data: { updatedReview },
   });
 });

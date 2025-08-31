@@ -1,44 +1,50 @@
-import { startSession } from "mongoose";
-import { deleteProductFromCategory, updateProductInCategories } from "@repositories/category/categoryRepo";
-import { createDoc, deleteDoc, getOneDocById } from "@repositories/global";
-import { updateProduct } from "@repositories/product/productRepo";
-import { CategoryDocument } from "@Types/Category";
+import createNewProduct from "@services/auth/productServices/createNewProduct";
+import deleteProductAndItsRelated from "@services/auth/productServices/deleteProductAndItsRelated";
+import getAllProductsForAuthorisedUser from "@services/auth/productServices/getAllProductsForAuthorisedUser";
+import getOneProduct from "@services/auth/productServices/getOneProduct";
+import updateOneProduct from "@services/auth/productServices/updateProduct";
 import { AppError } from "@utils/AppError";
-import { deleteFromCache, setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
 import { catchAsync } from "@utils/catchAsync";
-import Product from "@models/productModel";
-import { categoriesInCache } from "./categoryController";
-import { deleteAllResourceReviews } from "@repositories/review/reviewRepo";
+import returnError from "@utils/returnError";
 
 export const createProductController = catchAsync(async (request, response, next) => {
   const { categories } = request.body;
   if (categories && categories.constructor !== Array) return next(new AppError(400, "the categories should be inside an array")); /*✅*/
 
   const storeId = request.store;
-  const data = { store: storeId, ...request.body };
 
-  const newProd = await createDoc(Product, data);
-  if (categories) {
-    await updateProductInCategories(categories, newProd.id);
-    await setCompressedCacheData(`Category:${newProd.id}`, newProd.categories, "fifteen-minutes"); // set the new cats, without waiting
-  }
+  const result = await createNewProduct(storeId, request.body);
+  if (!result.ok) return next(returnError(result));
+
+  const { result: newProd } = result;
 
   response.status(201).json({
     success: true,
-    data: {newProd},
+    data: { newProd },
+  });
+});
+
+export const getAllStoreProducts = catchAsync(async (request, response, next) => {
+  const result = await getAllProductsForAuthorisedUser(request.store, request.query);
+  if (!result.ok) return next(returnError(result));
+
+  const { result: productsList } = result;
+  response.status(200).json({
+    success: true,
+    result: productsList.length,
+    data: { productsList },
   });
 });
 
 export const getOneProductController = catchAsync(async (request, response, next) => {
-  let product = await getOneDocById(Product, request.params.productId);
-  if (!product) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
-  const cats = await categoriesInCache(request.params.productId);
+  const result = await getOneProduct(request.params.productId);
+  if (!result?.ok) return next(returnError(result));
 
-  product.categories = cats as CategoryDocument[];
+  const { result: product } = result;
 
   response.status(200).json({
     success: true,
-    data: {product},
+    data: { product },
   });
 });
 
@@ -50,40 +56,28 @@ export const updateProductController = catchAsync(async (request, response, next
 
   const productId = request.params.productId;
 
-  const updatedProduct = await updateProduct(request.store, productId, request.body);
-  if (!updatedProduct) return next(new AppError(400, "تأكد من صحة البيانات"));
+  const result = await updateOneProduct(request.store, productId, request.body);
+  if (!result.ok) return next(returnError(result));
 
-  if (categories) {
-    await updateProductInCategories(categories, productId); /*✅*/
-    await setCompressedCacheData(`Category:${productId}`, updatedProduct.categories, "fifteen-minutes"); // set the new cats, without waiting
-  }
+  const { result: updatedProduct } = result;
 
   response.status(203).json({
     success: true,
-    data: {updatedProduct},
+    data: { updatedProduct },
   });
 });
 
 export const deleteProductController = catchAsync(async (request, response, next) => {
   const productId = request.params.productId;
 
-  const session = await startSession();
+  const result = await deleteProductAndItsRelated(productId);
+  if (!result.ok) return next(returnError(result));
 
-  const result = await session.withTransaction(async () => {
-    const deletedProduct = await deleteDoc(Product, productId, { session });
-    if (!deletedProduct) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
-
-    await deleteProductFromCategory(deletedProduct.categories, productId, session); /*✅*/
-    await deleteAllResourceReviews(productId, session);
-
-    return deletedProduct;
-  });
-
-  deleteFromCache(`Product:${productId}`); // remove from cache if exist
+  const { result: deletedProduct } = result;
 
   response.status(204).json({
     success: true,
-    data: {result},
+    message: "product was deleted successfully",
+    data: { deletedProduct },
   });
 });
-

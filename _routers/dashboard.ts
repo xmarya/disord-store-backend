@@ -24,6 +24,7 @@ import { createReviewController } from "../controllers/auth/reviews/publicReview
 import assignFromCacheToRequest from "../middlewares/requestModifiers/assignFromCacheToRequest";
 import { assignStoreIdToRequest } from "../middlewares/requestModifiers/assignStoreIdToRequest";
 import assignPlanIdToRequest from "../middlewares/requestModifiers/assignPlanIdToRequest";
+import canCreateStore from "middlewares/protectors/canCreateStore";
 
 export const router = express.Router();
 
@@ -35,7 +36,7 @@ router.use("/me", meRouter);
 router.use("/settings", settingsRouter);
 router.post("/emailConfirmation", sendConfirmationEmail);
 router.use("/subscriptions", restrict("storeOwner"), subscriptionsRouter);
-router.post("/newStore", restrict("storeOwner"), sanitisedData, createStoreController);
+router.post("/newStore", restrict("storeOwner"), canCreateStore, sanitisedData, createStoreController);
 router.route("/store/:resourceId/reviews").post(restrict("user"), createReviewController);
 router.route("/products/:resourceId/reviews").post(restrict("user"), createReviewController);
 router.use("/platform/reviews", platformReviewsRouter);

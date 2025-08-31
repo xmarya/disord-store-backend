@@ -1,0 +1,21 @@
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
+import Admin from "@models/adminModel";
+import { getOneDocById } from "@repositories/global";
+import { AdminDocument } from "@Types/admin/AdminUser";
+import { QueryOptions } from "@Types/QueryOptions";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import safeThrowable from "@utils/safeThrowable";
+
+async function getAdminProfile(adminId: string) {
+  const fields: QueryOptions<AdminDocument>["select"] = ["firstName", "lastName", "email", "image", "userType"];
+  const safeGetAdminProfile = safeThrowable(
+    () => getOneDocById(Admin, adminId, { select: fields }),
+    () => new Error(INTERNAL_ERROR_MESSAGE)
+  );
+
+  const adminProfile = await extractSafeThrowableResult(() => safeGetAdminProfile);
+
+  return adminProfile;
+}
+
+export default getAdminProfile;

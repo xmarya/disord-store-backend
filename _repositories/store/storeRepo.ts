@@ -1,46 +1,13 @@
-import mongoose, { startSession } from "mongoose";
-import { MongoId } from "@Types/MongoId";
-import { StoreDataBody } from "@Types/Store";
-import { AppError } from "@utils/AppError";
 import Store from "@models/storeModel";
-import User from "@models/userModel";
+import { MongoId } from "@Types/MongoId";
+import { PlansNames } from "@Types/Plan";
+import { FullStoreDataBody } from "@Types/Store";
+import mongoose from "mongoose";
 
-export async function createStore(data: StoreDataBody) {
-  const { storeName, description, owner, inPlan, logo } = data;
-  const session = await startSession();
-  session.startTransaction();
+export async function createStore(data: FullStoreDataBody, session: mongoose.ClientSession) {
+  const newStore = await Store.create([data], { session });
 
-  try {
-    const newStore = await Store.create(
-      [
-        {
-          storeName,
-          description,
-          logo,
-          owner,
-          inPlan,
-        },
-      ],
-      { session }
-    );
-
-    await User.findByIdAndUpdate(
-      owner,
-      {
-        myStore: newStore[0].id,
-      },
-      { session }
-    );
-
-    await session.commitTransaction();
-    return newStore;
-  } catch (error) {
-    await session.abortTransaction();
-    console.log((error as Error).message);
-    throw new AppError(500, "حدث خطأ أثناء معالجة العملية. الرجاء المحاولة مجددًا");
-  } finally {
-    await session.endSession();
-  }
+  return newStore[0];
 }
 
 export async function confirmAuthorization(userId: string, storeId: MongoId): Promise<boolean> {
@@ -57,6 +24,9 @@ export async function confirmAuthorization(userId: string, storeId: MongoId): Pr
   return !!userIdExist;
 }
 
+export async function updateStoreInPlan(storeOwnerId: string, planName: PlansNames) {
+  await Store.findOneAndUpdate({ owner: storeOwnerId }, { inPlan: planName });
+}
 export async function deleteStore(storeId: MongoId, session: mongoose.ClientSession) {
   const deletedStore = await Store.findByIdAndDelete(storeId, { session });
 

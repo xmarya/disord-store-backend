@@ -16,15 +16,17 @@ export interface IShipmentCompany {
 }
 
 export interface StoreDataBody {
-  [x: string]: any;
   storeName: string;
   description: string;
   logo?: string;
-  inPlan: MongoId;
+}
+
+export interface FullStoreDataBody extends StoreDataBody {
+    inPlan: MongoId;
   owner: MongoId;
 }
 
-export interface StoreBasic extends StoreDataBody {
+export interface StoreBasic extends FullStoreDataBody {
   status: "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
   verified: boolean;
   ratingsAverage: number;

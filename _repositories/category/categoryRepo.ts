@@ -3,7 +3,7 @@ import { CategoryBasic } from "@Types/Category";
 import { MongoId } from "@Types/MongoId";
 import Category from "@models/categoryModel";
 
-export async function getAllProductCategories(productId: MongoId): Promise<CategoryBasic[]> {
+export async function getAllProductCategories(productId: MongoId): Promise<CategoryBasic[] | []> {
   const categories = await Category.find({ products: productId }, "name colour createdBy updatedBy");
 
   return categories;
@@ -15,7 +15,7 @@ export async function assignProductToCategory(categories:Array<CategoryBasic>, p
 }
 */
 
-export async function updateProductInCategories(categories: Array<CategoryBasic>, productId: MongoId) {
+export async function updateProductInCategories(/*categories: Array<CategoryBasic>*/categories:Array<MongoId>, productId: MongoId) {
   const operations = [];
   // STEP 1) Add productId to provided categories (addToSet)
   operations.push({
@@ -40,8 +40,8 @@ export async function updateProductInCategories(categories: Array<CategoryBasic>
 }
 
 // NOTE: this is going to be called when deleting a product permanently.
-export async function deleteProductFromCategory(categories: Array<CategoryBasic>, productId: MongoId, session: mongoose.ClientSession) {
-  await Category.updateMany({ _id: { $in: categories } }, { $pull: { products: productId } }).session(session);
+export async function deleteProductFromCategory(categories: Array<MongoId>, productId: MongoId) {
+  await Category.updateMany({ _id: { $in: categories } }, { $pull: { products: productId } });
   // get all the cats that have this product id,
   // remove the one that is not in the new cats array
   // await Category.find({products: "684ac7b49e4ba6351f4fa89d"});

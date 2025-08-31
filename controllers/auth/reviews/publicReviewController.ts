@@ -1,31 +1,12 @@
-import { startSession } from "mongoose";
-import { Model } from "@Types/Model";
-import { MongoId } from "@Types/MongoId";
 import { ReviewDataBody } from "@Types/Review";
-import { createDoc, deleteDoc, getAllDocs, updateDoc } from "@repositories/global";
-import { setRanking } from "@repositories/ranking/rankingRepo";
-import { calculateRatingsAverage } from "@repositories/review/reviewRepo";
+import createNewReview from "@services/auth/resourcesReviewServices/createNewResourceReview";
+import deleteReview from "@services/auth/resourcesReviewServices/deleteResourceReview";
+import getAllResourceReviews from "@services/auth/resourcesReviewServices/getAllResourceReviews";
+import updateReview from "@services/auth/resourcesReviewServices/updateResourceReview";
+import getAllUserReviews from "@services/auth/usersServices/getAllUserReviews";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import PlatformReview from "@models/platformReviewModel";
-import Review from "@models/reviewModel";
-
-async function updateResourceRatingController(Model: Extract<Model, "Store" | "Product">, resourceId: MongoId) {
-  const session = await startSession();
-
-  try {
-    session.startTransaction();
-    await calculateRatingsAverage(Model, resourceId, session);
-    await setRanking(Model, session);
-    await session.commitTransaction();
-  } catch (error) {
-    await session.abortTransaction();
-
-    throw new AppError(500, "something went wrong, please try again");
-  } finally {
-    await session.endSession();
-  }
-}
+import returnError from "@utils/returnError";
 
 export const createReviewController = catchAsync(async (request, response, next) => {
   const storeOrProduct = request.path.includes("store") ? "Store" : "Product";
@@ -37,41 +18,43 @@ export const createReviewController = catchAsync(async (request, response, next)
 
   const { id, firstName, lastName, userType, image } = request.user;
   const data: ReviewDataBody = { reviewedResourceId, storeOrProduct, reviewBody, rating, writer: id, firstName, lastName, userType, image };
-  const newReview = await createDoc(Review, data);
+  const result = await createNewReview(data);
 
-  await updateResourceRatingController(storeOrProduct, reviewedResourceId);
+  if (!result.ok) return next(returnError(result));
+
+  const { result: newReview } = result;
 
   response.status(201).json({
     success: true,
-    dat: {newReview},
+    data: { newReview },
   });
 });
 
 export const getAllReviewsController = catchAsync(async (request, response, next) => {
-  // ENHANCE: make it specific! what resource's reviews should it return? for whom? ✅
   const storeOrProduct = request.path.includes("store") ? "Store" : "Product";
   const reviewedResourceId = request.params[`${storeOrProduct.toLowerCase()}Id`];
-  const reviews = await getAllDocs(Review, request.query, { condition: { storeOrProduct, reviewedResourceId } });
-  if (!reviews.length) return next(new AppError(404, "لا يوجد بيانات لعرضها"));
+  const result = await getAllResourceReviews(storeOrProduct, reviewedResourceId, request.query);
+  if (!result.ok) return next(returnError(result));
+  const { result: reviews } = result;
 
   response.status(200).json({
     success: true,
-    data: {reviews},
+    data: {
+      result: reviews.length,
+      reviews,
+    },
   });
 });
 
 export const getMyReviewsController = catchAsync(async (request, response, next) => {
-  const [reviews, platformReviews] = await Promise.all([
-    getAllDocs(Review, request.query, { condition: { writer: request.user._id } }),
-    getAllDocs(PlatformReview, request.query, { condition: { writer: request.user._id } }),
-  ]);
+  const { reviews, platformReviews } = await getAllUserReviews(request.user.id, request.query);
 
   response.status(200).json({
     success: true,
     data: {
       reviews,
-    platformReviews,
-    }
+      platformReviews,
+    },
   });
 });
 
@@ -80,25 +63,23 @@ export const updateMyReviewController = catchAsync(async (request, response, nex
   const { reviewBody, rating }: ReviewDataBody = request.body;
   if (!reviewBody?.trim() && !rating) return next(new AppError(400, "الرجاء إضافة تعليق وتقييم قبل الإرسال"));
 
-  // const updatedReview = await updateDoc(request.Model, request.params.reviewId, request.body, {locals: modelId});
-  const updatedReview = await updateDoc(Review, request.params.reviewId, request.body);
-  if (!updatedReview) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
+  const result = await updateReview(request.params.reviewId, { reviewBody, rating });
+  if (!result.ok) return next(returnError(result));
 
-  await updateResourceRatingController(updatedReview.storeOrProduct, updatedReview.reviewedResourceId);
+  const { result: updatedReview } = result;
 
   response.status(203).json({
     success: true,
-    data: {updatedReview}
+    data: { updatedReview },
   });
 });
 
 export const deleteMyReviewController = catchAsync(async (request, response, next) => {
-  const deletedReview = await deleteDoc(Review, request.params.reviewId);
-  if (!deletedReview) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
-
-  await updateResourceRatingController(deletedReview.storeOrProduct, deletedReview.reviewedResourceId);
+  const result = await deleteReview(request.params.reviewId);
+  if (!result.ok) return next(returnError(result));
 
   response.status(204).json({
     success: true,
+    message: "review was deleted successfully",
   });
 });

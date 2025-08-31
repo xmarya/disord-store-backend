@@ -1,8 +1,7 @@
-import { CategoryDocument } from "./Category";
+import { CategoryBasic, CategoryDocument } from "./Category";
 import { MongoId } from "./MongoId";
 import { CompressedFiles, FileSizeUnit, ImageExtension, ReadableFileExtension } from "./DigitalProductExtensions";
 import mongoose from "mongoose";
-
 
 export interface ProductDataBody {
   productType: "digital" | "physical";
@@ -11,19 +10,20 @@ export interface ProductDataBody {
   image: Array<string>;
   description: string;
   stock: number | null;
-  categories: Array<CategoryDocument>;
-  store: MongoId;
+  categories?: Array<MongoId>;
 }
 
-interface ProductBasic {
+interface ProductBasic extends Omit<ProductDataBody, "categories">  {
+  store: MongoId;
   ranking: number;
   ratingsAverage: number;
   ratingsQuantity: number;
   discount: number;
   numberOfPurchases: number;
+  categories?: Array<CategoryBasic> | Array<MongoId>
 }
 
-export interface DigitalProduct extends ProductDataBody, ProductBasic {
+export interface DigitalProduct extends ProductBasic {
   productType: "digital";
   isPreviewable: boolean;
   isDownloadable: boolean;
@@ -37,9 +37,9 @@ export interface DigitalProduct extends ProductDataBody, ProductBasic {
   filePath: string; // helps in Generating signed download links, Serving the file.
 }
 
-export interface PhysicalProduct extends ProductDataBody, ProductBasic {
+export interface PhysicalProduct extends ProductBasic {
   productType: "physical";
- weight:number;
+  weight: number;
 }
 
 export type ProductDocument = (DigitalProduct | PhysicalProduct) & mongoose.Document;

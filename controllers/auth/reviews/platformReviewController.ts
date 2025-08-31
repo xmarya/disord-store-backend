@@ -1,62 +1,79 @@
-import { createDoc, deleteDoc, getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
+import createNewPlatformReview from "@services/auth/platformReviewServices/createNewPlatformReview";
+import deletePlatformReview from "@services/auth/platformReviewServices/deletePlatformReview";
+import getAllPlatformReviews from "@services/auth/platformReviewServices/getAllPlatformReviews";
+import getOnePlatformReview from "@services/auth/platformReviewServices/getOnePlatformReview";
+import updatePlatformReview from "@services/auth/platformReviewServices/updatePlatformReview";
 import { PlatformReviewDataBody } from "@Types/Review";
+import { UserDocument } from "@Types/User";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import PlatformReview from "@models/platformReviewModel";
+import returnError from "@utils/returnError";
 
 export const createPlatformReviewController = catchAsync(async (request, response, next) => {
   const { reviewBody }: PlatformReviewDataBody = request.body;
   if (!reviewBody?.trim()) return next(new AppError(400, "الرجاء إضافة تعليق قبل الإرسال"));
 
-  const { id, firstName, lastName, userType, image } = request.user;
+  const result = await createNewPlatformReview(request.user as UserDocument, reviewBody);
 
-  const data: PlatformReviewDataBody = { reviewBody, writer: id, firstName, lastName, userType, image };
-  const newReview = await createDoc(PlatformReview, data);
-  if (!newReview.id) return next(new AppError(500, "حدث خطأ أثناء معالجة العملية. حاول مجددًا"));
+  if (!result.ok) return next(returnError(result));
+  const { result: newReview } = result;
 
   response.status(201).json({
     success: true,
-    data: {newReview},
+    data: { newReview },
   });
 });
 
 export const getAllPlatformReviewsController = catchAsync(async (request, response, next) => {
-  const reviews = await getAllDocs(PlatformReview, request.query);
-  if (!reviews.length) return next(new AppError(404, "لا يوجد بيانات لعرضها"));
+  const result = await getAllPlatformReviews(request.query);
 
+  if (!result.ok) return next(returnError(result));
+
+  const { result: reviews } = result;
   response.status(200).json({
     success: true,
-    data: {reviews},
+    data: {
+      result: reviews.length,
+      reviews,
+    },
   });
 });
 
 export const getOnePlatformReviewController = catchAsync(async (request, response, next) => {
-  const review = await getOneDocById(PlatformReview, request.params.reviewId);
+  const result = await getOnePlatformReview(request.params.reviewId);
 
-  if (!review) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
+  if (!result.ok) return next(returnError(result));
+
+  const { result: review } = result;
 
   response.status(200).json({
     success: true,
-    data: {review},
+    data: { review },
   });
 });
 
 export const updateMyPlatformReviewController = catchAsync(async (request, response, next) => {
   const { reviewBody }: PlatformReviewDataBody = request.body;
   if (!reviewBody?.trim()) return next(new AppError(400, "الرجاء إضافة تعليق قبل الإرسال"));
-  const data = { reviewBody };
-  const updatedReview = await updateDoc(PlatformReview, request.params.reviewId, data);
+  const result = await updatePlatformReview(request.params.reviewId, { reviewBody });
+
+  if (!result.ok) return next(returnError(result));
+
+  const { result: updatedReview } = result;
 
   response.status(201).json({
     success: true,
-    data: {updatedReview},
+    data: { updatedReview },
   });
 });
 
 export const deletePlatformReviewController = catchAsync(async (request, response, next) => {
-  await deleteDoc(PlatformReview, request.params.reviewId);
+  const result = await deletePlatformReview(request.params.reviewId);
+
+  if (!result.ok) return next(returnError(result));
 
   response.status(204).json({
     success: true,
+    message: "review deleted successfully",
   });
 });

@@ -1,8 +1,7 @@
 import express from "express";
 import restrict from "../../middlewares/protectors/restrict";
 import sanitisedData from "../../middlewares/validators/sanitisedData";
-import { cancelSubscriptionController, createNewSubscribeController, renewalSubscriptionController } from "../../controllers/auth/subscriptionController";
-import { getMySubscriptionsLogController } from "../../controllers/auth/userAuthController";
+import { cancelSubscriptionController, createNewSubscribeController, getMySubscriptionsLogController, renewalSubscriptionController } from "../../controllers/auth/subscriptionController";
 
 export const router = express.Router();
 

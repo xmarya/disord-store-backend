@@ -1,87 +1,78 @@
-import { addDays, isPast } from "date-fns";
-import { startSession } from "mongoose";
-import { PLAN_TRIAL_PERIOD } from "../../_constants/ttl";
-import { getOneDocById, updateDoc } from "@repositories/global";
-import { updatePlanMonthlyStats } from "@repositories/plan/planRepo";
-import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import { getSubscriptionType } from "@utils/getSubscriptionType";
-import { startSubscription } from "@utils/startSubscription";
-import Plan from "@models/planModel";
-import User from "@models/userModel";
-import cacheUser from "../../externals/redis/cacheControllers/user";
-import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPlan";
+import cancelSubscription from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/cancelSubscription";
+import createNewPlanSubscription from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/createNewSubscription";
+import getStoreOwnerSubscriptionsLog from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/getStoreOwnerSubscriptionsLog";
+import renewalStoreOwnerSubscription from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/renewalStoreOwnerSubscription";
+import isErr from "@utils/isErr";
+import returnError from "@utils/returnError";
 
 export const createNewSubscribeController = catchAsync(async (request, response, next) => {
-  /*✅*/
-
   const { planId, paidPrice } = request.body;
-  if (!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
-  const plan = await getOneDocById(Plan, planId);
-  if (!plan) return next(new AppError(404, "لايوجد باقة بهذا المعرف"));
+  if (!planId?.trim() || !paidPrice) return next(returnError({ reason: "bad-request", message: "الرجاء ادخال تفاصيل الباقة" }));
 
-  const updatedUser = await startSubscription(request.user.id, plan, paidPrice, "new");
+  const result = await createNewPlanSubscription(request.user.id, planId, paidPrice);
+  if (isErr(result)) return next(returnError({ reason: "bad-request", message: result.error }));
+  if (!result?.ok) return next(returnError(result));
+
+  const { result: updatedStoreOwner } = result;
 
   response.status(203).json({
     success: true,
-    data: {newSubscription: updatedUser?.subscribedPlanDetails,}
+    data: { newSubscription: updatedStoreOwner.subscribedPlanDetails },
+  });
+});
+
+export const getMySubscriptionsLogController = catchAsync(async (request, response, next) => {
+  const result = await getStoreOwnerSubscriptionsLog(request.user.id);
+  if (!result.ok) return next(returnError(result));
+
+  const {
+    result: { currentSubscription, subscriptionsLog },
+  } = result;
+
+  response.status(200).json({
+    success: true,
+    data: {
+      currentSubscription,
+      subscriptionsLog,
+    },
   });
 });
 
 export const renewalSubscriptionController = catchAsync(async (request, response, next) => {
   const { planId, paidPrice } = request.body;
-  if (!planId?.trim() || !paidPrice?.trim()) return next(new AppError(400, "الرجاء ادخال تفاصيل الباقة"));
-
-  const plan = await getOneDocById(Plan, planId);
-  if (!plan) return next(new AppError(404, "لايوجد باقة بهذا المعرف"));
+  if (!planId?.trim() || !paidPrice) return next(returnError({ reason: "bad-request", message: "الرجاء ادخال تفاصيل الباقة" }));
 
   const currentPlanId = request.plan;
-  const subscriptionType = await getSubscriptionType(currentPlanId, planId);
-  if (!subscriptionType) return;
+  const storeOwnerId = request.user.id;
+  const result = await renewalStoreOwnerSubscription(storeOwnerId, currentPlanId, planId, paidPrice);
 
-  const updatedUser = await startSubscription(request.user.id, plan, paidPrice, subscriptionType);
+  if (isErr(result)) return next(returnError({ reason: "not-found", message: result.error }));
+  if (!result.ok) return next(returnError(result));
 
+  const { result: renewalData } = result;
   response.status(203).json({
     success: true,
-    data: {updatedUserSubscription: updatedUser?.subscribedPlanDetails,}
+    data: { updatedUserSubscription: renewalData.subscribedPlanDetails },
   });
 });
 
 export const cancelSubscriptionController = catchAsync(async (request, response, next) => {
   const { notes } = request.body; // TODO: for the admin log
-  const userId = request.user.id;
-  const user = await getOneDocById(User, userId, { select: ["subscribedPlanDetails"] });
-  if (!user || !user.subscribedPlanDetails) return next(new AppError(404, "User has no active subscription"));
+  const result = await cancelSubscription(request.user.id, request.plan, notes);
 
-  const { subscribedPlanDetails } = user;
+  if (isErr(result)) return next(returnError({ reason: "bad-request", message: result.error }));
+  if (!result.ok) return next(returnError(result));
 
-  const trialOver = isPast(addDays(subscribedPlanDetails.subscribeStarts, PLAN_TRIAL_PERIOD));
+  const {result: updatedStoreOwner, plan, planExpiryDate, isPlanPaid} = result;
 
-  if (trialOver) return next(new AppError(400, "the 10 days limit for cancellation is over"));
-
-  const session = await startSession();
-  const updatedUser = await session.withTransaction(async () => {
-    //TODO: add an admin log
-    await updatePlanMonthlyStats(subscribedPlanDetails.planName, subscribedPlanDetails.paidPrice, "cancellation", session);
-    const updatedUser = await updateDoc(User, userId, { $unset: { subscribedPlanDetails: "" } }, { session });
-
-    return updatedUser;
-  });
-
-  await session.endSession();
-
-  //TODO: refund the money using the User's bank account.
-
-  updatedUser && cacheUser(updatedUser);
-
-  request.planExpiryDate = new Date();
-  request.isPlanPaid = false;
-  request.plan = "";
-
-  await cacheStoreAndPlan(request.store, request.plan, request.isPlanPaid, request.planExpiryDate);
+  request.plan = plan;
+  request.isPlanPaid = isPlanPaid;
+  request.planExpiryDate = planExpiryDate;
+  
 
   response.status(200).json({
     success: true,
-    data: {updatedUser},
+    data: { updatedStoreOwner },
   });
 });

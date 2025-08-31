@@ -4,7 +4,6 @@ import { getAllStoresStats, getOneStoreStats } from "@repositories/store/storeSt
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import Store from "@models/storeModel";
-import { deleteStorePermanently } from "../storeControllers";
 import Product from "@models/productModel";
 
 export const getAllStoresInfo = catchAsync(async (request, response, next) => {
@@ -54,14 +53,15 @@ export const suspendStore = catchAsync(async (request, response, next) => {
 
 export const deleteStore = catchAsync(async (request, response, next) => {
   const session = await startSession();
-  const deletedStore = await session.withTransaction(async () => {
-    return await deleteStorePermanently(request.params.storeId, session);
-  });
-  await session.endSession();
+  // FIX
+  // const deletedStore = await session.withTransaction(async () => {
+  //   return await deleteStorePermanently(request.params.storeId, session);
+  // });
+  // await session.endSession();
 
   //TODO: create a new adminLog
   response.status(204).json({
     success: true,
-    data: {deletedStore},
+    // data: {deletedStore},
   });
 });

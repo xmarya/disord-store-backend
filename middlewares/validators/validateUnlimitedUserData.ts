@@ -23,12 +23,10 @@ const validateUnlimitedUserData = catchAsync(async (request, response, next) => 
     if (!isMatching) return next(new AppError(400, "كلمات المرور غير متطابقة"));
 
     user = {
-      userType: "storeOwner",
-      signMethod: "credentials",
       firstName,
       lastName,
       email,
-      credentials: { password },
+      password,
       subscriptionType,
     };
   } else {
@@ -41,7 +39,6 @@ const validateUnlimitedUserData = catchAsync(async (request, response, next) => 
     user = {
       email,
       subscriptionType,
-      // BUG: the inPlan property of a store should be updated along with the upgrade. may I'll use hook
     };
   }
 

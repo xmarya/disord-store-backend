@@ -46,6 +46,6 @@ export async function calculateRatingsAverage(Model: Extract<Model, "Store" | "P
   await doc.save({ validateBeforeSave: false, session }); // Mongoose internally manages sessions for save() calls, because of that, it conflicts with the session inside setRanking. so I'll create one session inside the controller and pass it to both services
 }
 
-export async function deleteAllResourceReviews(resourceId: MongoId, session: mongoose.ClientSession) {
-  await Review.deleteMany({ reviewedResourceId: resourceId }).session(session);
+export async function deleteAllResourceReviews(resourceId: MongoId, session?: mongoose.ClientSession) {
+  await Review.deleteMany({ reviewedResourceId: resourceId }, {session});
 }

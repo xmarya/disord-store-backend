@@ -1,4 +1,4 @@
-import { ms } from "../../../_constants/numbers";
+import { ms } from "../../../_constants/primitives";
 import { createNewInvoices } from "@repositories/invoice/invoiceRepo";
 import { InvoiceDocument } from "@Types/Invoice";
 import bullmq from "@config/bullmq";
