@@ -3,7 +3,7 @@ import { CategoryBasic } from "@Types/Category";
 import { MongoId } from "@Types/MongoId";
 import Category from "@models/categoryModel";
 
-export async function getAllProductCategories(productId: MongoId): Promise<CategoryBasic[]> {
+export async function getAllProductCategories(productId: MongoId): Promise<CategoryBasic[] | []> {
   const categories = await Category.find({ products: productId }, "name colour createdBy updatedBy");
 
   return categories;
