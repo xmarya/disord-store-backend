@@ -3,7 +3,6 @@ import { MongoId } from "./MongoId";
 import { CompressedFiles, FileSizeUnit, ImageExtension, ReadableFileExtension } from "./DigitalProductExtensions";
 import mongoose from "mongoose";
 
-
 export interface ProductDataBody {
   productType: "digital" | "physical";
   name: string;
@@ -11,11 +10,11 @@ export interface ProductDataBody {
   image: Array<string>;
   description: string;
   stock: number | null;
-  categories: Array<CategoryDocument>;
-  store: MongoId;
+  categories?: Array<MongoId>;
 }
 
 interface ProductBasic {
+  store: MongoId;
   ranking: number;
   ratingsAverage: number;
   ratingsQuantity: number;
@@ -39,7 +38,7 @@ export interface DigitalProduct extends ProductDataBody, ProductBasic {
 
 export interface PhysicalProduct extends ProductDataBody, ProductBasic {
   productType: "physical";
- weight:number;
+  weight: number;
 }
 
 export type ProductDocument = (DigitalProduct | PhysicalProduct) & mongoose.Document;
