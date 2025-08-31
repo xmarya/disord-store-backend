@@ -1,4 +1,3 @@
-import { CategoryBasic, CategoryDocument } from "./Category";
 import { MongoId } from "./MongoId";
 import { CompressedFiles, FileSizeUnit, ImageExtension, ReadableFileExtension } from "./DigitalProductExtensions";
 import mongoose from "mongoose";
@@ -13,14 +12,13 @@ export interface ProductDataBody {
   categories?: Array<MongoId>;
 }
 
-interface ProductBasic extends Omit<ProductDataBody, "categories">  {
+interface ProductBasic extends ProductDataBody {
   store: MongoId;
   ranking: number;
   ratingsAverage: number;
   ratingsQuantity: number;
   discount: number;
   numberOfPurchases: number;
-  categories?: Array<CategoryBasic>
 }
 
 export interface DigitalProduct extends ProductBasic {
