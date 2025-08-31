@@ -1,9 +1,9 @@
 import eventBus from "@config/EventBus";
 import { setCompressedCacheData } from "@externals/redis/cacheControllers/globalCache";
-import { CategoryUpdateEvent } from "@Types/events/CategoryEvents";
+import { ProductUpdatedEvent } from "@Types/events/ProductEvents";
 import safeThrowable from "@utils/safeThrowable";
 
-eventBus.ofType<CategoryUpdateEvent>("category.updated").subscribe((event) => {
+eventBus.ofType<ProductUpdatedEvent>("product.updated").subscribe((event) => {
   const { categories, productId } = event.payload;
 
   safeThrowable(
