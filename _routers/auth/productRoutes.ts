@@ -7,8 +7,7 @@ import verifyUsedQuota from "@middlewares/validators/verifyUsedQuota";
 import checkAssistantPermissions from "@middlewares/validators/validateAssistantPermissions";
 import sanitisedData from "@middlewares/validators/sanitisedData";
 import { validateProductBody } from "@middlewares/validators/validateProductBody";
-import { createProductController, deleteProductController, getOneProductController, updateProductController } from "@controllers/auth/productController";
-import { getProductsListController } from "@controllers/nonAuth/publicResourcesController";
+import { createProductController, deleteProductController, getAllStoreProducts, getOneProductController, updateProductController } from "@controllers/auth/productController";
 
 export const router = express.Router();
 
@@ -19,13 +18,7 @@ router.use(restrict("storeOwner", "storeAssistant"), hasAuthorization); // this 
 router
   .route("/")
   .post(verifyUsedQuota("ofProducts"), checkAssistantPermissions("addProduct"), sanitisedData, validateProductBody, createProductController)
-  .get((request, response, next) => {
-    const storeId = request.store;
-    const modifiedQuery = { store: storeId as string, ...request.query };
-    request.query = modifiedQuery;
-
-    next();
-  }, getProductsListController); /*✅*/
+  .get(getAllStoreProducts);
 
 router
   .route("/:productId")
