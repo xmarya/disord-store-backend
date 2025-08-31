@@ -1,9 +1,9 @@
 import express from "express";
-import checkCache from "@externals/redis/cacheControllers/checkCache";
 import validateRequestParams from "@middlewares/validators/validateRequestParams";
+import isStoreActive from "@middlewares/protectors/isStoreActive";
+import checkCache from "@externals/redis/cacheControllers/checkCache";
 import { getAllPlansController, getProductsListController, getStoresListController, getStoreWithProductsController } from "@controllers/nonAuth/publicResourcesController";
 import { getOneProductController } from "@controllers/auth/productController";
-import isStoreActive from "@middlewares/protectors/isStoreActive";
 import { getAllReviewsController } from "@controllers/auth/reviews/publicReviewController";
 
 export const router = express.Router();

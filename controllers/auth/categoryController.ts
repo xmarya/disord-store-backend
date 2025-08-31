@@ -26,7 +26,7 @@ export const createCategoryController = catchAsync(async (request, response, nex
 });
 
 export const getAllCategoriesController = catchAsync(async (request, response, next) => {
-  const categories = await getAllDocs(Category, request, { condition: { store: request.store } });
+  const categories = await getAllDocs(Category, request.query, { condition: { store: request.store } });
   if (!categories) return next(new AppError(404, "لا يوجد فئات في هذا المتجر"));
 
   response.status(200).json({

@@ -13,6 +13,29 @@ import jwtVerify from "@utils/jwtToken/jwtVerify";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import { comparePasswords } from "@utils/passwords/comparePasswords";
 
+export const noOTPLogin = catchAsync(async (request, response, next) => {
+  // S 1) getting the provided email/phone and password from the request body to start checking:
+  const { password, email } = request.body;
+  if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
+
+  const user = await getOneDocByFindOne(User, {
+    condition: { email },
+    select: ["credentials", "email", "firstName", "lastName", "userType", "subscribedPlanDetails", "myStore", "image", "phoneNumber"],
+  });
+  if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
+
+  // S 2) checking the password:
+  if (!(await comparePasswords(password, user.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
+
+  const token = jwtSignature(user.id, "1h");
+  tokenWithCookies(response, token);
+
+  response.status(200).json({
+    success: true,
+    token,
+  });
+});
+
 export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
   catchAsync(async (request, response, next) => {
     const { firstName, lastName, email, password } = request.body;

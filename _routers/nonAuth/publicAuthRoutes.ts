@@ -12,6 +12,7 @@ import confirmUserEmail from "../../middlewares/validators/confirmUserEmail";
 export const router = express.Router();
 
 router.post("/login", credentialsLoginOld);
+router.post("/noOTPLogin", noOTPLogin);
 router.use(sanitisedData);
 router.post("/user-signup", validateNewUserData, createNewUserController("user"));
 router.post("/storeOwner-signup", validateNewUserData, createNewUserController("storeOwner"));

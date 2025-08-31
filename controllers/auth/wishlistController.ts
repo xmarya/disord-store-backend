@@ -17,7 +17,7 @@ export const updateWishlistController = catchAsync(async (request, response, nex
 });
 export const getWishlistController = catchAsync(async (request, response, next) => {
   const user = request.user.id;
-  const wishlist = await getAllDocs(Wishlist, request, { condition: { user } });
+  const wishlist = await getAllDocs(Wishlist, request.query, { condition: { user } });
   response.status(200).json({
     success: true,
     data: {wishlist},

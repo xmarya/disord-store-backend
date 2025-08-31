@@ -42,7 +42,6 @@ export const getStoreWithProductsController = catchAsync(async (request, respons
   if (isErr(result)) return next(returnError({ reason: "not-found", message: result.error }));
 
   const {result: {store, products}} = result;
-
   response.status(200).json({
     success: true,
     data: { store, products },
