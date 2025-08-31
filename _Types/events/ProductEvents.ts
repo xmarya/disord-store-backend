@@ -11,6 +11,9 @@ export interface ProductUpdatedEvent extends DomainEvent {
 }
 export interface ProductDeletedEvent extends DomainEvent {
   type: "product.deleted";
-  payload: {};
+  payload: {
+    categories: Array<MongoId>;
+    productId: MongoId;
+  };
   occurredAt: Date;
 }
