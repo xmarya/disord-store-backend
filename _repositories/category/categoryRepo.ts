@@ -15,7 +15,7 @@ export async function assignProductToCategory(categories:Array<CategoryBasic>, p
 }
 */
 
-export async function updateProductInCategories(categories: Array<CategoryBasic>, productId: MongoId) {
+export async function updateProductInCategories(/*categories: Array<CategoryBasic>*/categories:Array<MongoId>, productId: MongoId) {
   const operations = [];
   // STEP 1) Add productId to provided categories (addToSet)
   operations.push({
