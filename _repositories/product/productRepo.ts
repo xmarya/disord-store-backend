@@ -3,7 +3,7 @@ import { MongoId } from "@Types/MongoId";
 import { ProductDocument } from "@Types/Product";
 import Product from "@models/productModel";
 
-export async function updateProduct(storeId: MongoId, productId: MongoId, data: ProductDocument) {
+export async function updateProduct(storeId: MongoId, productId: MongoId, data: Partial<ProductDocument>) {
   /*✅*/
   /* OLD CODE (kept for reference): 
   let addToSetStage = {};
