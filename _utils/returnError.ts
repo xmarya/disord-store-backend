@@ -1,10 +1,6 @@
-import { ErrorNames } from "@Types/ErrorNames";
+import { ErrorNames } from "@Types/errors/ErrorNames";
 import { AppError } from "./AppError";
-
-type ErrorInfo = {
-  reason: ErrorNames;
-  message: string;
-};
+import { ErrorInfo } from "@Types/errors/ErrorInfo";
 
 function getCodeStatus(reason:ErrorNames) {
   switch (reason) {
