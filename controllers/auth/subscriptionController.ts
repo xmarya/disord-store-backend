@@ -1,8 +1,8 @@
 import { catchAsync } from "@utils/catchAsync";
-import cancelSubscription from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/cancelSubscription";
-import createNewPlanSubscription from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/createNewSubscription";
-import getStoreOwnerSubscriptionsLog from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/getStoreOwnerSubscriptionsLog";
-import renewalStoreOwnerSubscription from "@services/auth/usersServices/storeOwnerServices.ts/subscriptionsServices/renewalStoreOwnerSubscription";
+import cancelSubscription from "@services/auth/usersServices/storeOwnerServices/subscriptionsServices/cancelSubscription";
+import createNewPlanSubscription from "@services/auth/usersServices/storeOwnerServices/subscriptionsServices/createNewSubscription";
+import getStoreOwnerSubscriptionsLog from "@services/auth/usersServices/storeOwnerServices/subscriptionsServices/getStoreOwnerSubscriptionsLog";
+import renewalStoreOwnerSubscription from "@services/auth/usersServices/storeOwnerServices/subscriptionsServices/renewalStoreOwnerSubscription";
 import isErr from "@utils/isErr";
 import returnError from "@utils/returnError";
 
@@ -64,12 +64,11 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
   if (isErr(result)) return next(returnError({ reason: "bad-request", message: result.error }));
   if (!result.ok) return next(returnError(result));
 
-  const {result: updatedStoreOwner, plan, planExpiryDate, isPlanPaid} = result;
+  const { result: updatedStoreOwner, plan, planExpiryDate, isPlanPaid } = result;
 
   request.plan = plan;
   request.isPlanPaid = isPlanPaid;
   request.planExpiryDate = planExpiryDate;
-  
 
   response.status(200).json({
     success: true,

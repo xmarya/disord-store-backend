@@ -4,7 +4,7 @@ import { getOneDocById } from "@repositories/global";
 import { deleteRegularUser } from "@repositories/user/userRepo";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
 import { err, ok } from "neverthrow";
-import deleteStoreOwnerAndStore from "./storeOwnerServices.ts/deleteStoreOwnerAndStore";
+import deleteStoreOwnerAndStore from "./storeOwnerServices/deleteStoreOwnerAndStore";
 
 async function deleteUser(userId: string) {
   const user = await getOneDocById(User, userId, { select: ["userType", "myStore"] });
