@@ -1,14 +1,17 @@
 import mongoose from "mongoose";
 import { MongoId } from "./MongoId";
+import { UserTypes } from "./User";
 
-export type AssistantRegisterData = {
+export type AssistantDataBody = {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
-  storeId: string;
   permissions: AssistantPermissions;
+  phoneNumber: `+966${string}`;
 };
+
+export type AssistantRegisterData = Omit<AssistantDataBody, "password"> & { userType: Extract<UserTypes, "storeAssistant">; storeId: MongoId; credentials: { password: string } };
 
 export interface StoreAssistant {
   id: string;
@@ -18,7 +21,7 @@ export interface StoreAssistant {
 }
 
 export interface AssistantPermissions {
-  updateStoreStatus:boolean
+  updateStoreStatus: boolean;
   changePrice: boolean;
   addProduct: boolean;
   editProduct: boolean;
@@ -31,8 +34,8 @@ export interface AssistantPermissions {
   previewStoreStats: boolean;
   addCoupon: boolean;
   updateCoupon: boolean;
-  replyToCustomers:boolean,
-  manageOrders:boolean
+  replyToCustomers: boolean;
+  manageOrders: boolean;
 }
 
 export type StoreAssistantDocument = StoreAssistant & mongoose.Document;

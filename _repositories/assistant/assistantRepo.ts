@@ -13,7 +13,7 @@ import { MongoId } from "@Types/MongoId";
 */
 
 export async function createAssistant(data: AssistantRegisterData) {
-  const { email, password, firstName, lastName, permissions, storeId } = data;
+  const { email, credentials, firstName, lastName, permissions, storeId, phoneNumber, userType } = data;
   const session = await startSession();
   session.startTransaction();
 
@@ -27,11 +27,12 @@ export async function createAssistant(data: AssistantRegisterData) {
       [
         {
           signMethod: "credentials",
-          userType: "storeAssistant",
+          userType,
           email,
           firstName,
           lastName,
-          credentials: { password },
+          phoneNumber,
+          credentials,
         },
       ],
       { session }

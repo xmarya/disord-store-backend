@@ -1,27 +1,22 @@
-import { createAssistant, deleteAssistant } from "@repositories/assistant/assistantRepo";
-import { getAllDocs, getOneDocByFindOne, getOneDocById, isExist, updateDoc } from "@repositories/global";
-import { AppError } from "@utils/AppError";
-import { catchAsync } from "@utils/catchAsync";
-import novuCreateAssistantSubscriber from "../../externals/novu/subscribers/createSubscriber";
 import StoreAssistant from "@models/storeAssistantModel";
 import User from "@models/userModel";
+import { deleteAssistant } from "@repositories/assistant/assistantRepo";
+import { getAllDocs, getOneDocByFindOne, updateDoc } from "@repositories/global";
+import createNewAssistantInStore from "@services/auth/usersServices/storeOwnerServices.ts/storeAssistant/createNewAssistantInStore";
+import { AppError } from "@utils/AppError";
+import { catchAsync } from "@utils/catchAsync";
+import returnError from "@utils/returnError";
 
 export const createAssistantController = catchAsync(async (request, response, next) => {
-  const { permissions } = request.body;
-  if (!permissions) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
+  const result = await createNewAssistantInStore(request.store, request.body);
 
-  const storeId = request.store; // there is no storeId in the request.params for this route, these controllers are only for storeOwner uses, so the store id is available inside request.user.myStore
+  if(!result.ok) return next(returnError(result));
 
-  const data = { ...request.body, permissions, storeId };
-
-  const { assistant, user } = await createAssistant(data);
-
-  /* CHANGE LATER: publish an event */
-  await novuCreateAssistantSubscriber(user, assistant.inStore, assistant.permissions);
+  const {result: {newAssistant}} = result;
 
   response.status(201).json({
     success: true,
-    data: {assistant},
+    data: {newAssistant},
   });
 });
 
