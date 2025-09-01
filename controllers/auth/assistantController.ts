@@ -2,7 +2,8 @@ import StoreAssistant from "@models/storeAssistantModel";
 import User from "@models/userModel";
 import { deleteAssistant } from "@repositories/assistant/assistantRepo";
 import { getAllDocs, getOneDocByFindOne, updateDoc } from "@repositories/global";
-import createNewAssistantInStore from "@services/auth/usersServices/storeOwnerServices.ts/storeAssistant/createNewAssistantInStore";
+import createNewAssistantInStore from "@services/auth/usersServices/storeOwnerServices/storeAssistant/createNewAssistantInStore";
+import getOneAssistant from "@services/auth/usersServices/storeOwnerServices/storeAssistant/getOneAssistant";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
@@ -10,13 +11,15 @@ import returnError from "@utils/returnError";
 export const createAssistantController = catchAsync(async (request, response, next) => {
   const result = await createNewAssistantInStore(request.store, request.body);
 
-  if(!result.ok) return next(returnError(result));
+  if (!result.ok) return next(returnError(result));
 
-  const {result: {newAssistant}} = result;
+  const {
+    result: { newAssistant },
+  } = result;
 
   response.status(201).json({
     success: true,
-    data: {newAssistant},
+    data: { newAssistant },
   });
 });
 
@@ -29,21 +32,21 @@ export const getAllAssistantsController = catchAsync(async (request, response, n
 
   response.status(200).json({
     success: true,
-    data: {assistants},
+    data: { assistants },
   });
 });
 
 export const getOneAssistantController = catchAsync(async (request, response, next) => {
   const { assistantId } = request.params;
-  if (!assistantId) return next(new AppError(400, "لابد من توفير معرف المستخدم"));
 
-  const assistant = await getOneDocByFindOne(StoreAssistant, { condition: { assistant: assistantId } });
+  const result = await getOneAssistant(assistantId, request.store);
 
-  if (!assistant) return next(new AppError(404, "لا يوجد مستخدم بهذا المعرف"));
+  if (!result.ok) return next(returnError(result));
 
+  const { result: assistant } = result;
   response.status(200).json({
     success: true,
-    data: {assistant},
+    data: { assistant },
   });
 });
 
