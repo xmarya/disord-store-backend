@@ -6,7 +6,6 @@ type NovuUpdatedData = {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
-  store?: string;
   permissions?: AssistantPermissions;
 };
 
@@ -19,12 +18,12 @@ async function novuUpdateSubscriber(subscriberId: string, data: NovuUpdatedData)
   };
 
   const moreData = {
-    ...(data.store && { store: data.store }),
     ...(data.permissions && { permissions: data.permissions }),
   };
 
   if (Object.keys(moreData).length) payload.data = moreData;
 
+  console.log("Novu final updated data", payload);
   await novu.subscribers.patch(payload, subscriberId);
 
 }
