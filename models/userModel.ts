@@ -68,8 +68,8 @@ const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
     phoneNumber: {
       type: String,
       // the format must be +9665xxxxxxxx
-      minlength: [13, "the phone number should be 11 to 12 digits"],
-      maxlength: [13, "the phone number should be 11 to 12 digits"],
+      minlength: [13, "the phone number should start with +966"],
+      maxlength: [13, "the phone number should start with +966"],
       default: undefined,
       validate: {
         validator: function (value: string) {
