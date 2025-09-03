@@ -3,7 +3,7 @@ import User from "@models/userModel";
 import StoreAssistant from "@models/storeAssistantModel";
 import Store from "@models/storeModel";
 import { AppError } from "@utils/AppError";
-import { AssistantRegisterData } from "@Types/StoreAssistant";
+import { AssistantPermissions, AssistantRegisterData } from "@Types/StoreAssistant";
 import { MongoId } from "@Types/MongoId";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
@@ -79,7 +79,7 @@ export async function getOneAssistant(assistantId: string):Promise<StoreAssistan
 }
 */
 
-export async function deleteAssistant(storeId: MongoId, assistantId: string) {
+export async function deleteAssistant(assistantId: MongoId, storeId: MongoId) {
   const session = await startSession();
   session.startTransaction();
   try {
@@ -97,10 +97,19 @@ export async function deleteAssistant(storeId: MongoId, assistantId: string) {
   }
 }
 
-export async function getAssistantPermissions(storeId: MongoId, assistantId: string) {
-  const assistant = await StoreAssistant.findOne({ assistant: assistantId, inStore: storeId });
+export async function getAssistantPermissions(assistantId: MongoId, storeId: MongoId) {
+  return await StoreAssistant.findOne({ assistant: assistantId, inStore: storeId });
+}
 
-  return assistant;
+export async function updateAssistantPermissions(assistantId: MongoId, storeId: MongoId, permissions:AssistantPermissions) {
+  const updatedPermissions:Record<string, any> = {};
+
+  Object.entries(permissions).map(([key, value]) => {
+    updatedPermissions[`permissions.${key}`] = value;
+  });
+
+  return await StoreAssistant.findOneAndUpdate({assistant: assistantId, inStore: storeId}, {$set: updatedPermissions}, {new: true, runValidators:true});
+
 }
 
 export async function deleteAllAssistants(storeId: MongoId, session: mongoose.ClientSession) {
