@@ -1,4 +1,4 @@
-export type ErrorNames = "not-found" | "bad-request" | "forbidden" | "error";
+export type ErrorNames = "not-found" | "bad-request" | "unauthorised" | "forbidden" | "error";
 export type ErrorInfo = {
   reason: ErrorNames;
   message: string;

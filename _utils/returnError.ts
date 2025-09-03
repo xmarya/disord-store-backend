@@ -6,6 +6,9 @@ function getCodeStatus(reason:ErrorNames) {
     case "bad-request":
       return 400;
 
+    case "unauthorised":
+      return 401;
+
     case "not-found":
       return 404;
     
