@@ -1,10 +1,8 @@
-import StoreAssistant from "@models/storeAssistantModel";
-import User from "@models/userModel";
-import { deleteAssistant } from "@repositories/assistant/assistantRepo";
-import { getAllDocs, getOneDocByFindOne, updateDoc } from "@repositories/global";
 import createNewAssistantInStore from "@services/auth/usersServices/storeOwnerServices/storeAssistant/createNewAssistantInStore";
+import deleteStoreAssistant from "@services/auth/usersServices/storeOwnerServices/storeAssistant/deleteStoreAssistant";
+import getAllStoreAssistants from "@services/auth/usersServices/storeOwnerServices/storeAssistant/getAllStoreAssistants";
 import getOneAssistant from "@services/auth/usersServices/storeOwnerServices/storeAssistant/getOneAssistant";
-import { AppError } from "@utils/AppError";
+import updateStoreAssistant from "@services/auth/usersServices/storeOwnerServices/storeAssistant/updateStoreAssistant";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 
@@ -24,11 +22,12 @@ export const createAssistantController = catchAsync(async (request, response, ne
 });
 
 export const getAllAssistantsController = catchAsync(async (request, response, next) => {
-  const storeId = request.store; // NOTE: myStore property is only available for the storeOwner. Only the owner who can view all the assistants
+  const storeId = request.store;
 
-  const assistants = await getAllDocs(StoreAssistant, request.query, { condition: { inStore: storeId } });
+  const result = await getAllStoreAssistants(storeId, request.query);
+  if(!result.ok) return next(returnError(result));
 
-  if (!assistants?.length) return next(new AppError(404, "لا يوجد مساعدين في هذا المتجر"));
+  const {result: assistants} = result;
 
   response.status(200).json({
     success: true,
@@ -51,31 +50,30 @@ export const getOneAssistantController = catchAsync(async (request, response, ne
 });
 
 export const updateAssistantController = catchAsync(async (request, response, next) => {
-  if (!Object.keys(request.body).length) return next(new AppError(400, "no data was provided in the request.body"));
-  const { assistantId } = request.params;
-  const { permissions } = request.body;
-  if (permissions) await updateDoc(StoreAssistant, assistantId, permissions);
+  const assistantId = request.params.assistantId;
+  const storeId = request.store;
+  const result = await updateStoreAssistant(assistantId, storeId, request.body);
+  if(!result.ok) return next(returnError(result));
 
-  const otherData: Record<string, any> = {};
-  for (const [key, value] of Object.entries(request.body)) {
-    if (typeof value === "string" && value.trim()) otherData[key] = value.trim();
-  }
-
-  Object.keys(otherData).length && (await updateDoc(User, assistantId, otherData));
+  const {result: assistant} = result;
   response.status(203).json({
     success: true,
+    data: {
+      assistant
+    }
   });
 });
 
 export const deleteAssistantController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
-
   const { assistantId } = request.params;
-  if (!assistantId) return next(new AppError(400, "لابد من توفير معرف المستخدم"));
 
-  await deleteAssistant(storeId, assistantId);
+  const result = await deleteStoreAssistant(assistantId, storeId);
+
+  if(!result.ok) return next(returnError(result));
 
   response.status(204).json({
     success: true,
+    message: "assistant was deleted successfully"
   });
 });
