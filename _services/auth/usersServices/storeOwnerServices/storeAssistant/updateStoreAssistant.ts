@@ -1,48 +1,55 @@
 import eventBus from "@config/EventBus";
+import { updateAssistant } from "@repositories/assistant/assistantRepo";
 import { AssistantUpdatedEvent } from "@Types/events/AssistantEvents";
 import { MongoId } from "@Types/MongoId";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
-import { Success } from "@Types/ResultTypes/Success";
-import { StoreAssistant as StoreAssistantData } from "@Types/StoreAssistant";
-import { RegularUser } from "@Types/User";
-import formatAssistantData from "@utils/formatAssistantData";
-import updateUserProfile from "../../updateUserProfile";
-import getOneAssistant from "./getOneAssistant";
-import getUserProfile from "../../getUserProfile";
-import updatePermissions from "./updatePermissions";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { StoreAssistant } from "@Types/StoreAssistant";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import safeThrowable from "@utils/safeThrowable";
 
-async function updateStoreAssistant(assistantId: MongoId, storeId: MongoId, updatedData: Partial<RegularUser & Pick<StoreAssistantData, "permissions">>) {
+async function updateStoreAssistant(assistantId: MongoId, storeId: MongoId, updatedData: Partial<Omit<StoreAssistant, "credentials" | "userType" | "inStore" | "inPlan">>) {
   if (!Object.keys(updatedData).length) return new BadRequest("no data was provided in the request.body");
-  
+
   const { permissions } = updatedData;
+  const updatedPermissions: Record<string, any> = {};
 
-  const safeAssistantResult = permissions ? await updatePermissions(assistantId, storeId, permissions) : await getOneAssistant(assistantId, storeId);
+  permissions &&
+    Object.entries(permissions).map(([key, value]) => {
+      updatedPermissions[`permissions.${key}`] = value;
+    });
 
-  if (!safeAssistantResult.ok) return safeAssistantResult;
+  const updatedDataObj: Record<string, any> = {
+    ...(updatedData.firstName && { firstName: updatedData.firstName }),
+    ...(updatedData.lastName && { lastName: updatedData.lastName }),
+    ...(updatedData.phoneNumber && { phoneNumber: updatedData.phoneNumber }),
+    ...(updatedData.image && { image: updatedData.image }),
+    ...(updatedData.email && { email: updatedData.email }),
+  };
 
-  const otherData: Record<string, any> = {};
-  for (const [key, value] of Object.entries(updatedData)) {
-    if (typeof value === "string" && value.trim()) otherData[key] = value.trim();
-  }
+  const safeUpdateAssistant = safeThrowable(
+    () => updateAssistant(assistantId, storeId, updatedPermissions, updatedDataObj),
+    (error) => new Failure((error as Error).message)
+  );
 
-  const safeOtherDataResult = Object.keys(otherData).length ? await updateUserProfile(assistantId, otherData) : await getUserProfile(assistantId);
-    if (!safeOtherDataResult.ok) return safeOtherDataResult;
+  const updateAssistantResult = await extractSafeThrowableResult(() => safeUpdateAssistant);
 
-  const updatedAssistant = formatAssistantData(safeAssistantResult.result.permissions, safeOtherDataResult.result);
+  if (!updateAssistantResult.ok) return updateAssistantResult;
 
+  const { result } = updateAssistantResult;
   const event: AssistantUpdatedEvent = {
     type: "assistant.updated",
     payload: {
-      assistantId,
+      assistantId, // FIX duplicated values
       storeId,
-      permissions: updatedAssistant.permissions,
+      permissions: result.permissions,
       novuSubscriber: {
-        firstName: updatedAssistant.firstName,
-        lastName: updatedAssistant.lastName,
-        email: updatedAssistant.email,
-        phoneNumber: updatedAssistant.phoneNumber,
-        userType: updatedAssistant.userType,
-        id: assistantId
+        firstName: result.firstName,
+        lastName: result.lastName,
+        email: result.email,
+        phoneNumber: result.phoneNumber,
+        userType: result.userType,
+        id: assistantId, // FIX duplicated values
       },
     },
     occurredAt: new Date(),
@@ -50,8 +57,7 @@ async function updateStoreAssistant(assistantId: MongoId, storeId: MongoId, upda
 
   eventBus.publish(event);
 
-  return new Success(updatedAssistant);
+  return updateAssistantResult;
 }
-
 
 export default updateStoreAssistant;
