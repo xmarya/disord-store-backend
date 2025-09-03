@@ -8,7 +8,8 @@ export type AssistantDataBody = {
   firstName: string;
   lastName: string;
   permissions: AssistantPermissions;
-  phoneNumber: `+966${string}`;
+  phoneNumber?: `+966${string}`;
+  image?:string
 };
 
 export type AssistantRegisterData = Omit<AssistantDataBody, "password"> & { userType: Extract<UserTypes, "storeAssistant">; storeId: MongoId; credentials: { password: string } };
