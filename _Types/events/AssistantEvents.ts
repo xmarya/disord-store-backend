@@ -17,9 +17,18 @@ export interface AssistantCreatedEvent extends DomainEvent {
 export interface AssistantUpdatedEvent extends DomainEvent {
     type: "assistant.updated", 
     payload: {
+        assistantId:MongoId,
         storeId:MongoId,
-        novuSubscriber:NovuSubscriberData,
-        permissions:AssistantPermissions
+        novuSubscriber?:NovuSubscriberData,
+        permissions?:AssistantPermissions
+    }
+    occurredAt: Date
+}
+
+export interface AssistantDeletedEvent extends DomainEvent {
+    type: "assistant.deleted", 
+    payload: {
+        assistantId:MongoId,
     }
     occurredAt: Date
 }
