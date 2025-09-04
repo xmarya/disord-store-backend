@@ -1,15 +1,15 @@
-import { getOneDocById } from "@repositories/global";
-import User from "@models/userModel";
+import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
+import Credentials from "@models/credentialsModel";
+import { getOneDocByFindOne } from "@repositories/global";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 
 const validateEmailConfirmation = catchAsync(async (request, response, next) => {
-  const userId = request.user.id;
-  const user = await getOneDocById(User, userId, { select: ["credentials"] });
-  if (!user) return next(new AppError(500, INTERNAL_ERROR_MESSAGE));
+  const email = request.user.email;
+  const credentials = await getOneDocByFindOne(Credentials, {condition: {email}, select:["emailConfirmed"]});
+  if (!credentials) return next(new AppError(500, INTERNAL_ERROR_MESSAGE));
 
-  const { emailConfirmed } = user.credentials;
+  const { emailConfirmed } = credentials;
   if (!emailConfirmed) return next(new AppError(403, "the email address has not been confirmed yet. Please confirm the email address and try again"));
 
   next();
