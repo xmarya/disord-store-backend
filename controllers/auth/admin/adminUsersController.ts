@@ -1,19 +1,21 @@
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
-import createNewAdmin from "@services/auth/adminServices/adminAuth/createNewAdmin";
 import createUnlimitedPlanAndStoreOwner from "@services/auth/adminServices/user/createUnlimitedStoreOwner";
 import getAllUsersForAdmin from "@services/auth/adminServices/user/getAllUsersForAdmin";
 import getOneUserForAdmin from "@services/auth/adminServices/user/getOneUserForAdmin";
+import createNewUserAndSendConfirmationEmail from "@services/auth/usersServices/createNewUserAndSendConfirmationEmail";
 import { UnlimitedPlanDataBody } from "@Types/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 
 export const createAdminController = catchAsync(async (request, response, next) => {
-  await createNewAdmin(request.body, { hostname: request.hostname, protocol: request.protocol });
+  const tokenGenerator = { hostname: request.hostname, protocol: request.protocol };
+  const newAdmin = await createNewUserAndSendConfirmationEmail({ userType: "admin", ...request.body }, tokenGenerator);
 
   response.status(201).json({
     success: true,
     message: "a new admin was successfully created",
+    data:{newAdmin}
   });
 });
 

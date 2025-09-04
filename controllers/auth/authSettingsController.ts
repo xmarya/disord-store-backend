@@ -7,14 +7,14 @@ import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import returnError from "@utils/returnError";
 
 export const confirmChangePasswordController = catchAsync(async (request, response, next) => {
-  const {user}  = request;
   const { currentPassword, newPassword } = request.body;
-  const result = await confirmChangedPassword({user, currentPassword, newPassword});
+  const {id, email} = request.user;
+  const result = await confirmChangedPassword({currentPassword, newPassword, email, userId:id});
 
-  if (isErr(result)) return next(new AppError(401, "هذا المستخدم غير موجود"));
-  if(typeof result !== "string") return next(returnError(result));
+  if (!result.ok) return next(returnError(result))
 
-  const token = result;
+
+  const {result: token} = result;
   tokenWithCookies(response, token);
 
   response.status(203).json({

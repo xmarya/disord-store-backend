@@ -1,47 +1,44 @@
 import authentica from "@config/authentica";
-import User from "@models/userModel";
-import { getOneDocByFindOne } from "@repositories/global";
 import createNewDiscordUser from "@services/auth/usersServices/createNewDiscordUser";
-import createNewUser from "@services/auth/usersServices/createNewUser";
+import createNewUserAndSendConfirmationEmail from "@services/auth/usersServices/createNewUserAndSendConfirmationEmail";
+import getCredentialsVerifyResult from "@services/nonAuth/credentialsServices/login/getCredentialsVerifyResult";
+import loginMethodValidator from "@services/nonAuth/credentialsServices/login/loginMethodValidator";
 import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/AuthenticaOTP";
 import { UserTypes } from "@Types/User";
-import { CredentialsLoginDataBody } from "@Types/UserCredentials";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import jwtSignature from "@utils/jwtToken/generateSignature";
 import jwtVerify from "@utils/jwtToken/jwtVerify";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
-import { comparePasswords } from "@utils/passwords/comparePasswords";
+import returnError from "@utils/returnError";
 
-export const noOTPLogin = catchAsync(async (request, response, next) => {
-  // S 1) getting the provided email/phone and password from the request body to start checking:
-  const { password, email } = request.body;
-  if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
-  const user = await getOneDocByFindOne(User, {
-    condition: { email },
-    select: ["credentials", "email", "firstName", "lastName", "userType", "subscribedPlanDetails", "myStore", "image", "phoneNumber"],
-  });
-  if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
+export const oldCredentialsLogin = catchAsync(async(request, response, next) => {
+  const result1 = loginMethodValidator(request.body);
+  if (!result1.ok) return next(returnError(result1));
+  const { result: loginMethod } = result1;
+   const result2 = await getCredentialsVerifyResult(loginMethod, request.body.password);
+    if (!result2.ok) return next(returnError(result2));
+  
+    const { result: loggedInUser } = result2;
 
-  // S 2) checking the password:
-  if (!(await comparePasswords(password, user.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
-
-  const token = jwtSignature(user.id, "1h");
-  tokenWithCookies(response, token);
-
-  response.status(200).json({
-    success: true,
-    token,
-  });
-});
+    const token = jwtSignature(loggedInUser.id, "1h");
+    tokenWithCookies(response, token);
+    request.user = loggedInUser;
+  
+    response.status(200).json({
+      success:true,
+      data: {
+        token
+      }
+    })
+})
 
 export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
   catchAsync(async (request, response, next) => {
-    const { firstName, lastName, email, password } = request.body;
 
     const tokenGenerator = { hostname: request.hostname, protocol: request.protocol };
-    const newUser = await createNewUser({ firstName, lastName, email, password, userType }, tokenGenerator);
+    const newUser = await createNewUserAndSendConfirmationEmail({userType, ...request.body}, tokenGenerator);
 
     response.status(201).json({
       success: true,
@@ -51,38 +48,15 @@ export const createNewUserController = (userType: Extract<UserTypes, "user" | "s
   });
 
 export const credentialsLogin = catchAsync(async (request, response, next) => {
-  // STEP 1) getting the provided email/phone and password from the request body to start checking:
-  const { password, emailOrPhoneNumber }: CredentialsLoginDataBody = request.body;
-  if (!emailOrPhoneNumber?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
+  const result = loginMethodValidator(request.body);
+  if (!result.ok) return next(returnError(result));
+  const { result: loginMethod } = result;
 
-  const isEmail = emailOrPhoneNumber.includes("@");
-  request.loginMethod = isEmail ? { email: emailOrPhoneNumber } : { phoneNumber: emailOrPhoneNumber };
+  request.loginMethod = loginMethod;
 
   next();
 });
 
-export const credentialsLoginOld = catchAsync(async (request, response, next) => {
-  // S 1) getting the provided email/phone and password from the request body to start checking:
-  const { password, email } = request.body;
-  if (!email?.trim() || !password?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
-
-  const user = await getOneDocByFindOne(User, {
-    condition: { email },
-    select: ["credentials", "email", "firstName", "lastName", "userType", "subscribedPlanDetails", "myStore", "image", "phoneNumber"],
-  });
-  if (!user) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
-
-  // S 2) checking the password:
-  if (!(await comparePasswords(password, user.credentials.password))) return next(new AppError(401, "الرجاء التحقق من البيانات المدخلة"));
-
-  const token = jwtSignature(user.id, "1h");
-  tokenWithCookies(response, token);
-
-  response.status(200).json({
-    success: true,
-    token,
-  });
-});
 
 export const sendOTP = catchAsync(async (request, response, next) => {
   const user = request.user;

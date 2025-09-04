@@ -1,24 +1,42 @@
-import { getOneDocById } from "@repositories/global";
-import Admin from "@models/adminModel";
-import User from "@models/userModel";
-import { AppError } from "@utils/AppError";
+import eventBus from "@config/EventBus";
+import Credentials from "@models/credentialsModel";
+import { getOneDocByFindOne } from "@repositories/global";
+import { EmailConfirmationSentEvent } from "@Types/events/UserEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { catchAsync } from "@utils/catchAsync";
 import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import returnError from "@utils/returnError";
+import safeThrowable from "@utils/safeThrowable";
 
 export const sendConfirmationEmail = catchAsync(async (request, response, next) => {
-  const { userType } = request.user;
-  const query = ["user", "storeOwner"].includes(userType)
-    ? getOneDocById(User, request.user.id, { select: ["credentials", "userType"] })
-    : getOneDocById(Admin, request.user.id, { select: ["credentials", "userType"] });
+  const { email } = request.user;
 
-  const user = await query;
+  // REFACTOR
+  const safeGetCredentials = safeThrowable(
+    () => getOneDocByFindOne(Credentials, { condition: { email } }),
+    (error) => new Failure((error as Error).message)
+  );
+  const credentialsResult = await extractSafeThrowableResult(() => safeGetCredentials);
+  if (!credentialsResult.ok) return next(returnError(credentialsResult));
 
-  if (!user) return next(new AppError(500, "حدثت مشكلة. الرجاء المحاولة مرة أخرى"));
+  const emailTokenGenerator = { hostname: request.hostname, protocol: request.protocol };
+  const {confirmUrl, randomToken} = await generateEmailConfirmationToken(credentialsResult.result, emailTokenGenerator);
 
-  const confirmUrl = await generateEmailConfirmationToken(user, request);
+  const event:EmailConfirmationSentEvent = {
+    type: "emailConfirmation.sent",
+    payload: {
+      credentialsId: credentialsResult.result.id,
+      userType: credentialsResult.result.userType,
+      randomToken
+    },
+    occurredAt: new Date()
+  }
+
+  eventBus.publish(event);
 
   response.status(200).json({
     success: true,
-    data: {confirmUrl},
+    data: { confirmUrl },
   });
 });

@@ -1,12 +1,12 @@
-import { AdminDocument } from "@Types/admin/AdminUser";
-import { UserDocument } from "@Types/User";
+import { CredentialsDocument } from "@Types/UserCredentials";
 import { generateRandomToken } from "../generateRandomToken";
 
-async function generateEmailConfirmationToken(user: UserDocument | AdminDocument, emailTokenGenerator: {hostname:string, protocol:string}) {
-  const randomToken = await generateRandomToken(user, "emailConfirmation");
+
+export async function generateEmailConfirmationToken(credentials:CredentialsDocument, emailTokenGenerator: {hostname:string, protocol:string}) {
+  const randomToken = await generateRandomToken(credentials, "emailConfirmation");
   const confirmUrl = `${emailTokenGenerator.protocol}://${emailTokenGenerator.hostname}/api/v1/auth/confirmEmail/${randomToken}`;
 
-  return confirmUrl;
+  return {confirmUrl, randomToken};
 }
 
 export default generateEmailConfirmationToken;

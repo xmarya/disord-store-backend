@@ -1,13 +1,4 @@
-/*
-    - Verifying data checks if the data is accurate and matches the source.
-    Validating data checks if the data meets the required format and rules.
 
-    - Verification ensures correctness; validation ensures compliance.
-
-    - Verification is about "is it true?"; validation is about "is it acceptable?"
-
-    - Verification can involve external checks; validation uses predefined rules.
-*/
 
 import { type Request, type Response, type NextFunction, request } from "express";
 import { AssistantPermissions } from "@Types/StoreAssistant";
@@ -17,7 +8,6 @@ import { AppError } from "@utils/AppError";
 const checkAssistantPermissions = (permissionKey: keyof AssistantPermissions) => {
   return async (request: Request, response: Response, next: NextFunction) => {
     if (request.user.userType === "storeOwner") return next();
-    // console.log("checkAssistantPermissions", request.user.userType, permissionKey);
 
     const storeId = request.store;
     const assistantId = request.user.id;
