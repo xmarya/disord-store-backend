@@ -1,8 +1,8 @@
 import confirmChangedPassword from "@services/_sharedServices/confirmChangedPassword";
 import updateProfile from "@services/_sharedServices/updateProfile";
-import { AppError } from "@utils/AppError";
+import { AdminDocument } from "@Types/admin/AdminUser";
+import { UserDocument } from "@Types/User";
 import { catchAsync } from "@utils/catchAsync";
-import isErr from "@utils/isErr";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import returnError from "@utils/returnError";
 
@@ -24,10 +24,8 @@ export const confirmChangePasswordController = catchAsync(async (request, respon
 });
 
 export const updateProfileController = catchAsync(async (request, response, next) => {
-  const userId = request.user.id;
-  const result = await updateProfile(userId, request.body);
-
-  if(isErr(result)) return next(new AppError(400, result.error));
+  const user = request.user;
+  const result = await updateProfile((user as UserDocument | AdminDocument), request.body);
 
   if (!result.ok) return next(returnError(result));
 
