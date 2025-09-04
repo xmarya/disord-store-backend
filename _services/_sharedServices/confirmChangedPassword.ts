@@ -1,4 +1,4 @@
-import { updatePassword } from "@repositories/credentials/credentialsRepo";
+import { getCredentials } from "@repositories/credentials/credentialsRepo";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
@@ -11,28 +11,29 @@ type ChangedPasswordData = {
   userId: string;
   email: string;
   newPassword: string;
-  currentPassword: string;
+  providedPassword: string;
 };
 
 //REFACTOR
 async function confirmChangedPassword(data: ChangedPasswordData) {
-  const { currentPassword, newPassword, email, userId } = data;
+  const { providedPassword, newPassword, email, userId } = data;
 
-  const safeUpdatePassword = safeThrowable(
-    () => updatePassword(email, newPassword),
+  const safeGetCredentials = safeThrowable(
+    () => getCredentials({ email }),
     (error) => new Failure((error as Error).message)
   );
 
-  const updatePasswordResult = await extractSafeThrowableResult(() => safeUpdatePassword);
-  if (!updatePasswordResult.ok) return updatePasswordResult;
+  const getCredentialsResult = await extractSafeThrowableResult(() => safeGetCredentials);
+  if (!getCredentialsResult.ok) return getCredentialsResult;
 
-  const { result: credentials } = updatePasswordResult;
+  
+  const { result: currentCredentials } = getCredentialsResult;
   //STEP 3) is the provided password matching our record?
-  if (!(await comparePasswords(currentPassword, credentials.password))) return new BadRequest("كلمة المرور الحالية لا تطابق الموجودة في السجلات");
+  if (!(await comparePasswords(providedPassword, currentCredentials.password))) return new BadRequest("كلمة المرور الحالية لا تطابق الموجودة في السجلات");
 
   //STEP 4) allow changing the password:
-  credentials.password = newPassword;
-  await credentials.save();
+  currentCredentials.password = newPassword;
+  await currentCredentials.save();
 
   // STEP 5) generate a new token:
   const token = jwtSignature(userId, "1h");

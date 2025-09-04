@@ -9,7 +9,7 @@ import returnError from "@utils/returnError";
 export const confirmChangePasswordController = catchAsync(async (request, response, next) => {
   const { currentPassword, newPassword } = request.body;
   const {id, email} = request.user;
-  const result = await confirmChangedPassword({currentPassword, newPassword, email, userId:id});
+  const result = await confirmChangedPassword({providedPassword: currentPassword, newPassword, email, userId:id});
 
   if (!result.ok) return next(returnError(result))
 
@@ -19,7 +19,7 @@ export const confirmChangePasswordController = catchAsync(async (request, respon
 
   response.status(203).json({
     success: true,
-    message: "your password has been changed successfully."
+    message: "تم تغيير كلمة المرور بنجاح"
   });
 });
 

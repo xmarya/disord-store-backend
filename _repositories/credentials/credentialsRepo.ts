@@ -11,13 +11,11 @@ export async function createNewCredentials(credentialsData: CredentialsSignupDat
 
   return newCredentials[0];
 }
-export async function getCredentials(loginMethod: LoginMethod) {
+export async function getCredentials(condition:QueryOptions<CredentialsDocument>["condition"]) {
   const fields: QueryOptions<CredentialsDocument>["select"] = ["password", "userType", "email", "phoneNumber"];
-  return await Credentials.findOne(loginMethod).select(fields);
+  return await Credentials.findOne(condition).select(fields);
 }
-export async function updatePassword(email: string, newPassword: string) {
-  return await Credentials.findOneAndUpdate({ email }, { password: newPassword });
-}
+
 export async function updateEmail(session: mongoose.ClientSession) {}
 
 export async function deleteCredentials(session: mongoose.ClientSession) {}
