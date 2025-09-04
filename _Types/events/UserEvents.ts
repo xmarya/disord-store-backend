@@ -1,10 +1,16 @@
 import { AdminDocument } from "@Types/admin/AdminUser";
-import { UserDocument } from "../User";
+import { UserDocument, UserTypes } from "../User";
 import { DomainEvent } from "./DomainEvent";
 
 export interface UserCreatedEvent extends DomainEvent {
   type: "user.created";
-  payload: {user:UserDocument | AdminDocument, confirmUrl?:string};
+  payload: {user:UserDocument | AdminDocument, credentialsId:string, confirmUrl:string, randomToken:string};
+  occurredAt: Date;
+}
+
+export interface EmailConfirmationSentEvent extends DomainEvent {
+  type: "emailConfirmation.sent",
+  payload: {userType:UserTypes, credentialsId:string, randomToken:string};
   occurredAt: Date;
 }
 

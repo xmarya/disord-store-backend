@@ -1,9 +1,10 @@
+console.log("event subscriber user created listener");
 import eventBus from "@config/EventBus";
-import { UserCreatedEvent } from "@Types/events/UserEvents";
-import novuSendWelcome from "../../externals/novu/workflowTriggers/welcomeEmail";
-import { createRedisHash } from "@externals/redis/redisOperations/redisHash";
 import { TokenSlicer } from "@constants/dataStructures";
-import { fromPromise, ResultAsync } from "neverthrow";
+import { createRedisHash } from "@externals/redis/redisOperations/redisHash";
+import { EmailConfirmationSentEvent, UserCreatedEvent } from "@Types/events/UserEvents";
+import { ResultAsync } from "neverthrow";
+import novuSendWelcome from "../../externals/novu/workflowTriggers/welcomeEmail";
 
 // Novu Listener
 eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
@@ -17,16 +18,33 @@ eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
   
 });
 
-// Redis Listener
 eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
-  const { user } = event.payload;
+  const { user, credentialsId, randomToken } = event.payload;
   const cacheData = {
-    id: user.id,
+    id: credentialsId,
     userType: user.userType,
+    randomToken
   };
 
-  const slicedTokenKey = user.credentials.emailConfirmationToken.slice(TokenSlicer.from, TokenSlicer.to);
-  const key = `Email:${slicedTokenKey}`;
+  const slicedTokenKey = randomToken!.slice(TokenSlicer.from, TokenSlicer.to);
+  const key = `EmailConfirm:${slicedTokenKey}`;
+  console.log("Redis listener: key", key);
+
+  const safeCreateRedisHash = ResultAsync.fromThrowable(()=> createRedisHash(key, cacheData, "one-hour"), () => new Error("couldn't store the in the Cache" ));
+  safeCreateRedisHash();
+
+});
+
+eventBus.ofType<EmailConfirmationSentEvent>("emailConfirmation.sent").subscribe((event) => {
+  const { userType, credentialsId, randomToken } = event.payload;
+  const cacheData = {
+    id: credentialsId,
+    userType,
+    randomToken
+  };
+
+  const slicedTokenKey = randomToken!.slice(TokenSlicer.from, TokenSlicer.to);
+  const key = `EmailConfirm:${slicedTokenKey}`;
 
   const safeCreateRedisHash = ResultAsync.fromThrowable(()=> createRedisHash(key, cacheData, "one-hour"), () => new Error("couldn't store the in the Cache" ));
   safeCreateRedisHash();
