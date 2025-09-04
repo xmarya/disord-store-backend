@@ -1,6 +1,7 @@
 import Store from "@models/storeModel";
 import { updateDoc } from "@repositories/global";
 import { MongoId } from "@Types/MongoId";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import { err } from "neverthrow";
@@ -11,7 +12,7 @@ async function updateStoreStatus(storeId: MongoId, status: string) {
 
   const safeUpdatedStoreStatus = safeThrowable(
     () => updateDoc(Store, storeId, { status }),
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
   return await extractSafeThrowableResult(() => safeUpdatedStoreStatus);
 }

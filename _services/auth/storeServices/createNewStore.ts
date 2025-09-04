@@ -1,5 +1,5 @@
 import { createStore } from "@repositories/store/storeRepo";
-import assignStoreToOwner from "@services/auth/usersServices/storeOwnerServices.ts/assignStoreToOwner";
+import assignStoreToOwner from "@services/auth/usersServices/storeOwnerServices/assignStoreToOwner";
 import { FullStoreDataBody, StoreDataBody, StoreDocument } from "@Types/Store";
 import { StoreOwner, UserDocument } from "@Types/User";
 import returnError from "@utils/returnError";

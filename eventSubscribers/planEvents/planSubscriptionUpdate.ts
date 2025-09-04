@@ -6,6 +6,7 @@ import { updateDoc } from "@repositories/global";
 import { updatePlanMonthlyStats } from "@repositories/plan/planRepo";
 import { updateStoreInPlan } from "@repositories/store/storeRepo";
 import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import safeThrowable from "@utils/safeThrowable";
 
 // update the plans stats:
@@ -14,7 +15,7 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
   safeThrowable(
     () => updatePlanMonthlyStats(planName, profit, subscriptionType),
     //TODO: () => addFailedJob("key", event.payload)
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 });
 
@@ -26,7 +27,7 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
   safeThrowable(
     () => updateStoreInPlan(storeOwner.id, planName),
     //TODO: () => addFailedJob("key", event.payload)
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 });
 
@@ -38,7 +39,7 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
   safeThrowable(
     () => updateDoc(Plan, planId, { unlimitedUser: storeOwner.id }),
     //TODO: () => addFailedJob("key", event.payload)
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 });
 
@@ -49,7 +50,7 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
 
   safeThrowable(
     () => cacheUser(storeOwner),
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 });
 
@@ -64,6 +65,6 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
 
   safeThrowable(
     () => cacheStoreAndPlan(storeOwner.myStore, planId, isPaid, planExpiryDate),
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 });

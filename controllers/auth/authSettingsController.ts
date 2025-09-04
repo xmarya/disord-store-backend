@@ -1,33 +1,31 @@
 import confirmChangedPassword from "@services/_sharedServices/confirmChangedPassword";
 import updateProfile from "@services/_sharedServices/updateProfile";
-import { AppError } from "@utils/AppError";
+import { AdminDocument } from "@Types/admin/AdminUser";
+import { UserDocument } from "@Types/User";
 import { catchAsync } from "@utils/catchAsync";
-import isErr from "@utils/isErr";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import returnError from "@utils/returnError";
 
 export const confirmChangePasswordController = catchAsync(async (request, response, next) => {
-  const {user}  = request;
   const { currentPassword, newPassword } = request.body;
-  const result = await confirmChangedPassword({user, currentPassword, newPassword});
+  const {id, email} = request.user;
+  const result = await confirmChangedPassword({providedPassword: currentPassword, newPassword, email, userId:id});
 
-  if (isErr(result)) return next(new AppError(401, "هذا المستخدم غير موجود"));
-  if(typeof result !== "string") return next(returnError(result));
+  if (!result.ok) return next(returnError(result))
 
-  const token = result;
+
+  const {result: token} = result;
   tokenWithCookies(response, token);
 
   response.status(203).json({
     success: true,
-    message: "your password has been changed successfully."
+    message: "تم تغيير كلمة المرور بنجاح"
   });
 });
 
 export const updateProfileController = catchAsync(async (request, response, next) => {
-  const userId = request.user.id;
-  const result = await updateProfile(userId, request.body);
-
-  if(isErr(result)) return next(new AppError(400, result.error));
+  const user = request.user;
+  const result = await updateProfile((user as UserDocument | AdminDocument), request.body);
 
   if (!result.ok) return next(returnError(result));
 

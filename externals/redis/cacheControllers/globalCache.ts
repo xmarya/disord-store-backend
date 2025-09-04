@@ -22,7 +22,6 @@ export async function getDecompressedCacheData<T>(key: string): Promise<T | null
 export async function getAllCachedData<T>(key: string): Promise<T[]> {
   // STEP 1) get all the ids from the set to loop over:
   const allIds = await getRedisSet(key);
-
   // STEP 2) prepare an empty array to push the data in:
   const allData: T[] = [];
 

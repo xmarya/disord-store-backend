@@ -1,7 +1,5 @@
-import { filter, Subject } from "rxjs";
 import { DomainEvent } from "@Types/events/DomainEvent";
-import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
-import { UserCreatedEvent } from "@Types/events/UserEvents";
+import { filter, Subject } from "rxjs";
 
 
 class EventBus {
@@ -21,7 +19,5 @@ class EventBus {
 }
 
 const eventBus = new EventBus();
-
-eventBus.ofMultipleTypes<[PlanSubscriptionUpdateEvent, UserCreatedEvent]>([])
 
 export default eventBus;

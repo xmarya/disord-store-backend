@@ -7,7 +7,8 @@ import ratelimit from "express-rate-limit";
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "http://localhost:5173"
+  "http://localhost:5173",
+  "https://sa-ss-project.vercel.app"
 ]
 export default async function expressLoader(app: Application) {
   // app.set("trust proxy", true);

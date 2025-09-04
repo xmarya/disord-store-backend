@@ -5,6 +5,7 @@ import { createNewSubscription } from "@repositories/user/userRepo";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import getSubscriptionStartAndEndDates from "@utils/subscriptions/getSubscriptionStartAndEndDates";
 import safeThrowable from "@utils/safeThrowable";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 
 async function createNewSubscriptionsLog(storeOwnerId: MongoId, newPlan: PlanDocument, paidPrice: number, subscriptionType: SubscriptionTypes) {
   const { id: planId, planName } = newPlan;
@@ -24,7 +25,7 @@ async function createNewSubscriptionsLog(storeOwnerId: MongoId, newPlan: PlanDoc
 
   const safeUpdateStoreOwner = safeThrowable(
     () => createNewSubscription(storeOwnerId, userData),
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 
 

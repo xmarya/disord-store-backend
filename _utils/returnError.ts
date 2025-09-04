@@ -1,15 +1,13 @@
-import { ErrorNames } from "@Types/ErrorNames";
 import { AppError } from "./AppError";
-
-type ErrorInfo = {
-  reason: ErrorNames;
-  message: string;
-};
+import { ErrorInfo, ErrorNames } from "@Types/ResultTypes/errors/ErrorInfo";
 
 function getCodeStatus(reason:ErrorNames) {
   switch (reason) {
     case "bad-request":
       return 400;
+
+    case "unauthorised":
+      return 401;
 
     case "not-found":
       return 404;

@@ -1,11 +1,23 @@
-import mongoose from "mongoose";
 import { MongoId } from "@Types/MongoId";
+import { CredentialsSignupData } from "@Types/SignupData";
 import { StoreOwner, UnlimitedStoreOwnerData } from "@Types/User";
-import User from "@models/userModel";
-import { startSession } from "mongoose";
 import Cart from "@models/cartModel";
+import User from "@models/userModel";
 import Wishlist from "@models/wishlistModel";
+import mongoose, { startSession } from "mongoose";
 import { deleteDoc } from "../global";
+
+
+export async function createNewStoreOwner(signupData: Omit<CredentialsSignupData, "password" | "passwordConfirm">, session:mongoose.ClientSession) {
+  const newUser = await User.create([signupData], {session});
+
+  return newUser[0];
+}
+export async function createNewRegularUser(signupData: Omit<CredentialsSignupData, "password" | "passwordConfirm">, session:mongoose.ClientSession) {
+  const newUser = await User.create([signupData], {session});
+
+  return newUser[0];
+}
 
 export async function createNewUnlimitedUser(data: UnlimitedStoreOwnerData, session: mongoose.ClientSession) {
   const aNewUser = await User.findOneAndUpdate({ email: data.email }, { ...data }, { runValidators: true, new: true, upsert: true, setDefaultsOnInsert: true }).session(session);
@@ -91,9 +103,9 @@ export async function getUserSubscriptionsLog(userId: MongoId) {
 
   return logs;
 }
-export async function confirmUserEmail(bulkOps: any) {
-  await User.bulkWrite(bulkOps);
-}
+
+// TODO: move to credentialsRepo
+
 
 export async function deleteRegularUser(userId: MongoId) {
   const session = await startSession();

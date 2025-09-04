@@ -5,6 +5,7 @@ import { ProductDataBody } from "@Types/Product";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import updateCategoryRelatedToProduct from "../categoryServices/updateCategoryRelatedToProduct";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 
 async function createNewProduct(storeId: MongoId, newProductData: ProductDataBody) {
   const data = { store: storeId, ...newProductData };
@@ -12,7 +13,7 @@ async function createNewProduct(storeId: MongoId, newProductData: ProductDataBod
 
   const safeCreateProduct = safeThrowable(
     () => createDoc(Product, data),
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 
   const newProductResult = await extractSafeThrowableResult(() => safeCreateProduct);

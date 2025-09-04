@@ -6,7 +6,6 @@ type NovuUpdatedData = {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
-  store?: string;
   permissions?: AssistantPermissions;
 };
 
@@ -19,7 +18,6 @@ async function novuUpdateSubscriber(subscriberId: string, data: NovuUpdatedData)
   };
 
   const moreData = {
-    ...(data.store && { store: data.store }),
     ...(data.permissions && { permissions: data.permissions }),
   };
 

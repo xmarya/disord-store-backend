@@ -1,13 +1,15 @@
 import { MongoId } from "./MongoId";
+import { StoreAssistantDocument } from "./StoreAssistant";
 import { UserDocument } from "./User";
+import { LoginMethod } from "./UserCredentials";
 import { AdminDocument } from "./admin/AdminUser";
 
 declare global {
   namespace Express {
     interface Request {
-      loginMethod: Record<"email", string> | Record<"phoneNumber", string>;
+      loginMethod: LoginMethod;
       token: string;
-      user: UserDocument | AdminDocument;
+      user: UserDocument | AdminDocument | StoreAssistantDocument;
       store: MongoId;
       plan: MongoId;
       isPlanPaid: boolean;

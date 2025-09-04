@@ -1,13 +1,13 @@
-import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import PlatformReview from "@models/platformReviewModel";
 import { getOneDocById } from "@repositories/global";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 async function getOnePlatformReview(reviewId: string) {
   const safeGetOneReview = safeThrowable(
     () => getOneDocById(PlatformReview, reviewId),
-    () => new Error(INTERNAL_ERROR_MESSAGE)
+    (error) => new Failure((error as Error).message)
   );
 
   return await extractSafeThrowableResult(() => safeGetOneReview);

@@ -1,38 +1,14 @@
-import crypto from "crypto";
-import { Model } from "@Types/Model";
 import { catchAsync } from "@utils/catchAsync";
-import { AppError } from "@utils/AppError";
-import mongoose from "mongoose";
+import resetUserPassword from "@services/nonAuth/credentialsServices/passwords/resetUserPassword";
+import returnError from "@utils/returnError";
 
-export const resetPassword = (Model: Extract<Model, "Admin" | "User">) =>
-  catchAsync(async (request, response, next) => {
-    //STEP 1) get the random token and compare it with the stored on in the db:
-    const hashedToken = crypto.createHash("sha256").update(request.params.randomToken).digest("hex");
+export const resetPassword = catchAsync(async (request, response, next) => {
+  const result = await resetUserPassword(request.params.randomToken, request.body.newPassword, request.body.newPasswordConfirm);
 
-    const user = await mongoose
-      .model(Model)
-      .findOne({
-        "credentials.passwordResetToken": hashedToken,
-        "credentials.passwordResetExpires": { $gt: new Date() },
-      })
-      .select("credentials");
+  if(!result.ok) return next(returnError(result));
 
-    if (!user) return next(new AppError(400, "انتهت المدة المسموحة للرابط"));
-
-    //STEP 2) get the new password since the link is still valid:
-    const newPassword = request.body.newPassword;
-    const newPasswordConfirm = request.body.newPasswordConfirm;
-    if (!newPassword || !newPasswordConfirm) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
-    if (newPassword !== newPasswordConfirm) return next(new AppError(400, "كلمات المرور غير متطابقة"));
-
-    user.credentials!.password = newPassword;
-    user.credentials!.passwordResetToken = "";
-
-    await user.save(); // still validating the new password against the schema
-
-    response.status(200).json({
-      success: true,
-    });
-
-    //STEP 3) redirect the user to the login page (handled by front-end)
+  response.status(200).json({
+    success: true,
+    message: "تم تحديث كلمة المرور بنجاح"
   });
+});

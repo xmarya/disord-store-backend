@@ -6,7 +6,6 @@ import validateNewUserData from "../../middlewares/validators/validateNewUserDat
 import sanitisedData from "../../middlewares/validators/sanitisedData";
 import validateEmailConfirmation from "../../middlewares/validators/validateEmailConfirmation";
 import validateRequestParams from "../../middlewares/validators/validateRequestParams";
-import isEmailExist from "../../middlewares/protectors/isEmailExist";
 
 export const router = express.Router({ mergeParams: true });
 
@@ -17,5 +16,5 @@ router.route("/").get(getAllAssistantsController).post(verifyUsedQuota("ofStoreA
 router
   .route("/:assistantId")
   .get(validateRequestParams("assistantId"), getOneAssistantController)
-  .patch(isEmailExist, validateRequestParams("assistantId"), updateAssistantController)
+  .patch(validateRequestParams("assistantId"), updateAssistantController)
   .delete(validateRequestParams("assistantId"), deleteAssistantController);

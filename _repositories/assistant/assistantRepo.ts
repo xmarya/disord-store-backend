@@ -3,7 +3,7 @@ import User from "@models/userModel";
 import StoreAssistant from "@models/storeAssistantModel";
 import Store from "@models/storeModel";
 import { AppError } from "@utils/AppError";
-import { AssistantRegisterData } from "@Types/StoreAssistant";
+import { AssistantPermissions, StoreAssistant as StoreAssistantData } from "@Types/StoreAssistant";
 import { MongoId } from "@Types/MongoId";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
@@ -12,51 +12,22 @@ import { MongoId } from "@Types/MongoId";
     hovering it it indicates that it returns an array of document, and this is driven by Model.create() query.
 */
 
-export async function createAssistant(data: AssistantRegisterData) {
-  const { email, password, firstName, lastName, permissions, storeId } = data;
+export async function createAssistant(data: StoreAssistantData) {
   const session = await startSession();
   session.startTransaction();
 
   try {
-    //STEP ) check if the store is exist:
-    const store = await Store.findById(storeId);
-    if (!store) throw new AppError(404, "لايوجد متجر  بهذا المعرف");
-
-    //STEP : create a new user with userType = assistant:
-    const user = await User.create(
-      [
-        {
-          signMethod: "credentials",
-          userType: "storeAssistant",
-          email,
-          firstName,
-          lastName,
-          credentials: { password },
-        },
-      ],
-      { session }
-    );
-
     //STEP : create a new assistant:
-    const assistant = await StoreAssistant.create(
-      [
-        {
-          assistant: user[0].id,
-          inStore: storeId,
-          permissions,
-        },
-      ],
-      { session }
-    );
+    const assistant = await StoreAssistant.create([{ ...data }], { session });
 
-    await session.commitTransaction();
-
+    console.log("whatigot", assistant);
+    
     //STEP 3) insert assistant data in store without registering it to the session to
     //  reduce the number of operations inside the critical section
     // (since th transactions should be as short as possible):
-    await Store.findByIdAndUpdate(storeId, { $addToSet: { storeAssistants: user[0].id } }); // it should have be linked to the user, not the assistant, it could have be also assistant[0].assistant
-
-    return { assistant: assistant[0], user: user[0] };
+    await Store.findByIdAndUpdate(data.inStore, { $addToSet: { storeAssistants: assistant[0].id } }, {session});
+    await session.commitTransaction();
+    return assistant[0];
   } catch (error) {
     await session.abortTransaction();
     const message = (error as AppError).message || "لم تتم العملية بنجاح. حاول مجددًا";
@@ -78,7 +49,7 @@ export async function getOneAssistant(assistantId: string):Promise<StoreAssistan
 }
 */
 
-export async function deleteAssistant(storeId: MongoId, assistantId: string) {
+export async function deleteAssistant(assistantId: MongoId, storeId: MongoId) {
   const session = await startSession();
   session.startTransaction();
   try {
@@ -96,20 +67,26 @@ export async function deleteAssistant(storeId: MongoId, assistantId: string) {
   }
 }
 
-export async function getAssistantPermissions(storeId: MongoId, assistantId: string) {
-  const assistant = await StoreAssistant.findOne({ assistant: assistantId, inStore: storeId });
+export async function getAssistantPermissions(assistantId: MongoId, storeId: MongoId) {
+  return await StoreAssistant.findOne({ assistant: assistantId, inStore: storeId });
+}
 
-  return assistant;
+export async function updateAssistant(assistantId: MongoId, storeId: MongoId, permission:any, anotherData:any) {
+
+  return await StoreAssistant.findOneAndUpdate({ assistant: assistantId, inStore: storeId }, 
+    { 
+      $set: {...permission, ...anotherData}
+    }
+    , { new: true, runValidators: true });
 }
 
 export async function deleteAllAssistants(storeId: MongoId, session: mongoose.ClientSession) {
   //STEP 1) get all the assistants ids based on the storeId to delete them from assistants collection:
-  const assistantsId = await StoreAssistant.find({ inStore: storeId }).select("assistant"); // this is going to have the mongodb default _id and the assistant field
-  if (!assistantsId) return;
+  // const assistantsId = await StoreAssistant.find({ inStore: storeId }).select("assistant"); // this is going to have the mongodb default _id and the assistant field
 
   await StoreAssistant.deleteMany({ inStore: storeId }).session(session);
 
   //STEP 2) delete them using the same assistants ids from users collection:
-  const userIds = assistantsId.map((a) => a.assistant); // to only extract the assistant filed that holds a reference to the User
-  await User.deleteMany({ _id: { $in: userIds }, userType: "storeAssistant" }).session(session);
+  // const userIds = assistantsId.map((a) => a.assistant); // to only extract the assistant filed that holds a reference to the User
+  // await User.deleteMany({ _id: { $in: userIds }, userType: "storeAssistant" }).session(session);
 }
