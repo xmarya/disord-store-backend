@@ -8,7 +8,7 @@ interface SharedReviewDataBody {
   userType: UserTypes,
   firstName:string,
   lastName:string,
-  image:string,
+  image?:string,
 }
 
 export interface ReviewDataBody extends SharedReviewDataBody {
