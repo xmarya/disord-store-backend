@@ -1,25 +1,22 @@
-import getAdminEmail from "@services/auth/adminServices/adminAuth/getAdminEmail";
-import getUserEmail from "@services/auth/usersServices/getUserEmail";
-import { MongoId } from "@Types/MongoId";
-import { UserTypes } from "@Types/User";
-import { err } from "neverthrow";
+import { isEmailExist } from "@repositories/credentials/credentialsRepo";
+import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import safeThrowable from "@utils/safeThrowable";
 
-async function emailChecker(userId: MongoId, userType: UserTypes, email: string) {
-  let isEmailExits: boolean;
+async function emailChecker(email: string) {
+  const safeCheckEmail = safeThrowable(
+    () => isEmailExist(email),
+    (error) => new Failure((error as Error).message)
+  );
 
-  switch (userType) {
-    case "admin":
-      isEmailExits = await getAdminEmail(userId, email);
-      break;
+  const checkEmailResult =  await extractSafeThrowableResult(() => safeCheckEmail);
+  if(checkEmailResult.ok) return new BadRequest("لا يمكن استخدام هذا البريد الإلكتروني");
+  if(!checkEmailResult.ok && checkEmailResult.reason === "not-found") return new Success(true);
 
-    default:
-      isEmailExits = await getUserEmail(userId, email);
-      break;
-  }
+  return checkEmailResult as Failure;
 
-  if (isEmailExits) return err("لا يمكن استخدام هذا البريد الإلكتروني");
-
-  return isEmailExits;
 }
 
 export default emailChecker;

@@ -27,25 +27,6 @@ const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
       enum: ["credentials", "discord"],
       required: [true, " the signMethod field is required"],
     },
-    credentials: {
-      password: {
-        type: String,
-        minLength: [8, "your password must be at least 8 characters"],
-        select: false,
-      },
-      emailConfirmed: {
-        type: Boolean,
-        default: false,
-      },
-      emailConfirmationToken: { type: String, select: false },
-      emailConfirmationExpires: { type: Date, select: false, default: null },
-      // passwordConfirm: String, // NOTE: zod will be use to validate this filed
-      // on the front-end + the field itself won't be saved in the db.
-      // it's only use inside the pre hook to check the password
-      passwordResetToken: String,
-      passwordResetExpires: Date,
-      passwordChangedAt: Date,
-    },
     discord: {
       discordId: {
         type: String,
@@ -242,24 +223,6 @@ userSchema.virtual("planExpiresInDays").get(function () {
     });
 */
 
-// this pre hook is for encrypting the pass before saving it for NEW USERS:
-userSchema.pre("save", async function (next) {
-  // STEP 1) check if the user isNew and the signMethod is credentials: (the condition this.credentials is for getting rid ot possibly undefined error)
-  if (this.isNew && this.signMethod === "credentials" && this.credentials) {
-    this.credentials.password = await bcrypt.hash(this.credentials.password, HASHING_SALT);
-  }
-  next();
-});
-
-// this pre hook for forget/rest or change password, it encrypts the password and sets the changeAt
-userSchema.pre("save", async function (next) {
-  if (!this.isNew && this.credentials && this.isModified("credentials.password")) {
-    this.credentials.password = await bcrypt.hash(this.credentials.password, HASHING_SALT);
-    this.credentials.passwordChangedAt = new Date();
-  }
-
-  next();
-});
 
 const User = mongoose.model<UserDocument, UserModel, UserVirtual>("User", userSchema);
 

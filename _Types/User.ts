@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
-import { Address } from "./UserAddress";
-import { PlansNames, SubscriptionTypes } from "./Plan";
 import { MongoId } from "./MongoId";
-import { Credentials } from "./UserCredentials";
+import { PlansNames, SubscriptionTypes } from "./Plan";
 
 type Discord = {
   discordId: string;
@@ -13,13 +11,10 @@ type Discord = {
 
 export type UserTypes = "user" | "storeOwner" | "storeAssistant" | "admin";
 
-export interface UserDataBody {
-  email: string;
-  credentials: Credentials;
-  discord: Discord;
-}
 
-export interface RegularUser extends UserDataBody {
+export interface RegularUser {
+  email: string;
+  discord: Discord;
   signMethod: "credentials" | "discord";
   userType: UserTypes;
   firstName: string;

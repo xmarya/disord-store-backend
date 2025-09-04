@@ -1,42 +1,42 @@
-import getAdminCredentials from "@services/auth/adminServices/adminAuth/getAdminCredentials";
-import getUserCredentials from "@services/auth/usersServices/getUserCredentials";
-import { AdminDocument } from "@Types/admin/AdminUser";
-import { UserDocument } from "@Types/User";
+import { updatePassword } from "@repositories/credentials/credentialsRepo";
+import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import jwtSignature from "@utils/jwtToken/generateSignature";
 import { comparePasswords } from "@utils/passwords/comparePasswords";
-import { err } from "neverthrow";
+import safeThrowable from "@utils/safeThrowable";
 
 type ChangedPasswordData = {
-  user: UserDocument | AdminDocument;
-  currentPassword: string;
+  userId: string;
+  email: string;
   newPassword: string;
+  currentPassword: string;
 };
+
+//REFACTOR
 async function confirmChangedPassword(data: ChangedPasswordData) {
-  const { userType, id } = data.user;
+  const { currentPassword, newPassword, email, userId } = data;
 
-  let result;
-  switch (userType) {
-    case "admin":
-      result = await getAdminCredentials(id);
-      break;
+  const safeUpdatePassword = safeThrowable(
+    () => updatePassword(email, newPassword),
+    (error) => new Failure((error as Error).message)
+  );
 
-    default:
-      result = await getUserCredentials(id);
-      break;
-  }
+  const updatePasswordResult = await extractSafeThrowableResult(() => safeUpdatePassword);
+  if (!updatePasswordResult.ok) return updatePasswordResult;
 
-  if (!result.ok) return result;
-
-  const { result: user } = result;
+  const { result: credentials } = updatePasswordResult;
   //STEP 3) is the provided password matching our record?
-  if (!(await comparePasswords(data.currentPassword, user.credentials.password))) return err("الرجاء التحقق من البيانات المدخلة");
+  if (!(await comparePasswords(currentPassword, credentials.password))) return new BadRequest("كلمة المرور الحالية لا تطابق الموجودة في السجلات");
 
   //STEP 4) allow changing the password:
-  user.credentials.password = data.newPassword;
-  await user.save();
+  credentials.password = newPassword;
+  await credentials.save();
 
   // STEP 5) generate a new token:
-  return jwtSignature(user.id, "1h");
+  const token = jwtSignature(userId, "1h");
+  return new Success(token);
 }
 
 export default confirmChangedPassword;
