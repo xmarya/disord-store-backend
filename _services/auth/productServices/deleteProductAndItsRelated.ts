@@ -3,13 +3,14 @@ import Product from "@models/productModel";
 import { deleteDoc } from "@repositories/global";
 import { ProductDeletedEvent } from "@Types/events/ProductEvents";
 import { MongoId } from "@Types/MongoId";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 async function deleteProductAndItsRelated(productId: MongoId) {
   const safeDeleteProduct = safeThrowable(
     () => deleteDoc(Product, productId),
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
   const deleteProductResult = await extractSafeThrowableResult(() => safeDeleteProduct);
 

@@ -1,14 +1,14 @@
 import Review from "@models/reviewModel";
 import { deleteDoc } from "@repositories/global";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
-import setResourceRating from "./setResourceRating";
 import safeThrowable from "@utils/safeThrowable";
-import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
+import setResourceRating from "./setResourceRating";
 
 async function deleteResourceReview(reviewId: string) {
   const safeDeleteReview = safeThrowable(
     () => deleteDoc(Review, reviewId),
-    () => new Error(INTERNAL_ERROR_MESSAGE)
+    (error) => new Failure((error as Error).message)
   );
   const deletedReview = await extractSafeThrowableResult(() => safeDeleteReview);
   if (deletedReview.ok) await setResourceRating(deletedReview.result.storeOrProduct, deletedReview.result.reviewedResourceId);

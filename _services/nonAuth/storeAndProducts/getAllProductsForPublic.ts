@@ -6,6 +6,7 @@ import { MongoId } from "@Types/MongoId";
 import { ProductDocument } from "@Types/Product";
 import { QueryOptions } from "@Types/QueryOptions";
 import { QueryParams } from "@Types/Request";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
@@ -14,7 +15,7 @@ async function getAllProductsForPublic(query: QueryParams, storeId?: MongoId) {
 
   const safeGetProducts = safeThrowable(
     () => getAllDocs(Product, query, { select: fields, ...(storeId && { condition: { store: storeId } }) }),
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 
   const result = await extractSafeThrowableResult(() => safeGetProducts);

@@ -1,15 +1,15 @@
 import { categoriesInCache } from "@controllers/auth/categoryController";
 import Product from "@models/productModel";
 import { getOneDocById } from "@repositories/global";
-import { CategoryDocument } from "@Types/Category";
 import { MongoId } from "@Types/MongoId";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 async function getOneProduct(productId: MongoId) {
   const safeGetProduct = safeThrowable(
     () => getOneDocById(Product, productId),
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 
   const getProductResult = await extractSafeThrowableResult(() => safeGetProduct);

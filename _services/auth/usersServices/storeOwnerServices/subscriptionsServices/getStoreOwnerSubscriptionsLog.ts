@@ -5,11 +5,12 @@ import { UserDocument } from "@Types/User";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import formatSubscriptionsLogs from "@utils/subscriptions/formatSubscriptionsLogs";
 import safeThrowable from "@utils/safeThrowable";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 
 async function getStoreOwnerSubscriptionsLog(storeOwner: MongoId) {
   const safeGetSubscriptionsLog = safeThrowable(
     () => getOneDocById(User, storeOwner, { select: ["subscribedPlanDetails", "subscriptionsLog"] }),
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 
   const subscriptionsLogResult = await extractSafeThrowableResult(() => safeGetSubscriptionsLog);

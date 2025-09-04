@@ -1,15 +1,14 @@
-import { PLAN_TRIAL_PERIOD } from "@constants/ttl";
+import eventBus from "@config/EventBus";
+import User from "@models/userModel";
+import { updateDoc } from "@repositories/global";
+import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
 import { MongoId } from "@Types/MongoId";
-import getStoreOwnerSubscriptionsLog from "./getStoreOwnerSubscriptionsLog";
-import { addDays, isPast } from "date-fns";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import safeThrowable from "@utils/safeThrowable";
 import isTrialOver from "@utils/subscriptions/isTrialOver";
 import { err } from "neverthrow";
-import { updateDoc } from "@repositories/global";
-import User from "@models/userModel";
-import safeThrowable from "@utils/safeThrowable";
-import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
-import eventBus from "@config/EventBus";
-import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
+import getStoreOwnerSubscriptionsLog from "./getStoreOwnerSubscriptionsLog";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 
 async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId:MongoId, cancellationNote?: string) {
   const subscriptionsLog = await getStoreOwnerSubscriptionsLog(storeOwnerId);
@@ -25,7 +24,7 @@ async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId:MongoId
 
   const safeUpdateStoreOwner = safeThrowable(
     () => updateDoc(User, storeOwnerId, { $unset: { subscribedPlanDetails: "" } }),
-    (error) => new Error((error as Error).message)
+    (error) => new Failure((error as Error).message)
   );
 
   const updateResult = await extractSafeThrowableResult(() => safeUpdateStoreOwner);

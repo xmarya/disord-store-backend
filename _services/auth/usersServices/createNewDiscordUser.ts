@@ -1,7 +1,5 @@
-import eventBus from "@config/EventBus";
 import User from "@models/userModel";
 import { createDoc } from "@repositories/global";
-import { UserCreatedEvent } from "@Types/events/UserEvents";
 import { DiscordSignupData } from "@Types/SignupData";
 
 async function createNewDiscordUser(signupData: DiscordSignupData) {
@@ -16,7 +14,7 @@ async function createNewDiscordUser(signupData: DiscordSignupData) {
       discordId: id,
       username: name,
     },
-    "credentials.emailConfirmed": true,
+    // "credentials.emailConfirmed": true, no longer exist
   });
 ;
 

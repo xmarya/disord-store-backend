@@ -1,17 +1,17 @@
-import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import User from "@models/userModel";
 import { updateDoc } from "@repositories/global";
+import { MongoId } from "@Types/MongoId";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { UserDocument } from "@Types/User";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-//ENHANCE the return type
-async function updateUserProfile(userId: string, updatedData: Partial<UserDocument>) {
+async function updateUserProfile(userId: MongoId, updatedData: Partial<UserDocument>) {
   updatedData?.userType && delete updatedData.userType;
 
   const safeUpdateUser = safeThrowable(
     () => updateDoc(User, userId, updatedData),
-    () => new Error(INTERNAL_ERROR_MESSAGE)
+    (error) => new Failure((error as Error).message)
   );
 
   return await extractSafeThrowableResult<UserDocument>(() => safeUpdateUser);
