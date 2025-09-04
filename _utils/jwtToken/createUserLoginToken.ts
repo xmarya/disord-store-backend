@@ -1,14 +1,11 @@
-import type { Response } from "express";
-import { getOneDocByFindOne, getOneDocById } from "@repositories/global";
-import { AdminDocument } from "@Types/admin/AdminUser";
-import { UserDocument } from "@Types/User";
 import User from "@models/userModel";
-import cacheUser from "../../externals/redis/cacheControllers/user";
-import createNovuSubscriber from "../../externals/novu/subscribers/createSubscriber";
-import jwtSignature from "./generateSignature";
-import tokenWithCookies from "./tokenWithCookies";
+import { getOneDocByFindOne } from "@repositories/global";
+import type { Response } from "express";
+// import cacheUser from "../../externals/redis/cacheControllers/user";
 import Admin from "@models/adminModel";
 import { AppError } from "../AppError";
+import jwtSignature from "./generateSignature";
+import tokenWithCookies from "./tokenWithCookies";
 
 async function createUserLoginToken(response: Response, condition: Record<string, string | undefined>) {
   const loggedInUser = (await getOneDocByFindOne(User, { condition })) ?? (await getOneDocByFindOne(Admin, { condition }));
@@ -19,7 +16,7 @@ async function createUserLoginToken(response: Response, condition: Record<string
     tokenWithCookies(response, token);
 
     // STEP 4) fetching and caching without awaiting
-    await cacheUser(loggedInUser);
+    // await cacheUser(loggedInUser);
   } else throw new AppError(400, "Couldn't generate login token. Please try to login again.");
 }
 
