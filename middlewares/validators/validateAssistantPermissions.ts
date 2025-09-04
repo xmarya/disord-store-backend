@@ -22,11 +22,9 @@ const checkAssistantPermissions = (permissionKey: keyof AssistantPermissions) =>
     const storeId = request.store;
     const assistantId = request.user.id;
 
-    // console.log("request.body.modelId", storeId, "request.user.id", assistantId);
-
     if (!storeId || !assistantId) return next(new AppError(400, "معلومات المتجر أو المستخدم مفقودة"));
 
-    const assistant = await getAssistantPermissions(storeId, assistantId);
+    const assistant = await getAssistantPermissions(assistantId, storeId);
     if (!assistant) return next(new AppError(403, "هذا المستخدم غير موجود من ضمن المساعدين"));
 
     if (!assistant.permissions[permissionKey]) return next(new AppError(403, "غير مصرح لك الوصول"));
