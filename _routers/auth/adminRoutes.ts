@@ -13,13 +13,12 @@ import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "..
 import { createAdminController, createUnlimitedUserController, getAllUsersController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
 import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviews/platformReviewController";
 import { deleteUserAccountController } from "../../controllers/auth/userAuthController";
-import isEmailExist from "middlewares/protectors/isEmailExist";
 import { confirmChangePasswordController, updateProfileController } from "controllers/auth/authSettingsController";
 
 export const router = express.Router();
 
 router.use(restrict("admin"));
-router.route("/").get(getAdminProfileController).patch(isEmailExist, updateProfileController); /*✅*/
+router.route("/").get(getAdminProfileController).patch(updateProfileController); /*✅*/
 router.post("/administratorUser", sanitisedData, validateNewUserData, createAdminController); /*✅*/
 router.route("/changePassword").patch(validateChangePassword, confirmChangePasswordController); /*✅*/
 
