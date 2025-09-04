@@ -23,7 +23,6 @@ async function novuUpdateSubscriber(subscriberId: string, data: NovuUpdatedData)
 
   if (Object.keys(moreData).length) payload.data = moreData;
 
-  console.log("Novu final updated data", payload);
   await novu.subscribers.patch(payload, subscriberId);
 
 }
