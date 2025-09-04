@@ -1,4 +1,4 @@
-import userForgetPassword from "@services/nonAuth/credentialsServices/passwords/UserForgetPassword";
+import userForgetPassword from "@services/nonAuth/credentialsServices/passwords/userForgetPassword";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 
