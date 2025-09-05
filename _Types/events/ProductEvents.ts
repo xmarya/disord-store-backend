@@ -1,4 +1,4 @@
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import { DomainEvent } from "./DomainEvent";
 
 export interface ProductUpdatedEvent extends DomainEvent {
