@@ -1,4 +1,4 @@
-import { DigitalProduct, PhysicalProduct, ProductDataBody } from "@Types/Product";
+import { DigitalProduct, PhysicalProduct, ProductDataBody } from "@Types/Schema/Product";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 

@@ -9,7 +9,7 @@
 */
 
 import { isPast, isValid } from "date-fns";
-import { UserCreditCardDataBody } from "@Types/UserCreditCard";
+import { UserCreditCardDataBody } from "@Types/Schema/Users/UserCreditCard";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 

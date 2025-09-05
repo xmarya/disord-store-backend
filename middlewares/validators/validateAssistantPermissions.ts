@@ -1,7 +1,5 @@
-
-
 import { type Request, type Response, type NextFunction, request } from "express";
-import { AssistantPermissions } from "@Types/StoreAssistant";
+import { AssistantPermissions } from "@Types/Schema/Users/StoreAssistant";
 import { getAssistantPermissions } from "@repositories/assistant/assistantRepo";
 import { AppError } from "@utils/AppError";
 
