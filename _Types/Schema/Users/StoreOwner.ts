@@ -3,7 +3,7 @@ import { MongoId } from "../MongoId";
 import { PlansNames, SubscriptionTypes } from "../Plan";
 import { BaseUserData, UserTypes } from "./BasicUserTypes";
 
-type StoreOwnerPlan = {
+export type StoreOwnerPlan = {
   planId: MongoId;
   planName: PlansNames;
   subscriptionType: "new" | "renewal" | "upgrade" | "downgrade";
@@ -14,7 +14,7 @@ type StoreOwnerPlan = {
   subscribeEnds: Date;
 };
 
-interface StoreOwner extends BaseUserData {
+export interface StoreOwner extends BaseUserData {
   userType: Extract<UserTypes, "storeOwner">;
   myStore: MongoId;
   subscribedPlanDetails: StoreOwnerPlan;

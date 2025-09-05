@@ -1,21 +1,12 @@
-import bcrypt from "bcryptjs";
-import { formatDistanceStrict, lightFormat } from "date-fns";
-import { arSA } from "date-fns/locale/ar-SA";
+import { RegularUserDocument } from "@Types/Schema/Users/RegularUser";
 import mongoose, { Schema } from "mongoose";
-import { HASHING_SALT } from "../_constants/primitives";
-import { UserDocument } from "@Types/Schema/Users/RegularUser";
-import "./storeModel"; // ✅ Make sure Store is registered before User
-
-interface UserVirtual {
-  planExpiresInDays: string;
-}
 
 // UserModel is only used when creating the Mongoose model at the last of the file (after creating the Schema).
-type UserModel = mongoose.Model<UserDocument, {}, {}, UserVirtual>;
+type RegularUserModel = mongoose.Model<RegularUserDocument>;
 
 // Schema<T> expects the first generic type to be an object containing ALL the schema fields.
 // The first argument for Schema<> should be the document type, not the model type.
-const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
+const userSchema = new Schema<RegularUserDocument>(
   {
     email: {
       type: String,
@@ -61,8 +52,7 @@ const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
     },
     userType: {
       type: String,
-      enum: ["admin", "storeOwner", "storeAssistant", "user"] /* SOLILOQUY: what if the user can be both an owner and an assistant? in this case the type should be [String] */,
-      required: [true, "the userType field is required"],
+      default: "user",
     },
     image: String,
     /* SOLILOQUY: 
@@ -82,41 +72,6 @@ const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
       select: false,
       default: undefined,
     },
-    subscribedPlanDetails: {
-      planId: {
-        type: Schema.Types.ObjectId,
-        ref: "Plan",
-        default: undefined,
-      },
-      planName: {
-        type: String,
-        enum: ["basic", "plus", "unlimited"],
-        default: undefined,
-      },
-      paidPrice: { type: Number, default: undefined },
-      paid: {
-        type: Boolean,
-        default: undefined,
-      },
-      subscribeStarts: { type: Date, default: undefined },
-      subscribeEnds: { type: Date, default: undefined },
-    },
-    subscriptionsLog: {
-      type: Map,
-      of: new Schema(
-        {
-          planName: String,
-          price: Number,
-        },
-        { _id: false }
-      ),
-      default: () => new Map(), // this is a must; since mongoose doesn't add and undefined field and empty Maps
-    },
-    myStore: {
-      type: Schema.Types.ObjectId,
-      ref: "Store",
-      default: undefined,
-    },
     createdAt: {
       type: Date,
       default: Date.now(),
@@ -133,27 +88,7 @@ const userSchema = new Schema<UserDocument, {}, {}, UserVirtual>(
   }
 );
 
-// this pre(findOneAndUpdate) for accumulating the count in subscriptionsLog whenever the subscribeStarts field has been modified during a new/renewal subscribing process
-userSchema.pre("findOneAndUpdate", async function (next) {
-  // STEP 1) get the original doc in order to access the userType and its subscriptionsLog field:
-  const doc: UserDocument = await this.model.findOne(this.getFilter()).select("userType subscriptionsLog");
 
-  // STEP 2) get the to-be-updated fields:
-  /*✅*/ const updatedFields = this.getUpdate() as mongoose.UpdateQuery<UserDocument>;
-
-  if (doc?.userType !== "storeOwner" || !updatedFields?.subscribedPlanDetails?.subscribeStarts) return next(); // don't enter if the updated fields has nothing to do with the subscription
-
-  const { subscribeStarts, planName, paidPrice } = updatedFields.subscribedPlanDetails;
-  const logsMap = doc.subscriptionsLog;
-
-  //STEP 3) insert the new log data:
-  const key = lightFormat(subscribeStarts, "yyyy-MM-dd");
-  logsMap.set(key, { planName, price: paidPrice }); // JavaScript Map enforces uniqueness of keys, not values.
-
-  // updatedFields.$set = updatedFields.$set ?? {}; need for this line; since it now behaves as UpdateQuery<T>, not as aggregation pipeline
-  updatedFields.$set.subscriptionsLog = logsMap;
-  next();
-});
 /* OLD CODE (kept for reference): 
 userSchema.pre("findOneAndUpdate", async function (next) {
   const updatedFields = this.getUpdate();
@@ -191,23 +126,7 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   the date to be a key since it's an object; Maps are strict to have a string key
 */
 
-// I decided to make this a virtual field, so it will be created and recalculated each time
-// the data is retrieved which maintains the accuracy of how many days exactly are left.
-userSchema.virtual("planExpiresInDays").get(function () {
-  if (!this.subscribedPlanDetails.subscribeStarts || this.userType === "storeAssistant") return undefined; // the return 0 causes the planExpiresInDays field to be returned in the doc. using undefined prevents this.
 
-  const days = formatDistanceStrict(this.subscribedPlanDetails.subscribeEnds, new Date(), { locale: arSA, unit: "day" });
-  return days;
-  /* OLD CODE (kept for reference): 
-  const ms = this.subscribeEnds.getTime() - this.subscribeStarts.getTime();
-  return Math.floor(ms / (1000 * 60 * 60 * 24));
-  */
-
-  // NOTE: this.subscribeEnds and this.subscribeStarts are Date objects, not numbers.
-  // TypeScript does not allow arithmetic (-) directly between Date objects.
-  // so, we'll convert them to a number by using getTime(), the result is going to be a timestamp in milliseconds
-  // we'll take it and convert it into a day by dividing by dividing by (1000 * 60 * 60 * 24) .
-});
 
 /* OLD CODE (kept for reference): 
     userSchema.pre("save", function (next) {
@@ -223,6 +142,6 @@ userSchema.virtual("planExpiresInDays").get(function () {
     });
 */
 
-const User = mongoose.model<UserDocument, UserModel, UserVirtual>("User", userSchema);
+const User = mongoose.model<RegularUserDocument, RegularUserModel>("User", userSchema);
 
 export default User;
