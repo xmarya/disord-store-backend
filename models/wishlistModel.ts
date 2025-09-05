@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { WishlistDocument } from "@Types/Wishlist";
+import { WishlistDocument } from "@Types/Schema/Wishlist";
 
 type WishListModel = Model<WishlistDocument>;
 const wishlistSchema = new Schema<WishlistDocument>(

@@ -1,5 +1,5 @@
 import { Model, Schema, model } from "mongoose";
-import { InvoiceDocument } from "@Types/Invoice";
+import { InvoiceDocument } from "@Types/Schema/Invoice";
 
 type InvoiceModel = Model<InvoiceDocument>;
 export const invoiceSchema = new Schema<InvoiceDocument>(

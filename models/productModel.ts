@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { ProductDocument } from "@Types/Product";
+import { ProductDocument } from "@Types/Schema/Product";
 
 type ProductModel = mongoose.Model<ProductDocument>;
 

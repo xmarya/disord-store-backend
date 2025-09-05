@@ -1,5 +1,5 @@
 import { HASHING_SALT } from "@constants/primitives";
-import { StoreAssistantDocument } from "@Types/StoreAssistant";
+import { StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
 import { Model, Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
 
@@ -39,7 +39,7 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
     },
     userType: {
       type: String,
-      default: "storeAssistant"
+      default: "storeAssistant",
     },
     image: String,
     inStore: {

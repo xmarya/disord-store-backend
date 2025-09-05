@@ -1,4 +1,4 @@
-import { CredentialsDocument } from "@Types/UserCredentials";
+import { CredentialsDocument } from "@Types/Schema/Users/UserCredentials";
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import { HASHING_SALT } from "@constants/primitives";
@@ -39,7 +39,7 @@ const credentialsSchema = new Schema<CredentialsDocument>(
         },
         message: (props) => `${props.value} isn't a valid phone number. it must starts with +966`,
       },
-      unique:true,
+      unique: true,
       sparse: true, // in order to not recognise null/undefined as a unique value, and to be only unique for existing phoneNumber
     },
     userType: {
