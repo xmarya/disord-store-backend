@@ -3,8 +3,8 @@ import getStoreForAuthorisedUser from "@services/auth/storeServices/getStoreForA
 import updateStore from "@services/auth/storeServices/updateStore";
 import updateStoreStatus from "@services/auth/storeServices/updateStoreStatus";
 import deleteMyStore from "@services/auth/usersServices/storeOwnerServices/deleteMyStore";
-import { StoreDataBody, StoreDocument } from "@Types/Store";
-import { UserDocument } from "@Types/User";
+import { StoreDataBody, StoreDocument } from "@Types/Schema/Store";
+import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import isErr from "@utils/isErr";
@@ -15,7 +15,7 @@ export const createStoreController = catchAsync(async (request, response, next) 
   const { storeName, description }: StoreDataBody = request.body;
   if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
 
-  const result = await createNewStore(request.user as UserDocument, request.body);
+  const result = await createNewStore(request.user as StoreOwnerDocument, request.body);
 
   if (!(result as StoreDocument)?.id) return next(result);
 

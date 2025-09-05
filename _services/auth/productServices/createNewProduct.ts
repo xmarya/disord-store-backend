@@ -1,7 +1,7 @@
 import Product from "@models/productModel";
 import { createDoc } from "@repositories/global";
-import { MongoId } from "@Types/MongoId";
-import { ProductDataBody } from "@Types/Product";
+import { MongoId } from "@Types/Schema/MongoId";
+import { ProductDataBody } from "@Types/Schema/Product";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import updateCategoryRelatedToProduct from "../categoryServices/updateCategoryRelatedToProduct";

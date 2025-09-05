@@ -1,13 +1,13 @@
 import eventBus from "@config/EventBus";
 import { createAssistant } from "@repositories/assistant/assistantRepo";
 import { AssistantCreatedEvent } from "@Types/events/AssistantEvents";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { AssistantDataBody, StoreAssistant } from "@Types/StoreAssistant";
+import { AssistantDataBody, StoreAssistant } from "@Types/Schema/Users/StoreAssistant";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-async function createNewAssistantInStore(storeId: MongoId, assistantData: AssistantDataBody, planId:MongoId) {
+async function createNewAssistantInStore(storeId: MongoId, assistantData: AssistantDataBody, planId: MongoId) {
   const { firstName, lastName, email, password, permissions, phoneNumber, image } = assistantData;
   const data: StoreAssistant = { userType: "storeAssistant", inStore: storeId, inPlan: planId, firstName, lastName, email, phoneNumber, permissions, credentials: { password }, image };
 
@@ -20,7 +20,7 @@ async function createNewAssistantInStore(storeId: MongoId, assistantData: Assist
 
   if (!createAssistantResult.ok) return createAssistantResult;
 
-  const {result} = createAssistantResult;
+  const { result } = createAssistantResult;
 
   const event: AssistantCreatedEvent = {
     type: "assistant.created",
@@ -43,7 +43,6 @@ async function createNewAssistantInStore(storeId: MongoId, assistantData: Assist
 
   createAssistantResult.result.credentials.password = "";
   return createAssistantResult;
-
 }
 
 export default createNewAssistantInStore;

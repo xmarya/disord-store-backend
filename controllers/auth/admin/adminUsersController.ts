@@ -3,7 +3,7 @@ import createUnlimitedPlanAndStoreOwner from "@services/auth/adminServices/user/
 import getAllUsersForAdmin from "@services/auth/adminServices/user/getAllUsersForAdmin";
 import getOneUserForAdmin from "@services/auth/adminServices/user/getOneUserForAdmin";
 import createNewUserAndSendConfirmationEmail from "@services/auth/usersServices/createNewUserAndSendConfirmationEmail";
-import { UnlimitedPlanDataBody } from "@Types/Plan";
+import { UnlimitedPlanDataBody } from "@Types/Schema/Plan";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
@@ -15,7 +15,7 @@ export const createAdminController = catchAsync(async (request, response, next) 
   response.status(201).json({
     success: true,
     message: "a new admin was successfully created",
-    data:{newAdmin}
+    data: { newAdmin },
   });
 });
 

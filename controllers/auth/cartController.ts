@@ -1,5 +1,5 @@
 import { addProductToCart, deleteProductFromCart, getUserCart } from "@repositories/cart/cartRepo";
-import { CartDataBody } from "@Types/Cart";
+import { CartDataBody } from "@Types/Schema/Cart";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 

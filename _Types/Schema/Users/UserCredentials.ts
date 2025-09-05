@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { UserTypes } from "./RegularUser";
+import { UserTypes } from "./BasicUserTypes";
 
 export type Credentials = {
   password: string;

@@ -4,7 +4,7 @@ import { confirmUserEmail } from "@repositories/credentials/credentialsRepo";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
-import { UserTypes } from "@Types/User";
+import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import crypto from "crypto";

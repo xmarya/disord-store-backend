@@ -1,5 +1,5 @@
 import novu from "@config/novu";
-import { AssistantPermissions } from "@Types/StoreAssistant";
+import { AssistantPermissions } from "@Types/Schema/Users/StoreAssistant";
 
 type NovuUpdatedData = {
   email?: string;
@@ -24,7 +24,6 @@ async function novuUpdateSubscriber(subscriberId: string, data: NovuUpdatedData)
   if (Object.keys(moreData).length) payload.data = moreData;
 
   await novu.subscribers.patch(payload, subscriberId);
-
 }
 
 export default novuUpdateSubscriber;

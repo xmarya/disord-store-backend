@@ -5,7 +5,7 @@ import { deleteAllResourceReviews } from "@repositories/review/reviewRepo";
 import { deleteStore } from "@repositories/store/storeRepo";
 import { deleteStoreStats } from "@repositories/store/storeStatsRepo";
 import { resetStoreOwnerToDefault } from "@repositories/user/userRepo";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import { startSession } from "mongoose";
 
 async function deleteStorePermanently(storeId: MongoId) {
@@ -27,7 +27,7 @@ async function deleteStorePermanently(storeId: MongoId) {
 
     //STEP:5) delete reviews:
     await deleteAllResourceReviews(storeId, session);
-    
+
     //STEP:5) delete stats records:
     await deleteStoreStats(storeId, session);
 

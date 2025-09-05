@@ -2,7 +2,7 @@ import eventBus from "@config/EventBus";
 import { createNewCredentials } from "@repositories/credentials/credentialsRepo";
 import getSignupFunctionOf from "@services/nonAuth/credentialsServices/signup/getSignupFunctionOf";
 import { EmailConfirmationSentEvent, UserCreatedEvent } from "@Types/events/UserEvents";
-import { CredentialsSignupData } from "@Types/SignupData";
+import { CredentialsSignupData } from "@Types/Schema/Users/SignupData";
 import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
 import { startSession } from "mongoose";
 

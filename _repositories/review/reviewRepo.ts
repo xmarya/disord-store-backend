@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { Model } from "@Types/Model";
-import { MongoId } from "@Types/MongoId";
+import { Model } from "@Types/Schema/Model";
+import { MongoId } from "@Types/Schema/MongoId";
 import Review from "@models/reviewModel";
 
 export async function confirmReviewAuthorisation(reviewId: string, userId: string): Promise<boolean> {
@@ -47,5 +47,5 @@ export async function calculateRatingsAverage(Model: Extract<Model, "Store" | "P
 }
 
 export async function deleteAllResourceReviews(resourceId: MongoId, session?: mongoose.ClientSession) {
-  await Review.deleteMany({ reviewedResourceId: resourceId }, {session});
+  await Review.deleteMany({ reviewedResourceId: resourceId }, { session });
 }

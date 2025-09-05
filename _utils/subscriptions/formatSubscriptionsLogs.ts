@@ -1,7 +1,7 @@
-import { PlanDocument } from "@Types/Plan";
-import { UserPlan } from "@Types/User";
+import { PlanDocument } from "@Types/Schema/Plan";
+import { StoreOwnerPlan } from "@Types/Schema/Users/StoreOwner";
 
-function formatSubscriptionsLogs(subscribedPlanDetails: UserPlan, planExpiresInDays: string) {
+function formatSubscriptionsLogs(subscribedPlanDetails: StoreOwnerPlan, planExpiresInDays: string) {
   // const currentSubscription ,currentSubscriptionDetails, pastSubscriptions
   const { paidPrice, subscribeStarts, subscribeEnds, planId } = subscribedPlanDetails;
   const { planName, price, quota } = planId as unknown as PlanDocument;

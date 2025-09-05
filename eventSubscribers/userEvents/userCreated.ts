@@ -18,6 +18,7 @@ eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
   
 });
 
+// caching the email confirmation token once user created
 eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
   const { user, credentialsId, randomToken } = event.payload;
   const cacheData = {
@@ -35,6 +36,7 @@ eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
 
 });
 
+// caching the email confirmation token once user sending a request for new confirmation email
 eventBus.ofType<EmailConfirmationSentEvent>("emailConfirmation.sent").subscribe((event) => {
   const { userType, credentialsId, randomToken } = event.payload;
   const cacheData = {

@@ -3,8 +3,8 @@ import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import createNewUnlimitedPlan from "@services/auth/plan/createNewUnlimitedPlan";
 import createUnlimitedStoreOwner from "@services/auth/usersServices/storeOwnerServices/createUnlimitedStoreOwner";
 import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
-import { UnlimitedPlanDataBody } from "@Types/Plan";
-import { UnlimitedStoreOwnerData } from "@Types/User";
+import { UnlimitedPlanDataBody } from "@Types/Schema/Plan";
+import { UnlimitedStoreOwnerData } from "@Types/Schema/Users/StoreOwner";
 import { startSession } from "mongoose";
 import { err } from "neverthrow";
 

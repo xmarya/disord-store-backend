@@ -1,8 +1,8 @@
-import { CredentialsDocument } from "@Types/UserCredentials";
+import { CredentialsDocument } from "@Types/Schema/Users/UserCredentials";
 import crypto from "crypto";
 import { addMinutes } from "date-fns";
 
-export async function generateRandomToken(credentials:CredentialsDocument, tokenFor: "forgetPassword" | "emailConfirmation") {
+export async function generateRandomToken(credentials: CredentialsDocument, tokenFor: "forgetPassword" | "emailConfirmation") {
   // STEP 1) Generate the token:
   const randomToken = crypto.randomBytes(32).toString("hex");
   const hashedToken = crypto.createHash("sha256").update(randomToken).digest("hex");

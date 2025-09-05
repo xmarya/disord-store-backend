@@ -1,20 +1,19 @@
-import { MongoId } from "@Types/MongoId";
-import { CredentialsSignupData } from "@Types/SignupData";
-import { StoreOwner, UnlimitedStoreOwnerData } from "@Types/User";
+import { MongoId } from "@Types/Schema/MongoId";
+import { CredentialsSignupData } from "@Types/Schema/Users/SignupData";
 import Cart from "@models/cartModel";
 import User from "@models/userModel";
 import Wishlist from "@models/wishlistModel";
 import mongoose, { startSession } from "mongoose";
 import { deleteDoc } from "../global";
+import { StoreOwner, UnlimitedStoreOwnerData } from "@Types/Schema/Users/StoreOwner";
 
-
-export async function createNewStoreOwner(signupData: Omit<CredentialsSignupData, "password" | "passwordConfirm">, session:mongoose.ClientSession) {
-  const newUser = await User.create([signupData], {session});
+export async function createNewStoreOwner(signupData: Omit<CredentialsSignupData, "password" | "passwordConfirm">, session: mongoose.ClientSession) {
+  const newUser = await User.create([signupData], { session });
 
   return newUser[0];
 }
-export async function createNewRegularUser(signupData: Omit<CredentialsSignupData, "password" | "passwordConfirm">, session:mongoose.ClientSession) {
-  const newUser = await User.create([signupData], {session});
+export async function createNewRegularUser(signupData: Omit<CredentialsSignupData, "password" | "passwordConfirm">, session: mongoose.ClientSession) {
+  const newUser = await User.create([signupData], { session });
 
   return newUser[0];
 }
@@ -23,7 +22,6 @@ export async function createNewUnlimitedUser(data: UnlimitedStoreOwnerData, sess
   const aNewUser = await User.findOneAndUpdate({ email: data.email }, { ...data }, { runValidators: true, new: true, upsert: true, setDefaultsOnInsert: true }).session(session);
   return aNewUser;
 }
-
 
 export async function resetStoreOwnerToDefault(storeId: MongoId, session: mongoose.ClientSession) {
   // await User.updateOne({_id: userId}, {
@@ -105,7 +103,6 @@ export async function getUserSubscriptionsLog(userId: MongoId) {
 }
 
 // TODO: move to credentialsRepo
-
 
 export async function deleteRegularUser(userId: MongoId) {
   const session = await startSession();

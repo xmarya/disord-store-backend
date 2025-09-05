@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { IOrderItem } from "@Types/Order"; // Add IOrderItem
+import { IOrderItem } from "@Types/Schema/Order"; // Add IOrderItem
 import Order from "@models/orderModel";
 import { HandleErrorResponse } from "@utils/common";
-import { IStoreAddress } from "@Types/Store";
+import { IStoreAddress } from "@Types/Schema/Store";
 
 export const GetShipmentData = async (req: Request, res: Response): Promise<void> => {
   try {

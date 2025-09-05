@@ -1,9 +1,9 @@
 import { endOfMonth, startOfMonth } from "date-fns";
 import mongoose from "mongoose";
-import { PlansNames, SubscriptionTypes, UnlimitedPlanDataBody } from "@Types/Plan";
+import { PlansNames, SubscriptionTypes, UnlimitedPlanDataBody } from "@Types/Schema/Plan";
 import Plan from "@models/planModel";
 import PlanStats from "@models/planStatsModel";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 
 export async function createUnlimitedPlan(data: UnlimitedPlanDataBody, session: mongoose.ClientSession) {
   /*✅*/
@@ -53,7 +53,7 @@ export async function getPlansStatsReport(sortBy: "year" | "profits" | "subscrib
   return { annualReport, totalsReport };
 }
 
-export async function updatePlanMonthlyStats(planName: PlansNames, profit: number, operationType: SubscriptionTypes | "cancellation", /*session: mongoose.ClientSession*/) {
+export async function updatePlanMonthlyStats(planName: PlansNames, profit: number, operationType: SubscriptionTypes | "cancellation" /*session: mongoose.ClientSession*/) {
   /*✅*/
   /* OLD CODE (kept for reference): 
         const firstDayOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1); // =< year-month-1st day
@@ -92,7 +92,7 @@ export async function updatePlanMonthlyStats(planName: PlansNames, profit: numbe
       },
     },
     { new: true, upsert: true, setDefaultsOnInsert: true } // options
-  )/*.session(session)*/;
+  ) /*.session(session)*/;
 }
 
 // subscription Timeline:

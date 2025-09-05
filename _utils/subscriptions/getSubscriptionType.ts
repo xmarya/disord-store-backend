@@ -1,6 +1,6 @@
 import { getOneDocById } from "@repositories/global";
-import { MongoId } from "@Types/MongoId";
-import { SubscriptionTypes } from "@Types/Plan";
+import { MongoId } from "@Types/Schema/MongoId";
+import { SubscriptionTypes } from "@Types/Schema/Plan";
 import Plan from "@models/planModel";
 import { planTiers } from "@constants/dataStructures";
 

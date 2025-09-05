@@ -1,7 +1,7 @@
 import { categoriesInCache } from "@controllers/auth/categoryController";
 import Product from "@models/productModel";
 import { getOneDocById } from "@repositories/global";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
@@ -17,11 +17,11 @@ async function getOneProduct(productId: MongoId) {
 
   const cats = await categoriesInCache(productId);
 
-  const {result: product} = getProductResult;
+  const { result: product } = getProductResult;
 
   product.categories = cats;
 
-  return {...getProductResult, result: product};
+  return { ...getProductResult, result: product };
 }
 
 export default getOneProduct;

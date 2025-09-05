@@ -1,12 +1,13 @@
 import User from "@models/userModel";
 import { updateDoc } from "@repositories/global";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { UserDocument } from "@Types/User";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
+import { RegularUser } from "@Types/Schema/Users/RegularUser";
+import { BaseUserData } from "@Types/Schema/Users/BasicUserTypes";
 
-async function updateUserProfile(userId: MongoId, updatedData: Partial<UserDocument>) {
+async function updateUserProfile(userId: MongoId, updatedData: Partial<BaseUserData>) {
   updatedData?.userType && delete updatedData.userType;
 
   const safeUpdateUser = safeThrowable(
@@ -14,8 +15,7 @@ async function updateUserProfile(userId: MongoId, updatedData: Partial<UserDocum
     (error) => new Failure((error as Error).message)
   );
 
-  return await extractSafeThrowableResult<UserDocument>(() => safeUpdateUser);
-
+  return await extractSafeThrowableResult(() => safeUpdateUser);
 }
 
 export default updateUserProfile;

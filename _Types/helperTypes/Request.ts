@@ -1,8 +1,5 @@
 import { MongoId } from "@Types/Schema/MongoId";
-import { AdminDocument } from "@Types/Schema/Users/admin/AdminUser";
-import { RegularUserDocument } from "@Types/Schema/Users/RegularUser";
-import { StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
-import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
+import { AllUsers } from "@Types/Schema/Users/AllUser";
 import { LoginMethod } from "@Types/Schema/Users/UserCredentials";
 
 
@@ -11,7 +8,7 @@ declare global {
     interface Request {
       loginMethod: LoginMethod;
       token: string;
-      user: RegularUserDocument | StoreOwnerDocument | AdminDocument | StoreAssistantDocument;
+      user: AllUsers;
       emailConfirmed: boolean;
       store: MongoId;
       plan: MongoId;

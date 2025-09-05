@@ -2,7 +2,7 @@ import eventBus from "@config/EventBus";
 import User from "@models/userModel";
 import { updateDoc } from "@repositories/global";
 import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import isTrialOver from "@utils/subscriptions/isTrialOver";
@@ -10,7 +10,7 @@ import { err } from "neverthrow";
 import getStoreOwnerSubscriptionsLog from "./getStoreOwnerSubscriptionsLog";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 
-async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId:MongoId, cancellationNote?: string) {
+async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId: MongoId, cancellationNote?: string) {
   const subscriptionsLog = await getStoreOwnerSubscriptionsLog(storeOwnerId);
   if (!subscriptionsLog.ok) return subscriptionsLog;
 
@@ -28,25 +28,24 @@ async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId:MongoId
   );
 
   const updateResult = await extractSafeThrowableResult(() => safeUpdateStoreOwner);
-  if(!updateResult.ok) return updateResult;
+  if (!updateResult.ok) return updateResult;
 
-  const event:PlanSubscriptionUpdateEvent = {
+  const event: PlanSubscriptionUpdateEvent = {
     type: "planSubscription.updated",
     payload: {
-        storeOwner: updateResult.result,
-        planId: cancelledPlanId,
-        planName: currentSubscription.currentSubscription.planName,
-        profit: currentSubscription.currentSubscription.paidPrice,
-        subscriptionType: "cancellation",
-        planExpiryDate: new Date()
+      storeOwner: updateResult.result,
+      planId: cancelledPlanId,
+      planName: currentSubscription.currentSubscription.planName,
+      profit: currentSubscription.currentSubscription.paidPrice,
+      subscriptionType: "cancellation",
+      planExpiryDate: new Date(),
     },
     occurredAt: new Date(),
-  }
+  };
 
   eventBus.publish(event);
   //TODO: refund the money using the User's bank account.
   //TODO: add an admin log
-
 
   return { ...updateResult, result: updateResult.result, planExpiryDate: new Date(), isPlanPaid: false, plan: "" };
 }

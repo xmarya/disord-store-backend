@@ -3,8 +3,8 @@ import deletePlatformReview from "@services/auth/platformReviewServices/deletePl
 import getAllPlatformReviews from "@services/auth/platformReviewServices/getAllPlatformReviews";
 import getOnePlatformReview from "@services/auth/platformReviewServices/getOnePlatformReview";
 import updatePlatformReview from "@services/auth/platformReviewServices/updatePlatformReview";
-import { PlatformReviewDataBody } from "@Types/Review";
-import { UserDocument } from "@Types/User";
+import { PlatformReviewDataBody } from "@Types/Schema/Review";
+import { RegularUserDocument } from "@Types/Schema/Users/RegularUser";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
@@ -13,7 +13,7 @@ export const createPlatformReviewController = catchAsync(async (request, respons
   const { reviewBody }: PlatformReviewDataBody = request.body;
   if (!reviewBody?.trim()) return next(new AppError(400, "الرجاء إضافة تعليق قبل الإرسال"));
 
-  const result = await createNewPlatformReview(request.user as UserDocument, reviewBody);
+  const result = await createNewPlatformReview(request.user as RegularUserDocument, reviewBody);
 
   if (!result.ok) return next(returnError(result));
   const { result: newReview } = result;

@@ -1,10 +1,10 @@
 import eventBus from "@config/EventBus";
 import { updateAssistant } from "@repositories/assistant/assistantRepo";
 import { AssistantUpdatedEvent } from "@Types/events/AssistantEvents";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { StoreAssistant } from "@Types/StoreAssistant";
+import { StoreAssistant } from "@Types/Schema/Users/StoreAssistant";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 

@@ -1,5 +1,5 @@
 import { createUnlimitedPlan } from "@repositories/plan/planRepo";
-import { UnlimitedPlanDataBody } from "@Types/Plan";
+import { UnlimitedPlanDataBody } from "@Types/Schema/Plan";
 import mongoose from "mongoose";
 
 async function createNewUnlimitedPlan(unlimitedPlanDetails: UnlimitedPlanDataBody, session: mongoose.ClientSession) {

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { MongoId } from "@Types/MongoId";
-import { ProductDocument } from "@Types/Product";
+import { MongoId } from "@Types/Schema/MongoId";
+import { ProductDocument } from "@Types/Schema/Product";
 import Product from "@models/productModel";
 
 export async function updateProduct(storeId: MongoId, productId: MongoId, data: Partial<ProductDocument>) {

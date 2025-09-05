@@ -1,6 +1,6 @@
 import User from "@models/userModel";
 import { getAllDocs } from "@repositories/global";
-import { QueryParams } from "@Types/Request";
+import { QueryParams } from "@Types/helperTypes/Request";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";

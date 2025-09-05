@@ -1,5 +1,5 @@
 import User from "@models/userModel";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import mongoose from "mongoose";
 
 async function assignStoreToOwner(storeId: MongoId, storeOwnerId: MongoId, session: mongoose.ClientSession) {

@@ -1,7 +1,5 @@
 import { getOneDocById } from "@repositories/global";
-import { AdminDocument } from "@Types/admin/AdminUser";
-import { MongoId } from "@Types/MongoId";
-import { UserDocument } from "@Types/User";
+import { MongoId } from "@Types/Schema/MongoId";
 import Admin from "@models/adminModel";
 import User from "@models/userModel";
 import { AppError } from "@utils/AppError";
@@ -10,7 +8,7 @@ import { catchAsync } from "@utils/catchAsync";
 import jwtVerify from "@utils/jwtToken/jwtVerify";
 
 const getUserFromPayload = catchAsync(async (request, response, next) => {
-  let user: UserDocument | AdminDocument | null;
+  let user;
 
   // STEP 2) validate the token:
   const payload = await jwtVerify(request.token, process.env.JWT_SALT!);
@@ -23,7 +21,7 @@ const getUserFromPayload = catchAsync(async (request, response, next) => {
 });
 
 async function getUserFromDB(id: MongoId) {
-  let user: UserDocument | AdminDocument | null;
+  let user;
   user = await getOneDocById(User, id);
   if (!user) user = await getOneDocById(Admin, id);
 

@@ -1,6 +1,6 @@
 import emailChecker from "@services/_sharedServices/emailChecker";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
-import { CredentialsSignupData } from "@Types/SignupData";
+import { CredentialsSignupData } from "@Types/Schema/Users/SignupData";
 
 async function validateCredentials(credentialsData: CredentialsSignupData) {
   const { email, password, passwordConfirm, firstName, lastName } = credentialsData;
@@ -10,10 +10,9 @@ async function validateCredentials(credentialsData: CredentialsSignupData) {
   if (!isMatching) return new BadRequest("كلمات المرور غير متطابقة");
 
   const emailCheckerResult = await emailChecker(email);
-  if(!emailCheckerResult.ok) return emailCheckerResult;
+  if (!emailCheckerResult.ok) return emailCheckerResult;
 
   return emailCheckerResult;
-
 }
 
 export default validateCredentials;

@@ -3,8 +3,8 @@ import User from "@models/userModel";
 import StoreAssistant from "@models/storeAssistantModel";
 import Store from "@models/storeModel";
 import { AppError } from "@utils/AppError";
-import { AssistantPermissions, StoreAssistant as StoreAssistantData } from "@Types/StoreAssistant";
-import { MongoId } from "@Types/MongoId";
+import { AssistantPermissions, StoreAssistant as StoreAssistantData } from "@Types/Schema/Users/StoreAssistant";
+import { MongoId } from "@Types/Schema/MongoId";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
     tha reason is because this is a service layer function, not the controller that always returns response,
@@ -21,11 +21,11 @@ export async function createAssistant(data: StoreAssistantData) {
     const assistant = await StoreAssistant.create([{ ...data }], { session });
 
     console.log("whatigot", assistant);
-    
+
     //STEP 3) insert assistant data in store without registering it to the session to
     //  reduce the number of operations inside the critical section
     // (since th transactions should be as short as possible):
-    await Store.findByIdAndUpdate(data.inStore, { $addToSet: { storeAssistants: assistant[0].id } }, {session});
+    await Store.findByIdAndUpdate(data.inStore, { $addToSet: { storeAssistants: assistant[0].id } }, { session });
     await session.commitTransaction();
     return assistant[0];
   } catch (error) {
@@ -71,13 +71,14 @@ export async function getAssistantPermissions(assistantId: MongoId, storeId: Mon
   return await StoreAssistant.findOne({ assistant: assistantId, inStore: storeId });
 }
 
-export async function updateAssistant(assistantId: MongoId, storeId: MongoId, permission:any, anotherData:any) {
-
-  return await StoreAssistant.findOneAndUpdate({ assistant: assistantId, inStore: storeId }, 
-    { 
-      $set: {...permission, ...anotherData}
-    }
-    , { new: true, runValidators: true });
+export async function updateAssistant(assistantId: MongoId, storeId: MongoId, permission: any, anotherData: any) {
+  return await StoreAssistant.findOneAndUpdate(
+    { assistant: assistantId, inStore: storeId },
+    {
+      $set: { ...permission, ...anotherData },
+    },
+    { new: true, runValidators: true }
+  );
 }
 
 export async function deleteAllAssistants(storeId: MongoId, session: mongoose.ClientSession) {

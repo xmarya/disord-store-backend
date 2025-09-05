@@ -1,7 +1,7 @@
 import User from "@models/userModel";
 import { deleteDoc } from "@repositories/global";
 import deleteStoreAndItsRelatedResourcePermanently from "@services/auth/storeServices/deleteStoreAndItsRelatedResourcePermanently";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import { startSession } from "mongoose";
 
 async function deleteStoreOwnerAndStore(storeOwnerId: MongoId, storeId: MongoId) {

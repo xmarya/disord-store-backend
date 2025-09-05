@@ -1,4 +1,4 @@
-import { ReviewDataBody } from "@Types/Review";
+import { ReviewDataBody } from "@Types/Schema/Review";
 import createNewReview from "@services/auth/resourcesReviewServices/createNewResourceReview";
 import deleteReview from "@services/auth/resourcesReviewServices/deleteResourceReview";
 import getAllResourceReviews from "@services/auth/resourcesReviewServices/getAllResourceReviews";

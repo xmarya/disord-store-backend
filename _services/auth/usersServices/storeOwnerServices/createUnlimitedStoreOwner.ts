@@ -1,7 +1,7 @@
 import { SUBSCRIPTION_PERIOD } from "@constants/ttl";
 import { createNewUnlimitedUser } from "@repositories/user/userRepo";
-import { PlanDocument } from "@Types/Plan";
-import { UnlimitedStoreOwnerData } from "@Types/User";
+import { PlanDocument } from "@Types/Schema/Plan";
+import { UnlimitedStoreOwnerData } from "@Types/Schema/Users/StoreOwner";
 import { addDays } from "date-fns";
 import mongoose from "mongoose";
 

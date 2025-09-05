@@ -1,11 +1,11 @@
 import User from "@models/userModel";
 import { getOneDocById } from "@repositories/global";
-import { MongoId } from "@Types/MongoId";
-import { UserDocument } from "@Types/User";
+import { MongoId } from "@Types/Schema/MongoId";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import formatSubscriptionsLogs from "@utils/subscriptions/formatSubscriptionsLogs";
 import safeThrowable from "@utils/safeThrowable";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 
 async function getStoreOwnerSubscriptionsLog(storeOwner: MongoId) {
   const safeGetSubscriptionsLog = safeThrowable(
@@ -18,10 +18,10 @@ async function getStoreOwnerSubscriptionsLog(storeOwner: MongoId) {
   if (!subscriptionsLogResult.ok) return subscriptionsLogResult;
 
   const { result: logs } = subscriptionsLogResult;
-  const { subscribedPlanDetails, subscriptionsLog, planExpiresInDays } = logs as UserDocument & { planExpiresInDays: string };
+  const { subscribedPlanDetails, subscriptionsLog, planExpiresInDays } = logs as StoreOwnerDocument & { planExpiresInDays: string };
   const currentSubscription = formatSubscriptionsLogs(subscribedPlanDetails, planExpiresInDays);
 
-  return {...subscriptionsLogResult, result: {currentSubscription, subscriptionsLog}}
+  return { ...subscriptionsLogResult, result: { currentSubscription, subscriptionsLog } };
 }
 
 export default getStoreOwnerSubscriptionsLog;

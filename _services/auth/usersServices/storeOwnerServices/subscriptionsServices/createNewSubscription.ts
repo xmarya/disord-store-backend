@@ -1,5 +1,5 @@
 import getOnePlan from "@services/auth/plan/getOnePlan";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import { err } from "neverthrow";
 import createNewSubscriptionsLog from "./addNewSubscriptionsLog";
 import eventBus from "@config/EventBus";
@@ -14,20 +14,20 @@ async function createNewPlanSubscription(storeOwner: MongoId, planId: MongoId, p
 
   const updatedStoreOwnerResult = await createNewSubscriptionsLog(storeOwner, plan, paidPrice, "new");
 
-  if(updatedStoreOwnerResult.ok) {
-    const {result: updatedStoreOwner} = updatedStoreOwnerResult
-    const event:PlanSubscriptionUpdateEvent = {
-      type:"planSubscription.updated",
+  if (updatedStoreOwnerResult.ok) {
+    const { result: updatedStoreOwner } = updatedStoreOwnerResult;
+    const event: PlanSubscriptionUpdateEvent = {
+      type: "planSubscription.updated",
       payload: {
         storeOwner: updatedStoreOwner,
         planId,
         planName: plan.planName,
         profit: paidPrice,
         subscriptionType: "new",
-        planExpiryDate: updatedStoreOwner.subscribedPlanDetails.subscribeEnds
+        planExpiryDate: updatedStoreOwner.subscribedPlanDetails.subscribeEnds,
       },
-      occurredAt: new Date()
-    }
+      occurredAt: new Date(),
+    };
 
     eventBus.publish(event);
   }

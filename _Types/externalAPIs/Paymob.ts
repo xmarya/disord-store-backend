@@ -1,4 +1,4 @@
-import { Address } from "./Schema/Order";
+import { Address } from "@Types/Schema/Order";
 
 export interface PaymobOrderData {
   orderId: string;

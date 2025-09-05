@@ -1,8 +1,9 @@
 import novu from "@config/novu";
-import { AdminDocument } from "@Types/admin/AdminUser";
-import { UserDocument } from "@Types/User";
+import { AdminDocument } from "@Types/Schema/Users/admin/AdminUser";
+import { RegularUserDocument } from "@Types/Schema/Users/RegularUser";
+import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 
-async function novuSendWelcome(workflowId: "welcome-admin" | "welcome-store-owner" | "welcome-general", user: UserDocument | AdminDocument, emailConfirmationToken?: string) {
+async function novuSendWelcome(workflowId: "welcome-admin" | "welcome-store-owner" | "welcome-general", user: RegularUserDocument | StoreOwnerDocument | AdminDocument, emailConfirmationToken?: string) {
   const { id, firstName, lastName, userType, email, phoneNumber } = user;
   await novu.trigger({
     workflowId,

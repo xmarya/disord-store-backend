@@ -1,4 +1,4 @@
-import { AuthenticaBalance, AuthenticaFullRequest, AuthenticaRequestEndpoint, AuthenticaResponse } from "@Types/AuthenticaOTP";
+import { AuthenticaBalance, AuthenticaFullRequest, AuthenticaRequestEndpoint, AuthenticaResponse } from "@Types/externalAPIs/AuthenticaOTP";
 import { catchAsync } from "@utils/catchAsync";
 
 const API_URL = (requestEndpoint: AuthenticaRequestEndpoint) => `https://api.authentica.sa/api/v2${requestEndpoint}`;

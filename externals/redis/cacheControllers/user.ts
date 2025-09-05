@@ -1,26 +1,29 @@
-// import { AdminDocument } from "@Types/admin/AdminUser";
-// import { UserDocument } from "@Types/User";
-// import { setCompressedCacheData } from "./globalCache";
+import { AdminDocument } from "@Types/Schema/Users/admin/AdminUser";
+import { RegularUserDocument } from "@Types/Schema/Users/RegularUser";
+import { setCompressedCacheData } from "./globalCache";
+import { StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
+import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 
-// async function cacheUser(user: UserDocument | AdminDocument) {
-//   const data = {
-//     id: user.id,
-//     userType: user.userType,
-//     firstName: user.firstName,
-//     lastName: user.lastName,
-//     image: user.image,
-//     email: user.email,
-//     emailConfirmed: user.credentials.emailConfirmed,
-//     ...(user.userType === "storeOwner" && { subscribedPlanDetails: user.subscribedPlanDetails, myStore: user.myStore }),
-//     // TRANSLATE: the reason behind HOW TS COULD INFER THE RIGHT PART IN THE LINE ABOVE once I did user.userType === "storeOwner"
-//     // is because in AdminDocument I did explicitly set the userType to be "admin".
-//     // so, if the user.userType === "storeOwner" is true, then that denies the possibility of the user being of type AdminDocument,
-//     // leaving us with the other type
-//   };
+async function cacheUser(user: RegularUserDocument | StoreOwnerDocument | AdminDocument | StoreAssistantDocument, emailConfirmed?: boolean) {
+  const data = {
+    id: user.id,
+    userType: user.userType,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    image: user.image,
+    email: user.email,
+    emailConfirmed,
+    ...(user.userType === "storeOwner" && { subscribedPlanDetails: user.subscribedPlanDetails, myStore: user.myStore }),
+    ...(user.userType === "storeAssistant" && {inStore:user.inStore, inPlan:user.inPlan})
+    // TRANSLATE: the reason behind HOW TS COULD INFER THE RIGHT PART IN THE LINE ABOVE once I did user.userType === "storeOwner"
+    // is because in AdminDocument I did explicitly set the userType to be "admin".
+    // so, if the user.userType === "storeOwner" is true, then that denies the possibility of the user being of type AdminDocument,
+    // leaving us with the other type
+  };
 
-//   // console.log("data before setCachedData", data);
+  // console.log("data before setCachedData", data);
 
-//   await setCompressedCacheData(`User:${data.id}`, data, "one-hour");
-// }
+  await setCompressedCacheData(`User:${data.id}`, data, "one-hour");
+}
 
-// export default cacheUser;
+export default cacheUser;

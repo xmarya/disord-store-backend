@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Coupon from "@models/couponModel";
-import { IOrderItem } from "@Types/Order";
+import { IOrderItem } from "@Types/Schema/Order";
 
 export const validateCoupon = async (
   couponCode: string,

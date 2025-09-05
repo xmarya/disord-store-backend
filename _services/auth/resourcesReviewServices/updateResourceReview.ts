@@ -1,4 +1,4 @@
-import { ReviewDataBody } from "@Types/Review";
+import { ReviewDataBody } from "@Types/Schema/Review";
 import setResourceRating from "./setResourceRating";
 import safeThrowable from "@utils/safeThrowable";
 import { updateDoc } from "@repositories/global";

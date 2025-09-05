@@ -2,13 +2,13 @@ import eventBus from "@config/EventBus";
 import Product from "@models/productModel";
 import { getAllDocs } from "@repositories/global";
 import { QueryResultsFetchedEvent } from "@Types/events/QueryResultsFetchedEvent";
-import { MongoId } from "@Types/MongoId";
-import { ProductDocument } from "@Types/Product";
-import { QueryOptions } from "@Types/QueryOptions";
-import { QueryParams } from "@Types/Request";
+import { MongoId } from "@Types/Schema/MongoId";
+import { ProductDocument } from "@Types/Schema/Product";
+import { QueryOptions } from "@Types/helperTypes/QueryOptions";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
+import { QueryParams } from "@Types/helperTypes/Request";
 
 async function getAllProductsForPublic(query: QueryParams, storeId?: MongoId) {
   const fields: QueryOptions<ProductDocument>["select"] = ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"];

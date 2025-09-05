@@ -1,7 +1,7 @@
 import Admin from "@models/adminModel";
 import { getOneDocById } from "@repositories/global";
-import { AdminDocument } from "@Types/admin/AdminUser";
-import { QueryOptions } from "@Types/QueryOptions";
+import { AdminDocument } from "@Types/Schema/Users/admin/AdminUser";
+import { QueryOptions } from "@Types/helperTypes/QueryOptions";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";

@@ -3,7 +3,7 @@ import Order from "@models/orderModel";
 import Coupon from "@models/couponModel";
 import { validateCoupon } from "../coupon/couponRepo";
 import { RoundToTwo } from "@utils/common";
-import { CreateOrderParams, IOrder, IOrderItem, IOrderItemCheck, Address } from "@Types/Order";
+import { CreateOrderParams, IOrder, IOrderItem, IOrderItemCheck, Address } from "@Types/Schema/Order";
 import Product from "@models/productModel";
 
 export const ProcessOrderItems = async (

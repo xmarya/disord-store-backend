@@ -1,16 +1,21 @@
-import { getOneDocByFindOne } from "@repositories/global";
-import { CacheStoreAndPlan } from "@Types/CacheStoreAndPlan";
-import { MongoId } from "@Types/MongoId";
-import { AppError } from "@utils/AppError";
+import { CacheStoreAndPlan } from "@Types/externalAPIs/CacheStoreAndPlan";
+import { Forbidden } from "@Types/ResultTypes/errors/Forbidden";
+import { MongoId } from "@Types/Schema/MongoId";
 import { catchAsync } from "@utils/catchAsync";
+import returnError from "@utils/returnError";
 import { getRedisHash } from "../../externals/redis/redisOperations/redisHash";
-import Store from "@models/storeModel";
+import getStoreOf from "@services/auth/storeServices/getStoreOfOwner";
 
 export const assignFromCacheToRequest = catchAsync(async (request, response, next) => {
-  if (request.user.userType !== "storeOwner" && request.user.userType !== "storeAssistant") return next(new AppError(403, "غير مصرح لك الوصول للصفحة"));
-  const userId = request.user._id;
-  const store = await getOneDocByFindOne(Store, { condition: { $or: [{ owner: userId }, { storeAssistants: userId }] } });
-  const key = `StoreAndPlan:${store?.id}`;
+  if (request.user.userType !== "storeOwner" && request.user.userType !== "storeAssistant") return new Forbidden();
+
+  const userId = request.user._id as MongoId;
+  const getStoreResult = await getStoreOf(userId);
+
+  if(!getStoreResult.ok) return next(returnError(getStoreResult));
+  const {result :store} = getStoreResult;
+  
+  const key = `StoreAndPlan:${store.id}`;
   const data = await getRedisHash<CacheStoreAndPlan>(key);
   if (!data) return next();
 

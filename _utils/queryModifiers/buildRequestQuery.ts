@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 import { DOCS_PER_PAGE } from "../../_constants/primitives";
-import { QueryParams } from "@Types/Request";
-import { QueryOptions } from "@Types/QueryOptions";
+import { QueryOptions } from "@Types/helperTypes/QueryOptions";
+import { QueryParams } from "@Types/helperTypes/Request";
 
-
-export function buildQuery<T extends mongoose.Document>(requestQuery: QueryParams, Model: mongoose.Model<T>, internalAppSelect?:QueryOptions<T>["select"]) {
+export function buildQuery<T extends mongoose.Document>(requestQuery: QueryParams, Model: mongoose.Model<T>, internalAppSelect?: QueryOptions<T>["select"]) {
   // STEP 1) convert the query from JSON object to a normal JavaScript object in order to manipulate it:
   const rawQuery = { ...requestQuery };
   let stringifiedQuery: any = JSON.stringify(rawQuery);

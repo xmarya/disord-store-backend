@@ -1,11 +1,11 @@
-import { MongoId } from "@Types/MongoId";
-import { PlanDocument, SubscriptionTypes } from "@Types/Plan";
-import { StoreOwner } from "@Types/User";
+import { MongoId } from "@Types/Schema/MongoId";
+import { PlanDocument, SubscriptionTypes } from "@Types/Schema/Plan";
 import { createNewSubscription } from "@repositories/user/userRepo";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import getSubscriptionStartAndEndDates from "@utils/subscriptions/getSubscriptionStartAndEndDates";
 import safeThrowable from "@utils/safeThrowable";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { StoreOwner } from "@Types/Schema/Users/StoreOwner";
 
 async function createNewSubscriptionsLog(storeOwnerId: MongoId, newPlan: PlanDocument, paidPrice: number, subscriptionType: SubscriptionTypes) {
   const { id: planId, planName } = newPlan;
@@ -27,7 +27,6 @@ async function createNewSubscriptionsLog(storeOwnerId: MongoId, newPlan: PlanDoc
     () => createNewSubscription(storeOwnerId, userData),
     (error) => new Failure((error as Error).message)
   );
-
 
   return extractSafeThrowableResult(() => safeUpdateStoreOwner);
 }

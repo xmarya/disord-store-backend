@@ -3,8 +3,8 @@ import createNewDiscordUser from "@services/auth/usersServices/createNewDiscordU
 import createNewUserAndSendConfirmationEmail from "@services/auth/usersServices/createNewUserAndSendConfirmationEmail";
 import getCredentialsVerifyResult from "@services/nonAuth/credentialsServices/login/getCredentialsVerifyResult";
 import loginMethodValidator from "@services/nonAuth/credentialsServices/login/loginMethodValidator";
-import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/AuthenticaOTP";
-import { UserTypes } from "@Types/User";
+import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/externalAPIs/AuthenticaOTP";
+import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 import { AppError } from "@utils/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import jwtSignature from "@utils/jwtToken/generateSignature";
@@ -12,33 +12,34 @@ import jwtVerify from "@utils/jwtToken/jwtVerify";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import returnError from "@utils/returnError";
 
-
-export const oldCredentialsLogin = catchAsync(async(request, response, next) => {
+export const oldCredentialsLogin = catchAsync(async (request, response, next) => {
   const result1 = loginMethodValidator(request.body);
   if (!result1.ok) return next(returnError(result1));
   const { result: loginMethod } = result1;
-   const result2 = await getCredentialsVerifyResult(loginMethod, request.body.password);
-    if (!result2.ok) return next(returnError(result2));
-  
-    const { result: loggedInUser } = result2;
+  const result2 = await getCredentialsVerifyResult(loginMethod, request.body.password);
+  if (!result2.ok) return next(returnError(result2));
 
-    const token = jwtSignature(loggedInUser.id, "1h");
-    tokenWithCookies(response, token);
-    request.user = loggedInUser;
-  
-    response.status(200).json({
-      success:true,
-      data: {
-        token
-      }
-    })
-})
+  const {
+    result: { loggedInUser, emailConfirmed },
+  } = result2;
+
+  const token = jwtSignature(loggedInUser.id, "1h");
+  tokenWithCookies(response, token);
+  request.user = loggedInUser;
+  request.emailConfirmed = emailConfirmed;
+
+  response.status(200).json({
+    success: true,
+    data: {
+      token,
+    },
+  });
+});
 
 export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
   catchAsync(async (request, response, next) => {
-
     const tokenGenerator = { hostname: request.hostname, protocol: request.protocol };
-    const newUser = await createNewUserAndSendConfirmationEmail({userType, ...request.body}, tokenGenerator);
+    const newUser = await createNewUserAndSendConfirmationEmail({ userType, ...request.body }, tokenGenerator);
 
     response.status(201).json({
       success: true,
@@ -56,7 +57,6 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
 
   next();
 });
-
 
 export const sendOTP = catchAsync(async (request, response, next) => {
   const user = request.user;

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { Model } from "@Types/Model";
-import { ProductDocument } from "@Types/Product";
-import { StoreDocument } from "@Types/Store";
+import { Model } from "@Types/Schema/Model";
+import { ProductDocument } from "@Types/Schema/Product";
+import { StoreDocument } from "@Types/Schema/Store";
 
 export async function setRanking(Model: Extract<Model, "Store" | "Product">, session: mongoose.ClientSession) {
   const sortedDocs = await mongoose.model(Model).aggregate(

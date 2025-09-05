@@ -1,7 +1,7 @@
 import { MongoId } from "@Types/Schema/MongoId";
 import { DomainEvent } from "./DomainEvent";
-import { NovuSubscriberData } from "@Types/NovuSubscriberData";
 import { AssistantPermissions } from "@Types/Schema/Users/StoreAssistant";
+import { NovuSubscriberData } from "@Types/externalAPIs/NovuSubscriberData";
 
 export interface AssistantCreatedEvent extends DomainEvent {
   type: "assistant.created";

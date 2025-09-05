@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 import { Model } from "./Model";
 import { MongoId } from "./MongoId";
-import { UserTypes } from "./Users/RegularUser";
+import { UserTypes } from "./Users/BasicUserTypes";
 
 interface SharedReviewDataBody {
   writer: MongoId;
-  userType: UserTypes;
+  userType: Extract<UserTypes, "user">;
   firstName: string;
   lastName: string;
   image?: string;
