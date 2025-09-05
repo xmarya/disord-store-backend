@@ -5,7 +5,7 @@ export interface StoreStats {
   store: MongoId;
   date: Date;
   profits: number;
-  soldProducts:Map<MongoId, number>
+  soldProducts: Map<MongoId, number>;
   numOfPurchases: Number;
   numOfCancellations: Number;
 }

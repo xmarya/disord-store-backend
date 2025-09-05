@@ -1,26 +1,26 @@
 import mongoose from "mongoose";
 import { Model } from "./Model";
 import { MongoId } from "./MongoId";
-import { UserTypes } from "./User";
+import { UserTypes } from "./Users/RegularUser";
 
 interface SharedReviewDataBody {
-  writer: MongoId,
-  userType: UserTypes,
-  firstName:string,
-  lastName:string,
-  image?:string,
+  writer: MongoId;
+  userType: UserTypes;
+  firstName: string;
+  lastName: string;
+  image?: string;
 }
 
 export interface ReviewDataBody extends SharedReviewDataBody {
-  storeOrProduct: Extract<Model, "Store" | "Product">,
-  reviewedResourceId: MongoId,
-  reviewBody:string,
-  rating:number
-} 
+  storeOrProduct: Extract<Model, "Store" | "Product">;
+  reviewedResourceId: MongoId;
+  reviewBody: string;
+  rating: number;
+}
 
-export interface ReviewDocument extends ReviewDataBody, mongoose.Document{
-  displayInStorePage: boolean,
-  storeReply:string,
+export interface ReviewDocument extends ReviewDataBody, mongoose.Document {
+  displayInStorePage: boolean;
+  storeReply: string;
 }
 
 /* OLD CODE (kept for reference): 
@@ -34,8 +34,8 @@ export interface PlatformReviewDataBody extends SharedReviewDataBody {
   reviewBody: string;
 }
 
-interface PlatformReview extends PlatformReviewDataBody{
-  displayInHomePage: boolean,
+interface PlatformReview extends PlatformReviewDataBody {
+  displayInHomePage: boolean;
 }
 
 export type PlatformReviewDocument = PlatformReview & mongoose.Document;

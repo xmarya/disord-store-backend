@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { MongoId } from "./MongoId";
-import { UserTypes } from "./User";
+import { MongoId } from "../MongoId";
 import { Credentials } from "./UserCredentials";
+import { UserTypes } from "./BasicUserTypes";
 
 export interface AssistantPermissions {
   updateStoreStatus: boolean;

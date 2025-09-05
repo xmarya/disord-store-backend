@@ -22,7 +22,7 @@ export interface StoreDataBody {
 }
 
 export interface FullStoreDataBody extends StoreDataBody {
-    inPlan: MongoId;
+  inPlan: MongoId;
   owner: MongoId;
 }
 
@@ -31,7 +31,7 @@ export interface StoreBasic extends FullStoreDataBody {
   verified: boolean;
   ratingsAverage: number;
   ratingsQuantity: number;
-  ranking:number;
+  ranking: number;
   address: IStoreAddress;
   shipmentCompanies?: IShipmentCompany[];
 }

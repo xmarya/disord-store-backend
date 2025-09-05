@@ -9,12 +9,12 @@ type Price = {
 };
 
 export type PlanQuota = {
-    ofProducts: number;
-    ofCategories: number;
-    ofStoreAssistants: number;
-    ofColourThemes: number;
-    ofCommission: number;
-    ofShipmentCompanies: number;
+  ofProducts: number;
+  ofCategories: number;
+  ofStoreAssistants: number;
+  ofColourThemes: number;
+  ofCommission: number;
+  ofShipmentCompanies: number;
 };
 
 interface Plan {
@@ -46,7 +46,7 @@ type StatsData = {
   downgrades: number;
 };
 
-export type SubscriptionTypes= "new" | "renewal" | "upgrade" | "downgrade";
+export type SubscriptionTypes = "new" | "renewal" | "upgrade" | "downgrade";
 type PlanStats = {
   planName: PlansNames;
   subscriptionType: SubscriptionTypes;

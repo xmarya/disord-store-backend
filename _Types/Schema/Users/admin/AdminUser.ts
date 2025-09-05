@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { UserTypes } from "../User";
 import { Credentials } from "../UserCredentials";
+import { UserTypes } from "../BasicUserTypes";
 
 export interface AdminDocument extends mongoose.Document {
   firstName: string;
@@ -9,5 +9,5 @@ export interface AdminDocument extends mongoose.Document {
   phoneNumber: `+966${string}`;
   credentials: Credentials;
   userType: Extract<UserTypes, "admin">;
-  image:string
+  image: string;
 }

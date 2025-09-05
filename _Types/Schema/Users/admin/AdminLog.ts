@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { PlansNames } from "../Plan";
+import { PlansNames } from "../../Plan";
 
 type StoresLogs = {
   storeInfo: {

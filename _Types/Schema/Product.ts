@@ -13,14 +13,14 @@ export interface ProductDataBody {
   categories?: Array<MongoId>;
 }
 
-interface ProductBasic extends Omit<ProductDataBody, "categories">  {
+interface ProductBasic extends Omit<ProductDataBody, "categories"> {
   store: MongoId;
   ranking: number;
   ratingsAverage: number;
   ratingsQuantity: number;
   discount: number;
   numberOfPurchases: number;
-  categories?: Array<CategoryBasic> | Array<MongoId>
+  categories?: Array<CategoryBasic> | Array<MongoId>;
 }
 
 export interface DigitalProduct extends ProductBasic {
