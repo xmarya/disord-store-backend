@@ -4,7 +4,7 @@ import { deleteAllProducts } from "@repositories/product/productRepo";
 import { deleteAllResourceReviews } from "@repositories/review/reviewRepo";
 import { deleteStore } from "@repositories/store/storeRepo";
 import { deleteStoreStats } from "@repositories/store/storeStatsRepo";
-import { resetStoreOwnerToDefault } from "@repositories/user/userRepo";
+import { resetStoreOwnerToDefault } from "@repositories/storeOwner/storeOwnerRepo";
 import { MongoId } from "@Types/Schema/MongoId";
 import { startSession } from "mongoose";
 

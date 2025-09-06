@@ -1,4 +1,4 @@
-import { resetStoreOwnerToDefault } from "@repositories/user/userRepo";
+import { resetStoreOwnerToDefault } from "@repositories/storeOwner/storeOwnerRepo";
 import deleteStoreAndItsRelatedResourcePermanently from "@services/auth/storeServices/deleteStoreAndItsRelatedResourcePermanently";
 import { MongoId } from "@Types/Schema/MongoId";
 import { startSession } from "mongoose";
