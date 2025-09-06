@@ -16,10 +16,10 @@ async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId: MongoI
   if (!subscriptionsLog.ok) return subscriptionsLog;
 
   const {
-    result: { currentSubscription },
+    result: { currentSubscription, currentSubscriptionDetails },
   } = subscriptionsLog;
 
-  const isOver = isTrialOver(currentSubscription.currentSubscriptionDetails.subscribeStarts);
+  const isOver = isTrialOver(currentSubscriptionDetails.subscribeStarts);
 
   if (isOver) return err("the 10 days limit for cancellation is over");
 
@@ -36,8 +36,8 @@ async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId: MongoI
     payload: {
       storeOwner: updateResult.result,
       planId: cancelledPlanId,
-      planName: currentSubscription.currentSubscription.planName,
-      profit: currentSubscription.currentSubscription.paidPrice,
+      planName: currentSubscription.planName,
+      profit: currentSubscription.paidPrice,
       subscriptionType: "cancellation",
       planExpiryDate: new Date(),
     },
