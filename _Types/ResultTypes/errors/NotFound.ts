@@ -6,9 +6,9 @@ export class NotFound implements ErrorTemplate {
   reason: ErrorNames;
   message: string;
 
-  constructor() {
+  constructor(message?:string) {
     this.ok = false;
     this.reason = "not-found";
-    this.message = NOT_FOUND_ERROR_MESSAGE;
+    this.message = message ?? NOT_FOUND_ERROR_MESSAGE;
   }
 }
