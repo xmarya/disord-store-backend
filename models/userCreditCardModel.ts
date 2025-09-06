@@ -1,7 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 import { UserCreditCardDocument } from "@Types/Schema/Users/UserCreditCard";
-import bcrypt from "bcryptjs";
-import { AppError } from "@utils/AppError";
 
 type UserCreditCardModel = mongoose.Model<UserCreditCardDocument>;
 export const creditCardSchema = new Schema<UserCreditCardDocument>(
