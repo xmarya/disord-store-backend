@@ -1,9 +1,9 @@
-import User from "@models/userModel";
+import StoreOwner from "@models/storeOwnerModel";
 import { MongoId } from "@Types/Schema/MongoId";
 import mongoose from "mongoose";
 
 async function assignStoreToOwner(storeId: MongoId, storeOwnerId: MongoId, session: mongoose.ClientSession) {
-  await User.findByIdAndUpdate(
+  await StoreOwner.findByIdAndUpdate(
     storeOwnerId,
     {
       myStore: storeId,

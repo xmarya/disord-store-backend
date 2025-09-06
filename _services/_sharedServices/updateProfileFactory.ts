@@ -1,12 +1,12 @@
 import eventBus from "@config/EventBus";
 import updateAdminProfile from "@services/auth/adminServices/adminAuth/updateAdminProfile";
+import updateStoreOwnerProfile from "@services/auth/storeOwnerServices/updateStoreOwnerProfile";
 import updateUserProfile from "@services/auth/usersServices/updateUserProfile";
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { BaseUserData } from "@Types/Schema/Users/BasicUserTypes";
 import { NotAssistant } from "@Types/Schema/Users/NotAssistant";
 
-// FIX
 async function updateProfileFactory(user: NotAssistant, updatedData: Partial<BaseUserData>) {
   const { userType, id } = user;
   const { firstName, lastName } = updatedData;
@@ -18,10 +18,11 @@ async function updateProfileFactory(user: NotAssistant, updatedData: Partial<Bas
     case "admin":
       result = await updateAdminProfile(id, updatedData);
       break;
-    case "user":
     case "storeOwner":
-      result = await updateUserProfile(id, updatedData);
+      result = await updateStoreOwnerProfile(id, updatedData);
       break;
+    default:
+      result = await updateUserProfile(id, updatedData);
   }
 
   if (!result.ok) return result;

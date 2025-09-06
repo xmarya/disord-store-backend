@@ -1,15 +1,15 @@
 import deleteUser from "@services/auth/usersServices/deleteUser";
-import getUserProfile from "@services/auth/usersServices/getUserProfile";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 import type { Request, Response } from "express";
 import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
+import getProfileFactory from "@services/_sharedServices/getUserProfileFactory";
 
 export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
-  const result = await getUserProfile(userId);
+  const result = await getProfileFactory(userId, request.user.userType);
 
   if (!result.ok) return next(returnError(result));
   const { result: userProfile } = result;

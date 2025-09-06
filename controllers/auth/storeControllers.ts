@@ -9,13 +9,17 @@ import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import isErr from "@utils/isErr";
 import returnError from "@utils/returnError";
+import { Forbidden } from "@Types/ResultTypes/errors/Forbidden";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
+
+  const storeOwner = request.user as StoreOwnerDocument;
+  if(!storeOwner.subscribedPlanDetails.paid) return next(returnError(new Forbidden("لابد من الأشتراك في باقة لإنشاء متجر جديد")))
   // TODO: complete the store data
   const { storeName, description }: StoreDataBody = request.body;
   if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
 
-  const result = await createNewStore(request.user as StoreOwnerDocument, request.body);
+  const result = await createNewStore(storeOwner, request.body);
 
   if (!(result as StoreDocument)?.id) return next(result);
 

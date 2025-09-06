@@ -11,6 +11,7 @@ import jwtSignature from "@utils/jwtToken/generateSignature";
 import jwtVerify from "@utils/jwtToken/jwtVerify";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import returnError from "@utils/returnError";
+import { NotFound } from "@Types/ResultTypes/errors/NotFound";
 
 export const oldCredentialsLogin = catchAsync(async (request, response, next) => {
   const result1 = loginMethodValidator(request.body);
@@ -50,6 +51,7 @@ export const createNewUserController = (userType: Extract<UserTypes, "user" | "s
 
 export const credentialsLogin = catchAsync(async (request, response, next) => {
   const result = loginMethodValidator(request.body);
+  if (!result.ok && result.reason === "not-found") return next(returnError(new NotFound("لم يتم العثور على هذا المستخدم")));
   if (!result.ok) return next(returnError(result));
   const { result: loginMethod } = result;
 
