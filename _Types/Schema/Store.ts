@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { CategoryDocument } from "./Category";
 import { ProductDocument } from "./Product";
 import { MongoId } from "./MongoId";
+import { PlansNames } from "./Plan";
 
 export interface IStoreAddress {
   street: string;
@@ -22,7 +22,7 @@ export interface StoreDataBody {
 }
 
 export interface FullStoreDataBody extends StoreDataBody {
-  inPlan: MongoId;
+  inPlan: PlansNames;
   owner: MongoId;
 }
 
