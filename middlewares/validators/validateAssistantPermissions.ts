@@ -1,7 +1,7 @@
 import { type Request, type Response, type NextFunction, request } from "express";
 import { AssistantPermissions } from "@Types/Schema/Users/StoreAssistant";
 import { getAssistantPermissions } from "@repositories/assistant/assistantRepo";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 
 const checkAssistantPermissions = (permissionKey: keyof AssistantPermissions) => {
   return async (request: Request, response: Response, next: NextFunction) => {

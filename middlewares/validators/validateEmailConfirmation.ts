@@ -1,7 +1,7 @@
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import Credentials from "@models/credentialsModel";
 import { getOneDocByFindOne } from "@repositories/global";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 
 const validateEmailConfirmation = catchAsync(async (request, response, next) => {

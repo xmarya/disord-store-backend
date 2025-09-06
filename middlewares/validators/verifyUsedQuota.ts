@@ -4,7 +4,7 @@ import { getOneDocById } from "@repositories/global";
 import Category from "@models/categoryModel";
 import Plan from "@models/planModel";
 import StoreAssistant from "@models/storeAssistantModel";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import Product from "@models/productModel";
 import ColourTheme from "@models/colourThemeModel";
 import mongoose from "mongoose";

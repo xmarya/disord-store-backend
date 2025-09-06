@@ -1,4 +1,4 @@
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 
 export const validateChangePassword = catchAsync(async (request, response, next) => {
