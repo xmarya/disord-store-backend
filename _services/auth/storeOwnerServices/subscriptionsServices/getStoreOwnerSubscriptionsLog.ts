@@ -6,10 +6,11 @@ import formatSubscriptionsLogs from "@utils/subscriptions/formatSubscriptionsLog
 import safeThrowable from "@utils/safeThrowable";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
+import StoreOwner from "@models/storeOwnerModel";
 
-async function getStoreOwnerSubscriptionsLog(storeOwner: MongoId) {
+async function getStoreOwnerSubscriptionsLog(storeOwnerId: MongoId) {
   const safeGetSubscriptionsLog = safeThrowable(
-    () => getOneDocById(User, storeOwner, { select: ["subscribedPlanDetails", "subscriptionsLog"] }),
+    () => getOneDocById(StoreOwner, storeOwnerId, { select: ["subscribedPlanDetails", "subscriptionsLog"] }),
     (error) => new Failure((error as Error).message)
   );
 
@@ -21,7 +22,7 @@ async function getStoreOwnerSubscriptionsLog(storeOwner: MongoId) {
   const { subscribedPlanDetails, subscriptionsLog, planExpiresInDays } = logs as StoreOwnerDocument & { planExpiresInDays: string };
   const currentSubscription = formatSubscriptionsLogs(subscribedPlanDetails, planExpiresInDays);
 
-  return { ...subscriptionsLogResult, result: { currentSubscription, subscriptionsLog } };
+  return { ...subscriptionsLogResult, result: { ...currentSubscription, subscriptionsLog } };
 }
 
 export default getStoreOwnerSubscriptionsLog;

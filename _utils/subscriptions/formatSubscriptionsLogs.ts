@@ -3,9 +3,9 @@ import { StoreOwnerPlan } from "@Types/Schema/Users/StoreOwner";
 
 function formatSubscriptionsLogs(subscribedPlanDetails: StoreOwnerPlan, planExpiresInDays: string) {
   // const currentSubscription ,currentSubscriptionDetails, pastSubscriptions
-  const { paidPrice, subscribeStarts, subscribeEnds, planId } = subscribedPlanDetails;
+  const { paidPrice, subscribeStarts, subscribeEnds, planId, paid } = subscribedPlanDetails;
   const { planName, price, quota } = planId as unknown as PlanDocument;
-  const currentSubscription = { planName, paidPrice, planExpiresInDays };
+  const currentSubscription = {planId, planName, paid, paidPrice, planExpiresInDays };
   const currentSubscriptionDetails = { subscribeStarts, subscribeEnds, originalPrice: price?.riyal, quota };
 
   return { currentSubscription, currentSubscriptionDetails };
