@@ -1,5 +1,5 @@
 import { createStore } from "@repositories/store/storeRepo";
-import assignStoreToOwner from "@services/auth/usersServices/storeOwnerServices/assignStoreToOwner";
+import assignStoreToOwner from "@services/auth/storeOwnerServices/assignStoreToOwner";
 import { FullStoreDataBody, StoreDataBody, StoreDocument } from "@Types/Schema/Store";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 import returnError from "@utils/returnError";

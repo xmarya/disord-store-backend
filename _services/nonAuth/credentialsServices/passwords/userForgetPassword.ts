@@ -4,7 +4,7 @@ import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
-import { generateRandomToken } from "@utils/generateRandomToken";
+import { generateRandomToken } from "@utils/generators/generateRandomToken";
 import safeThrowable from "@utils/safeThrowable";
 
 async function userForgetPassword(email: string, emailTokenGenerator: { hostname: string; protocol: string }) {

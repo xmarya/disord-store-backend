@@ -3,7 +3,7 @@ import { createNewCredentials } from "@repositories/credentials/credentialsRepo"
 import getSignupFunctionOf from "@services/nonAuth/credentialsServices/signup/getSignupFunctionOf";
 import { EmailConfirmationSentEvent, UserCreatedEvent } from "@Types/events/UserEvents";
 import { CredentialsSignupData } from "@Types/Schema/Users/SignupData";
-import generateEmailConfirmationToken from "@utils/email/generateEmailConfirmationToken";
+import generateEmailConfirmationToken from "@utils/generators/generateEmailConfirmationToken";
 import { startSession } from "mongoose";
 
 async function createNewUserAndSendConfirmationEmail(signupData: CredentialsSignupData, emailTokenGenerator: { hostname: string; protocol: string }) {

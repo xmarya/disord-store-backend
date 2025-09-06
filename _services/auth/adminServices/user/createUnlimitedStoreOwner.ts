@@ -1,7 +1,7 @@
 import eventBus from "@config/EventBus";
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import createNewUnlimitedPlan from "@services/auth/plan/createNewUnlimitedPlan";
-import createUnlimitedStoreOwner from "@services/auth/usersServices/storeOwnerServices/createUnlimitedStoreOwner";
+import createUnlimitedStoreOwner from "@services/auth/storeOwnerServices/createUnlimitedStoreOwner";
 import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
 import { UnlimitedPlanDataBody } from "@Types/Schema/Plan";
 import { UnlimitedStoreOwnerData } from "@Types/Schema/Users/StoreOwner";

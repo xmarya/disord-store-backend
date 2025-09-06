@@ -1,5 +1,6 @@
 import { createNewAdmin } from "@repositories/admin/adminRepo";
-import { createNewRegularUser, createNewStoreOwner } from "@repositories/user/userRepo";
+import { createNewStoreOwner } from "@repositories/storeOwner/storeOwnerRepo";
+import { createNewRegularUser } from "@repositories/user/userRepo";
 import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 
 function getSignupFunctionOf(userType: UserTypes) {
