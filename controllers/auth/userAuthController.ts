@@ -1,6 +1,6 @@
 import deleteUser from "@services/auth/usersServices/deleteUser";
 import getUserProfile from "@services/auth/usersServices/getUserProfile";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 import type { Request, Response } from "express";
@@ -19,7 +19,6 @@ export const getUserProfileController = catchAsync(async (request, response, nex
     data: { userProfile },
   });
 });
-
 
 // TODO: bank account controller, it's separate because it needs card data validation
 
