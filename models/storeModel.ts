@@ -1,7 +1,5 @@
-import { ProductDocument } from "@Types/Schema/Product";
-import { ReviewDocument } from "@Types/Schema/Review";
 import { StoreDocument } from "@Types/Schema/Store";
-import { Model, Query, Schema, model } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 
 type StoreModel = Model<StoreDocument>;
 export const storeSchema = new Schema<StoreDocument>(
