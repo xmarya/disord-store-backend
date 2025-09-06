@@ -4,13 +4,15 @@ import loginRegularUser from "./loginRegularUser";
 import loginStoreAssistant from "./loginStoreAssistant";
 import loginAdmin from "./loginAdmin";
 import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
+import loginStoreOwner from "./loginStoreOwner";
 
 async function loginFactory(userType: UserTypes, loginMethod: LoginMethod) {
   switch (userType) {
     case "user":
-    case "storeOwner":
       return await loginRegularUser(loginMethod);
 
+    case "storeOwner":
+      return await loginStoreOwner(loginMethod);
     case "storeAssistant":
       return await loginStoreAssistant(loginMethod);
 
