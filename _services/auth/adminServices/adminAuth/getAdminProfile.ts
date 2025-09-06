@@ -13,9 +13,8 @@ async function getAdminProfile(adminId: string) {
     (error) => new Failure((error as Error).message)
   );
 
-  const adminProfile = await extractSafeThrowableResult(() => safeGetAdminProfile);
+  return await extractSafeThrowableResult(() => safeGetAdminProfile);
 
-  return adminProfile;
 }
 
 export default getAdminProfile;
