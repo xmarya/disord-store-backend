@@ -4,10 +4,10 @@ import { PlansNames } from "@Types/Schema/Plan";
 import { FullStoreDataBody } from "@Types/Schema/Store";
 import mongoose from "mongoose";
 
-export async function createStore(data: FullStoreDataBody, session: mongoose.ClientSession) {
-  const newStore = await Store.create([data], { session });
+export async function createStore(data: FullStoreDataBody) {
+  const newStore = await Store.create(data);
 
-  return newStore[0];
+  return newStore;
 }
 
 export async function confirmAuthorization(userId: string, storeId: MongoId): Promise<boolean> {

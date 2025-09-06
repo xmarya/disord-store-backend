@@ -19,7 +19,7 @@ export const createStoreController = catchAsync(async (request, response, next) 
   const { storeName, description }: StoreDataBody = request.body;
   if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
 
-  const result = await createNewStore(storeOwner, request.body);
+  const result = await createNewStore(storeOwner, request.body, request.emailConfirmed);
 
   if (!(result as StoreDocument)?.id) return next(result);
 
