@@ -6,7 +6,8 @@ import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { BaseUserData } from "@Types/Schema/Users/BasicUserTypes";
 import { NotAssistant } from "@Types/Schema/Users/NotAssistant";
 
-async function updateProfile(user: NotAssistant, updatedData: Partial<BaseUserData>) {
+// FIX
+async function updateProfileFactory(user: NotAssistant, updatedData: Partial<BaseUserData>) {
   const { userType, id } = user;
   const { firstName, lastName } = updatedData;
 
@@ -36,4 +37,4 @@ async function updateProfile(user: NotAssistant, updatedData: Partial<BaseUserDa
   return result;
 }
 
-export default updateProfile;
+export default updateProfileFactory;
