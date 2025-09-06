@@ -7,8 +7,10 @@ import { getRedisHash } from "../../externals/redis/redisOperations/redisHash";
 import getStoreOf from "@services/auth/storeServices/getStoreOfOwner";
 
 export const assignFromCacheToRequest = catchAsync(async (request, response, next) => {
+  console.log("assignFromCacheToRequest");
   if (request.user.userType !== "storeOwner" && request.user.userType !== "storeAssistant") return new Forbidden();
 
+  if(request.user.userType === "storeOwner" && !request.user.myStore) return next(returnError(new Forbidden("لابد من إضافة متجر")))
   const userId = request.user._id as MongoId;
   const getStoreResult = await getStoreOf(userId);
 
