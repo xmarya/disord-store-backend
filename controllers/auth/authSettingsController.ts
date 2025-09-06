@@ -7,8 +7,8 @@ import returnError from "@utils/returnError";
 
 export const confirmChangePasswordController = catchAsync(async (request, response, next) => {
   const { currentPassword, newPassword } = request.body;
-  const { id, email } = request.user;
-  const result = await confirmChangedPassword({ providedPassword: currentPassword, newPassword, email, userId: id });
+  const { id, email, userType } = request.user;
+  const result = await confirmChangedPassword({userType, providedPassword: currentPassword, newPassword, email, userId: id });
 
   if (!result.ok) return next(returnError(result));
 

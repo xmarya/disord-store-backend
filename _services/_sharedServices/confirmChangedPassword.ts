@@ -2,6 +2,7 @@ import { getCredentials } from "@repositories/credentials/credentialsRepo";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
+import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import jwtSignature from "@utils/jwtToken/generateSignature";
 import { comparePasswords } from "@utils/passwords/comparePasswords";
@@ -12,11 +13,12 @@ type ChangedPasswordData = {
   email: string;
   newPassword: string;
   providedPassword: string;
+  userType:UserTypes
 };
 
 //REFACTOR
 async function confirmChangedPassword(data: ChangedPasswordData) {
-  const { providedPassword, newPassword, email, userId } = data;
+  const { providedPassword, newPassword, email, userId, userType } = data;
 
   const safeGetCredentials = safeThrowable(
     () => getCredentials({ email }),
@@ -36,7 +38,7 @@ async function confirmChangedPassword(data: ChangedPasswordData) {
   await currentCredentials.save();
 
   // STEP 5) generate a new token:
-  const token = jwtSignature(userId, "1h");
+  const token = jwtSignature(userId, userType, "1h");
   return new Success(token);
 }
 
