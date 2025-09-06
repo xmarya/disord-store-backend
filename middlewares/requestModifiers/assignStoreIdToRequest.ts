@@ -3,12 +3,13 @@ import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 
 export const assignStoreIdToRequest = catchAsync(async (request, response, next) => {
-  // console.log("assignStoreIdToRequest");
+  console.log("assignStoreIdToRequest");
 
   // if the store is exist from the previous cache middleware
   if (request.store) return next();
 
   const user = request.user;
+  console.log(user);
   let storeId;
 
   if (user.userType === "storeOwner") storeId = user.myStore;
@@ -21,5 +22,6 @@ export const assignStoreIdToRequest = catchAsync(async (request, response, next)
   else return next(returnError(new Forbidden()))
 
   request.store = storeId;
+  console.log(request.store);
   next();
 });
