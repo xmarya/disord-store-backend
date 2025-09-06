@@ -9,6 +9,7 @@ import isTrialOver from "@utils/subscriptions/isTrialOver";
 import { err } from "neverthrow";
 import getStoreOwnerSubscriptionsLog from "./getStoreOwnerSubscriptionsLog";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
+import StoreOwner from "@models/storeOwnerModel";
 
 async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId: MongoId, cancellationNote?: string) {
   const subscriptionsLog = await getStoreOwnerSubscriptionsLog(storeOwnerId);
@@ -23,7 +24,7 @@ async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId: MongoI
   if (isOver) return err("the 10 days limit for cancellation is over");
 
   const safeUpdateStoreOwner = safeThrowable(
-    () => updateDoc(User, storeOwnerId, { $unset: { subscribedPlanDetails: "" } }),
+    () => updateDoc(StoreOwner, storeOwnerId, { $unset: { subscribedPlanDetails: "" } }),
     (error) => new Failure((error as Error).message)
   );
 
