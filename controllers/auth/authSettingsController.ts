@@ -1,6 +1,5 @@
 import confirmChangedPassword from "@services/_sharedServices/confirmChangedPassword";
 import updateProfile from "@services/_sharedServices/updateProfile";
-import { AdminDocument } from "@Types/Schema/Users/admin/AdminUser";
 import { NotAssistant } from "@Types/Schema/Users/NotAssistant";
 import { catchAsync } from "@utils/catchAsync";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
