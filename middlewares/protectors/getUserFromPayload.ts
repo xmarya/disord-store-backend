@@ -5,7 +5,6 @@ import jwtVerify from "@utils/jwtToken/jwtVerify";
 import returnError from "@utils/returnError";
 
 
-// REFACTOR
 const getUserFromPayload = catchAsync(async (request, response, next) => {
   // STEP 2) validate the token:
   const payload = await jwtVerify(request.token, process.env.JWT_SALT!);
