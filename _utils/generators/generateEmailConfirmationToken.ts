@@ -1,5 +1,5 @@
 import { CredentialsDocument } from "@Types/Schema/Users/UserCredentials";
-import { generateRandomToken } from "../generateRandomToken";
+import { generateRandomToken } from "./generateRandomToken";
 
 export async function generateEmailConfirmationToken(credentials: CredentialsDocument, emailTokenGenerator: { hostname: string; protocol: string }) {
   const randomToken = await generateRandomToken(credentials, "emailConfirmation");
