@@ -23,7 +23,7 @@ export const oldCredentialsLogin = catchAsync(async (request, response, next) =>
     result: { loggedInUser, emailConfirmed },
   } = result2;
 
-  const token = jwtSignature(loggedInUser.id, "1h");
+  const token = jwtSignature(loggedInUser.id, loggedInUser.userType, "1h");
   tokenWithCookies(response, token);
   request.user = loggedInUser;
   request.emailConfirmed = emailConfirmed;
@@ -77,7 +77,7 @@ export const sendOTP = catchAsync(async (request, response, next) => {
 
   if (!success) return next(new AppError(400, message));
 
-  const temporeToken = jwtSignature(user.id, "1m");
+  const temporeToken = jwtSignature(user.id, user.userType, "5m");
   response.status(200).json({
     success: true,
     message: `${message} to ${Object.values(request.loginMethod)[0]}`,
@@ -105,7 +105,7 @@ export const verifyOTP = catchAsync(async (request, response, next) => {
 
   if (!status || !payload.id) return next(new AppError(400, "OTP or temporeToken has expired"));
 
-  const token = jwtSignature(payload.id, "1h");
+  const token = jwtSignature(payload.id, payload.userType, "1h");
   tokenWithCookies(response, token);
 
   response.status(200).json({
