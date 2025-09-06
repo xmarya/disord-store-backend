@@ -2,7 +2,7 @@ import { getAllProductCategories } from "@repositories/category/categoryRepo";
 import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from "@repositories/global";
 import { CategoryBasic } from "@Types/Schema/Category";
 import { MongoId } from "@Types/Schema/MongoId";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { getDecompressedCacheData, setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
 import { catchAsync } from "@utils/catchAsync";
 import Category from "@models/categoryModel";

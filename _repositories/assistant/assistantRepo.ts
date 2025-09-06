@@ -2,8 +2,8 @@ import mongoose, { startSession } from "mongoose";
 import User from "@models/userModel";
 import StoreAssistant from "@models/storeAssistantModel";
 import Store from "@models/storeModel";
-import { AppError } from "@utils/AppError";
-import { AssistantPermissions, StoreAssistant as StoreAssistantData } from "@Types/Schema/Users/StoreAssistant";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
+import { StoreAssistant as StoreAssistantData } from "@Types/Schema/Users/StoreAssistant";
 import { MongoId } from "@Types/Schema/MongoId";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?

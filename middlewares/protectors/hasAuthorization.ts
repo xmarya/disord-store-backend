@@ -1,5 +1,5 @@
 import { confirmAuthorization } from "@repositories/store/storeRepo";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 
 const hasAuthorization = catchAsync(async (request, response, next) => {

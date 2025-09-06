@@ -31,6 +31,18 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
   );
 });
 
+// TODO update the assistant inPlan field:
+// NOTE: needs a the plan id, not the name
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+  const { storeOwner, planId } = event.payload;
+
+  // safeThrowable(
+  //   () => updateStoreInPlan(storeOwner.id, planName),
+  //   //TODO: () => addFailedJob("key", event.payload)
+  //   (error) => new Failure((error as Error).message)
+  // );
+});
+
 // link the unlimited store owner id to the unlimited plan
 eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
   const { storeOwner, planId, planName } = event.payload;

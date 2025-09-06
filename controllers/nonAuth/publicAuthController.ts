@@ -5,7 +5,7 @@ import getCredentialsVerifyResult from "@services/nonAuth/credentialsServices/lo
 import loginMethodValidator from "@services/nonAuth/credentialsServices/login/loginMethodValidator";
 import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/externalAPIs/AuthenticaOTP";
 import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import jwtSignature from "@utils/jwtToken/generateSignature";
 import jwtVerify from "@utils/jwtToken/jwtVerify";

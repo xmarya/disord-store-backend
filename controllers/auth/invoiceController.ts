@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import { getOneDocByFindOne } from "@repositories/global";
 import { createNewInvoices } from "@repositories/invoice/invoiceRepo";
 import { InvoiceDataBody } from "@Types/Schema/Invoice";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import Invoice from "@models/invoiceModel";
 import Order from "@models/orderModel";

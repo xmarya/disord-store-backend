@@ -1,5 +1,5 @@
 import { confirmReviewAuthorisation } from "@repositories/review/reviewRepo";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 
 const isWriter = catchAsync(async (request, response, next) => {

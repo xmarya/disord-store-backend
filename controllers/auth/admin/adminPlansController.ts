@@ -3,7 +3,7 @@ import { getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/pl
 import getOnePlan from "@services/auth/plan/getOnePlan";
 import updatePlan from "@services/auth/plan/updatePlan";
 import { PlanDataBody } from "@Types/Schema/Plan";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 

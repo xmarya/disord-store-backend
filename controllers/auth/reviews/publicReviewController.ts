@@ -5,7 +5,7 @@ import deleteReview from "@services/auth/resourcesReviewServices/deleteResourceR
 import getAllResourceReviews from "@services/auth/resourcesReviewServices/getAllResourceReviews";
 import updateReview from "@services/auth/resourcesReviewServices/updateResourceReview";
 import getAllUserReviews from "@services/auth/usersServices/getAllUserReviews";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 

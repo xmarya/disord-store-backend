@@ -1,5 +1,5 @@
 import { lightFormat } from "date-fns";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import { buildDateFilter } from "@utils/queryModifiers/formatDateQuery";
 import { SUPPORTED_DATE_FORMATS } from "../_constants/dataStructures";

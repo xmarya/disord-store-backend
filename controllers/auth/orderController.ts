@@ -2,14 +2,14 @@ import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import { ApplyCoupon, CreateOrder, ProcessOrderItems, updateCouponUsage } from "@repositories/order/orderRepo";
 import Order from "@models/orderModel";
-import { generateOrderNumber } from "@utils/genrateOrderNumber";
+import { generateOrderNumber } from "@utils/generators/genrateOrderNumber";
 import { CreateOrderInput, createOrderSchema } from "@repositories/order/zodSchemas/orderSchemas";
 import { HandleErrorResponse } from "@utils/common";
 import { AxiosError } from "axios";
 import Product from "@models/productModel";
 import { catchAsync } from "@utils/catchAsync";
 import { getOneDocById } from "@repositories/global";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { getPaymentSuccessHtml, processPaymobWebhook } from "../../externals/paymob/paymnetProcessor";
 import { ProcessPaymobPayment } from "../../externals/paymob/paymobService";
 
@@ -127,7 +127,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({
       status: "success",
       message: "Order created successfully",
-      data: {order: orderResponse},
+      data: { order: orderResponse },
     });
   } catch (error) {
     console.error("Transaction failed:", error);
@@ -163,7 +163,7 @@ export const GetUserOrders = async (req: Request, res: Response): Promise<any> =
 
     return res.status(200).json({
       status: "success",
-      data: {order: formattedOrders},
+      data: { order: formattedOrders },
     });
   } catch (error) {
     HandleErrorResponse(error, res);
@@ -176,7 +176,7 @@ export const getOneOrder = catchAsync(async (request, response, next) => {
   if (!order) return next(new AppError(400, "no order was found with this orderId"));
   response.status(200).json({
     success: true,
-    data: {order},
+    data: { order },
   });
 });
 
@@ -188,8 +188,8 @@ export const handlePaymobWebhook = async (req: Request, res: Response) => {
       status: "success",
       data: {
         order: result.orderNumber,
-      transaction: result.transaction_id,
-      }
+        transaction: result.transaction_id,
+      },
     });
   } catch (error) {
     HandleErrorResponse(error, res);

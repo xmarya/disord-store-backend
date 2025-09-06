@@ -5,7 +5,7 @@ import getOnePlatformReview from "@services/auth/platformReviewServices/getOnePl
 import updatePlatformReview from "@services/auth/platformReviewServices/updatePlatformReview";
 import { PlatformReviewDataBody } from "@Types/Schema/Review";
 import { RegularUserDocument } from "@Types/Schema/Users/RegularUser";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 

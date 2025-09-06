@@ -3,7 +3,7 @@ import { getAllDocs } from "@repositories/global";
 import getAllProductsForPublic from "@services/nonAuth/storeAndProducts/getAllProductsForPublic";
 import getAllStoresForPublic from "@services/nonAuth/storeAndProducts/getAllStoresForPublic";
 import getOneStoreWithItsProducts from "@services/nonAuth/storeAndProducts/getOneStoreWithItsProducts";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import isErr from "@utils/isErr";
 import returnError from "@utils/returnError";

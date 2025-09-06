@@ -2,7 +2,7 @@ import { startSession } from "mongoose";
 import { getOneStoreStats, updateStoreStats } from "@repositories/store/storeStatsRepo";
 import { InvoiceDataBody } from "@Types/Schema/Invoice";
 import { MongoId } from "@Types/Schema/MongoId";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 

@@ -1,5 +1,5 @@
 import addStoreReplayToResourceReview from "@services/auth/storeServices/addStoreReplayToResourceReview";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 

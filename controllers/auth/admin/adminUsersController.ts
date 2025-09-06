@@ -4,7 +4,7 @@ import getAllUsersForAdmin from "@services/auth/adminServices/user/getAllUsersFo
 import getOneUserForAdmin from "@services/auth/adminServices/user/getOneUserForAdmin";
 import createNewUserAndSendConfirmationEmail from "@services/auth/usersServices/createNewUserAndSendConfirmationEmail";
 import { UnlimitedPlanDataBody } from "@Types/Schema/Plan";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 

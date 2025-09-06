@@ -1,5 +1,5 @@
 import confirmChangedPassword from "@services/_sharedServices/confirmChangedPassword";
-import updateProfile from "@services/_sharedServices/updateProfile";
+import updateProfile from "@services/_sharedServices/updateProfileFactory";
 import { NotAssistant } from "@Types/Schema/Users/NotAssistant";
 import { catchAsync } from "@utils/catchAsync";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";

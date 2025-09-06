@@ -3,7 +3,7 @@ import deleteProductAndItsRelated from "@services/auth/productServices/deletePro
 import getAllProductsForAuthorisedUser from "@services/auth/productServices/getAllProductsForAuthorisedUser";
 import getOneProduct from "@services/auth/productServices/getOneProduct";
 import updateOneProduct from "@services/auth/productServices/updateProduct";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 
