@@ -1,11 +1,11 @@
 import { MongoId } from "@Types/Schema/MongoId";
 import { PlanDocument, SubscriptionTypes } from "@Types/Schema/Plan";
-import { createNewSubscription } from "@repositories/user/userRepo";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import getSubscriptionStartAndEndDates from "@utils/subscriptions/getSubscriptionStartAndEndDates";
 import safeThrowable from "@utils/safeThrowable";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { StoreOwner } from "@Types/Schema/Users/StoreOwner";
+import { createNewSubscription } from "@repositories/storeOwner/storeOwnerRepo";
 
 async function createNewSubscriptionsLog(storeOwnerId: MongoId, newPlan: PlanDocument, paidPrice: number, subscriptionType: SubscriptionTypes) {
   const { id: planId, planName } = newPlan;

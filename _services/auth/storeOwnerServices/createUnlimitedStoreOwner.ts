@@ -1,5 +1,5 @@
 import { SUBSCRIPTION_PERIOD } from "@constants/ttl";
-import { createNewUnlimitedUser } from "@repositories/user/userRepo";
+import { createNewUnlimitedUser } from "@repositories/storeOwner/storeOwnerRepo";
 import { PlanDocument } from "@Types/Schema/Plan";
 import { UnlimitedStoreOwnerData } from "@Types/Schema/Users/StoreOwner";
 import { addDays } from "date-fns";
