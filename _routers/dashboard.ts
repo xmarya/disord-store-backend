@@ -52,9 +52,3 @@ router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
 
-// TODOs:
-// 1- check the StoreAndPlan in the cache again ✅
-// 2- think of a way to reduce the PC's heavy relationship
-// 3- regular user's invoice and store's invoice
-// 4- public reviews route ✅
-// 5- what about reviews? ✅
