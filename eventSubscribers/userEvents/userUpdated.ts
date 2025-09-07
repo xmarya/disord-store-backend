@@ -14,7 +14,6 @@ eventBus.ofType<UserUpdatedEvent>("user.updated").subscribe((event) => {
 
 
 eventBus.ofMultipleTypes<[UserUpdatedEvent, UserLoggedInEvent, UserCredentialsUpdatedEvent]>(["user.updated", "user.loggedIn", "userCredentials.updated"]).subscribe(event => {
-    console.log("ofMultipleTypes", event.payload);
     const {user, emailConfirmed} = event.payload;
 
     const safeUpdateRedisCache = ResultAsync.fromThrowable(() => cacheUser(user, emailConfirmed), () => new Error("couldn't update Redis cache"));
