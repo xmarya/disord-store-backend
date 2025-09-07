@@ -41,7 +41,6 @@ async function createNewAssistantInStore(storeId: MongoId, assistantData: Assist
 
   eventBus.publish(event);
 
-  createAssistantResult.result.credentials.password = "";
   return createAssistantResult;
 }
 
