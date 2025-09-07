@@ -1,12 +1,13 @@
-import { deleteRegularUser as deleteRegular } from "@repositories/user/userRepo";
+import { deleteRegularUser } from "@repositories/user/userRepo";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { MongoId } from "@Types/Schema/MongoId";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-async function deleteRegularUser(userId: string) {
-
+async function deleteRegularUserAccount(userId: MongoId) {
+  
   const safeDeleteRegular = safeThrowable(
-    () => deleteRegular(userId),
+    () => deleteRegularUser(userId),
     (error) => new Failure((error as Error).message)
   );
 
@@ -14,4 +15,4 @@ async function deleteRegularUser(userId: string) {
 
 }
 
-export default deleteRegularUser;
+export default deleteRegularUserAccount;
