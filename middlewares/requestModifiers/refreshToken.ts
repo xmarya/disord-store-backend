@@ -14,7 +14,7 @@ const refreshToken = catchAsync(async (request, response, next) => {
 
   // if there, check its expDate <= 5 ? refresh by 1 hour : next();
   if (differenceInMinutes(expData, new Date()) <= 5) {
-    const refreshedToken = jwtSignature(user.id, "1h");
+    const refreshedToken = jwtSignature(user.id, user.userType, "1h");
     tokenWithCookies(response, refreshedToken);
     response.set("x-refreshed-token", "true");
   }

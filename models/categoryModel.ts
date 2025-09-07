@@ -1,4 +1,4 @@
-import { CategoryDocument } from "@Types/Category";
+import { CategoryDocument } from "@Types/Schema/Category";
 import mongoose, { Schema } from "mongoose";
 import Product from "./productModel";
 

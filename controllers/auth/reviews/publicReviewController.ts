@@ -1,10 +1,11 @@
-import { ReviewDataBody } from "@Types/Review";
+import { ReviewDataBody } from "@Types/Schema/Review";
+import { RegularUserDocument } from "@Types/Schema/Users/RegularUser";
 import createNewReview from "@services/auth/resourcesReviewServices/createNewResourceReview";
 import deleteReview from "@services/auth/resourcesReviewServices/deleteResourceReview";
 import getAllResourceReviews from "@services/auth/resourcesReviewServices/getAllResourceReviews";
 import updateReview from "@services/auth/resourcesReviewServices/updateResourceReview";
 import getAllUserReviews from "@services/auth/usersServices/getAllUserReviews";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 
@@ -16,7 +17,7 @@ export const createReviewController = catchAsync(async (request, response, next)
   const { reviewBody, rating }: ReviewDataBody = request.body;
   if (!reviewBody?.trim() || !rating) return next(new AppError(400, "الرجاء التأكد من كتابة جميع البيانات قبل الإرسال"));
 
-  const { id, firstName, lastName, userType, image } = request.user;
+  const { id, firstName, lastName, userType, image } = request.user as RegularUserDocument;
   const data: ReviewDataBody = { reviewedResourceId, storeOrProduct, reviewBody, rating, writer: id, firstName, lastName, userType, image };
   const result = await createNewReview(data);
 

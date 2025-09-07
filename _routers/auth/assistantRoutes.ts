@@ -9,9 +9,8 @@ import validateRequestParams from "../../middlewares/validators/validateRequestP
 
 export const router = express.Router({ mergeParams: true });
 
-router.use(validateEmailConfirmation);
+router.use(restrict("storeOwner"),validateEmailConfirmation);
 
-router.use(restrict("storeOwner"));
 router.route("/").get(getAllAssistantsController).post(verifyUsedQuota("ofStoreAssistants"), sanitisedData, validateNewUserData, createAssistantController);
 router
   .route("/:assistantId")

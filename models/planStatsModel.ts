@@ -1,6 +1,6 @@
 import { endOfYear, startOfYear } from "date-fns";
 import { model, Schema } from "mongoose";
-import { PlanStatsDocument, PlanStatsModel } from "@Types/Plan";
+import { PlanStatsDocument, PlanStatsModel } from "@Types/Schema/Plan";
 
 const planStatsSchema = new Schema<PlanStatsDocument>(
   {

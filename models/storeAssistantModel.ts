@@ -1,7 +1,5 @@
-import { HASHING_SALT } from "@constants/primitives";
-import { StoreAssistantDocument } from "@Types/StoreAssistant";
+import { StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
 import { Model, Schema, model } from "mongoose";
-import bcrypt from "bcryptjs";
 
 type StoreAssistantModel = Model<StoreAssistantDocument>;
 
@@ -11,16 +9,6 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
       type: String,
       unique: true,
       required: [true, "the email field is required"],
-    },
-    credentials: {
-      password: {
-        type: String,
-        minLength: [8, "your password must be at least 8 characters"],
-        select: false,
-      },
-      passwordResetToken: String,
-      passwordResetExpires: Date,
-      passwordChangedAt: Date,
     },
     firstName: { type: String, required: [true, "the firstName field is required"] },
     lastName: { type: String, required: [true, "the lastName field is required"] },
@@ -39,7 +27,7 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
     },
     userType: {
       type: String,
-      default: "storeAssistant"
+      default: "storeAssistant",
     },
     image: String,
     inStore: {
@@ -102,23 +90,6 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
 
 storeAssistantSchema.index({ inStore: 1 });
 
-storeAssistantSchema.pre("save", async function (next) {
-  // STEP 1) check if the user isNew and the signMethod is credentials: (the condition this.credentials is for getting rid ot possibly undefined error)
-  if (this.isNew && this.credentials) {
-    this.credentials.password = await bcrypt.hash(this.credentials.password, HASHING_SALT);
-  }
-  next();
-});
-
-// this pre hook for forget/rest or change password, it encrypts the password and sets the changeAt
-storeAssistantSchema.pre("save", async function (next) {
-  if (!this.isNew && this.credentials && this.isModified("credentials.password")) {
-    this.credentials.password = await bcrypt.hash(this.credentials.password, HASHING_SALT);
-    this.credentials.passwordChangedAt = new Date();
-  }
-
-  next();
-});
 
 const StoreAssistant = model<StoreAssistantDocument, StoreAssistantModel>("StoreAssistant", storeAssistantSchema);
 

@@ -1,7 +1,7 @@
 import Review from "@models/reviewModel";
 import { createDoc } from "@repositories/global";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { ReviewDataBody } from "@Types/Review";
+import { ReviewDataBody } from "@Types/Schema/Review";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import setResourceRating from "./setResourceRating";

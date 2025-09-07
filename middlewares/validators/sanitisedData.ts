@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import xss from "xss";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 
 function deepSanitise(data: any): any {
   if (typeof data === "string") return xss(data);

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { PlatformReviewDocument } from "@Types/Review";
+import { PlatformReviewDocument } from "@Types/Schema/Review";
 
 type PlatFormReviewModel = mongoose.Model<PlatformReviewDocument>;
 const platformReviewSchema = new mongoose.Schema<PlatformReviewDocument>(

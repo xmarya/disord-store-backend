@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { CategoryBasic } from "@Types/Category";
-import { MongoId } from "@Types/MongoId";
+import { CategoryBasic } from "@Types/Schema/Category";
+import { MongoId } from "@Types/Schema/MongoId";
 import Category from "@models/categoryModel";
 
 export async function getAllProductCategories(productId: MongoId): Promise<CategoryBasic[] | []> {
@@ -15,7 +15,7 @@ export async function assignProductToCategory(categories:Array<CategoryBasic>, p
 }
 */
 
-export async function updateProductInCategories(/*categories: Array<CategoryBasic>*/categories:Array<MongoId>, productId: MongoId) {
+export async function updateProductInCategories(/*categories: Array<CategoryBasic>*/ categories: Array<MongoId>, productId: MongoId) {
   const operations = [];
   // STEP 1) Add productId to provided categories (addToSet)
   operations.push({
@@ -48,5 +48,5 @@ export async function deleteProductFromCategory(categories: Array<MongoId>, prod
 }
 
 export async function deleteAllCategories(storeId: MongoId, session: mongoose.ClientSession) {
-  await Category.deleteMany({ store: storeId }).session(session);
+  return await Category.deleteMany({ store: storeId }).session(session);
 }

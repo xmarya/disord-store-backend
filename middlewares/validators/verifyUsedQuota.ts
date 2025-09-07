@@ -1,14 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
-import { PlanQuota } from "@Types/Plan";
+import { PlanQuota } from "@Types/Schema/Plan";
 import { getOneDocById } from "@repositories/global";
 import Category from "@models/categoryModel";
 import Plan from "@models/planModel";
 import StoreAssistant from "@models/storeAssistantModel";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import Product from "@models/productModel";
 import ColourTheme from "@models/colourThemeModel";
 import mongoose from "mongoose";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 
 async function getDocsCount<T extends mongoose.Document>(Model: mongoose.Model<T>, condition: Record<string, MongoId>) {
   const result: Array<{ countOfDocs: number }> = await Model.aggregate([{ $match: condition }, { $count: "countOfDocs" }]);

@@ -1,9 +1,9 @@
 import Admin from "@models/adminModel";
-import { CredentialsSignupData } from "@Types/SignupData";
+import { CredentialsSignupData } from "@Types/Schema/Users/SignupData";
 import mongoose from "mongoose";
 
-export async function createNewAdmin(signupData: Omit<CredentialsSignupData, "password" | "passwordConfirm">, session:mongoose.ClientSession) {
-  const newAdmin = await Admin.create([signupData], {session});
+export async function createNewAdmin(signupData: Omit<CredentialsSignupData, "password" | "passwordConfirm">, session: mongoose.ClientSession) {
+  const newAdmin = await Admin.create([signupData], { session });
 
   return newAdmin[0];
 }

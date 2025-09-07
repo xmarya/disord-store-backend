@@ -1,7 +1,7 @@
 import eventBus from "@config/EventBus";
 import { updateProductInCategories } from "@repositories/category/categoryRepo";
 import { ProductUpdatedEvent } from "@Types/events/ProductEvents";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 
 async function updateCategoryRelatedToProduct(categories: Array<MongoId>, productId: MongoId) {
   await updateProductInCategories(categories, productId);

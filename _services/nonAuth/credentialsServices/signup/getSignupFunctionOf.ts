@@ -1,6 +1,7 @@
 import { createNewAdmin } from "@repositories/admin/adminRepo";
-import { createNewRegularUser, createNewStoreOwner } from "@repositories/user/userRepo";
-import { UserTypes } from "@Types/User";
+import { createNewStoreOwner } from "@repositories/storeOwner/storeOwnerRepo";
+import { createNewRegularUser } from "@repositories/user/userRepo";
+import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 
 function getSignupFunctionOf(userType: UserTypes) {
   switch (userType) {
@@ -9,8 +10,8 @@ function getSignupFunctionOf(userType: UserTypes) {
     case "admin":
       return createNewAdmin;
 
-      default:
-        return createNewRegularUser;
+    default:
+      return createNewRegularUser;
 
     /* 
     default:

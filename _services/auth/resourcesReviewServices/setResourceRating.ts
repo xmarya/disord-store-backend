@@ -1,8 +1,8 @@
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import { setRanking } from "@repositories/ranking/rankingRepo";
 import { calculateRatingsAverage } from "@repositories/review/reviewRepo";
-import { Model } from "@Types/Model";
-import { MongoId } from "@Types/MongoId";
+import { Model } from "@Types/Schema/Model";
+import { MongoId } from "@Types/Schema/MongoId";
 import { startSession } from "mongoose";
 import { err } from "neverthrow";
 

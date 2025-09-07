@@ -1,4 +1,4 @@
-import { QueryParams } from "@Types/Request";
+import { QueryParams } from "@Types/helperTypes/Request";
 import type { NextFunction, Request, Response } from "express"
 
 type Controller = (request:Request, response:Response, next:NextFunction) => Promise<any>

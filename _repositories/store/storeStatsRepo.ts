@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import StoreStats from "@models/storeStatModel";
 import { endOfDay, startOfDay } from "date-fns";
-import { MongoId } from "@Types/MongoId";
-import { StoreStatsDocument } from "@Types/StoreStats";
-import { PlansNames } from "@Types/Plan";
+import { MongoId } from "@Types/Schema/MongoId";
+import { StoreStatsDocument } from "@Types/Schema/StoreStats";
+import { PlansNames } from "@Types/Schema/Plan";
 
 export async function getAllStoresStats(
   sortBy: "totalProfits" | "createdAt" = "totalProfits",
@@ -243,5 +243,5 @@ soldProductsUpdate.$inc =>  {
 }
 
 export async function deleteStoreStats(storeId: MongoId, session: mongoose.ClientSession) {
-  await StoreStats.deleteOne({ store: storeId }).session(session);
+  return await StoreStats.deleteOne({ store: storeId }).session(session);
 }

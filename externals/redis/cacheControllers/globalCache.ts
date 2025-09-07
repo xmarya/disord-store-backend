@@ -1,5 +1,5 @@
 import { ttl } from "@constants/ttl";
-import { RedisTTL } from "@Types/RedisCache";
+import { RedisTTL } from "@Types/externalAPIs/RedisCache";
 import { compressJSON, decompressJSON } from "@utils/compression";
 import { getRedisKeyValuePair, deleteRedisKeyValuePair, setRedisKeyValuePair } from "../redisOperations/redisBasicFormat";
 import { getRedisSet, deleteFromRedisSet } from "../redisOperations/redisSet";

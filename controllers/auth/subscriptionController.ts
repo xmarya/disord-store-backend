@@ -1,8 +1,8 @@
 import { catchAsync } from "@utils/catchAsync";
-import cancelSubscription from "@services/auth/usersServices/storeOwnerServices/subscriptionsServices/cancelSubscription";
-import createNewPlanSubscription from "@services/auth/usersServices/storeOwnerServices/subscriptionsServices/createNewSubscription";
-import getStoreOwnerSubscriptionsLog from "@services/auth/usersServices/storeOwnerServices/subscriptionsServices/getStoreOwnerSubscriptionsLog";
-import renewalStoreOwnerSubscription from "@services/auth/usersServices/storeOwnerServices/subscriptionsServices/renewalStoreOwnerSubscription";
+import cancelSubscription from "@services/auth/storeOwnerServices/subscriptionsServices/cancelSubscription";
+import createNewPlanSubscription from "@services/auth/storeOwnerServices/subscriptionsServices/createNewSubscription";
+import getStoreOwnerSubscriptionsLog from "@services/auth/storeOwnerServices/subscriptionsServices/getStoreOwnerSubscriptionsLog";
+import renewalStoreOwnerSubscription from "@services/auth/storeOwnerServices/subscriptionsServices/renewalStoreOwnerSubscription";
 import isErr from "@utils/isErr";
 import returnError from "@utils/returnError";
 

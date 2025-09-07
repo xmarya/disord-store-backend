@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { MongoId } from "@Types/MongoId";
-import { ProductDocument } from "@Types/Product";
+import { MongoId } from "@Types/Schema/MongoId";
+import { ProductDocument } from "@Types/Schema/Product";
 import Product from "@models/productModel";
 
 export async function updateProduct(storeId: MongoId, productId: MongoId, data: Partial<ProductDocument>) {
@@ -41,5 +41,5 @@ so, to overwrite the existing array, $set should be used instead of $addToSet; s
 a category if not exist, it doesn't remove any removed category */
 
 export async function deleteAllProducts(storeId: MongoId, session: mongoose.ClientSession) {
-  await Product.deleteMany({ store: storeId }).session(session);
+  return await Product.deleteMany({ store: storeId }).session(session);
 }

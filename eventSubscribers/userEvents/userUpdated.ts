@@ -1,7 +1,7 @@
 import eventBus from "@config/EventBus";
 import novuUpdateSubscriber from "@externals/novu/subscribers/updateSubscriber";
-// import cacheUser from "@externals/redis/cacheControllers/user";
-import { UserUpdatedEvent } from "@Types/events/UserEvents";
+import cacheUser from "@externals/redis/cacheControllers/user";
+import { UserCredentialsUpdatedEvent, UserLoggedInEvent, UserUpdatedEvent } from "@Types/events/UserEvents";
 import { ResultAsync } from "neverthrow";
 
 eventBus.ofType<UserUpdatedEvent>("user.updated").subscribe((event) => {
@@ -13,9 +13,9 @@ eventBus.ofType<UserUpdatedEvent>("user.updated").subscribe((event) => {
 });
 
 
-// eventBus.ofType<UserUpdatedEvent>("user.updated").subscribe(event => {
-//     const {user} = event.payload;
+eventBus.ofMultipleTypes<[UserUpdatedEvent, UserLoggedInEvent, UserCredentialsUpdatedEvent]>(["user.updated", "user.loggedIn", "userCredentials.updated"]).subscribe(event => {
+    const {user, emailConfirmed} = event.payload;
 
-//     const safeUpdateRedisCache = ResultAsync.fromThrowable(() => cacheUser(user), () => new Error("couldn't update Redis cache"));
-//     safeUpdateRedisCache();
-// });
+    const safeUpdateRedisCache = ResultAsync.fromThrowable(() => cacheUser(user, emailConfirmed), () => new Error("couldn't update Redis cache"));
+    safeUpdateRedisCache();
+});

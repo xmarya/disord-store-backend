@@ -1,12 +1,12 @@
 import PlatformReview from "@models/platformReviewModel";
 import { createDoc } from "@repositories/global";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { PlatformReviewDataBody } from "@Types/Review";
-import { UserDocument } from "@Types/User";
+import { PlatformReviewDataBody } from "@Types/Schema/Review";
+import { RegularUserDocument } from "@Types/Schema/Users/RegularUser";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-async function createNewPlatformReview(user: UserDocument, reviewBody: string) {
+async function createNewPlatformReview(user: RegularUserDocument, reviewBody: string) {
   const { id, firstName, lastName, userType, image } = user;
 
   const data: PlatformReviewDataBody = { reviewBody, writer: id, firstName, lastName, userType, image };

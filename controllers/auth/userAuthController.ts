@@ -1,6 +1,5 @@
-import deleteUser from "@services/auth/usersServices/deleteUser";
-import getUserProfile from "@services/auth/usersServices/getUserProfile";
-import { AppError } from "@utils/AppError";
+import getProfileFactory from "@services/_sharedServices/getUserProfileFactory";
+import deleteRegularUserAccount from "@services/auth/usersServices/deleteRegularUserAccount";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 import type { Request, Response } from "express";
@@ -9,7 +8,7 @@ import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash
 
 export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
-  const result = await getUserProfile(userId);
+  const result = await getProfileFactory(userId, request.user.userType);
 
   if (!result.ok) return next(returnError(result));
   const { result: userProfile } = result;
@@ -20,19 +19,18 @@ export const getUserProfileController = catchAsync(async (request, response, nex
   });
 });
 
-
 // TODO: bank account controller, it's separate because it needs card data validation
 
 export const deleteUserAccountController = catchAsync(async (request, response, next) => {
   const { userId } = request.params;
 
-  const result = await deleteUser(userId);
+  const result = await deleteRegularUserAccount(userId);
 
-  if (result.isErr()) return next(new AppError(400, result.error));
+  if (!result.ok) return next(returnError(result));
 
   response.status(204).json({
     success: true,
-    message: result.value,
+    message: "تم حذف المستخدم بنجاح",
   });
 });
 

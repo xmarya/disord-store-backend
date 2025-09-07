@@ -1,4 +1,4 @@
-import { PlanDocument } from "@Types/Plan";
+import { PlanDocument } from "@Types/Schema/Plan";
 import { Model, Schema, model } from "mongoose";
 
 // This schema is ONLY for storing the plans and the users for the unlimited plan

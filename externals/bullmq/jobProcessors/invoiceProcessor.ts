@@ -1,6 +1,6 @@
 import { ms } from "../../../_constants/primitives";
 import { createNewInvoices } from "@repositories/invoice/invoiceRepo";
-import { InvoiceDocument } from "@Types/Invoice";
+import { InvoiceDocument } from "@Types/Schema/Invoice";
 import bullmq from "@config/bullmq";
 import { getAllCachedData } from "../../redis/cacheControllers/globalCache";
 

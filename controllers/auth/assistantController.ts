@@ -1,8 +1,8 @@
-import createNewAssistantInStore from "@services/auth/usersServices/storeOwnerServices/storeAssistant/createNewAssistantInStore";
-import deleteStoreAssistant from "@services/auth/usersServices/storeOwnerServices/storeAssistant/deleteStoreAssistant";
-import getAllStoreAssistants from "@services/auth/usersServices/storeOwnerServices/storeAssistant/getAllStoreAssistants";
-import getOneAssistant from "@services/auth/usersServices/storeOwnerServices/storeAssistant/getOneAssistant";
-import updateStoreAssistant from "@services/auth/usersServices/storeOwnerServices/storeAssistant/updateStoreAssistant";
+import createNewAssistantInStore from "@services/auth/storeOwnerServices/createNewAssistantInStore";
+import deleteStoreAssistant from "@services/auth/storeOwnerServices/storeAssistant/deleteStoreAssistantAccount";
+import getAllStoreAssistants from "@services/auth/storeOwnerServices/storeAssistant/getAllStoreAssistants";
+import getOneAssistant from "@services/auth/storeOwnerServices/storeAssistant/getAssistantProfile";
+import updateStoreAssistant from "@services/auth/storeOwnerServices/storeAssistant/updateStoreAssistant";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 

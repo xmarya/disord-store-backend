@@ -1,6 +1,6 @@
 import redis from "@config/redis";
 import { ttl } from "@constants/ttl";
-import { RedisTTL } from "@Types/RedisCache";
+import { RedisTTL } from "@Types/externalAPIs/RedisCache";
 
 /*TODO:
     - Caching the stores' products (id, name, price, first image only, productType, discounted price)

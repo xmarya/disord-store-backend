@@ -1,4 +1,4 @@
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import Wishlist from "@models/wishlistModel";
 
 export async function updateWishlist(products: Array<MongoId>, user: MongoId) {

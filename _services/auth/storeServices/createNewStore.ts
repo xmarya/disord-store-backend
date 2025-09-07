@@ -1,28 +1,48 @@
+import eventBus from "@config/EventBus";
 import { createStore } from "@repositories/store/storeRepo";
-import assignStoreToOwner from "@services/auth/usersServices/storeOwnerServices/assignStoreToOwner";
-import { FullStoreDataBody, StoreDataBody, StoreDocument } from "@Types/Store";
-import { StoreOwner, UserDocument } from "@Types/User";
-import returnError from "@utils/returnError";
-import { startSession } from "mongoose";
+import assignStoreToOwner from "@services/auth/storeOwnerServices/assignStoreToOwner";
+import { UserUpdatedEvent } from "@Types/events/UserEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { FullStoreDataBody, StoreDataBody } from "@Types/Schema/Store";
+import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import safeThrowable from "@utils/safeThrowable";
 
-async function createNewStore(storeOwner: UserDocument, storeData: StoreDataBody) {
+async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDataBody, emailConfirmed:boolean) {
   const { storeName, description, logo } = storeData;
   //TODO: handling logo and uploading it to cloudflare
-  const data: FullStoreDataBody = { storeName, description, logo, owner: storeOwner.id, inPlan: (storeOwner as StoreOwner).subscribedPlanDetails.planName };
-  const session = await startSession();
+  const data: FullStoreDataBody = { storeName, description, logo, owner: storeOwner.id, inPlan: storeOwner.subscribedPlanDetails.planName };
 
-  let newStore: StoreDocument;
-  try {
-    session.startTransaction();
-    newStore = await createStore(data, session);
-    await assignStoreToOwner(newStore.id, data.owner, session);
-    await session.commitTransaction();
-  } catch (error) {
-    await session.abortTransaction();
-    return returnError({ reason: "error", message: (error as Error).message });
-  } finally {
-    await session.endSession();
-  }
+  const safeCreateStore = safeThrowable(
+    () => createStore(data),
+    (error) => new Failure((error as Error).message)
+  );
+
+  const createStoreResult = await extractSafeThrowableResult(() => safeCreateStore);
+  if (!createStoreResult.ok) return createStoreResult;
+
+  const { result: newStore } = createStoreResult;
+
+  const safeAssignStoreToOwner = safeThrowable(
+    () => assignStoreToOwner(newStore.id, data.owner),
+    (error) => new Failure((error as Error).message)
+  );
+
+  const assignStoreToOwnerResult = await extractSafeThrowableResult(() => safeAssignStoreToOwner);
+  if (!assignStoreToOwnerResult.ok) return assignStoreToOwnerResult;
+  const { result: updatedStoreOwner } = assignStoreToOwnerResult;
+
+  const event: UserUpdatedEvent = {
+    type: "user.updated",
+    payload: {
+      user: updatedStoreOwner,
+      emailConfirmed
+    },
+
+    occurredAt: new Date(),
+  };
+
+  eventBus.publish(event);
 
   return newStore;
 }

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { getOneDocByFindOne, getOneDocById } from "@repositories/global";
 import Review from "@models/reviewModel";
 import { catchAsync } from "@utils/catchAsync";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import Product from "@models/productModel";
 
 const canReplyToReview = catchAsync(async (request, response, next) => {

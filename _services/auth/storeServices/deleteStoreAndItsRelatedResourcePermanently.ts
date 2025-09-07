@@ -4,7 +4,7 @@ import { deleteAllProducts } from "@repositories/product/productRepo";
 import { deleteAllResourceReviews } from "@repositories/review/reviewRepo";
 import { deleteStore } from "@repositories/store/storeRepo";
 import { deleteStoreStats } from "@repositories/store/storeStatsRepo";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import mongoose from "mongoose";
 
 // NOTE: this function must run inside a TRANSACTION
@@ -28,7 +28,6 @@ async function deleteStoreAndItsRelatedResourcePermanently(storeId: MongoId, ses
   //STEP 7) delete the store:
   await deleteStore(storeId, session);
 
-  //TODO: // ADD FEATURE for adding the deleted data to an AdminLog
 }
 
 export default deleteStoreAndItsRelatedResourcePermanently;

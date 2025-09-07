@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { StoreStatsDocument } from "@Types/StoreStats";
+import { StoreStatsDocument } from "@Types/Schema/StoreStats";
 
 type StoreStatsModel = mongoose.Model<StoreStatsDocument>;
 

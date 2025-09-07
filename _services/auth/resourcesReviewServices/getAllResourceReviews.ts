@@ -1,9 +1,9 @@
 import Review from "@models/reviewModel";
 import { getAllDocs } from "@repositories/global";
-import { QueryOptions } from "@Types/QueryOptions";
-import { QueryParams } from "@Types/Request";
+import { QueryOptions } from "@Types/helperTypes/QueryOptions";
+import { QueryParams } from "@Types/helperTypes/Request";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { ReviewDocument } from "@Types/Review";
+import { ReviewDocument } from "@Types/Schema/Review";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 

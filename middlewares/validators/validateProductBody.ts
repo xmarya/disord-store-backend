@@ -1,5 +1,5 @@
-import { DigitalProduct, PhysicalProduct, ProductDataBody } from "@Types/Product";
-import { AppError } from "@utils/AppError";
+import { DigitalProduct, PhysicalProduct, ProductDataBody } from "@Types/Schema/Product";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 
 export const validateProductBody = catchAsync(async (request, response, next) => {

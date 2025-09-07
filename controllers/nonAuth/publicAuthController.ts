@@ -1,44 +1,46 @@
 import authentica from "@config/authentica";
 import createNewDiscordUser from "@services/auth/usersServices/createNewDiscordUser";
-import createNewUserAndSendConfirmationEmail from "@services/auth/usersServices/createNewUserAndSendConfirmationEmail";
+import createNewUserAndSendConfirmationEmail from "@services/nonAuth/credentialsServices/signup/signupNewUserAndSendConfirmationEmail";
 import getCredentialsVerifyResult from "@services/nonAuth/credentialsServices/login/getCredentialsVerifyResult";
 import loginMethodValidator from "@services/nonAuth/credentialsServices/login/loginMethodValidator";
-import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/AuthenticaOTP";
-import { UserTypes } from "@Types/User";
-import { AppError } from "@utils/AppError";
+import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/externalAPIs/AuthenticaOTP";
+import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import jwtSignature from "@utils/jwtToken/generateSignature";
 import jwtVerify from "@utils/jwtToken/jwtVerify";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import returnError from "@utils/returnError";
+import { NotFound } from "@Types/ResultTypes/errors/NotFound";
 
-
-export const oldCredentialsLogin = catchAsync(async(request, response, next) => {
+export const oldCredentialsLogin = catchAsync(async (request, response, next) => {
   const result1 = loginMethodValidator(request.body);
   if (!result1.ok) return next(returnError(result1));
   const { result: loginMethod } = result1;
-   const result2 = await getCredentialsVerifyResult(loginMethod, request.body.password);
-    if (!result2.ok) return next(returnError(result2));
-  
-    const { result: loggedInUser } = result2;
+  const result2 = await getCredentialsVerifyResult(loginMethod, request.body.password);
+  if (!result2.ok) return next(returnError(result2));
 
-    const token = jwtSignature(loggedInUser.id, "1h");
-    tokenWithCookies(response, token);
-    request.user = loggedInUser;
-  
-    response.status(200).json({
-      success:true,
-      data: {
-        token
-      }
-    })
-})
+  const {
+    result: { loggedInUser, emailConfirmed },
+  } = result2;
+
+  const token = jwtSignature(loggedInUser.id, loggedInUser.userType, "1h");
+  tokenWithCookies(response, token);
+  request.user = loggedInUser;
+  request.emailConfirmed = emailConfirmed;
+
+  response.status(200).json({
+    success: true,
+    data: {
+      token,
+    },
+  });
+});
 
 export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
   catchAsync(async (request, response, next) => {
-
     const tokenGenerator = { hostname: request.hostname, protocol: request.protocol };
-    const newUser = await createNewUserAndSendConfirmationEmail({userType, ...request.body}, tokenGenerator);
+    const newUser = await createNewUserAndSendConfirmationEmail({ userType, ...request.body }, tokenGenerator);
 
     response.status(201).json({
       success: true,
@@ -49,6 +51,7 @@ export const createNewUserController = (userType: Extract<UserTypes, "user" | "s
 
 export const credentialsLogin = catchAsync(async (request, response, next) => {
   const result = loginMethodValidator(request.body);
+  if (!result.ok && result.reason === "not-found") return next(returnError(new NotFound("لم يتم العثور على هذا المستخدم")));
   if (!result.ok) return next(returnError(result));
   const { result: loginMethod } = result;
 
@@ -56,7 +59,6 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
 
   next();
 });
-
 
 export const sendOTP = catchAsync(async (request, response, next) => {
   const user = request.user;
@@ -77,7 +79,7 @@ export const sendOTP = catchAsync(async (request, response, next) => {
 
   if (!success) return next(new AppError(400, message));
 
-  const temporeToken = jwtSignature(user.id, "1m");
+  const temporeToken = jwtSignature(user.id, user.userType, "5m");
   response.status(200).json({
     success: true,
     message: `${message} to ${Object.values(request.loginMethod)[0]}`,
@@ -105,7 +107,7 @@ export const verifyOTP = catchAsync(async (request, response, next) => {
 
   if (!status || !payload.id) return next(new AppError(400, "OTP or temporeToken has expired"));
 
-  const token = jwtSignature(payload.id, "1h");
+  const token = jwtSignature(payload.id, payload.userType, "1h");
   tokenWithCookies(response, token);
 
   response.status(200).json({

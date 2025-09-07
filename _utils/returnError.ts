@@ -1,7 +1,7 @@
-import { AppError } from "./AppError";
+import { AppError } from "../_Types/ResultTypes/errors/AppError";
 import { ErrorInfo, ErrorNames } from "@Types/ResultTypes/errors/ErrorInfo";
 
-function getCodeStatus(reason:ErrorNames) {
+function getCodeStatus(reason: ErrorNames) {
   switch (reason) {
     case "bad-request":
       return 400;
@@ -11,10 +11,10 @@ function getCodeStatus(reason:ErrorNames) {
 
     case "not-found":
       return 404;
-    
-    case "forbidden": 
+
+    case "forbidden":
       return 403;
-      
+
     default:
       return 500;
   }

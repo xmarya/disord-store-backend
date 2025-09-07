@@ -6,13 +6,13 @@ import novuDeleteSubscriber from "../../externals/novu/subscribers/deleteSubscri
 eventBus.ofType<UserDeletedEvent>("user.deleted").subscribe(async (event) => {
   const { userId } = event.payload;
 
-  await novuDeleteSubscriber(userId);
+  await novuDeleteSubscriber(userId as string);
 });
 
 eventBus.ofType<UserDeletedEvent>("user.deleted").subscribe(async (event) => {
   const { userId } = event.payload;
 
-  await deleteFromCache(userId);
+  await deleteFromCache(userId as string);
 });
 
 /*

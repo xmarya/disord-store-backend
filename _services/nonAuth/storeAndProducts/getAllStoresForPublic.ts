@@ -2,7 +2,7 @@ import eventBus from "@config/EventBus";
 import Store from "@models/storeModel";
 import { getAllDocs } from "@repositories/global";
 import { QueryResultsFetchedEvent } from "@Types/events/QueryResultsFetchedEvent";
-import { QueryParams } from "@Types/Request";
+import { QueryParams } from "@Types/helperTypes/Request";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";

@@ -1,6 +1,6 @@
 import { addProductToCart, deleteProductFromCart, getUserCart } from "@repositories/cart/cartRepo";
-import { CartDataBody } from "@Types/Cart";
-import { AppError } from "@utils/AppError";
+import { CartDataBody } from "@Types/Schema/Cart";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 
 export const addToCartController = catchAsync(async (request, response, next) => {
@@ -14,7 +14,7 @@ export const addToCartController = catchAsync(async (request, response, next) =>
 
   response.status(203).json({
     success: true,
-    data: {cart},
+    data: { cart },
   });
 });
 
@@ -26,7 +26,7 @@ export const getMyCartController = catchAsync(async (request, response, next) =>
 
   response.status(200).json({
     success: true,
-    data: {cart},
+    data: { cart },
   });
 });
 

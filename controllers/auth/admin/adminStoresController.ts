@@ -1,7 +1,7 @@
 import { startSession } from "mongoose";
 import { getAllDocs, getOneDocById, updateDoc } from "@repositories/global";
 import { getAllStoresStats, getOneStoreStats } from "@repositories/store/storeStatsRepo";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import Store from "@models/storeModel";
 import Product from "@models/productModel";

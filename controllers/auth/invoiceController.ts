@@ -5,8 +5,8 @@ import PDFDocument from "pdfkit";
 import { fileURLToPath } from "url";
 import { getOneDocByFindOne } from "@repositories/global";
 import { createNewInvoices } from "@repositories/invoice/invoiceRepo";
-import { InvoiceDataBody } from "@Types/Invoice";
-import { AppError } from "@utils/AppError";
+import { InvoiceDataBody } from "@Types/Schema/Invoice";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import Invoice from "@models/invoiceModel";
 import Order from "@models/orderModel";
@@ -145,7 +145,7 @@ export const getOneInvoiceController = catchAsync(async (request, response, next
   const invoice = await getOneDocByFindOne(Invoice, { condition: { orderId } });
   response.status(200).json({
     success: true,
-    data: {invoice},
+    data: { invoice },
   });
 });
 
@@ -174,6 +174,6 @@ export const testInvoiceController = catchAsync(async (request, response, next) 
 
   response.status(201).json({
     success: true,
-    data: {invoice: data},
+    data: { invoice: data },
   });
 });

@@ -1,4 +1,4 @@
-import { ColourThemeDocument } from "@Types/ColourTheme";
+import { ColourThemeDocument } from "@Types/Schema/ColourTheme";
 import { Model, Schema, model } from "mongoose";
 import Store from "./storeModel";
 

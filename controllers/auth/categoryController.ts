@@ -1,8 +1,8 @@
 import { getAllProductCategories } from "@repositories/category/categoryRepo";
 import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from "@repositories/global";
-import { CategoryBasic } from "@Types/Category";
-import { MongoId } from "@Types/MongoId";
-import { AppError } from "@utils/AppError";
+import { CategoryBasic } from "@Types/Schema/Category";
+import { MongoId } from "@Types/Schema/MongoId";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { getDecompressedCacheData, setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
 import { catchAsync } from "@utils/catchAsync";
 import Category from "@models/categoryModel";
@@ -21,7 +21,7 @@ export const createCategoryController = catchAsync(async (request, response, nex
 
   response.status(201).json({
     success: true,
-    data: {newCategory},
+    data: { newCategory },
   });
 });
 
@@ -32,7 +32,7 @@ export const getAllCategoriesController = catchAsync(async (request, response, n
   response.status(200).json({
     success: true,
     results: categories.length,
-    data: {categories},
+    data: { categories },
   });
 });
 
@@ -45,7 +45,7 @@ export const getCategoryController = catchAsync(async (request, response, next) 
 
   response.status(200).json({
     success: true,
-    data: {category},
+    data: { category },
   });
 });
 
@@ -59,7 +59,7 @@ export const updateCategoryController = catchAsync(async (request, response, nex
 
   response.status(201).json({
     success: true,
-    data: {updatedCategory},
+    data: { updatedCategory },
   });
 });
 export const deleteCategoryController = catchAsync(async (request, response, next) => {
@@ -69,7 +69,6 @@ export const deleteCategoryController = catchAsync(async (request, response, nex
     success: true,
   });
 });
-
 
 export async function categoriesInCache(productId: MongoId): Promise<CategoryBasic[]> {
   let categories;
@@ -86,4 +85,3 @@ export async function categoriesInCache(productId: MongoId): Promise<CategoryBas
 
   return categories;
 }
-

@@ -2,7 +2,7 @@ import eventBus from "@config/EventBus";
 import Product from "@models/productModel";
 import { deleteDoc } from "@repositories/global";
 import { ProductDeletedEvent } from "@Types/events/ProductEvents";
-import { MongoId } from "@Types/MongoId";
+import { MongoId } from "@Types/Schema/MongoId";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
@@ -23,7 +23,7 @@ async function deleteProductAndItsRelated(productId: MongoId) {
       productId: deletedProduct.id,
       categories: deletedProduct.categories as MongoId[],
     },
-    occurredAt: new Date()
+    occurredAt: new Date(),
   };
 
   eventBus.publish(event);

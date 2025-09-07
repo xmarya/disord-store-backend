@@ -1,4 +1,4 @@
-import confirmEmail from "@services/_sharedServices/confirmEmail";
+import confirmEmail from "@services/auth/credentials/confirmEmail";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 

@@ -1,6 +1,6 @@
 import { getOneDocById } from "@repositories/global";
 import Store from "@models/storeModel";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 

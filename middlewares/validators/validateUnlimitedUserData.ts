@@ -1,6 +1,6 @@
 import { getOneDocByFindOne } from "@repositories/global";
 import User from "@models/userModel";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 
 const validateUnlimitedUserData = catchAsync(async (request, response, next) => {

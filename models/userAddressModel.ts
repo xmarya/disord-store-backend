@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { AddressDocument } from "@Types/UserAddress";
+import { AddressDocument } from "@Types/Schema/Users/UserAddress";
 
 type AddressModel = mongoose.Model<AddressDocument>;
 

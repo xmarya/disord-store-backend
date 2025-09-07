@@ -1,6 +1,6 @@
 import User from "@models/userModel";
 import { createDoc } from "@repositories/global";
-import { DiscordSignupData } from "@Types/SignupData";
+import { DiscordSignupData } from "@Types/Schema/Users/SignupData";
 
 async function createNewDiscordUser(signupData: DiscordSignupData) {
   const { email, name, id, image } = signupData;
@@ -16,8 +16,6 @@ async function createNewDiscordUser(signupData: DiscordSignupData) {
     },
     // "credentials.emailConfirmed": true, no longer exist
   });
-;
-
   return newDiscordUser;
 }
 

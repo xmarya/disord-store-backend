@@ -1,6 +1,6 @@
 import { type NextFunction, type Request, type Response } from "express";
-import { UserTypes } from "@Types/User";
-import { AppError } from "@utils/AppError";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
+import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 
 const restrict = (...userTypes: Array<UserTypes>) => {
   return async (request: Request, response: Response, next: NextFunction) => {
