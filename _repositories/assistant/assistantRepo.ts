@@ -3,7 +3,7 @@ import User from "@models/userModel";
 import StoreAssistant from "@models/storeAssistantModel";
 import Store from "@models/storeModel";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
-import { StoreAssistant as StoreAssistantData } from "@Types/Schema/Users/StoreAssistant";
+import { StoreAssistant as StoreAssistantData, StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
 import { MongoId } from "@Types/Schema/MongoId";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
@@ -51,11 +51,11 @@ export async function getOneAssistant(assistantId: string):Promise<StoreAssistan
 
 export async function deleteAssistant(assistantId: MongoId, storeId: MongoId) {
   const session = await startSession();
+  let deletedAssistant:StoreAssistantDocument | null;
   session.startTransaction();
   try {
     await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: assistantId } }, { session });
-    await User.findByIdAndDelete(assistantId, { session });
-    await StoreAssistant.deleteOne({ assistant: assistantId }, { session });
+    deletedAssistant = await StoreAssistant.findOneAndDelete({ id: assistantId }, { session });
 
     await session.commitTransaction();
   } catch (error) {
@@ -65,6 +65,8 @@ export async function deleteAssistant(assistantId: MongoId, storeId: MongoId) {
   } finally {
     await session.endSession();
   }
+
+  return deletedAssistant
 }
 
 export async function getAssistantPermissions(assistantId: MongoId, storeId: MongoId) {
