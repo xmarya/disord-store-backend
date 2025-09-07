@@ -1,4 +1,4 @@
-import createNewAssistantInStore from "@services/auth/storeOwnerServices/storeAssistant/createNewAssistantInStore";
+import createNewAssistantInStore from "@services/auth/storeOwnerServices/createNewAssistantInStore";
 import deleteStoreAssistant from "@services/auth/storeOwnerServices/storeAssistant/deleteStoreAssistantAccount";
 import getAllStoreAssistants from "@services/auth/storeOwnerServices/storeAssistant/getAllStoreAssistants";
 import getOneAssistant from "@services/auth/storeOwnerServices/storeAssistant/getAssistantProfile";

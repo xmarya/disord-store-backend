@@ -13,23 +13,15 @@ import mongoose, { startSession } from "mongoose";
 */
 
 export async function createAssistant(data: StoreAssistantData, session: mongoose.ClientSession) {
-  try {
-    //STEP : create a new assistant:
     const assistant = await StoreAssistant.create([{ ...data }], { session });
 
-    //STEP 3) insert assistant data in store without registering it to the session to
+    //STEP 2) insert assistant data in store
     //  reduce the number of operations inside the critical section
     // (since th transactions should be as short as possible):
     await Store.findByIdAndUpdate(data.inStore, { $addToSet: { storeAssistants: assistant[0].id } }, { session });
-    await session.commitTransaction();
-    return new Success(assistant[0]);
-  } catch (error) {
-    await session.abortTransaction();
-    console.log((error as Error).message);
-    return new Failure("لم تتم العملية بنجاح. حاول مجددًا");
-  } finally {
-    await session.endSession();
-  }
+
+  return assistant[0];
+
 }
 
 /* OLD CODE (kept for reference):  

@@ -5,6 +5,7 @@ import { AssistantCreatedEvent } from "@Types/events/AssistantEvents";
 import { MongoId } from "@Types/Schema/MongoId";
 import { AssistantDataBody, StoreAssistant } from "@Types/Schema/Users/StoreAssistant";
 import { startSession } from "mongoose";
+import createNewAssistant from "./storeAssistant/createNewAssistant";
 
 async function createNewAssistantInStore(storeId: MongoId, assistantData: AssistantDataBody, planId: MongoId) {
   const { firstName, lastName, email, password, permissions, phoneNumber, image } = assistantData;
@@ -12,7 +13,7 @@ async function createNewAssistantInStore(storeId: MongoId, assistantData: Assist
 
   const session = await startSession();
   const { newAssistantResult } = await session.withTransaction(async () => {
-    const newAssistantResult = await createAssistant(data, session);
+    const newAssistantResult = await createNewAssistant(data, session);
     await createNewCredentials({ email, password, firstName, lastName, userType: data.userType, phoneNumber }, session);
 
     return { newAssistantResult };
