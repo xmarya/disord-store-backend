@@ -36,7 +36,6 @@ export interface StoreAssistant extends Omit<AssistantDataBody, "password"> {
   inPlan: MongoId;
   permissions: AssistantPermissions;
   userType: Extract<UserTypes, "storeAssistant">;
-  credentials: Pick<Credentials, "password"> & Partial<Omit<Credentials, "password">>;
 }
 
 export type StoreAssistantDocument = StoreAssistant & mongoose.Document;

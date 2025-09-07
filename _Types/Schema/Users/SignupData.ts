@@ -7,6 +7,7 @@ export type CredentialsSignupData = {
   email: string;
   password: string;
   passwordConfirm: string;
+  phoneNumber?:`+966${string}`
 };
 
 export type DiscordSignupData = {
