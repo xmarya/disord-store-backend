@@ -6,12 +6,12 @@ import { ProductDeletedEvent } from "@Types/events/ProductEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import safeThrowable from "@utils/safeThrowable";
 
-// remove the id of deleted product from reviews
-eventBus.ofType<ProductDeletedEvent>("product.deleted").subscribe(async (event) => {
-  const { productId } = event.payload;
+// FIX remove the id of deleted product from reviews
+// eventBus.ofType<ProductDeletedEvent>("product.deleted").subscribe(async (event) => {
+//   const { productId } = event.payload;
 
-  await deleteAllResourceReviews(productId);
-});
+//   await deleteAllResourceReviews(productId);
+// });
 
 // remove the id of deleted product from categories
 eventBus.ofType<ProductDeletedEvent>("product.deleted").subscribe(async (event) => {
