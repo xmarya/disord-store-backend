@@ -1,39 +1,39 @@
 import eventBus from "@config/EventBus";
 import { createAssistant } from "@repositories/assistant/assistantRepo";
+import { createNewCredentials } from "@repositories/credentials/credentialsRepo";
 import { AssistantCreatedEvent } from "@Types/events/AssistantEvents";
 import { MongoId } from "@Types/Schema/MongoId";
-import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { AssistantDataBody, StoreAssistant } from "@Types/Schema/Users/StoreAssistant";
-import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
-import safeThrowable from "@utils/safeThrowable";
+import { startSession } from "mongoose";
 
 async function createNewAssistantInStore(storeId: MongoId, assistantData: AssistantDataBody, planId: MongoId) {
   const { firstName, lastName, email, password, permissions, phoneNumber, image } = assistantData;
-  const data: StoreAssistant = { userType: "storeAssistant", inStore: storeId, inPlan: planId, firstName, lastName, email, phoneNumber, permissions, credentials: { password }, image };
+  const data: StoreAssistant = { userType: "storeAssistant", inStore: storeId, inPlan: planId, firstName, lastName, email, phoneNumber, permissions, image };
 
-  const safeCreateAssistant = safeThrowable(
-    () => createAssistant(data),
-    (error) => new Failure((error as Error).message)
-  );
+  const session = await startSession();
+  const { newAssistantResult } = await session.withTransaction(async () => {
+    const newAssistantResult = await createAssistant(data, session);
+    await createNewCredentials({ email, password, firstName, lastName, userType: data.userType, phoneNumber }, session);
 
-  const createAssistantResult = await extractSafeThrowableResult(() => safeCreateAssistant);
+    return { newAssistantResult };
+  });
 
-  if (!createAssistantResult.ok) return createAssistantResult;
+  if(!newAssistantResult.ok) return newAssistantResult;
 
-  const { result } = createAssistantResult;
+  const {result: newAssistant} = newAssistantResult;
 
   const event: AssistantCreatedEvent = {
     type: "assistant.created",
     payload: {
       storeId,
-      permissions: result.permissions,
+      permissions: newAssistant.permissions,
       novuSubscriber: {
         firstName,
         lastName,
         email,
         phoneNumber,
-        userType: result.userType,
-        id: result.id,
+        userType: newAssistant.userType,
+        id: newAssistant.id,
       },
     },
     occurredAt: new Date(),
@@ -41,7 +41,7 @@ async function createNewAssistantInStore(storeId: MongoId, assistantData: Assist
 
   eventBus.publish(event);
 
-  return createAssistantResult;
+  return newAssistantResult;
 }
 
 export default createNewAssistantInStore;

@@ -1,10 +1,10 @@
-import mongoose, { startSession } from "mongoose";
-import User from "@models/userModel";
 import StoreAssistant from "@models/storeAssistantModel";
 import Store from "@models/storeModel";
-import { AppError } from "@Types/ResultTypes/errors/AppError";
-import { StoreAssistant as StoreAssistantData, StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
+import { StoreAssistant as StoreAssistantData, StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
+import mongoose, { startSession } from "mongoose";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
     tha reason is because this is a service layer function, not the controller that always returns response,
@@ -12,10 +12,7 @@ import { MongoId } from "@Types/Schema/MongoId";
     hovering it it indicates that it returns an array of document, and this is driven by Model.create() query.
 */
 
-export async function createAssistant(data: StoreAssistantData) {
-  const session = await startSession();
-  session.startTransaction();
-
+export async function createAssistant(data: StoreAssistantData, session: mongoose.ClientSession) {
   try {
     //STEP : create a new assistant:
     const assistant = await StoreAssistant.create([{ ...data }], { session });
@@ -25,11 +22,11 @@ export async function createAssistant(data: StoreAssistantData) {
     // (since th transactions should be as short as possible):
     await Store.findByIdAndUpdate(data.inStore, { $addToSet: { storeAssistants: assistant[0].id } }, { session });
     await session.commitTransaction();
-    return assistant[0];
+    return new Success(assistant[0]);
   } catch (error) {
     await session.abortTransaction();
-    const message = (error as AppError).message || "لم تتم العملية بنجاح. حاول مجددًا";
-    throw new AppError(500, message);
+    console.log((error as Error).message);
+    return new Failure("لم تتم العملية بنجاح. حاول مجددًا");
   } finally {
     await session.endSession();
   }
@@ -49,31 +46,30 @@ export async function getOneAssistant(assistantId: string):Promise<StoreAssistan
 
 export async function deleteAssistant(assistantId: MongoId, storeId: MongoId) {
   const session = await startSession();
-  let deletedAssistant:StoreAssistantDocument | null;
+  let deletedAssistant: StoreAssistantDocument | null;
   session.startTransaction();
   try {
     await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: assistantId } }, { session });
     deletedAssistant = await StoreAssistant.findOneAndDelete({ id: assistantId }, { session });
 
     await session.commitTransaction();
+    return deletedAssistant;
   } catch (error) {
     await session.abortTransaction();
-    const message = (error as AppError).message || "لم تتم العملية بنجاح. حاول مجددًا";
-    throw new AppError(500, message);
+    console.log((error as Error).message);
+    return new Failure("لم تتم العملية بنجاح. حاول مجددًا");
   } finally {
     await session.endSession();
   }
-
-  return deletedAssistant
 }
 
 export async function getAssistantPermissions(assistantId: MongoId, storeId: MongoId) {
-  return await StoreAssistant.findOne({ assistant: assistantId, inStore: storeId });
+  return await StoreAssistant.findOne({ id: assistantId, inStore: storeId });
 }
 
 export async function updateAssistant(assistantId: MongoId, storeId: MongoId, permission: any, anotherData: any) {
   return await StoreAssistant.findOneAndUpdate(
-    { assistant: assistantId, inStore: storeId },
+    { id: assistantId, inStore: storeId },
     {
       $set: { ...permission, ...anotherData },
     },

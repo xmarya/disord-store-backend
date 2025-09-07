@@ -7,8 +7,8 @@ import generateEmailConfirmationToken from "@utils/generators/generateEmailConfi
 import { startSession } from "mongoose";
 
 async function signupNewUserAndSendConfirmationEmail(signupData: CredentialsSignupData, emailTokenGenerator: { hostname: string; protocol: string }) {
-  const { firstName, lastName, email, userType } = signupData;
-  const data = { firstName, lastName, email, signMethod: "credentials", userType };
+  const { firstName, lastName, email, userType, phoneNumber } = signupData;
+  const data = { firstName, lastName, email, signMethod: "credentials", userType, phoneNumber };
 
   const signupFn = getSignupFunctionOf(userType);
 
