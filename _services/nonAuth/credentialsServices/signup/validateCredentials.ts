@@ -1,4 +1,4 @@
-import emailChecker from "@services/_sharedServices/emailChecker";
+import emailChecker from "@services/auth/credentials/emailChecker";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { CredentialsSignupData } from "@Types/Schema/Users/SignupData";
 

@@ -6,8 +6,9 @@ import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { BaseUserData } from "@Types/Schema/Users/BasicUserTypes";
 import { NotAssistant } from "@Types/Schema/Users/NotAssistant";
+import mongoose from "mongoose";
 
-async function updateProfileFactory(user: NotAssistant, updatedData: Partial<BaseUserData>) {
+async function updateProfileFactory(user: NotAssistant, updatedData: Partial<BaseUserData>, session?:mongoose.ClientSession) {
   const { userType, id } = user;
   const { firstName, lastName } = updatedData;
 
@@ -16,13 +17,13 @@ async function updateProfileFactory(user: NotAssistant, updatedData: Partial<Bas
   let result;
   switch (userType) {
     case "admin":
-      result = await updateAdminProfile(id, updatedData);
+      result = await updateAdminProfile(id, updatedData, session);
       break;
     case "storeOwner":
-      result = await updateStoreOwnerProfile(id, updatedData);
+      result = await updateStoreOwnerProfile(id, updatedData, session);
       break;
     default:
-      result = await updateUserProfile(id, updatedData);
+      result = await updateUserProfile(id, updatedData, session);
   }
 
   if (!result.ok) return result;

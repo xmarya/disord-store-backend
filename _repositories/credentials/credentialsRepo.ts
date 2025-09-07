@@ -16,8 +16,9 @@ export async function getCredentials(condition: QueryOptions<CredentialsDocument
   return await Credentials.findOne(condition).select(fields);
 }
 
-export async function updateEmail(session: mongoose.ClientSession) {
-  // TODO: changing the email reset the emailConfirmed to false
+export async function updateEmail(oldEmail:string, newEmail:string, session: mongoose.ClientSession) {
+  // TODO: changing the email resets the emailConfirmed to false
+  return await Credentials.findOneAndUpdate({email: oldEmail}, {email: newEmail, emailConfirmed:false}, {new:true, runValidators:true, session});
   // TODO: downgrading the plan to basic deleting all the assistant data
 }
 

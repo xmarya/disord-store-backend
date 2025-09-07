@@ -12,15 +12,15 @@ import { displayReviewInHomePageController } from "../../controllers/auth/admin/
 import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
 import { createAdminController, createUnlimitedUserController, deleteRegularUser, deleteStoreOwnerAndStore, getAllStoreOwnersController, getAllUsersController, getOneStoreOwnerController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
 import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviews/platformReviewController";
-import { deleteUserAccountController } from "../../controllers/auth/userAuthController";
-import { confirmChangePasswordController, updateProfileController } from "controllers/auth/authSettingsController";
+import { changePasswordController, updateProfileController } from "@controllers/auth/authSettingsController";
+
 
 export const router = express.Router();
 
 router.use(restrict("admin"));
 router.route("/").get(getAdminProfileController).patch(updateProfileController); 
 router.post("/administratorUser", sanitisedData, validateNewUserData, createAdminController);
-router.route("/changePassword").patch(validateChangePassword, confirmChangePasswordController);
+router.route("/changePassword").patch(validateChangePassword, changePasswordController);
 
 /* STORES 
     1- patch route for suspend store

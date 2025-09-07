@@ -5,12 +5,13 @@ import { MongoId } from "@Types/Schema/MongoId";
 import { BaseUserData } from "@Types/Schema/Users/BasicUserTypes";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
+import mongoose from "mongoose";
 
-async function updateStoreOwnerProfile(storeOwnerId: MongoId, updatedData: Partial<BaseUserData>) {
+async function updateStoreOwnerProfile(storeOwnerId: MongoId, updatedData: Partial<BaseUserData>, session?:mongoose.ClientSession) {
   updatedData?.userType && delete updatedData.userType;
 
   const safeUpdateUser = safeThrowable(
-    () => updateDoc(StoreOwner, storeOwnerId, updatedData),
+    () => updateDoc(StoreOwner, storeOwnerId, updatedData, {session}),
     (error) => new Failure((error as Error).message)
   );
 
