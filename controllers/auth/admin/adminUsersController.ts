@@ -2,7 +2,7 @@ import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import createUnlimitedPlanAndStoreOwner from "@services/auth/adminServices/user/createUnlimitedPlanAndOwnerByAdmin";
 import getAllUsersForAdmin from "@services/auth/adminServices/user/getAllUsersForAdmin";
 import getOneUserForAdmin from "@services/auth/adminServices/user/getOneUserForAdmin";
-import createNewUserAndSendConfirmationEmail from "@services/auth/usersServices/createNewUserAndSendConfirmationEmail";
+import createNewUserAndSendConfirmationEmail from "@services/nonAuth/credentialsServices/signup/signupNewUserAndSendConfirmationEmail";
 import { UnlimitedPlanDataBody } from "@Types/Schema/Plan";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
@@ -93,26 +93,25 @@ export const getOneStoreOwnerController = catchAsync(async (request, response, n
 });
 
 export const deleteStoreOwnerAndStore = catchAsync(async (request, response, next) => {
-  const {storeOwnerId, storeId} = request.body;
+  const { storeOwnerId, storeId } = request.body;
 
   const result = await deleteStoreOwnerAndStoreByAdmin(storeOwnerId, storeId);
-  if(!result.ok) return next(returnError(result));
+  if (!result.ok) return next(returnError(result));
 
   response.status(204).json({
-    success:true,
-    message:result.result
+    success: true,
+    message: result.result,
   });
 });
 
-
 export const deleteRegularUser = catchAsync(async (request, response, next) => {
-  const {userId} = request.params;
+  const { userId } = request.params;
 
   const result = await deleteRegularUserAccount(userId);
-  if(!result.ok) return next(returnError(result));
+  if (!result.ok) return next(returnError(result));
 
   response.status(204).json({
-    success:true,
-    message:"تم حذ المستخدم بنجاح"
+    success: true,
+    message: "تم حذ المستخدم بنجاح",
   });
 });

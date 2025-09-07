@@ -1,6 +1,6 @@
 import authentica from "@config/authentica";
 import createNewDiscordUser from "@services/auth/usersServices/createNewDiscordUser";
-import createNewUserAndSendConfirmationEmail from "@services/auth/usersServices/createNewUserAndSendConfirmationEmail";
+import createNewUserAndSendConfirmationEmail from "@services/nonAuth/credentialsServices/signup/signupNewUserAndSendConfirmationEmail";
 import getCredentialsVerifyResult from "@services/nonAuth/credentialsServices/login/getCredentialsVerifyResult";
 import loginMethodValidator from "@services/nonAuth/credentialsServices/login/loginMethodValidator";
 import { AuthenticaResponse, AuthenticaSendOTPDataBody, AuthenticaVerifyOTPDataBody } from "@Types/externalAPIs/AuthenticaOTP";

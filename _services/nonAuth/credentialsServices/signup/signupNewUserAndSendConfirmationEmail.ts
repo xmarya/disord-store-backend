@@ -6,7 +6,7 @@ import { CredentialsSignupData } from "@Types/Schema/Users/SignupData";
 import generateEmailConfirmationToken from "@utils/generators/generateEmailConfirmationToken";
 import { startSession } from "mongoose";
 
-async function createNewUserAndSendConfirmationEmail(signupData: CredentialsSignupData, emailTokenGenerator: { hostname: string; protocol: string }) {
+async function signupNewUserAndSendConfirmationEmail(signupData: CredentialsSignupData, emailTokenGenerator: { hostname: string; protocol: string }) {
   const { firstName, lastName, email, userType } = signupData;
   const data = { firstName, lastName, email, signMethod: "credentials", userType };
 
@@ -44,4 +44,4 @@ async function createNewUserAndSendConfirmationEmail(signupData: CredentialsSign
   return newUser;
 }
 
-export default createNewUserAndSendConfirmationEmail;
+export default signupNewUserAndSendConfirmationEmail;
