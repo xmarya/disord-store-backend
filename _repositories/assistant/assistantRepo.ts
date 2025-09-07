@@ -20,8 +20,6 @@ export async function createAssistant(data: StoreAssistantData) {
     //STEP : create a new assistant:
     const assistant = await StoreAssistant.create([{ ...data }], { session });
 
-    console.log("whatigot", assistant);
-
     //STEP 3) insert assistant data in store without registering it to the session to
     //  reduce the number of operations inside the critical section
     // (since th transactions should be as short as possible):
