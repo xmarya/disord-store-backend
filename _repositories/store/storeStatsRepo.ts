@@ -243,5 +243,5 @@ soldProductsUpdate.$inc =>  {
 }
 
 export async function deleteStoreStats(storeId: MongoId, session: mongoose.ClientSession) {
-  await StoreStats.deleteOne({ store: storeId }).session(session);
+  return await StoreStats.deleteOne({ store: storeId }).session(session);
 }

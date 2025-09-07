@@ -41,5 +41,5 @@ so, to overwrite the existing array, $set should be used instead of $addToSet; s
 a category if not exist, it doesn't remove any removed category */
 
 export async function deleteAllProducts(storeId: MongoId, session: mongoose.ClientSession) {
-  await Product.deleteMany({ store: storeId }).session(session);
+  return await Product.deleteMany({ store: storeId }).session(session);
 }

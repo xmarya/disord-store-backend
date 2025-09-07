@@ -85,7 +85,7 @@ export async function deleteAllAssistants(storeId: MongoId, session: mongoose.Cl
   //STEP 1) get all the assistants ids based on the storeId to delete them from assistants collection:
   // const assistantsId = await StoreAssistant.find({ inStore: storeId }).select("assistant"); // this is going to have the mongodb default _id and the assistant field
 
-  await StoreAssistant.deleteMany({ inStore: storeId }).session(session);
+  return await StoreAssistant.deleteMany({ inStore: storeId }).session(session);
 
   //STEP 2) delete them using the same assistants ids from users collection:
   // const userIds = assistantsId.map((a) => a.assistant); // to only extract the assistant filed that holds a reference to the User
