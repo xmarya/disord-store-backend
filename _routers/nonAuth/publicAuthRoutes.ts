@@ -25,5 +25,3 @@ router.patch("/resetPassword/:randomToken", validateRequestParams("randomToken")
 router.post("/forgetPassword", forgetPassword);
 
 router.post("/administrator-login", credentialsLogin, verifyLoginData, restrict("admin"), getAuthenticaBalance, sendOTP);
-router.post("/administrator-forgetPassword", forgetPassword);
-router.route("/resetPassword/:randomToken").patch(validateRequestParams("randomToken"), resetPassword);
