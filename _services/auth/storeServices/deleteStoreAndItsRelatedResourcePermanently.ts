@@ -28,7 +28,6 @@ async function deleteStoreAndItsRelatedResourcePermanently(storeId: MongoId, ses
   //STEP 7) delete the store:
   await deleteStore(storeId, session);
 
-  //TODO: // ADD FEATURE for adding the deleted data to an AdminLog
 }
 
 export default deleteStoreAndItsRelatedResourcePermanently;
