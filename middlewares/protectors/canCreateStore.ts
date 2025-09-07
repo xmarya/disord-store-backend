@@ -1,4 +1,4 @@
-import getStoreOf from "@services/auth/storeServices/getStoreOf";
+import getStoreOf from "@services/auth/storeServices/getStoreOfOwner";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 

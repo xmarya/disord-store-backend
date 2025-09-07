@@ -1,11 +1,10 @@
-import deleteUser from "@services/auth/usersServices/deleteUser";
-import { AppError } from "@Types/ResultTypes/errors/AppError";
+import getProfileFactory from "@services/_sharedServices/getUserProfileFactory";
+import deleteRegularUserAccount from "@services/auth/usersServices/deleteRegularUserAccount";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 import type { Request, Response } from "express";
 import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
-import getProfileFactory from "@services/_sharedServices/getUserProfileFactory";
 
 export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -25,13 +24,13 @@ export const getUserProfileController = catchAsync(async (request, response, nex
 export const deleteUserAccountController = catchAsync(async (request, response, next) => {
   const { userId } = request.params;
 
-  const result = await deleteUser(userId);
+  const result = await deleteRegularUserAccount(userId);
 
-  if (result.isErr()) return next(new AppError(400, result.error));
+  if (!result.ok) return next(returnError(result));
 
   response.status(204).json({
     success: true,
-    message: result.value,
+    message: "تم حذف المستخدم بنجاح",
   });
 });
 
