@@ -3,7 +3,7 @@ import { TTLMap } from "@Types/externalAPIs/RedisCache";
 export const SUBSCRIPTION_PERIOD = 30;
 export const PLAN_TRIAL_PERIOD = 10;
 
-export const LOGIN_OTP = 60; // two minutes
+export const LOGIN_OTP = 300; /* CHANGE LATER:  to 1 minute*/ 
 export const REDIS_SHORT_TTL = 120; // two minutes
 // export const REDIS_LONG_TTL = 300; // 5 minutes
 export const REDIS_LONG_TTL = 900; // 15 minutes
