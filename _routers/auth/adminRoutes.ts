@@ -37,7 +37,7 @@ router
     2- create unlimited plan user
     3- delete user
 */
-router.post("/storeOwner/unlimitedUser", sanitisedData, validateUnlimitedUserData, createUnlimitedUserController); 
+router.post("/storeOwners/unlimitedUser", sanitisedData, validateUnlimitedUserData, createUnlimitedUserController); 
 router.route("/storeOwners").get(getAllStoreOwnersController).delete(deleteStoreOwnerAndStore); 
 router
   .route("/storeOwners/:storeOwnerId")
