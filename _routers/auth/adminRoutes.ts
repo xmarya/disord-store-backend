@@ -10,7 +10,7 @@ import {getAdminProfileController } from "../../controllers/auth/admin/adminAuth
 import { getMonthlyPlansStatsController, getPlanController, getPlansStatsReportController, updatePlanController } from "../../controllers/auth/admin/adminPlansController";
 import { displayReviewInHomePageController } from "../../controllers/auth/admin/adminReviewsController";
 import { deleteStore, getAllStoresInfo, getOneStoreInfo, suspendStore } from "../../controllers/auth/admin/adminStoresController";
-import { createAdminController, createUnlimitedUserController, getAllUsersController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
+import { createAdminController, createUnlimitedUserController, deleteRegularUser, deleteStoreOwnerAndStore, getAllStoreOwnersController, getAllUsersController, getOneStoreOwnerController, getOneUserController } from "../../controllers/auth/admin/adminUsersController";
 import { deletePlatformReviewController, getAllPlatformReviewsController } from "../../controllers/auth/reviews/platformReviewController";
 import { deleteUserAccountController } from "../../controllers/auth/userAuthController";
 import { confirmChangePasswordController, updateProfileController } from "controllers/auth/authSettingsController";
@@ -18,9 +18,9 @@ import { confirmChangePasswordController, updateProfileController } from "contro
 export const router = express.Router();
 
 router.use(restrict("admin"));
-router.route("/").get(getAdminProfileController).patch(updateProfileController); /*✅*/
-router.post("/administratorUser", sanitisedData, validateNewUserData, createAdminController); /*✅*/
-router.route("/changePassword").patch(validateChangePassword, confirmChangePasswordController); /*✅*/
+router.route("/").get(getAdminProfileController).patch(updateProfileController); 
+router.post("/administratorUser", sanitisedData, validateNewUserData, createAdminController);
+router.route("/changePassword").patch(validateChangePassword, confirmChangePasswordController);
 
 /* STORES 
     1- patch route for suspend store
@@ -37,12 +37,17 @@ router
     2- create unlimited plan user
     3- delete user
 */
-router.post("/users/unlimitedUser", sanitisedData, validateUnlimitedUserData, createUnlimitedUserController); /*✅*/
-router.get("/users", getAllUsersController); /*✅*/
+router.post("/storeOwner/unlimitedUser", sanitisedData, validateUnlimitedUserData, createUnlimitedUserController); 
+router.route("/storeOwners").get(getAllStoreOwnersController).delete(deleteStoreOwnerAndStore); 
+router
+  .route("/storeOwners/:storeOwnerId")
+  .get(validateRequestParams("storeOwnerId"),getOneStoreOwnerController) ;
+
+router.get("/users", getAllUsersController); 
 router
   .route("/users/:userId")
-  .get(validateRequestParams("userId"), getOneUserController) /*✅*/
-  .delete(validateRequestParams("userId"), deleteUserAccountController);
+  .get(validateRequestParams("userId"),getOneUserController) 
+  .delete(validateRequestParams("userId"), deleteRegularUser);
 
 /* PLANS 
     1- get route for plans stats ✅
@@ -52,8 +57,8 @@ router
 
 
 // rule of 👍🏻: remember to keep the specific routes at the top of the routes stack, whilst keeping the general -especially that has /:params) at the bottom of the stack
-router.get("/plans/monthlyStats", getDateQuery, getMonthlyPlansStatsController); /*✅*/ // for displaying data per month (the default is this month)
-router.get("/plans/plansReports", getPlansStatsReportController); /*✅*/
+router.get("/plans/monthlyStats", getDateQuery, getMonthlyPlansStatsController);  // for displaying data per month (the default is this month)
+router.get("/plans/plansReports", getPlansStatsReportController); 
 
 router
   .route("/plans/:planId")
