@@ -12,16 +12,6 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
       unique: true,
       required: [true, "the email field is required"],
     },
-    credentials: {
-      password: {
-        type: String,
-        minLength: [8, "your password must be at least 8 characters"],
-        select: false,
-      },
-      passwordResetToken: String,
-      passwordResetExpires: Date,
-      passwordChangedAt: Date,
-    },
     firstName: { type: String, required: [true, "the firstName field is required"] },
     lastName: { type: String, required: [true, "the lastName field is required"] },
     phoneNumber: {
