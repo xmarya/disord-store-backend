@@ -8,7 +8,7 @@ import { UnlimitedStoreOwnerData } from "@Types/Schema/Users/StoreOwner";
 import { startSession } from "mongoose";
 import { err } from "neverthrow";
 
-async function createUnlimitedPlanAndStoreOwner(unlimitedPlanDetails: Omit<UnlimitedPlanDataBody, "planName">, storeOwnerData: UnlimitedStoreOwnerData) {
+async function createUnlimitedPlanAndOwnerByAdmin(unlimitedPlanDetails: Omit<UnlimitedPlanDataBody, "planName">, storeOwnerData: UnlimitedStoreOwnerData) {
   const session = await startSession();
 
   let newUnlimitedStoreOwner;
@@ -44,4 +44,4 @@ async function createUnlimitedPlanAndStoreOwner(unlimitedPlanDetails: Omit<Unlim
   return { email: newUnlimitedStoreOwner?.email, subscribedPlanDetails: newUnlimitedStoreOwner?.subscribedPlanDetails };
 }
 
-export default createUnlimitedPlanAndStoreOwner;
+export default createUnlimitedPlanAndOwnerByAdmin;
