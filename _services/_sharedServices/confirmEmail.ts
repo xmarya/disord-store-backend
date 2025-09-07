@@ -11,7 +11,6 @@ import crypto from "crypto";
 
 async function confirmEmail(randomToken: string) {
   const slicedToken = randomToken.slice(TokenSlicer.from, TokenSlicer.to);
-  console.log("confirmEmailslicedToken", slicedToken);
   const data: { id: string; userType: UserTypes } | null = await getRedisHash(`EmailConfirm:${slicedToken}`);
 
   if (!data) return new BadRequest("انتهت المدة المسموحة لرابط التفعيل");
