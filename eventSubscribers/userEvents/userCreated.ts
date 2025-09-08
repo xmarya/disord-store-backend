@@ -32,7 +32,6 @@ eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
 
   const slicedTokenKey = randomToken!.slice(TokenSlicer.from, TokenSlicer.to);
   const key = `EmailConfirm:${slicedTokenKey}`;
-  console.log("Redis listener: key", key);
 
   const safeCreateRedisHash = ResultAsync.fromThrowable(
     () => createRedisHash(key, cacheData, "one-hour"),
