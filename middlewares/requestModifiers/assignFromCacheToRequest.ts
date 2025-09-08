@@ -14,7 +14,6 @@ export const assignFromCacheToRequest = catchAsync(async (request, response, nex
   let storeId = userType === "storeOwner" ? request.user.myStore : request.user.inStore;
   if(!storeId) return next(returnError(new NotFound("لم يتم العثور على المتجر")));
 
-  console.log("does it search for the store.id as undefined which makes it loop forever producing the same result?", storeId);
   request.store = storeId;
   
   const key = `StoreAndPlan:${storeId}`;

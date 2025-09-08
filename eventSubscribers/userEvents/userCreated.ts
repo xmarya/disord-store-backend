@@ -1,4 +1,3 @@
-console.log("event subscriber user created listener");
 import eventBus from "@config/EventBus";
 import { TokenSlicer } from "@constants/dataStructures";
 import { createRedisHash } from "@externals/redis/redisOperations/redisHash";
