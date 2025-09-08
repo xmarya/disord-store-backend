@@ -69,9 +69,10 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
 // caching the store and the plan
 eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
   const { subscriptionType, planId, planName, planExpiryDate, storeOwner } = event.payload;
+  const doesHaveStore = !!storeOwner.myStore;
   const isUnlimitedPlan = planName === "unlimited";
   const isRenewal = subscriptionType === "renewal";
-  if (isRenewal || isUnlimitedPlan) return;
+  if (!doesHaveStore || isRenewal || isUnlimitedPlan) return;
 
   const isPaid = subscriptionType === "cancellation" ? false : true;
 

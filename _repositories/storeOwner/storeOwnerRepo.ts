@@ -10,6 +10,17 @@ export async function createNewStoreOwner(signupData: Omit<CredentialsSignupData
 
   return newStoreOwner[0];
 }
+
+export async function assignStoreToOwner(storeOwnerId: MongoId, storeId: MongoId) {
+  return await StoreOwner.findByIdAndUpdate(
+    storeOwnerId,
+    {
+      myStore: storeId,
+    },
+    {new: true}
+  );
+}
+
 export async function createNewUnlimitedUser(data: UnlimitedStoreOwnerData, session: mongoose.ClientSession) {
   return await StoreOwner.findOneAndUpdate({ email: data.email }, { ...data }, { runValidators: true, new: true, upsert: true, setDefaultsOnInsert: true }).session(session);
 }
