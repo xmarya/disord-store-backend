@@ -76,3 +76,73 @@ export const GetCouponById = async (req: Request, res: Response): Promise<void> 
     HandleErrorResponse(error, res);
   }
 };
+
+// Get all coupons for a store
+export const GetAllCoupons = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { storeId } = req.params;
+
+    // Verify store exists
+    const store = await Store.findById(storeId);
+    if (!store) {
+      res.status(404).json({
+        status: "failed",
+        message: "Store not found",
+      });
+      return;
+    }
+
+    const coupons = await Coupon.find({ storeId })
+      .sort({ createdAt: -1 });
+
+    // If no coupons found
+    if (!coupons || coupons.length === 0) {
+      res.status(200).json({
+        status: "success",
+        results: 0,
+        data: {
+          coupons: []
+        },
+        message: "No coupons found for this store"
+      });
+      return;
+    }
+
+    res.status(200).json({
+      status: "success",
+      results: coupons.length,
+      data: {
+        coupons
+      }
+    });
+  } catch (error) {
+    HandleErrorResponse(error, res);
+  }
+};
+
+// Delete coupon
+export const DeleteCoupon = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { couponId } = req.params;
+
+    const deletedCoupon = await Coupon.findByIdAndDelete(couponId);
+
+    if (!deletedCoupon) {
+      res.status(404).json({
+        status: "failed",
+        message: "Coupon not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Coupon deleted successfully",
+      data: {
+        deletedCoupon
+      }
+    });
+  } catch (error) {
+    HandleErrorResponse(error, res);
+  }
+};
