@@ -3,8 +3,7 @@ dotenv.config({ path: "./.env" });
 import { Novu } from "@novu/api";
 const development = process.env.NODE_ENV === "development";
 const secretKey = development ? process.env.NOVU_DEVELOPMENT_KEY : process.env.NOVU_PRODUCTION_KEY;
-console.log("what is the evn?", development);
-console.log("what is novu key", secretKey, );
+
 const novu = new Novu({ secretKey });
 
 export default novu;
