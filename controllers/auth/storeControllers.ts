@@ -2,7 +2,7 @@ import createNewStore from "@services/auth/storeServices/createNewStore";
 import updateStore from "@services/auth/storeServices/updateStore";
 import updateStoreStatus from "@services/auth/storeServices/updateStoreStatus";
 import deleteMyStore from "@services/auth/storeOwnerServices/deleteMyStore";
-import { StoreDataBody, StoreDocument } from "@Types/Schema/Store";
+import { StoreDataBody } from "@Types/Schema/Store";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
@@ -20,11 +20,13 @@ export const createStoreController = catchAsync(async (request, response, next) 
 
   const result = await createNewStore(storeOwner, request.body, request.emailConfirmed);
 
-  if (!(result as StoreDocument)?.id) return next(result);
+  if(!result.ok) return next(returnError(result));
+
+  const {result :newStore} = result;
 
   response.status(201).json({
     success: true,
-    data: { newStore: result },
+    data: { newStore },
   });
 });
 

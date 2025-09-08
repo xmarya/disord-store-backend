@@ -1,8 +1,9 @@
 import eventBus from "@config/EventBus";
 import { createStore } from "@repositories/store/storeRepo";
-import assignStoreToOwner from "@services/auth/storeOwnerServices/assignStoreToOwner";
+import { assignStoreToOwner } from "@repositories/storeOwner/storeOwnerRepo";
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
 import { FullStoreDataBody, StoreDataBody } from "@Types/Schema/Store";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
@@ -24,11 +25,13 @@ async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDa
   const { result: newStore } = createStoreResult;
 
   const safeAssignStoreToOwner = safeThrowable(
-    () => assignStoreToOwner(newStore.id, data.owner),
+    () => assignStoreToOwner(data.owner, newStore.id),
     (error) => new Failure((error as Error).message)
   );
 
   const assignStoreToOwnerResult = await extractSafeThrowableResult(() => safeAssignStoreToOwner);
+  // BUG: when the assigning process fails, the data are going to be inconsistent
+  // TODO: recover failing
   if (!assignStoreToOwnerResult.ok) return assignStoreToOwnerResult;
   const { result: updatedStoreOwner } = assignStoreToOwnerResult;
 
@@ -42,9 +45,10 @@ async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDa
     occurredAt: new Date(),
   };
 
+  console.log("whattheeventpayload", event.payload.user);
   eventBus.publish(event);
 
-  return newStore;
+  return new Success(newStore);
 }
 
 export default createNewStore;
