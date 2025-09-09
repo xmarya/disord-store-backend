@@ -22,7 +22,9 @@ export async function updateEmail(oldEmail:string, newEmail:string, session: mon
   // TODO: downgrading the plan to basic deleting all the assistant data
 }
 
-export async function deleteCredentials(session: mongoose.ClientSession) {}
+export async function deleteCredentials(email:string, session: mongoose.ClientSession) {
+  return await Credentials.findOneAndDelete({email}).session(session);
+}
 
 export async function getResetPasswordCredentials(hashedToken: string) {
   return await Credentials.findOne({ passwordResetToken: hashedToken, passwordResetExpires: { $gt: new Date() } });
