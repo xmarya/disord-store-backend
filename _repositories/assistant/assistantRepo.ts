@@ -34,23 +34,8 @@ export async function getOneAssistant(assistantId: string):Promise<StoreAssistan
 }
 */
 
-export async function deleteAssistant(assistantId: MongoId, storeId: MongoId) {
-  const session = await startSession();
-  let deletedAssistant: StoreAssistantDocument | null;
-  session.startTransaction();
-  try {
-    await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: assistantId } }, { session });
-    deletedAssistant = await StoreAssistant.findOneAndDelete({ id: assistantId }, { session });
-
-    await session.commitTransaction();
-    return deletedAssistant;
-  } catch (error) {
-    await session.abortTransaction();
-    console.log((error as Error).message);
-    return new Failure("لم تتم العملية بنجاح. حاول مجددًا");
-  } finally {
-    await session.endSession();
-  }
+export async function deleteAssistant(assistantId: MongoId, storeId: MongoId, session:mongoose.ClientSession) {
+  return await StoreAssistant.findOneAndDelete({ id: assistantId, inStore: storeId }, { session });
 }
 
 export async function getAssistantPermissions(assistantId: MongoId, storeId: MongoId) {

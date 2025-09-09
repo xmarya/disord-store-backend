@@ -1,5 +1,6 @@
 import createNewAssistantInStore from "@services/auth/storeOwnerServices/createNewAssistantInStore";
-import deleteStoreAssistant from "@services/auth/storeOwnerServices/storeAssistant/deleteStoreAssistantAccount";
+import deleteOneAssistantByStoreOwner from "@services/auth/storeOwnerServices/deleteOneAssistantByStoreOwner";
+import deleteStoreAssistant from "@services/auth/storeOwnerServices/storeAssistant/deleteAssistantAccount";
 import getAllStoreAssistants from "@services/auth/storeOwnerServices/storeAssistant/getAllStoreAssistants";
 import getOneAssistant from "@services/auth/storeOwnerServices/storeAssistant/getAssistantProfile";
 import updateStoreAssistant from "@services/auth/storeOwnerServices/storeAssistant/updateStoreAssistant";
@@ -66,7 +67,7 @@ export const deleteAssistantController = catchAsync(async (request, response, ne
   const storeId = request.store;
   const { assistantId } = request.params;
 
-  const result = await deleteStoreAssistant(assistantId, storeId);
+  const result = await deleteOneAssistantByStoreOwner({assistantId, storeId});
 
   if (!result.ok) return next(returnError(result));
 
