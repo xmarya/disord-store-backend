@@ -1,7 +1,6 @@
 import StoreAssistant from "@models/storeAssistantModel";
 import Store from "@models/storeModel";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
 import { StoreAssistant as StoreAssistantData, StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
 import mongoose, { startSession } from "mongoose";
@@ -13,15 +12,14 @@ import mongoose, { startSession } from "mongoose";
 */
 
 export async function createAssistant(data: StoreAssistantData, session: mongoose.ClientSession) {
-    const assistant = await StoreAssistant.create([{ ...data }], { session });
+  const assistant = await StoreAssistant.create([{ ...data }], { session });
 
-    //STEP 2) insert assistant data in store
-    //  reduce the number of operations inside the critical section
-    // (since th transactions should be as short as possible):
-    await Store.findByIdAndUpdate(data.inStore, { $addToSet: { storeAssistants: assistant[0].id } }, { session });
+  //STEP 2) insert assistant data in store
+  //  reduce the number of operations inside the critical section
+  // (since th transactions should be as short as possible):
+  await Store.findByIdAndUpdate(data.inStore, { $addToSet: { storeAssistants: assistant[0].id } }, { session });
 
   return assistant[0];
-
 }
 
 /* OLD CODE (kept for reference):  
@@ -61,7 +59,7 @@ export async function getAssistantPermissions(assistantId: MongoId, storeId: Mon
 
 export async function updateAssistant(assistantId: MongoId, storeId: MongoId, permission: any, anotherData: any) {
   return await StoreAssistant.findOneAndUpdate(
-    { id: assistantId, inStore: storeId },
+    { _id: assistantId, inStore: storeId },
     {
       $set: { ...permission, ...anotherData },
     },
@@ -74,6 +72,7 @@ export async function deleteAllAssistants(storeId: MongoId, session: mongoose.Cl
   // const assistantsId = await StoreAssistant.find({ inStore: storeId }).select("assistant"); // this is going to have the mongodb default _id and the assistant field
 
   return await StoreAssistant.deleteMany({ inStore: storeId }).session(session);
+  //TODO event for deleting all assistants credentials (HOW?)
 
   //STEP 2) delete them using the same assistants ids from users collection:
   // const userIds = assistantsId.map((a) => a.assistant); // to only extract the assistant filed that holds a reference to the User
