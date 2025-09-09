@@ -1,8 +1,8 @@
 import { DomainEvent } from "@Types/events/DomainEvent";
-import OutboxRecordEvents from "@Types/events/OutboxEvents";
+import { OutboxRecordData } from "@Types/Schema/OutboxRecord";
 
 
-async function createNewOutboxRecord<T extends DomainEvent>(recordData:OutboxRecordEvents<T>) {
+async function createNewOutboxRecord<T extends DomainEvent>(recordData:OutboxRecordData<T>) {
     const {} = recordData;
 }
 

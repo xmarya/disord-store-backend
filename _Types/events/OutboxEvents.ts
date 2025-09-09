@@ -1,27 +1,42 @@
 import { DomainEvent } from "./DomainEvent";
-import { startSession } from "mongoose";
+import mongoose, { startSession } from "mongoose";
 
-export default interface OutboxRecordEvents<T extends DomainEvent> {
-//   aggregateId: MongoId;
-  type: T["type"];
-  payload: T["payload"];
+export default interface OutboxEvent extends DomainEvent {
+  //   aggregateId: MongoId;
   status: "pending" | "completed" | "failed";
-  retryCount:number;
-  for?: string; 
+  retryCount: number;
+  for?: string;
 }
 
-interface InternalsOutboxRecord<T extends DomainEvent> extends OutboxRecordEvents<T> {
-  readonly type: T["type"];
-  readonly payload: T["payload"];
-  status: "pending" | "completed" | "failed";
-  retryCount:number;
-  for?: string; // ??
+
+interface InternalsOutboxEvent extends OutboxEvent {}
+
+interface ExternalsOutboxEvent extends OutboxEvent {}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// using mongoose client session
+async function sessionWithSafeThrowable() {
+  const session = await startSession();
+  await session.withTransaction(async () => {
+    // update owner subscription();
+    // update store inPlan()
+    // updated assistants inPlan()
+  });
 }
 
-interface ExternalsOutboxRecord<T extends DomainEvent> extends OutboxRecordEvents<T> {
-  type: T["type"];
-  payload: T["payload"];
-  status: "pending" | "completed" | "failed";
-  for?: string; // ??
-}
-
+// using ResultAsync.combine()
+async function safeTransition() {}
