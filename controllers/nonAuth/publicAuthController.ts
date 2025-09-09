@@ -29,8 +29,6 @@ export const oldCredentialsLogin = catchAsync(async (request, response, next) =>
   request.user = loggedInUser;
   request.emailConfirmed = emailConfirmed;
 
-  console.log("whereismystore??", loggedInUser);
-
   response.status(200).json({
     success: true,
     data: {
