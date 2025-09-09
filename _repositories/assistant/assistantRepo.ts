@@ -1,7 +1,6 @@
 import StoreAssistant from "@models/storeAssistantModel";
 import Store from "@models/storeModel";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
 import { StoreAssistant as StoreAssistantData, StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
 import mongoose, { startSession } from "mongoose";
