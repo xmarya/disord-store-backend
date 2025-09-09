@@ -9,7 +9,7 @@ import { StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
 
 async function getAssistantProfile(assistantId: MongoId, storeId?: MongoId) {
   let condition:QueryOptions<StoreAssistantDocument>["condition"];
-  condition = storeId ? { inStore: storeId, assistant: assistantId } : {id: assistantId};
+  condition = storeId ? { inStore: storeId, id: assistantId } : {id: assistantId};
   
   const safeGetAssistant = safeThrowable(
     () => getOneDocByFindOne(StoreAssistant, { condition }),

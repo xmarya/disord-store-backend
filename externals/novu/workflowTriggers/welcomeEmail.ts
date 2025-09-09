@@ -19,6 +19,7 @@ async function novuSendWelcome(workflowId: "welcome-admin" | "welcome-store-owne
       emailConfirmationToken,
     },
   });
+
 }
 
 export default novuSendWelcome;

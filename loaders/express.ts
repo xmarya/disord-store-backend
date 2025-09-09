@@ -11,7 +11,7 @@ const allowedOrigins = [
   "https://sa-ss-project.vercel.app"
 ]
 export default async function expressLoader(app: Application) {
-  // app.set("trust proxy", true);
+  app.set("trust proxy", true);
   const limiter = ratelimit({
     max: 100, // #requests per hour.
     windowMs: 60 * 60 * 100, // the calculation of 1 hour.

@@ -1,4 +1,3 @@
-console.log("event subscriber user created listener");
 import eventBus from "@config/EventBus";
 import { TokenSlicer } from "@constants/dataStructures";
 import { createRedisHash } from "@externals/redis/redisOperations/redisHash";
@@ -33,7 +32,6 @@ eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
 
   const slicedTokenKey = randomToken!.slice(TokenSlicer.from, TokenSlicer.to);
   const key = `EmailConfirm:${slicedTokenKey}`;
-  console.log("Redis listener: key", key);
 
   const safeCreateRedisHash = ResultAsync.fromThrowable(
     () => createRedisHash(key, cacheData, "one-hour"),

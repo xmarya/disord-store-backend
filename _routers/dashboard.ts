@@ -43,7 +43,7 @@ router.use("/platform/reviews", platformReviewsRouter);
 
 // for testing purpose:
 router.post("/test-invoices", testInvoiceController);
-router.use(assignFromCacheToRequest, assignStoreIdToRequest, assignPlanIdToRequest, verifyPlanSubscription);
+router.use(assignFromCacheToRequest, /*assignStoreIdToRequest,*/ assignPlanIdToRequest, verifyPlanSubscription);
 
 router.use("/store", storeRouter);
 router.use("/products", productRouter);
@@ -52,3 +52,8 @@ router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
 
+
+/* TODO
+    1- blocking the assistants accounts if any in case the owner downgraded the plan to basic
+    2- check Novu settings in the production, the welcome email, registering new subscribers don't work
+*/
