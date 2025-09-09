@@ -11,13 +11,13 @@ export async function createNewStoreOwner(signupData: Omit<CredentialsSignupData
   return newStoreOwner[0];
 }
 
-export async function assignStoreToOwner(storeOwnerId: MongoId, storeId: MongoId) {
+export async function assignStoreToOwner(storeOwnerId: MongoId, storeId: MongoId, session: mongoose.ClientSession) {
   return await StoreOwner.findByIdAndUpdate(
     storeOwnerId,
     {
       myStore: storeId,
     },
-    {new: true}
+    { new: true, session }
   );
 }
 
@@ -26,16 +26,9 @@ export async function createNewUnlimitedUser(data: UnlimitedStoreOwnerData, sess
 }
 
 export async function resetStoreOwnerToDefault(storeId: MongoId, session: mongoose.ClientSession) {
-  // await User.updateOne({_id: storeOwnerId}, {
-  //     userType:"user",
-  //     $unset: {
-  //         myStore: ""
-  //     }
-  // }).session(session);
   await StoreOwner.updateOne(
     { myStore: storeId },
     {
-      // userType: "user",
       $unset: {
         myStore: "",
       },

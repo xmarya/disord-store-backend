@@ -2,50 +2,35 @@ import eventBus from "@config/EventBus";
 import { createStore } from "@repositories/store/storeRepo";
 import { assignStoreToOwner } from "@repositories/storeOwner/storeOwnerRepo";
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
-import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import { FullStoreDataBody, StoreDataBody } from "@Types/Schema/Store";
+import { AllUsers } from "@Types/Schema/Users/AllUser";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
-import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
-import safeThrowable from "@utils/safeThrowable";
+import { startSession } from "mongoose";
 
-async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDataBody, emailConfirmed:boolean) {
+async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDataBody, emailConfirmed: boolean) {
   const { storeName, description, logo } = storeData;
   //TODO: handling logo and uploading it to cloudflare
   const data: FullStoreDataBody = { storeName, description, logo, owner: storeOwner.id, inPlan: storeOwner.subscribedPlanDetails.planName };
+  const session = await startSession();
 
-  const safeCreateStore = safeThrowable(
-    () => createStore(data),
-    (error) => new Failure((error as Error).message)
-  );
-
-  const createStoreResult = await extractSafeThrowableResult(() => safeCreateStore);
-  if (!createStoreResult.ok) return createStoreResult;
-
-  const { result: newStore } = createStoreResult;
-
-  const safeAssignStoreToOwner = safeThrowable(
-    () => assignStoreToOwner(data.owner, newStore.id),
-    (error) => new Failure((error as Error).message)
-  );
-
-  const assignStoreToOwnerResult = await extractSafeThrowableResult(() => safeAssignStoreToOwner);
-  // BUG: when the assigning process fails, the data are going to be inconsistent
-  // TODO: recover failing
-  if (!assignStoreToOwnerResult.ok) return assignStoreToOwnerResult;
-  const { result: updatedStoreOwner } = assignStoreToOwnerResult;
+  const {newStore, updatedOwner} = await session.withTransaction(async () => {
+    const newStore = await createStore(data, session);
+    const updatedOwner = await assignStoreToOwner(data.owner, newStore.id, session);
+    
+    return {newStore, updatedOwner}
+  });
 
   const event: UserUpdatedEvent = {
     type: "user.updated",
     payload: {
-      user: updatedStoreOwner,
-      emailConfirmed
+      user: updatedOwner as AllUsers,
+      emailConfirmed,
     },
 
     occurredAt: new Date(),
   };
 
-  console.log("whattheeventpayload", event.payload.user);
   eventBus.publish(event);
 
   return new Success(newStore);
