@@ -6,7 +6,7 @@ export type OutboxRecordData<T extends DomainEvent> = {
   type: T["type"];
   payload: T["payload"];
   status: "pending" | "completed" | "failed";
-  retryCount: number;
+  retryAttempts: number;
   occurredAt: T["occurredAt"];
   for?: string;
 };

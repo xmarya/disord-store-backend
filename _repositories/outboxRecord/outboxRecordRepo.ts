@@ -1,13 +1,23 @@
+import OutboxRecord from "@models/outboxRecordModel";
 import { DomainEvent } from "@Types/events/DomainEvent";
+import { MongoId } from "@Types/Schema/MongoId";
 import { OutboxRecordData } from "@Types/Schema/OutboxRecord";
+import mongoose from "mongoose";
 
 
-async function createNewOutboxRecord<T extends DomainEvent>(recordData:OutboxRecordData<T>) {
-    const {} = recordData;
+export async function createNewOutboxRecord<T extends DomainEvent>(data:OutboxRecordData<T>, session:mongoose.ClientSession) {
+    return await OutboxRecord.create([data], {session});
 }
 
-async function getOneOutboxRecord() {
-
+export async function getOneOutboxRecord(type:string) {
+    await OutboxRecord.findOne({type});
 }
 
-export default { createNewOutboxRecord, getOneOutboxRecord}
+export async function updateOutboxRecordStatus(recordId:MongoId, status: "completed" | "failed"){
+    // NOTE: don't forget to update the retry
+    await OutboxRecord.findOneAndUpdate({id: recordId}, {status}, {new: true});
+}
+
+export async function deleteOutboxCompletedRecord() {
+    await OutboxRecord.deleteMany({status: "completed"});
+}
