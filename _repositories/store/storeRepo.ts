@@ -27,6 +27,10 @@ export async function confirmAuthorization(userId: string, storeId: MongoId): Pr
 export async function updateStoreInPlan(storeOwnerId: string, planName: PlansNames) {
   await Store.findOneAndUpdate({ owner: storeOwnerId }, { inPlan: planName });
 }
+
+export async function updateStoreAssistantArray(storeId:MongoId, assistantId:MongoId, session:mongoose.ClientSession) {
+  await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: assistantId } }, { new:true, session: session });
+}
 export async function deleteStore(storeId: MongoId, session: mongoose.ClientSession) {
   const deletedStore = await Store.findByIdAndDelete(storeId, { session });
 

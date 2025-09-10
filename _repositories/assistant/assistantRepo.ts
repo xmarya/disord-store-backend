@@ -34,23 +34,8 @@ export async function getOneAssistant(assistantId: string):Promise<StoreAssistan
 }
 */
 
-export async function deleteAssistant(assistantId: MongoId, storeId: MongoId) {
-  const session = await startSession();
-  let deletedAssistant: StoreAssistantDocument | null;
-  session.startTransaction();
-  try {
-    await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: assistantId } }, { session });
-    deletedAssistant = await StoreAssistant.findOneAndDelete({ id: assistantId }, { session });
-
-    await session.commitTransaction();
-    return deletedAssistant;
-  } catch (error) {
-    await session.abortTransaction();
-    console.log((error as Error).message);
-    return new Failure("لم تتم العملية بنجاح. حاول مجددًا");
-  } finally {
-    await session.endSession();
-  }
+export async function deleteAssistant(assistantId: MongoId, storeId: MongoId, session:mongoose.ClientSession) {
+  return await StoreAssistant.findOneAndDelete({ id: assistantId, inStore: storeId }, { session });
 }
 
 export async function getAssistantPermissions(assistantId: MongoId, storeId: MongoId) {
@@ -68,13 +53,14 @@ export async function updateAssistant(assistantId: MongoId, storeId: MongoId, pe
 }
 
 export async function deleteAllAssistants(storeId: MongoId, session: mongoose.ClientSession) {
-  //STEP 1) get all the assistants ids based on the storeId to delete them from assistants collection:
-  // const assistantsId = await StoreAssistant.find({ inStore: storeId }).select("assistant"); // this is going to have the mongodb default _id and the assistant field
-
-  return await StoreAssistant.deleteMany({ inStore: storeId }).session(session);
+  //STEP 1) get all the assistants emails based on the storeId to delete them from assistants collection:
+  const assistantsEmails = await StoreAssistant.find({ inStore: "68be82576336d2e9102279ef" }).select("email");
+  await StoreAssistant.deleteMany({ inStore: storeId }).session(session);
   //TODO event for deleting all assistants credentials (HOW?)
 
   //STEP 2) delete them using the same assistants ids from users collection:
   // const userIds = assistantsId.map((a) => a.assistant); // to only extract the assistant filed that holds a reference to the User
   // await User.deleteMany({ _id: { $in: userIds }, userType: "storeAssistant" }).session(session);
+
+  return assistantsEmails;
 }
