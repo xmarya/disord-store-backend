@@ -4,15 +4,15 @@ import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCa
 import novuDeleteSubscriber from "../../externals/novu/subscribers/deleteSubscriber";
 
 eventBus.ofType<UserDeletedEvent>("user.deleted").subscribe(async (event) => {
-  const { userId } = event.payload;
+  const { usersId } = event.payload;
 
-  await novuDeleteSubscriber(userId as string);
+  await novuDeleteSubscriber(usersId);
 });
 
 eventBus.ofType<UserDeletedEvent>("user.deleted").subscribe(async (event) => {
-  const { userId } = event.payload;
+  const { usersId } = event.payload;
 
-  await deleteFromCache(userId as string);
+  await deleteFromCache(usersId);
 });
 
 /*

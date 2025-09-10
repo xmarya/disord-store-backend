@@ -40,6 +40,10 @@ export async function getAllCachedData<T>(key: string): Promise<T[]> {
   return allData;
 }
 
-export async function deleteFromCache(key: string) {
-  await deleteRedisKeyValuePair(key);
+export async function deleteFromCache(keys: Array<string>) {
+  await Promise.all(
+    keys.map(async (key) => {
+      await deleteRedisKeyValuePair(key);
+    })
+  );
 }

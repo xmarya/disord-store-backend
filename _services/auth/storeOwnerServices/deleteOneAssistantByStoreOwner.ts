@@ -30,7 +30,7 @@ async function deleteOneAssistantByStoreOwner(data:Arguments) {
     const event:UserDeletedEvent = {
         type:"user.deleted",
         payload: {
-            userId:assistantId
+            usersId:[assistantId as string]
         },
         occurredAt: new Date()
     }
