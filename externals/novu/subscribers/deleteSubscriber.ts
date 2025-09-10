@@ -1,9 +1,11 @@
 import novu from "@config/novu";
 
-async function novuDeleteSubscriber(subscriberId: string) {
-  const result = await novu.subscribers.delete(subscriberId);
-
-  console.log("novuDeleteSubscriber", result);
+async function novuDeleteSubscriber(subscribersIds: Array<string>) {
+  await Promise.all(
+    subscribersIds.map(async (id) => {
+      await novu.subscribers.delete(id);
+    })
+  );
 }
 
 export default novuDeleteSubscriber;
