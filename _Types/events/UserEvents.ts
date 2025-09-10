@@ -26,7 +26,7 @@ export interface UserUpdatedEvent extends DomainEvent {
 
 export interface UserDeletedEvent extends DomainEvent {
   type: "user.deleted";
-  payload: { usersId: Array<string>, emailsToDelete?:Array<string> };
+  payload: { usersId: Array<string>, emailsToDelete:Array<string> };
   occurredAt: Date;
 }
 
