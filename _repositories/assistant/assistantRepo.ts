@@ -39,7 +39,7 @@ export async function deleteAssistant(assistantId: MongoId, storeId: MongoId, se
 }
 
 export async function getAssistantPermissions(assistantId: MongoId, storeId: MongoId) {
-  return await StoreAssistant.findOne({ id: assistantId, inStore: storeId });
+  return await StoreAssistant.findOne({ _id: assistantId, inStore: storeId });
 }
 
 export async function updateAssistant(assistantId: MongoId, storeId: MongoId, permission: any, anotherData: any) {
