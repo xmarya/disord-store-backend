@@ -16,6 +16,6 @@ export async function getRedisKeyValuePair(key: string) {
   return { result: Boolean(data), data };
 }
 
-export async function deleteRedisKeyValuePair(key: string) {
-  await redis.del(key);
+export async function deleteRedisKeyValuePair(keys: Array<string>) {
+  await redis.del([...keys]);
 }

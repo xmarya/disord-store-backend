@@ -32,7 +32,7 @@ export async function getAllCachedData<T>(key: string): Promise<T[]> {
       // STEP 4) if the original data isn't null, push, then delete it along with its id from the cache:
       allData.push(orgData);
       // delete
-      await deleteRedisKeyValuePair(`${key}:${allIds[index]}`);
+      await deleteRedisKeyValuePair([`${key}:${allIds[index]}`]);
       await deleteFromRedisSet(key, allIds[index]);
     }
   }
@@ -40,10 +40,6 @@ export async function getAllCachedData<T>(key: string): Promise<T[]> {
   return allData;
 }
 
-export async function deleteFromCache(keys: Array<string>) {
-  await Promise.all(
-    keys.map(async (key) => {
-      await deleteRedisKeyValuePair(key);
-    })
-  );
+export async function deleteFromCache(key: Array<string>) {
+  await deleteRedisKeyValuePair(key);
 }
