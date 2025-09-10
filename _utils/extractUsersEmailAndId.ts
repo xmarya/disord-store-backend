@@ -10,6 +10,8 @@ function extractUsersEmailAndId(usersDocs:Array<AllUsers>) {
     emails.push(email);
   });
 
+  return {ids, emails};
+
   /*
     assistantsEmails [
         {
