@@ -4,20 +4,25 @@ import { MongoId } from "@Types/Schema/MongoId";
 import { OutboxRecordData } from "@Types/Schema/OutboxRecord";
 import mongoose from "mongoose";
 
+export async function createNewOutboxRecord<T extends DomainEvent>(data: OutboxRecordData<T>, session: mongoose.ClientSession) {
+  const newOutBoxRecord = await OutboxRecord.create([data], { session });
 
-export async function createNewOutboxRecord<T extends DomainEvent>(data:OutboxRecordData<T>, session:mongoose.ClientSession) {
-    return await OutboxRecord.create([data], {session});
+  return newOutBoxRecord[0];
 }
 
-export async function getOneOutboxRecord(type:string) {
-    await OutboxRecord.findOne({type});
+export async function getAllOutboxRecords<T extends DomainEvent>(type: T["type"]) {
+  await OutboxRecord.find({ type, status: { $ne: "completed" } });
 }
 
-export async function updateOutboxRecordStatus(recordId:MongoId, status: "completed" | "failed"){
-    // NOTE: don't forget to update the retry
-    await OutboxRecord.findOneAndUpdate({id: recordId}, {status}, {new: true});
+export async function getOneOutboxRecord<T extends DomainEvent>(type: T["type"]) {
+  await OutboxRecord.findOne({ type });
 }
 
-export async function deleteOutboxCompletedRecord() {
-    await OutboxRecord.deleteMany({status: "completed"});
+export async function updateOutboxRecordStatus(recordId: MongoId, status: "completed" | "failed", session: mongoose.ClientSession) {
+  // NOTE: don't forget to update the retry
+  await OutboxRecord.findOneAndUpdate({ _id: recordId }, { status }, { new: true, session });
+}
+
+export async function deleteCompletedOutboxRecord() {
+  await OutboxRecord.deleteMany({ status: "completed" });
 }
