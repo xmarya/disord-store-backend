@@ -12,14 +12,14 @@ const outboxRecordSchema = new Schema<OutboxRecordDocument>(
       type: Schema.Types.Mixed,
       required: true,
     },
+    sent: {
+      type: Date,
+      default:null,
+    },
     status: {
       type: String,
-      enum: ["pending", "completed", "failed"],
+      enum: ["pending", "processing",  "completed"],
       default: "pending",
-    },
-    retryAttempts: {
-      type: Number,
-      default: 0,
     },
   },
   {
