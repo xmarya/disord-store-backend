@@ -14,18 +14,15 @@ export async function getAllOutboxRecords<T extends DomainEvent>(type: T["type"]
   await OutboxRecord.find({ type, status: { $ne: "completed" } });
 }
 
-export async function getOneOutboxRecord<T extends DomainEvent>(type: T["type"]) {
-  return await OutboxRecord.findOne({ type });
+export async function getOneOutboxRecordAndProcessingIt() {
+  // NOTE: or find all ?? in I would go with find all, then the updateOutboxRecordStatus should updateMany
+  // return await OutboxRecord.findOne({ type, status: "pending", sent: {$ne: null} });
+  return OutboxRecord.findOneAndUpdate({ status: "pending", sent: {$ne: null} }, {status: "processing", sent: new Date()});
 }
 
-export async function updateOutboxRecordStatus(recordId: MongoId, status: "completed" | "failed", session: mongoose.ClientSession) {
-  // NOTE: don't forget to update the retry when failed
-  const isCompleted = status === "completed";
-  const updatedData:mongoose.UpdateQuery<OutboxRecordDocument> = isCompleted ? { status } : {
-    status,
-    retryAttempts : {$inc: 1}
-  }
-  await OutboxRecord.findOneAndUpdate({ _id: recordId }, updatedData, { new: true, session });
+export async function updateOutboxRecordStatusToCompleted(recordId: MongoId) {
+  
+  return await OutboxRecord.findOneAndUpdate({ _id: recordId }, {status: "completed"}, { new: true });
 }
 
 export async function deleteCompletedOutboxRecord() {
