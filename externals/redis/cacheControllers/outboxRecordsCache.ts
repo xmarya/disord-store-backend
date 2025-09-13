@@ -2,24 +2,13 @@ import { upsertRedisJson, deleteRedisJson, getRedisJson } from "../redisOperatio
 
 const CACHE_KEY = "OutboxRecords";
 
-const formatPath = (eventType: string, outboxRecordId: string, serviceName: string) => `$.["${eventType}"].${outboxRecordId}.${serviceName}` as `$.${string}`;
 
-export async function upsertOutboxRecordInCache(eventType: string, outboxRecordId: string, serviceName: string, data: any) {
-const isKeyExist = await getRedisJson(CACHE_KEY); /* CHANGE LATER: to  CACHE_KEY*/
-  if (!isKeyExist) {
-    const res = await upsertRedisJson(CACHE_KEY, "$", {});
-    console.log(res);
-  }
+export async function upsertOutboxRecordInCache(eventType: string, outboxRecordId: string, /*serviceName: string,*/ data: any) {
+  await upsertRedisJson(CACHE_KEY, "$", {}, "NX");
+  // the creation is in the root ".""
+  // the id MUST be initialised with an empty {} in the section
 
-  const isEventTypeExist = await getRedisJson(CACHE_KEY, `$.${eventType}`);
-
-  if (!isEventTypeExist.length) {
-    // the creation is in the root ".""
-    // the id MUST be initialised with an empty {} in the section
-
-    const res =await upsertRedisJson(CACHE_KEY, `.${eventType}`, {});
-    console.log(res);
-  }
+  await upsertRedisJson(CACHE_KEY, `.${eventType}`, {}, "NX");
   await upsertRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}`, data);
 }
 
@@ -32,20 +21,20 @@ export async function removeCompletedOutboxRecord(eventType: string, outboxRecor
   return await deleteRedisJson("betterTestOutboxRecords", `$.["${eventType}"].${outboxRecordId}`); /* CHANGE LATER: to  CACHE_KEY*/
 }
 
-export async function upsertOutboxRecordInCache2(eventType: string, outboxRecordId: string, serviceName: string, data: any) {
-  const isKeyExist = await getRedisJson("newtest"); /* CHANGE LATER: to  CACHE_KEY*/
-  if (!isKeyExist) {
-    await upsertRedisJson("newtest", "$", {});
-  }
+// export async function upsertOutboxRecordInCache2(eventType: string, outboxRecordId: string, serviceName: string, data: any) {
+//   const isKeyExist = await getRedisJson("newtest"); /* CHANGE LATER: to  CACHE_KEY*/
+//   if (!isKeyExist) {
+//     await upsertRedisJson("newtest", "$", {});
+//   }
 
-  const isEventTypeExist = await getRedisJson("newtest", `$.${eventType}`);
+//   const isEventTypeExist = await getRedisJson("newtest", `$.${eventType}`);
 
-  if (!isEventTypeExist.length) {
-    console.log("insider");
-    // the creation is in the root $
-    // the id MUST be initialised with an empty {} in the section
+//   if (!isEventTypeExist.length) {
+//     console.log("insider");
+//     // the creation is in the root $
+//     // the id MUST be initialised with an empty {} in the section
 
-    await upsertRedisJson("newtest", `.${eventType}`, {});
-  }
-  await upsertRedisJson("newtest", `.${eventType}.${outboxRecordId}`, data);
-}
+//     await upsertRedisJson("newtest", `.${eventType}`, {});
+//   }
+//   await upsertRedisJson("newtest", `.${eventType}.${outboxRecordId}`, data);
+// }

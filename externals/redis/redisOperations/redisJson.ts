@@ -1,7 +1,7 @@
 import redis from "@config/node-redis";
 
-export async function upsertRedisJson(key: string, path: string, data: any) {
-  return await redis.json.set(key, path, data);
+export async function upsertRedisJson(key: string, path: string, data: any, condition?: "NX" | "XX") {
+  return await redis.json.set(key, path, data, {condition});
   // return await redis.call("JSON.SET", key, path, JSON.stringify(data), "NX"); //success = ok, error = ReplyError
 }
 
