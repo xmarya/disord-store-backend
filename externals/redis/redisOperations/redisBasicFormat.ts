@@ -1,4 +1,4 @@
-import redis from "@config/redis";
+import redis from "@config/node-redis";
 
 export async function setRedisKeyValuePair(key: string, data: string, TTL?: number) {
   const result = await redis.set(key, data);
@@ -17,5 +17,5 @@ export async function getRedisKeyValuePair(key: string) {
 }
 
 export async function deleteRedisKeyValuePair(keys: Array<string>) {
-  await redis.del([...keys]);
+  await redis.del([...keys]); /*REQUIRES TESTING*/
 }

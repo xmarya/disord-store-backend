@@ -1,17 +1,17 @@
-import redis from "@config/redis";
+import redis from "@config/node-redis";
 
-export async function createRedisSet(name: string, data: string | number) {
-  const result = Boolean(await redis.sadd(name, data));
+export async function createRedisSet(name: string, data: string) {
+  const result = Boolean(await redis.sAdd(name, data));
   return result;
 }
 
 export async function getRedisSet(name: string) {
-  const data = await redis.smembers(name);
+  const data = await redis.sMembers(name);
   return data;
 }
 
-export async function deleteFromRedisSet(name: string, data: string | number) {
-  const result = Boolean(await redis.srem(name, data));
+export async function deleteFromRedisSet(name: string, data: string) {
+  const result = Boolean(await redis.sRem(name, data));
 
   return result;
 }
