@@ -2,18 +2,34 @@ import eventBus from "@config/EventBus";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
 import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import novuDeleteSubscriber from "../../externals/novu/subscribers/deleteSubscriber";
+import { concatMap } from "rxjs";
+import deletedUserRegister from "eventRegisters/deletedUserRegister";
 
-eventBus.ofType<UserDeletedEvent>("user.deleted").subscribe(async (event) => {
-  const { usersId } = event.payload;
+eventBus
+  .ofType<UserDeletedEvent>("user-deleted")
+  .pipe(
+    concatMap(async (event) => {
+      const { outboxRecordId } = event;
+      const { usersId } = event.payload;
+      const { finished } = deletedUserRegister("novu", outboxRecordId);
+      await novuDeleteSubscriber(usersId); // what should it resturn??
+      finished();
+    })
+  )
+  .subscribe();
 
-  await novuDeleteSubscriber(usersId);
-});
-
-eventBus.ofType<UserDeletedEvent>("user.deleted").subscribe(async (event) => {
-  const { usersId } = event.payload;
-
-  await deleteFromCache(usersId);
-});
+eventBus
+  .ofType<UserDeletedEvent>("user-deleted")
+  .pipe(
+    concatMap(async (event) => {
+      const { outboxRecordId } = event;
+      const { usersId } = event.payload;
+      const { finished } = deletedUserRegister("redis", outboxRecordId);
+      await deleteFromCache(usersId);
+      finished();
+    })
+  )
+  .subscribe();
 
 /*
     NOTE: it's better to place each side-effect in separate subscribe() for:

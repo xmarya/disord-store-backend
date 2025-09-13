@@ -8,7 +8,7 @@ import { NotAssistant } from "@Types/Schema/Users/NotAssistant";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 
 // Novu Listener
-eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
+eventBus.ofType<UserCreatedEvent>("user-created").subscribe((event) => {
   const user = event.payload.user as NotAssistant;
   const confirmUrl = event.payload.confirmUrl;
   const { userType } = user;
@@ -22,7 +22,7 @@ eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
 });
 
 // caching the email confirmation token once user created
-eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
+eventBus.ofType<UserCreatedEvent>("user-created").subscribe((event) => {
   const { user, credentialsId, randomToken } = event.payload;
   const cacheData = {
     id: credentialsId,
@@ -41,7 +41,7 @@ eventBus.ofType<UserCreatedEvent>("user.created").subscribe((event) => {
 });
 
 // caching the email confirmation token once user sending a request for new confirmation email
-eventBus.ofType<EmailConfirmationSentEvent>("emailConfirmation.sent").subscribe((event) => {
+eventBus.ofType<EmailConfirmationSentEvent>("emailConfirmation-sent").subscribe((event) => {
   const { userType, credentialsId, randomToken } = event.payload;
   const cacheData = {
     id: credentialsId,

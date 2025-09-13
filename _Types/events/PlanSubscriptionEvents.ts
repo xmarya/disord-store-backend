@@ -4,7 +4,7 @@ import { MongoId } from "@Types/Schema/MongoId";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 
 export interface PlanSubscriptionUpdateEvent extends DomainEvent {
-  type: "planSubscription.updated";
+  type: "planSubscription-updated";
   payload: {
     storeOwner: StoreOwnerDocument;
     planName: PlansNames;

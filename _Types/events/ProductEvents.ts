@@ -2,7 +2,7 @@ import { MongoId } from "@Types/Schema/MongoId";
 import { DomainEvent } from "./DomainEvent";
 
 export interface ProductUpdatedEvent extends DomainEvent {
-  type: "product.updated";
+  type: "product-updated";
   payload: {
     categories: Array<MongoId>;
     productId: MongoId;
@@ -10,7 +10,7 @@ export interface ProductUpdatedEvent extends DomainEvent {
   occurredAt: Date;
 }
 export interface ProductDeletedEvent extends DomainEvent {
-  type: "product.deleted";
+  type: "product-deleted";
   payload: {
     categories: Array<MongoId>;
     productId: MongoId;

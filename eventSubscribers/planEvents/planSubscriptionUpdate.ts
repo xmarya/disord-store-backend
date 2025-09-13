@@ -10,7 +10,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import safeThrowable from "@utils/safeThrowable";
 
 // update the plans stats:
-eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription-updated").subscribe((event) => {
   const { planName, profit, subscriptionType } = event.payload;
   safeThrowable(
     () => updatePlanMonthlyStats(planName, profit, subscriptionType),
@@ -20,7 +20,7 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
 });
 
 // update the store inPlan field:
-eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription-updated").subscribe((event) => {
   const { storeOwner, planName, subscriptionType } = event.payload;
   if (subscriptionType === "renewal" || planName === "unlimited") return;
 
@@ -33,7 +33,7 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
 
 // TODO update the assistant inPlan field:
 // NOTE: needs a the plan id, not the name
-eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription-updated").subscribe((event) => {
   const { storeOwner, planId } = event.payload;
 
   // safeThrowable(
@@ -44,7 +44,7 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
 });
 
 // link the unlimited store owner id to the unlimited plan
-eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription-updated").subscribe((event) => {
   const { storeOwner, planId, planName } = event.payload;
 
   if (planName !== "unlimited") return;
@@ -56,7 +56,7 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
 });
 
 // caching the updatedUser
-eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription-updated").subscribe((event) => {
   const { storeOwner, planName } = event.payload;
   if (planName === "unlimited") return;
 
@@ -67,7 +67,7 @@ eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscri
 });
 
 // caching the store and the plan
-eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription.updated").subscribe((event) => {
+eventBus.ofType<PlanSubscriptionUpdateEvent>("planSubscription-updated").subscribe((event) => {
   const { subscriptionType, planId, planName, planExpiryDate, storeOwner } = event.payload;
   const doesHaveStore = !!storeOwner.myStore;
   const isUnlimitedPlan = planName === "unlimited";

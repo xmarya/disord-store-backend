@@ -4,21 +4,21 @@ import { DomainEvent } from "./DomainEvent";
 
 export interface UserCreatedEvent extends DomainEvent {
   outboxRecordId: string;
-  type: "user.created";
+  type: "user-created";
   payload: { user: AllUsers; credentialsId: string; confirmUrl: string; randomToken: string };
   occurredAt: Date;
 }
 
 export interface EmailConfirmationSentEvent extends DomainEvent {
   outboxRecordId: string;
-  type: "emailConfirmation.sent";
+  type: "emailConfirmation-sent";
   payload: { userType: UserTypes; credentialsId: string; randomToken: string };
   occurredAt: Date;
 }
 
 export interface UserUpdatedEvent extends DomainEvent {
   outboxRecordId: string;
-  type: "user.updated";
+  type: "user-updated";
   payload: {
     user: AllUsers;
     emailConfirmed?: boolean;
@@ -28,13 +28,13 @@ export interface UserUpdatedEvent extends DomainEvent {
 
 export interface UserDeletedEvent extends DomainEvent {
   outboxRecordId: string;
-  type: "user.deleted";
+  type: "user-deleted";
   payload: { usersId: Array<string>; emailsToDelete: Array<string> };
   occurredAt: Date;
 }
 
 export interface UserLoggedInEvent extends DomainEvent {
-  type: "user.loggedIn";
+  type: "user-loggedIn";
   payload: {
     user: AllUsers;
     emailConfirmed?: boolean;
@@ -43,7 +43,7 @@ export interface UserLoggedInEvent extends DomainEvent {
 }
 export interface UserCredentialsUpdatedEvent extends DomainEvent {
   outboxRecordId: string;
-  type: "userCredentials.updated";
+  type: "userCredentials-updated";
   payload: {
     user: AllUsers;
     emailConfirmed?: boolean;

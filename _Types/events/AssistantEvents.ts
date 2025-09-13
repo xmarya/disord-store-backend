@@ -4,7 +4,7 @@ import { AssistantPermissions } from "@Types/Schema/Users/StoreAssistant";
 import { NovuSubscriberData } from "@Types/externalAPIs/NovuSubscriberData";
 
 export interface AssistantCreatedEvent extends DomainEvent {
-  type: "assistant.created";
+  type: "assistant-created";
   payload: {
     storeId: MongoId;
     novuSubscriber: NovuSubscriberData;
@@ -14,7 +14,7 @@ export interface AssistantCreatedEvent extends DomainEvent {
 }
 
 export interface AssistantUpdatedEvent extends DomainEvent {
-  type: "assistant.updated";
+  type: "assistant-updated";
   payload: {
     assistantId: MongoId;
     storeId: MongoId;
@@ -25,7 +25,7 @@ export interface AssistantUpdatedEvent extends DomainEvent {
 }
 
 export interface AssistantDeletedEvent extends DomainEvent {
-  type: "assistant.deleted";
+  type: "assistant-deleted";
   payload: {
     assistantId: MongoId;
   };

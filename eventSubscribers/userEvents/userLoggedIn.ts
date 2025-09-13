@@ -4,12 +4,11 @@ import { UserLoggedInEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import safeThrowable from "@utils/safeThrowable";
 
+eventBus.ofType<UserLoggedInEvent>("user-loggedIn").subscribe((event) => {
+  const { user } = event.payload;
 
-eventBus.ofType<UserLoggedInEvent>("user.loggedIn").subscribe(event => {
-    const {user} = event.payload;
-
-    safeThrowable(
-        () => cacheUser(user),
-        (error) => new Failure((error as Error).message)
-    )
-})
+  safeThrowable(
+    () => cacheUser(user),
+    (error) => new Failure((error as Error).message)
+  );
+});
