@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@novu/api": "^1.5.0",
+    "amqplib": "^0.10.9",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "bullmq": "^5.56.0",
@@ -39,10 +40,12 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.7",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^24.3.3",
     "@types/pdfkit": "^0.13.9",
     "eslint-plugin-neverthrow": "^1.1.4",
     "nodemon": "^3.1.9",
