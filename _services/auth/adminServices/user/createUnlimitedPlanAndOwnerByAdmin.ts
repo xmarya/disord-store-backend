@@ -16,7 +16,7 @@ async function createUnlimitedPlanAndOwnerByAdmin(unlimitedPlanDetails: Omit<Unl
   try {
     session.startTransaction();
     const newUnlimitedPlan = await createNewUnlimitedPlan({ planName: "unlimited", ...unlimitedPlanDetails }, session);
-    await createNewCredentials({...storeOwnerData, userType: "storeOwner"}, session);
+    if(storeOwnerData.subscriptionType === "new") await createNewCredentials({...storeOwnerData, userType: "storeOwner"}, session);
     newUnlimitedStoreOwner = await createUnlimitedStoreOwner(storeOwnerData, newUnlimitedPlan, session);
 
     await session.commitTransaction();
