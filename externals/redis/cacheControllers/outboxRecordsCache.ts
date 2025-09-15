@@ -1,3 +1,4 @@
+import { OutboxRecordsInfo } from "@Types/events/OutboxRecordManager";
 import { upsertRedisJson, deleteRedisJson, getRedisJson } from "../redisOperations/redisJson";
 
 const CACHE_KEY = "OutboxRecords";
@@ -12,17 +13,17 @@ export async function upsertOutboxRecordInCache(eventType: string, outboxRecordI
   await upsertRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}`, data);
 }
 
-export async function getOutboxRecordsFromCache(): Promise<any> {
-  const result = await getRedisJson<any>("betterTestOutboxRecords"); /* CHANGE LATER: to  CACHE_KEY*/
+export async function getOutboxRecordsFromCache(): Promise<OutboxRecordsInfo> {
+  const result = await getRedisJson<OutboxRecordsInfo>(CACHE_KEY);
   return result;
 }
 
 export async function removeCompletedOutboxRecord(eventType: string, outboxRecordId: string) {
-  return await deleteRedisJson("betterTestOutboxRecords", `$.["${eventType}"].${outboxRecordId}`); /* CHANGE LATER: to  CACHE_KEY*/
+  return await deleteRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}`);
 }
 
 // export async function upsertOutboxRecordInCache2(eventType: string, outboxRecordId: string, serviceName: string, data: any) {
-//   const isKeyExist = await getRedisJson("newtest"); /* CHANGE LATER: to  CACHE_KEY*/
+//   const isKeyExist = await getRedisJson("newtest");
 //   if (!isKeyExist) {
 //     await upsertRedisJson("newtest", "$", {});
 //   }
