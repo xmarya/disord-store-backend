@@ -22,12 +22,13 @@ import refreshToken from "../middlewares/requestModifiers/refreshToken";
 import { sendConfirmationEmail } from "../middlewares/sendConfirmationEmail";
 import { createReviewController } from "../controllers/auth/reviews/publicReviewController";
 import assignFromCacheToRequest from "../middlewares/requestModifiers/assignFromCacheToRequest";
-import { assignStoreIdToRequest } from "../middlewares/requestModifiers/assignStoreIdToRequest";
 import assignPlanIdToRequest from "../middlewares/requestModifiers/assignPlanIdToRequest";
 import canCreateStore from "middlewares/protectors/canCreateStore";
+import { testAnyThingController } from "@controllers/test";
 
 export const router = express.Router();
 
+router.post("/test", testAnyThingController);
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
 router.get("/logout", logout);
