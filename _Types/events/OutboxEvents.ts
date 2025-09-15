@@ -3,7 +3,7 @@ import { DomainEvent } from "./DomainEvent";
 export default interface OutboxEvent extends DomainEvent {
   //   aggregateId: MongoId;
   sent: Date | null;
-  status: "pending" | "processing" | "completed";
+  status: "pending" | "completed";
   for?: string;
 }
 
