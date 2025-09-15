@@ -95,27 +95,27 @@ const storeOwnerSchema = new Schema<StoreOwnerDocument, {}, {}, StoreOwnerVirtua
   }
 );
 
-// // this pre(findOneAndUpdate) for accumulating the count in subscriptionsLog whenever the subscribeStarts field has been modified during a new/renewal subscribing process
-// storeOwnerSchema.pre("findOneAndUpdate", async function (next) {
-//   // STEP 1) get the original doc in order to access the userType and its subscriptionsLog field:
-//   const doc: StoreOwnerDocument = await this.model.findOne(this.getFilter()).select("subscriptionsLog");
+// this pre(findOneAndUpdate) for accumulating the count in subscriptionsLog whenever the subscribeStarts field has been modified during a new/renewal subscribing process
+storeOwnerSchema.pre("findOneAndUpdate", async function (next) {
+  // STEP 1) get the original doc in order to access the userType and its subscriptionsLog field:
+  const doc: StoreOwnerDocument = await this.model.findOne(this.getFilter()).select("subscriptionsLog");
 
-//   // STEP 2) get the to-be-updated fields:
-//   /*✅*/ const updatedFields = this.getUpdate() as mongoose.UpdateQuery<StoreOwnerDocument>;
+  // STEP 2) get the to-be-updated fields:
+  /*✅*/ const updatedFields = this.getUpdate() as mongoose.UpdateQuery<StoreOwnerDocument>;
 
-//   if (!updatedFields?.subscribedPlanDetails?.subscribeStarts) return next(); // don't enter if the updated fields has nothing to do with the subscription
+  if (!updatedFields?.subscribedPlanDetails?.subscribeStarts) return next(); // don't enter if the updated fields has nothing to do with the subscription
 
-//   const { subscribeStarts, planName, paidPrice } = updatedFields.subscribedPlanDetails;
-//   const logsMap = doc.subscriptionsLog;
+  const { subscribeStarts, planName, paidPrice } = updatedFields.subscribedPlanDetails;
+  const logsMap = doc.subscriptionsLog;
 
-//   //STEP 3) insert the new log data:
-//   const key = lightFormat(subscribeStarts, "yyyy-MM-dd");
-//   logsMap.set(key, { planName, price: paidPrice }); // JavaScript Map enforces uniqueness of keys, not values.
+  //STEP 3) insert the new log data:
+  const key = lightFormat(subscribeStarts, "yyyy-MM-dd");
+  logsMap.set(key, { planName, price: paidPrice }); // JavaScript Map enforces uniqueness of keys, not values.
 
-//   // updatedFields.$set = updatedFields.$set ?? {}; need for this line; since it now behaves as UpdateQuery<T>, not as aggregation pipeline
-//   updatedFields.$set.subscriptionsLog = logsMap;
-//   next();
-// });
+  // updatedFields.$set = updatedFields.$set ?? {}; need for this line; since it now behaves as UpdateQuery<T>, not as aggregation pipeline
+  updatedFields.$set.subscriptionsLog = logsMap;
+  next();
+});
 
 // I decided to make this a virtual field, so it will be created and recalculated each time
 // the data is retrieved which maintains the accuracy of how many days exactly are left.
