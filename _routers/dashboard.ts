@@ -25,7 +25,7 @@ import assignFromCacheToRequest from "../middlewares/requestModifiers/assignFrom
 import { assignStoreIdToRequest } from "../middlewares/requestModifiers/assignStoreIdToRequest";
 import assignPlanIdToRequest from "../middlewares/requestModifiers/assignPlanIdToRequest";
 import canCreateStore from "middlewares/protectors/canCreateStore";
-import { createNewSubscribeController } from "@controllers/auth/subscriptionController";
+import { createNewSubscribeController, getMySubscriptionsLogController } from "@controllers/auth/subscriptionController";
 
 export const router = express.Router();
 
@@ -36,6 +36,7 @@ router.use("/me", meRouter);
 router.use("/settings", settingsRouter);
 router.post("/emailConfirmation", sendConfirmationEmail);
 router.patch("/subscriptions/newSubscribe", restrict("storeOwner"), sanitisedData, createNewSubscribeController);
+router.get("/subscriptions", restrict("storeOwner"), getMySubscriptionsLogController);
 router.post("/newStore", restrict("storeOwner"), canCreateStore, sanitisedData, createStoreController);
 router.route("/store/:resourceId/reviews").post(restrict("user"), createReviewController);
 router.route("/products/:resourceId/reviews").post(restrict("user"), createReviewController);
