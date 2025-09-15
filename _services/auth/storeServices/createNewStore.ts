@@ -45,7 +45,6 @@ async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDa
     occurredAt: new Date(),
   };
 
-  console.log("whattheeventpayload", event.payload.user);
   eventBus.publish(event);
 
   return new Success(newStore);
