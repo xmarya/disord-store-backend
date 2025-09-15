@@ -2,6 +2,7 @@ import { getOneDocByFindOne } from "@repositories/global";
 import User from "@models/userModel";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
+import { getCredentials } from "@repositories/credentials/credentialsRepo";
 
 const validateUnlimitedUserData = catchAsync(async (request, response, next) => {
   const { subscriptionType } = request.body.user;
@@ -33,7 +34,7 @@ const validateUnlimitedUserData = catchAsync(async (request, response, next) => 
     const { email } = request.body.user;
     if (!email?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول المطلوبة"));
 
-    const isEmailExist = await getOneDocByFindOne(User, { condition: { email } });
+    const isEmailExist = await getCredentials({ condition: { email } });
     if (!isEmailExist) return next(new AppError(400, "لايوجد مستخدم بهذا البريد الإلكتروني"));
 
     user = {

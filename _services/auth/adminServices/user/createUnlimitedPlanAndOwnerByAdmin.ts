@@ -1,5 +1,6 @@
 import eventBus from "@config/EventBus";
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
+import { createNewCredentials } from "@repositories/credentials/credentialsRepo";
 import createNewUnlimitedPlan from "@services/auth/plan/createNewUnlimitedPlan";
 import createUnlimitedStoreOwner from "@services/auth/storeOwnerServices/createUnlimitedStoreOwner";
 import { PlanSubscriptionUpdateEvent } from "@Types/events/PlanSubscriptionEvents";
@@ -15,6 +16,7 @@ async function createUnlimitedPlanAndOwnerByAdmin(unlimitedPlanDetails: Omit<Unl
   try {
     session.startTransaction();
     const newUnlimitedPlan = await createNewUnlimitedPlan({ planName: "unlimited", ...unlimitedPlanDetails }, session);
+    if(storeOwnerData.subscriptionType === "new") await createNewCredentials({...storeOwnerData, userType: "storeOwner"}, session);
     newUnlimitedStoreOwner = await createUnlimitedStoreOwner(storeOwnerData, newUnlimitedPlan, session);
 
     await session.commitTransaction();

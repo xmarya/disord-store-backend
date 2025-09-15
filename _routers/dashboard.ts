@@ -53,8 +53,8 @@ router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
 
-
 /* TODO
     1- blocking the assistants accounts if any in case the owner downgraded the plan to basic
     2- check Novu settings in the production, the welcome email, registering new subscribers don't work
+$2b$13$O3gPBrQKLvwcD5zz/1Q3x.irXBOyCTcIYEH9.YGmRG/vke2pMJl/i
 */

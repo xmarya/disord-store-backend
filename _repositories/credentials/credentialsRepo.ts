@@ -7,8 +7,7 @@ import mongoose from "mongoose";
 import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 
 export async function createNewCredentials(credentialsData: Omit<CredentialsSignupData, "passwordConfirm">, session: mongoose.ClientSession) {
-  const newCredentials = await Credentials.create([credentialsData], { session }); // in case the create must accept a session option, the data must be inside [], for mongoose not to mistake the {session} as another document
-
+  const newCredentials = await Credentials.create([credentialsData], {session});
   return newCredentials[0];
 }
 export async function getCredentials(condition: QueryOptions<CredentialsDocument>["condition"]) {

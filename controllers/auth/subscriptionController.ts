@@ -43,7 +43,7 @@ export const renewalSubscriptionController = catchAsync(async (request, response
   const { planId, paidPrice } = request.body;
   if (!planId?.trim() || !paidPrice) return next(returnError({ reason: "bad-request", message: "الرجاء ادخال تفاصيل الباقة" }));
 
-  const currentPlanId = request.plan;
+  const currentPlanId = planId;
   const storeOwnerId = request.user.id;
   const result = await renewalStoreOwnerSubscription(storeOwnerId, currentPlanId, planId, paidPrice);
 
