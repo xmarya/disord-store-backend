@@ -25,9 +25,9 @@ import assignFromCacheToRequest from "../middlewares/requestModifiers/assignFrom
 import { assignStoreIdToRequest } from "../middlewares/requestModifiers/assignStoreIdToRequest";
 import assignPlanIdToRequest from "../middlewares/requestModifiers/assignPlanIdToRequest";
 import canCreateStore from "middlewares/protectors/canCreateStore";
+import { createNewSubscribeController } from "@controllers/auth/subscriptionController";
 
 export const router = express.Router();
-
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
 router.get("/logout", logout);
@@ -35,7 +35,7 @@ router.use("/admin", adminRouter);
 router.use("/me", meRouter);
 router.use("/settings", settingsRouter);
 router.post("/emailConfirmation", sendConfirmationEmail);
-router.use("/subscriptions", restrict("storeOwner"), subscriptionsRouter);
+router.patch("/subscriptions/newSubscribe", restrict("storeOwner"), sanitisedData, createNewSubscribeController);
 router.post("/newStore", restrict("storeOwner"), canCreateStore, sanitisedData, createStoreController);
 router.route("/store/:resourceId/reviews").post(restrict("user"), createReviewController);
 router.route("/products/:resourceId/reviews").post(restrict("user"), createReviewController);
@@ -45,6 +45,7 @@ router.use("/platform/reviews", platformReviewsRouter);
 router.post("/test-invoices", testInvoiceController);
 router.use(assignFromCacheToRequest, /*assignStoreIdToRequest,*/ assignPlanIdToRequest, verifyPlanSubscription);
 
+router.use("/subscriptions", restrict("storeOwner"), subscriptionsRouter);
 router.use("/store", storeRouter);
 router.use("/products", productRouter);
 router.use("/categories", categoryRouter);
@@ -52,8 +53,8 @@ router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
 
-
 /* TODO
     1- blocking the assistants accounts if any in case the owner downgraded the plan to basic
     2- check Novu settings in the production, the welcome email, registering new subscribers don't work
+$2b$13$O3gPBrQKLvwcD5zz/1Q3x.irXBOyCTcIYEH9.YGmRG/vke2pMJl/i
 */
