@@ -8,6 +8,7 @@ import "@eventSubscribers/productEvents/initialiser";
 import "@eventSubscribers/planEvents/planSubscriptionUpdate";
 import "eventSubscribers/queryResultsEvents/queryResultsFetched";
 import "@eventSubscribers/assistantEvents/initialiser";
+import { initialiseRabbitMQ } from "@config/rabbitmq";
 
 const app = express();
 async function startApp() {
@@ -15,6 +16,8 @@ async function startApp() {
   await routerLoader(app);
   await dbStartConnection();
   await initiateBullMQJobs();
+  await initialiseRabbitMQ();
+
 }
 
 await startApp();
