@@ -6,7 +6,7 @@ import safeThrowable from "@utils/safeThrowable";
 
 async function getOutboxRecordOfType<T extends DomainEvent>(type: T["type"]) {
   const safeGetOutboxRecord = safeThrowable(
-    () => getOneOutboxRecord(type),
+    () => getOneOutboxRecord(),
     (error) => new Failure((error as Error).message)
   );
 
