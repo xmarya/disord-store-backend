@@ -35,8 +35,7 @@ router.use("/admin", adminRouter);
 router.use("/me", meRouter);
 router.use("/settings", settingsRouter);
 router.post("/emailConfirmation", sendConfirmationEmail);
-router.patch("/subscriptions/newSubscribe", restrict("storeOwner"), sanitisedData, createNewSubscribeController);
-router.get("/subscriptions", restrict("storeOwner"), getMySubscriptionsLogController);
+router.use("/subscriptions", restrict("storeOwner"), subscriptionsRouter);
 router.post("/newStore", restrict("storeOwner"), canCreateStore, sanitisedData, createStoreController);
 router.route("/store/:resourceId/reviews").post(restrict("user"), createReviewController);
 router.route("/products/:resourceId/reviews").post(restrict("user"), createReviewController);
@@ -46,7 +45,6 @@ router.use("/platform/reviews", platformReviewsRouter);
 router.post("/test-invoices", testInvoiceController);
 router.use(assignFromCacheToRequest, /*assignStoreIdToRequest,*/ assignPlanIdToRequest, verifyPlanSubscription);
 
-router.use("/subscriptions", restrict("storeOwner"), subscriptionsRouter);
 router.use("/store", storeRouter);
 router.use("/products", productRouter);
 router.use("/categories", categoryRouter);
