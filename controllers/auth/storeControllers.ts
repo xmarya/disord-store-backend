@@ -13,7 +13,6 @@ import getStoreOf from "@services/auth/storeServices/getStoreOfOwner";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   const storeOwner = request.user as StoreOwnerDocument;
-  if (!storeOwner.subscribedPlanDetails.paid) return next(returnError(new Forbidden("لابد من الأشتراك في باقة لإنشاء متجر جديد")));
   // TODO: complete the store data
   const { storeName, description }: StoreDataBody = request.body;
   if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
