@@ -14,15 +14,15 @@ async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDa
   const data: FullStoreDataBody = { storeName, description, logo, owner: storeOwner.id, inPlan: storeOwner.subscribedPlanDetails.planName };
   const session = await startSession();
 
-  const {newStore, updatedOwner} = await session.withTransaction(async () => {
+  const { newStore, updatedOwner } = await session.withTransaction(async () => {
     const newStore = await createStore(data, session);
     const updatedOwner = await assignStoreToOwner(data.owner, newStore.id, session);
-    
-    return {newStore, updatedOwner}
+
+    return { newStore, updatedOwner };
   });
 
   const event: UserUpdatedEvent = {
-    type: "user.updated",
+    type: "user-updated",
     payload: {
       user: updatedOwner as AllUsers,
       emailConfirmed,

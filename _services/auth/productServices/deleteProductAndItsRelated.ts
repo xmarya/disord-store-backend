@@ -18,7 +18,7 @@ async function deleteProductAndItsRelated(productId: MongoId) {
 
   const { result: deletedProduct } = deleteProductResult;
   const event: ProductDeletedEvent = {
-    type: "product.deleted",
+    type: "product-deleted",
     payload: {
       productId: deletedProduct.id,
       categories: deletedProduct.categories as MongoId[],

@@ -1,18 +1,11 @@
 import { deleteBulkCredentials } from "@repositories/credentials/credentialsRepo";
-import { updateOutboxRecordStatus } from "@repositories/outboxRecord/outboxRecordRepo";
-import getOutboxRecordOfType from "@services/_sharedServices/outboxRecordServices/getOutboxRecordOfType";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
 import { CredentialsDocument } from "@Types/Schema/Users/UserCredentials";
 import { AnyBulkWriteOperation, startSession } from "mongoose";
 
-// NOTE: run this using worker
-async function deleteMultipleCredentials() {
+// NOTE: run this using worker, it's a consumer function
+async function deleteMultipleCredentials<T extends UserDeletedEvent>(payload:T["payload"]) {
  
-  const outboxRecordResult = await getOutboxRecordOfType<UserDeletedEvent>("user.deleted");
-
-  if(!outboxRecordResult.ok) return;
-  const outboxRecordDoc = outboxRecordResult.result;
-  const payload = outboxRecordDoc.payload as UserDeletedEvent["payload"];
   
   const session = await startSession();
   const bulkOps: Array<AnyBulkWriteOperation<CredentialsDocument>> = [
@@ -29,7 +22,7 @@ async function deleteMultipleCredentials() {
     const errorList = await Promise.resolve(bulkResult.getWriteErrors());
     // mark outbox record as completed
     const status = hasError ? "completed" : "failed";
-    await updateOutboxRecordStatus(outboxRecordDoc.id, status, session);
+    
     // return { hasError, errorList };
   });
 

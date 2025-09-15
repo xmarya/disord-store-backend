@@ -23,14 +23,14 @@ async function signupNewUserAndSendConfirmationEmail(signupData: CredentialsSign
   const { confirmUrl, randomToken } = await generateEmailConfirmationToken(newCredentials, emailTokenGenerator);
 
   const userCreatedEvent: UserCreatedEvent = {
-    type: "user.created",
+    type: "user-created",
     payload: { user: newUser, credentialsId: newCredentials.id, confirmUrl, randomToken },
     occurredAt: new Date(),
   };
   eventBus.publish(userCreatedEvent);
 
   const emailSentEvent: EmailConfirmationSentEvent = {
-    type: "emailConfirmation.sent",
+    type: "emailConfirmation-sent",
     payload: {
       credentialsId: newCredentials.id,
       userType: newCredentials.userType,

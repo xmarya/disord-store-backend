@@ -1,4 +1,4 @@
-import createOutboxRecordAndPublishEvent from "@services/_sharedServices/outboxRecordServices/createOutboxRecordAndPublishEvent";
+import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
 import { MongoId } from "@Types/Schema/MongoId";
 import { startSession } from "mongoose";
@@ -22,7 +22,7 @@ async function deleteOneAssistantByStoreOwner(data: Arguments) {
         usersId: [assistantId as string],
         emailsToDelete: [deletedAssistantResult.result.email],
       };
-      await createOutboxRecordAndPublishEvent<UserDeletedEvent>("user.deleted", payload, session);
+      await createOutboxRecord<UserDeletedEvent>("user-deleted", payload, session);
     }
 
     return deletedAssistantResult;

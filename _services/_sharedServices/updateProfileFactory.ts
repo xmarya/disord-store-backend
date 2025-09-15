@@ -8,7 +8,7 @@ import { BaseUserData } from "@Types/Schema/Users/BasicUserTypes";
 import { NotAssistant } from "@Types/Schema/Users/NotAssistant";
 import mongoose from "mongoose";
 
-async function updateProfileFactory(user: NotAssistant, updatedData: Partial<BaseUserData>, session?:mongoose.ClientSession) {
+async function updateProfileFactory(user: NotAssistant, updatedData: Partial<BaseUserData>, session?: mongoose.ClientSession) {
   const { userType, id } = user;
   const { firstName, lastName } = updatedData;
 
@@ -30,7 +30,7 @@ async function updateProfileFactory(user: NotAssistant, updatedData: Partial<Bas
 
   const { result: updatedProfile } = result;
   const event: UserUpdatedEvent = {
-    type: "user.updated",
+    type: "user-updated",
     payload: { user: updatedProfile },
     occurredAt: new Date(),
   };

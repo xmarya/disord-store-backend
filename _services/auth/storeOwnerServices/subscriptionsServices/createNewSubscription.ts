@@ -17,7 +17,7 @@ async function createNewPlanSubscription(storeOwner: MongoId, planId: MongoId, p
   if (updatedStoreOwnerResult.ok) {
     const { result: updatedStoreOwner } = updatedStoreOwnerResult;
     const event: PlanSubscriptionUpdateEvent = {
-      type: "planSubscription.updated",
+      type: "planSubscription-updated",
       payload: {
         storeOwner: updatedStoreOwner,
         planId,

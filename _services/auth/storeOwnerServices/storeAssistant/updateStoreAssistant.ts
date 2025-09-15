@@ -38,7 +38,7 @@ async function updateStoreAssistant(assistantId: MongoId, storeId: MongoId, upda
 
   const { result } = updateAssistantResult;
   const event: AssistantUpdatedEvent = {
-    type: "assistant.updated",
+    type: "assistant-updated",
     payload: {
       assistantId, // FIX duplicated values
       storeId,

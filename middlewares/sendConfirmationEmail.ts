@@ -24,7 +24,7 @@ export const sendConfirmationEmail = catchAsync(async (request, response, next) 
   const { confirmUrl, randomToken } = await generateEmailConfirmationToken(credentialsResult.result, emailTokenGenerator);
 
   const event: EmailConfirmationSentEvent = {
-    type: "emailConfirmation.sent",
+    type: "emailConfirmation-sent",
     payload: {
       credentialsId: credentialsResult.result.id,
       userType: credentialsResult.result.userType,

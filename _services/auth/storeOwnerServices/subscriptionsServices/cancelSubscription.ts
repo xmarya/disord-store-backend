@@ -32,7 +32,7 @@ async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId: MongoI
   if (!updateResult.ok) return updateResult;
 
   const event: PlanSubscriptionUpdateEvent = {
-    type: "planSubscription.updated",
+    type: "planSubscription-updated",
     payload: {
       storeOwner: updateResult.result,
       planId: cancelledPlanId,

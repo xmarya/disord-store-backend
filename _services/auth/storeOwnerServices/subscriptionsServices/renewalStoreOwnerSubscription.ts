@@ -20,7 +20,7 @@ async function renewalStoreOwnerSubscription(storeOwnerId: MongoId, currentPlanI
   if (storeOwnerRenewalResult.ok) {
     const { result: storeOwnerRenewalDetails } = storeOwnerRenewalResult;
     const event: PlanSubscriptionUpdateEvent = {
-      type: "planSubscription.updated",
+      type: "planSubscription-updated",
       payload: {
         storeOwner: storeOwnerRenewalDetails,
         planName: newPlanDocument.planName,

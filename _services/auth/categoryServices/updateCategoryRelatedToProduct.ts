@@ -6,7 +6,7 @@ import { MongoId } from "@Types/Schema/MongoId";
 async function updateCategoryRelatedToProduct(categories: Array<MongoId>, productId: MongoId) {
   await updateProductInCategories(categories, productId);
   const event: ProductUpdatedEvent = {
-    type: "product.updated",
+    type: "product-updated",
     payload: {
       categories,
       productId,

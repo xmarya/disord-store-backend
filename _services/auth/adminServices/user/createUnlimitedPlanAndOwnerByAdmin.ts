@@ -20,7 +20,7 @@ async function createUnlimitedPlanAndOwnerByAdmin(unlimitedPlanDetails: Omit<Unl
     await session.commitTransaction();
 
     const event: PlanSubscriptionUpdateEvent = {
-      type: "planSubscription.updated",
+      type: "planSubscription-updated",
       payload: {
         storeOwner: newUnlimitedStoreOwner,
         planId: newUnlimitedPlan.id,

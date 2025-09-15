@@ -29,7 +29,7 @@ async function getCredentialsVerifyResult(loginMethod: LoginMethod, password: st
   if (!loggedInUser.ok) return loggedInUser;
 
   const event: UserLoggedInEvent = {
-    type: "user.loggedIn",
+    type: "user-loggedIn",
     payload: {
       user: loggedInUser.result,
       emailConfirmed,

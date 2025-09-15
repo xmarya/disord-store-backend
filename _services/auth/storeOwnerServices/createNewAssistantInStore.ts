@@ -19,12 +19,12 @@ async function createNewAssistantInStore(storeId: MongoId, assistantData: Assist
     return { newAssistantResult };
   });
 
-  if(!newAssistantResult.ok) return newAssistantResult;
+  if (!newAssistantResult.ok) return newAssistantResult;
 
-  const {result: newAssistant} = newAssistantResult;
+  const { result: newAssistant } = newAssistantResult;
 
   const event: AssistantCreatedEvent = {
-    type: "assistant.created",
+    type: "assistant-created",
     payload: {
       storeId,
       permissions: newAssistant.permissions,
