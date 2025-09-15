@@ -7,9 +7,8 @@ import mongoose from "mongoose";
 import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 
 export async function createNewCredentials(credentialsData: Omit<CredentialsSignupData, "passwordConfirm">, session: mongoose.ClientSession) {
-  const {email, userType} = credentialsData;
-  const newCredentials = await Credentials.findOneAndUpdate({email, userType}, credentialsData, {upsert:true, new: true, runValidators:true}).session(session);
-  return newCredentials;
+  const newCredentials = await Credentials.create([credentialsData], {session});
+  return newCredentials[0];
 }
 export async function getCredentials(condition: QueryOptions<CredentialsDocument>["condition"]) {
   const fields: QueryOptions<CredentialsDocument>["select"] = ["password", "userType", "email", "phoneNumber", "emailConfirmed"];
