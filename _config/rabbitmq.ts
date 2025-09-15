@@ -6,10 +6,11 @@ const isDevelopment = process.env.NODE_ENV === "development";
 let rabbitChannel:ConfirmChannel | null = null;
 export async function initialiseRabbitMQ() {
   const PORT = isDevelopment ? process.env.CLOUDAMQP_DEVELOPMENT_PORT : process.env.CLOUDAMQP_PRODUCTION_PORT;
-  const URL = `${process.env.CLOUDAMQP_URL}:${PORT}`
+  // const URL = `${process.env.CLOUDAMQP_URL}:${PORT}`
   try {
     // create connection and a channel using the created connection
-    const connection = await amqp.connect(URL);
+    // console.log("urlshape", URL + "?heartbeat=60");
+    const connection = await amqp.connect(process.env.CLOUDAMQP_URL);
     const channel = await connection.createConfirmChannel();
 
     rabbitChannel = channel;
