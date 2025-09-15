@@ -18,7 +18,7 @@ const outboxRecordSchema = new Schema<OutboxRecordDocument>(
     },
     status: {
       type: String,
-      enum: ["pending", "processing",  "completed"],
+      enum: ["pending", "completed"],
       default: "pending",
     },
   },
