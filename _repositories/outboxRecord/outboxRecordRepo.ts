@@ -1,10 +1,10 @@
 import OutboxRecord from "@models/outboxRecordModel";
 import { DomainEvent } from "@Types/events/DomainEvent";
 import { MongoId } from "@Types/Schema/MongoId";
-import { OutboxRecordData, OutboxRecordDocument } from "@Types/Schema/OutboxRecord";
+import OutboxRecordBase from "@Types/Schema/OutboxRecord";
 import mongoose from "mongoose";
 
-export async function createNewOutboxRecord<T extends DomainEvent>(data: OutboxRecordData<T>, session: mongoose.ClientSession) {
+export async function createNewOutboxRecord(data: OutboxRecordBase, session: mongoose.ClientSession) {
   const newOutBoxRecord = await OutboxRecord.create([data], { session });
 
   return newOutBoxRecord[0];

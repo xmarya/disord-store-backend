@@ -1,36 +1,40 @@
 import { AllUsers } from "@Types/Schema/Users/AllUser";
 import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 import { DomainEvent } from "./DomainEvent";
+import { OutboxEvent } from "./OutboxEvents";
 
-export interface UserCreatedEvent extends DomainEvent {
+export interface UserCreatedEvent extends OutboxEvent {
+  outboxRecordId: string;
   type: "user-created";
-  payload: { outboxRecordId: string; user: AllUsers; credentialsId: string; confirmUrl: string; randomToken: string };
+  payload: { user: AllUsers; credentialsId: string; confirmUrl: string; randomToken: string };
   occurredAt: Date;
 }
 
-export interface EmailConfirmationSentEvent extends Omit<DomainEvent, "payload"> {
+export interface EmailConfirmationSentEvent extends DomainEvent {
   type: "emailConfirmation-sent";
   payload: { userType: UserTypes; credentialsId: string; randomToken: string };
   occurredAt: Date;
 }
 
-export interface UserUpdatedEvent extends DomainEvent {
+export interface UserUpdatedEvent extends OutboxEvent {
+  outboxRecordId: string;
   type: "user-updated";
   payload: {
-    outboxRecordId: string;
     user: AllUsers;
     emailConfirmed?: boolean;
   };
   occurredAt: Date;
 }
 
-export interface UserDeletedEvent extends DomainEvent {
+export interface UserDeletedEvent extends OutboxEvent {
+  outboxRecordId: string;
   type: "user-deleted";
-  payload: { outboxRecordId: string; usersId: Array<string>; emailsToDelete: Array<string> };
+
+  payload: { usersId: Array<string>; emailsToDelete: Array<string> };
   occurredAt: Date;
 }
 
-export interface UserLoggedInEvent extends Omit<DomainEvent, "payload"> {
+export interface UserLoggedInEvent extends DomainEvent {
   type: "user-loggedIn";
   payload: {
     user: AllUsers;
@@ -38,10 +42,10 @@ export interface UserLoggedInEvent extends Omit<DomainEvent, "payload"> {
   };
   occurredAt: Date;
 }
-export interface UserCredentialsUpdatedEvent extends DomainEvent {
+export interface UserCredentialsUpdatedEvent extends OutboxEvent {
+  outboxRecordId: string;
   type: "userCredentials-updated";
   payload: {
-    outboxRecordId: string;
     user: AllUsers;
     emailConfirmed?: boolean;
   };

@@ -1,6 +1,6 @@
 
 export interface DomainEvent {
     type:string,
-    payload:unknown & { outboxRecordId: string },
+    payload:unknown,
     occurredAt:Date
 }
