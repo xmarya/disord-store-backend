@@ -27,4 +27,36 @@ type UserDeletedType = {
   routingKey: "user-deleted";
 };
 
-export type OutboxEventTypesMap = UserCreatedType["type"] | UserUpdatedType["type"] | UserDeletedType["type"];
+
+type ProductCreatedType = {
+  type: "product-created";
+  exchangeName: "product-events";
+  queueName: "product-created-queue";
+  routingKey: "product-created";
+};
+
+type ProductUpdatedType = {
+  type: "product-updated";
+  exchangeName: "product-events";
+  queueName: "product-updated-queue";
+  routingKey: "product-updated";
+};
+
+type ProductDeletedType = {
+  type: "product-deleted";
+  exchangeName: "product-events";
+  queueName: "product-deleted-queue";
+  routingKey: "product-deleted";
+};
+
+export type OutboxTypes = 
+  | UserCreatedType 
+  | UserUpdatedType 
+  | UserDeletedType 
+  | ProductCreatedType 
+  | ProductUpdatedType 
+  | ProductDeletedType;
+
+export type OutboxEventTypesMap = OutboxTypes["type"];
+
+
