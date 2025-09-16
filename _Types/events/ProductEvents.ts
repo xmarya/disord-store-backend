@@ -4,6 +4,7 @@ import { DomainEvent } from "./DomainEvent";
 export interface ProductUpdatedEvent extends DomainEvent {
   type: "product-updated";
   payload: {
+    outboxRecordId: string;
     categories: Array<MongoId>;
     productId: MongoId;
   };
@@ -12,6 +13,7 @@ export interface ProductUpdatedEvent extends DomainEvent {
 export interface ProductDeletedEvent extends DomainEvent {
   type: "product-deleted";
   payload: {
+    outboxRecordId: string;
     categories: Array<MongoId>;
     productId: MongoId;
   };

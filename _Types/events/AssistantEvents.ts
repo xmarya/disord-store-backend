@@ -6,6 +6,7 @@ import { NovuSubscriberData } from "@Types/externalAPIs/NovuSubscriberData";
 export interface AssistantCreatedEvent extends DomainEvent {
   type: "assistant-created";
   payload: {
+    outboxRecordId: string;
     storeId: MongoId;
     novuSubscriber: NovuSubscriberData;
     permissions: AssistantPermissions;
@@ -16,6 +17,7 @@ export interface AssistantCreatedEvent extends DomainEvent {
 export interface AssistantUpdatedEvent extends DomainEvent {
   type: "assistant-updated";
   payload: {
+    outboxRecordId: string;
     assistantId: MongoId;
     storeId: MongoId;
     novuSubscriber?: NovuSubscriberData;
@@ -27,6 +29,7 @@ export interface AssistantUpdatedEvent extends DomainEvent {
 export interface AssistantDeletedEvent extends DomainEvent {
   type: "assistant-deleted";
   payload: {
+    outboxRecordId: string;
     assistantId: MongoId;
   };
   occurredAt: Date;
