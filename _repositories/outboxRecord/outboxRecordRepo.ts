@@ -17,7 +17,7 @@ export async function getAllOutboxRecords<T extends DomainEvent>(type: T["type"]
 export async function getOneOutboxRecord() {
   // NOTE: or find all ?? in I would go with find all, then the updateOutboxRecordStatus should updateMany
   // return await OutboxRecord.findOne({ type, status: "pending", sent: {$ne: null} });
-  return await OutboxRecord.findOneAndUpdate({ status: "pending" }, {sent: new Date()});
+  return await OutboxRecord.findOneAndUpdate({ status: "pending" }, {status:"processing", sent: new Date()});
 }
 
 export async function updateOutboxRecordStatusToCompleted<T extends DomainEvent>(type: T["type"], recordId: MongoId) {

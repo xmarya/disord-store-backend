@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 
 export default interface OutboxRecordBase extends DomainEvent {
   sent?: Date | null;
-  status: "pending" | "completed";
+  status: "pending" | "processing" | "completed";
   for?: string;
 }
 
