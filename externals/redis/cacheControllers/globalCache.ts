@@ -1,8 +1,8 @@
 import { ttl } from "@constants/ttl";
 import { RedisTTL } from "@Types/externalAPIs/RedisCache";
 import { compressJSON, decompressJSON } from "@utils/compression";
-import { getRedisKeyValuePair, deleteRedisKeyValuePair, setRedisKeyValuePair } from "../redisOperations/redisBasicFormat";
-import { getRedisSet, deleteFromRedisSet } from "../redisOperations/redisSet";
+import { deleteRedisKeyValuePair, getRedisKeyValuePair, setRedisKeyValuePair } from "../redisOperations/redisBasicFormat";
+import { deleteFromRedisSet, getRedisSet } from "../redisOperations/redisSet";
 
 export async function setCompressedCacheData(key: string, data: object, TTL: RedisTTL) {
   // const REDIS_TTL = TTL === "long" ? REDIS_LONG_TTL : TTL === "short" ? REDIS_SHORT_TTL : undefined;
@@ -38,8 +38,4 @@ export async function getAllCachedData<T>(key: string): Promise<T[]> {
   }
 
   return allData;
-}
-
-export async function deleteFromCache(key: Array<string>) {
-  await deleteRedisKeyValuePair(key);
 }

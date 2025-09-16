@@ -1,10 +1,10 @@
-import { OutboxRecordsInfo } from "@Types/events/OutboxRecordManager";
+import { OutboxRecordsInfo } from "@Types/events/OutboxEvents";
 import { upsertRedisJson, deleteRedisJson, getRedisJson } from "../redisOperations/redisJson";
 
 const CACHE_KEY = "OutboxRecords";
 
 
-export async function upsertOutboxRecordInCache(eventType: string, outboxRecordId: string, /*serviceName: string,*/ data: any) {
+export async function upsertOutboxRecordInCache(eventType: string, outboxRecordId: string, data: Record<string, boolean>) {
   await upsertRedisJson(CACHE_KEY, "$", {}, "NX");
   // the creation is in the root ".""
   // the id MUST be initialised with an empty {} in the section
