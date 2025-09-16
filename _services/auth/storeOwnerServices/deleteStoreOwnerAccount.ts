@@ -2,20 +2,30 @@ import StoreOwner from "@models/storeOwnerModel";
 import { deleteDoc } from "@repositories/global";
 import { MongoId } from "@Types/Schema/MongoId";
 import { startSession } from "mongoose";
-import deleteStoreAndItsRelatedResourcePermanently from "../storeServices/deleteStoreAndItsRelatedResourcePermanently";
 import { Success } from "@Types/ResultTypes/Success";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import deleteStoreAndItsRelatedResourcePermanently from "../storeServices/deleteStoreAndItsRelatedResourcePermanently";
+import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
+import { UserDeletedEvent } from "@Types/events/UserEvents";
 
-async function deleteStoreOwnerAccount(storeOwnerId: MongoId, storeId:MongoId) {
-
+async function deleteStoreOwnerAccount(storeOwnerId: MongoId, storeId: MongoId) {
   const session = await startSession();
-  await session.withTransaction(async () => {
-    //STEP 1) change userType and remove myStore:
-    await deleteDoc(StoreOwner, storeOwnerId, { session });
+  const deletedStoreOwner = await session.withTransaction(async () => {
+    const deletedStoreOwner = await deleteDoc(StoreOwner, storeOwnerId, { session });
     await deleteStoreAndItsRelatedResourcePermanently(storeId, session);
-
-    //TODO: // ADD FEATURE for adding the deleted data to an AdminLog
+    if (deletedStoreOwner) {
+      await createOutboxRecord<UserDeletedEvent>("user-deleted", 
+        { usersId: [deletedStoreOwner.id], emailsToDelete: [deletedStoreOwner.email], userType: deletedStoreOwner.userType }, 
+        session);
+    }
+    
+    return deletedStoreOwner;
   });
+  
+  // TODO: publish to rabbit to delete credentials
+  // ADD FEATURE for adding the deleted data to an AdminLog
 
+  if (!deletedStoreOwner) return new Failure();
   return new Success("تم حذف مالك المتجر والمتجر بنجاح");
 }
 
