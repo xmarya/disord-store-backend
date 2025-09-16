@@ -1,2 +1,0 @@
-import "./assistantCreated"
-import "./assistantUpdated"
