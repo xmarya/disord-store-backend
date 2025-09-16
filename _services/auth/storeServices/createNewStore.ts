@@ -1,7 +1,7 @@
-import eventBus from "@config/EventBus";
 import { createStore } from "@repositories/store/storeRepo";
 import { assignStoreToOwner } from "@repositories/storeOwner/storeOwnerRepo";
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import { FullStoreDataBody, StoreDataBody } from "@Types/Schema/Store";
 import { AllUsers } from "@Types/Schema/Users/AllUser";
@@ -21,6 +21,7 @@ async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDa
     return { newStore, updatedOwner };
   });
 
+  if(!newStore.id || !updatedOwner?.myStore) return new Failure("حدثت مشكلة أثناء انشاء متجرك");
   const event: UserUpdatedEvent = {
     type: "user-updated",
     payload: {
@@ -31,8 +32,8 @@ async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDa
     occurredAt: new Date(),
   };
 
-  eventBus.publish(event);
-
+//FIX using outbox pattern
+  // eventBus.publish(event);
   return new Success(newStore);
 }
 
