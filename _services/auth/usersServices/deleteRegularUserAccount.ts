@@ -14,7 +14,7 @@ async function deleteRegularUserAccount(userId: MongoId) {
     const deletedUser = await session.withTransaction(async () => {
       const deletedUser = await deleteDoc(User, userId);
       if (deletedUser) {
-        await createOutboxRecord<UserDeletedEvent>("user-deleted", { usersId: [deletedUser.id], emailsToDelete: [deletedUser.email] }, session);
+        await createOutboxRecord<UserDeletedEvent>("user-deleted", { usersId: [deletedUser.id], emailsToDelete: [deletedUser.email], userType: deletedUser.userType }, session);
       }
       return deletedUser;
     });

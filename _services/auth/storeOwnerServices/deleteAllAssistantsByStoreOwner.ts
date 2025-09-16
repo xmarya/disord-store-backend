@@ -13,12 +13,15 @@ async function deleteAllAssistantsByStoreOwner(storeId: MongoId) {
 
     if (deleteAllAssistantsResult.ok) {
       const { ids, emails } = await extractUsersEmailAndId(deleteAllAssistantsResult.result);
-      const payload = { usersId: ids, emailsToDelete: emails };
+      const payload = { usersId: ids, emailsToDelete: emails, userType: deleteAllAssistantsResult.result[0].userType  };
       await createOutboxRecord<UserDeletedEvent>("user-deleted", payload, session);
     }
 
     return deleteAllAssistantsResult;
   });
+
+    // TODO: publish to rabbit to delete credentials
+
 
   return deleteAllAssistantsResult;
 }

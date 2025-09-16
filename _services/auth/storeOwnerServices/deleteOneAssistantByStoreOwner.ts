@@ -21,12 +21,15 @@ async function deleteOneAssistantByStoreOwner(data: Arguments) {
       const payload = {
         usersId: [assistantId as string],
         emailsToDelete: [deletedAssistantResult.result.email],
+        userType: deletedAssistantResult.result.userType
       };
       await createOutboxRecord<UserDeletedEvent>("user-deleted", payload, session);
     }
 
     return deletedAssistantResult;
   });
+
+  // TODO: publish to rabbit to delete credentials
 
   return deletedAssistantResult;
 }

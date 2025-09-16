@@ -30,7 +30,7 @@ export interface UserDeletedEvent extends OutboxEvent {
   outboxRecordId: string;
   type: "user-deleted";
 
-  payload: { usersId: Array<string>; emailsToDelete: Array<string> };
+  payload: { usersId: Array<string>; userType:UserTypes, emailsToDelete: Array<string> };
   occurredAt: Date;
 }
 
