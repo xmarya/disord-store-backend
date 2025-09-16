@@ -8,9 +8,9 @@ export interface UserCreatedEvent extends DomainEvent {
   occurredAt: Date;
 }
 
-export interface EmailConfirmationSentEvent extends DomainEvent {
+export interface EmailConfirmationSentEvent extends Omit<DomainEvent, "payload"> {
   type: "emailConfirmation-sent";
-  payload: { outboxRecordId?: string; userType: UserTypes; credentialsId: string; randomToken: string };
+  payload: { userType: UserTypes; credentialsId: string; randomToken: string };
   occurredAt: Date;
 }
 
@@ -30,7 +30,7 @@ export interface UserDeletedEvent extends DomainEvent {
   occurredAt: Date;
 }
 
-export interface UserLoggedInEvent extends DomainEvent {
+export interface UserLoggedInEvent extends Omit<DomainEvent, "payload"> {
   type: "user-loggedIn";
   payload: {
     user: AllUsers;
