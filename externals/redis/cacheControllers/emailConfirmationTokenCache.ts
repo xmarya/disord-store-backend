@@ -23,12 +23,12 @@ async function emailConfirmationTokenCache(event: UserCreatedEvent | EmailConfir
 
   const safeCreateRedisHash = safeThrowable(
     () => createRedisHash(key, cacheData, "one-hour"),
-    (error) => new Failure((error as Error).message, { redis: false })
+    (error) => new Failure((error as Error).message, { serviceName:"redis", ack: false })
   );
 
   const createRedisCacheResult = await extractSafeThrowableResult(() => safeCreateRedisHash);
 
-  if(!createRedisCacheResult.ok && createRedisCacheResult.reason === "error") return new Failure(createRedisCacheResult.message, {redis: false});
+  if(!createRedisCacheResult.ok && createRedisCacheResult.reason === "error") return new Failure(createRedisCacheResult.message, {serviceName:"redis", ack: false});
 
   return new Success({redis: true});
 }

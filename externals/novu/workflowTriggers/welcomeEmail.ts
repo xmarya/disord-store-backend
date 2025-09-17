@@ -27,11 +27,11 @@ async function novuSendWelcome(event: UserCreatedEvent) {
     });
 
 
-    return new Success({novu:true});
+    return new Success({serviceName:"novu", ack:true});
   } catch (error) {
     console.log("novu couldn't send welcome notification");
     console.log(error);
-    return new Failure((error as Error).message, { novu: false });
+    return new Failure((error as Error).message, { serviceName:"novu", ack: false });
   }
 }
 
