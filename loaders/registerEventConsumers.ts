@@ -6,6 +6,7 @@ import novuDeleteSubscriber from "@externals/novu/subscribers/deleteSubscriber";
 import deleteUserFromCache from "@externals/redis/cacheControllers/deleteUserFromCache";
 import deleteMultipleCredentials from "@services/auth/credentials/deleteMultipleCredentials";
 import deleteAssistantFromStore from "@services/auth/storeServices/deleteAssistantFromStore";
+import assistantDeletedRegister from "@externals/rabbitmq/assistantDeleted/assistantDeletedRegister";
 
 
 async function registerEventConsumers() {
@@ -15,7 +16,8 @@ async function registerEventConsumers() {
   userDeletedRegister({ receiver: novuDeleteSubscriber, queueName: "user-deleted-queue-novu", requeue: true }); // all users
   userDeletedRegister({ receiver: deleteUserFromCache, queueName: "user-deleted-queue-redis", requeue: false }); // all users
   userDeletedRegister({ receiver: deleteMultipleCredentials, queueName: "user-deleted-queue-credentials-collection", requeue: true }); // all users
-  userDeletedRegister({ receiver: deleteAssistantFromStore, queueName: "user-deleted-queue-stores-collection", requeue: true }); // assistantOnly
+  
+  assistantDeletedRegister({ receiver: deleteAssistantFromStore, queueName: "assistant-deleted-queue-stores-collection", requeue: true }); // assistantOnly
 }
 
 export default registerEventConsumers;

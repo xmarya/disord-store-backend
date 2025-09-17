@@ -1,8 +1,6 @@
 import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
-import { UserDeletedEvent } from "@Types/events/UserEvents";
 import { MongoId } from "@Types/Schema/MongoId";
 import { startSession } from "mongoose";
-import deleteAssistantFromStore from "../storeServices/deleteAssistantFromStore";
 import deleteAssistantAccount from "./storeAssistant/deleteAssistantAccount";
 
 type Arguments = {
@@ -16,14 +14,35 @@ async function deleteOneAssistantByStoreOwner(data: Arguments) {
 
   const deletedAssistantResult = await session.withTransaction(async () => {
     const deletedAssistantResult = await deleteAssistantAccount({ assistantId, storeId, session });
-    await deleteAssistantFromStore({ storeId, assistantId, session });
+    // await deleteAssistantFromStore({ storeId, assistantId, session }); // NOTE: this now a consumer
     if (deletedAssistantResult.ok) {
-      const payload = {
+      const userDeletedEventPayload = {
         usersId: [assistantId as string],
         emailsToDelete: [deletedAssistantResult.result.email],
-        userType: deletedAssistantResult.result.userType
+        userType: deletedAssistantResult.result.userType,
       };
-      await createOutboxRecord<UserDeletedEvent>("user-deleted", payload, session);
+
+      const assistantDeletedEventPayload = {
+        type: "assistant-deleted",
+        payload: {
+          storeId,
+          assistantsId: [assistantId],
+        },
+      };
+
+      await createOutboxRecord(
+        [
+          {
+            type: "user-deleted",
+            payload: userDeletedEventPayload,
+          },
+          {
+            type: "assistant-deleted",
+            payload: assistantDeletedEventPayload,
+          },
+        ],
+        session
+      );
     }
 
     return deletedAssistantResult;

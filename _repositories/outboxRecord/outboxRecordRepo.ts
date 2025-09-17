@@ -4,8 +4,8 @@ import { MongoId } from "@Types/Schema/MongoId";
 import OutboxRecordBase from "@Types/Schema/OutboxRecord";
 import mongoose from "mongoose";
 
-export async function createNewOutboxRecord(data: OutboxRecordBase, session: mongoose.ClientSession) {
-  const newOutBoxRecord = await OutboxRecord.create([data], { session });
+export async function createNewOutboxRecord(data: Array<OutboxRecordBase>, session: mongoose.ClientSession) {
+  const newOutBoxRecord = await OutboxRecord.create(data, { session });
 
   return newOutBoxRecord[0];
 }

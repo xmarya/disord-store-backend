@@ -5,9 +5,9 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import mongoose from "mongoose";
 
-async function createOutboxRecord<T extends Omit<OutboxEvent, "outboxRecordId">>(type: T["type"], payload: T["payload"], session: mongoose.ClientSession) {
+async function createOutboxRecord<T extends Array<Omit<OutboxEvent, "outboxRecordId">>>(data:Array<{type: T[number]["type"], payload: T[number]["payload"]}>, session: mongoose.ClientSession) {
   const safeCreateOutboxRecord = safeThrowable(
-    () => createNewOutboxRecord({ type, payload, occurredAt: new Date(), status: "pending" }, session),
+    () => createNewOutboxRecord(data, session),
     (error) => new Failure((error as Error).message)
   );
 
