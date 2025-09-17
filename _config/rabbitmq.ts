@@ -3,8 +3,8 @@ import { Success } from "@Types/ResultTypes/Success";
 import amqp, {ConfirmChannel} from "amqplib";
 import { ms } from "ms";
 
-const isDevelopment = process.env.NODE_ENV === "development";
 let channel:ConfirmChannel | null = null;
+const isDevelopment = process.env.NODE_ENV === "development";
 export async function initialiseRabbitMQ() {
   const PORT = isDevelopment ? process.env.CLOUDAMQP_DEVELOPMENT_PORT : process.env.CLOUDAMQP_PRODUCTION_PORT;
   // const URL = `${process.env.CLOUDAMQP_URL}:${PORT}`

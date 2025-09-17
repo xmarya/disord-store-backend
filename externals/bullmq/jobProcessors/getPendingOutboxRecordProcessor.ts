@@ -6,10 +6,10 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import { ms } from "ms";
 
-const { queue } = await bullmq("pendingOutboxRecord", getPendingOutboxRecordProcessor, 10);
+const { queue } = await bullmq("pendingOutboxRecord", getPendingOutboxRecordProcessor, 1); /* CHANGE LATER: increase the worker */
 
 async function pendingOutboxRecordBullMQ() {
-  queue.add("pendingOutboxRecords", {}, { repeat: { every: ms("5s") }, jobId: "outboxRecord-getPending-job" });
+  queue.add("pendingOutboxRecords", {}, { repeat: { every: ms("1m") }, jobId: "outboxRecord-getPending-job" });
 }
 
 async function getPendingOutboxRecordProcessor() {

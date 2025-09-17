@@ -6,50 +6,50 @@ export interface OutboxEvent extends DomainEvent {
   outboxRecordId: string;
 }
 
-type UserCreatedType = {
+export type UserCreatedType = {
   type: "user-created";
   exchangeName: "user-events";
-  queueName: "user-created-queue";
+  queueName: `user-created-queue-${string}`;
   routingKey: "user-created";
 };
 
-type UserUpdatedType = {
+export type UserUpdatedType = {
   type: "user-updated";
   exchangeName: "user-events";
-  queueName: "user-updated-queue";
+  queueName: `user-updated-queue-${string}`;
   routingKey: "user-updated";
 };
 
-type UserDeletedType = {
+export type UserDeletedType = {
   type: "user-deleted";
   exchangeName: "user-events";
-  queueName: "user-deleted-queue";
+  queueName: `user-deleted-queue-${string}`;
   routingKey: "user-deleted";
 };
 
 
-type ProductCreatedType = {
+export type ProductCreatedType = {
   type: "product-created";
   exchangeName: "product-events";
-  queueName: "product-created-queue";
+  queueName: `product-created-queue-${string}`;
   routingKey: "product-created";
 };
 
-type ProductUpdatedType = {
+export type ProductUpdatedType = {
   type: "product-updated";
   exchangeName: "product-events";
-  queueName: "product-updated-queue";
+  queueName: `product-updated-queue-${string}`;
   routingKey: "product-updated";
 };
 
-type ProductDeletedType = {
+export type ProductDeletedType = {
   type: "product-deleted";
   exchangeName: "product-events";
-  queueName: "product-deleted-queue";
+  queueName: `product-deleted-queue-${string}`;
   routingKey: "product-deleted";
 };
 
-export type OutboxTypes = 
+export type AllOutbox = 
   | UserCreatedType 
   | UserUpdatedType 
   | UserDeletedType 
@@ -57,6 +57,8 @@ export type OutboxTypes =
   | ProductUpdatedType 
   | ProductDeletedType;
 
-export type OutboxEventTypesMap = OutboxTypes["type"];
+export type OutboxEventTypesMap = AllOutbox["type"];
+export type OutboxEventQueueNamesMap<T extends AllOutbox> = T["queueName"];
+
 
 
