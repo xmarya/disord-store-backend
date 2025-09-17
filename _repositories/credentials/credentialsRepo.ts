@@ -48,10 +48,10 @@ export async function confirmUserEmail(credentialsId: MongoId, hashedToken: stri
   );
 }
 
-export async function deleteCredentials(email:string, session: mongoose.ClientSession) {
-  return await Credentials.findOneAndDelete({email}).session(session);
+export async function deleteCredentials(email:string) {
+  return await Credentials.findOneAndDelete({email});
 }
 
-export async function deleteBulkCredentials(bulk:any, session:mongoose.ClientSession) {
-  return await Credentials.bulkWrite(bulk, {session});
+export async function deleteBulkCredentials(bulk:any) {
+  return await Credentials.bulkWrite(bulk);
 }

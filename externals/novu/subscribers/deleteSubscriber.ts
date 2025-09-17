@@ -13,10 +13,10 @@ async function novuDeleteSubscriber(event: UserDeletedEvent) {
       })
     );
 
-    return new Success({novu:true});
+    return new Success({serviceName:"novu", ack:true});
   } catch (error) {
     if ((error as { statusCode: number }).statusCode === 404) return new Success({novu:true});
-    return new Failure((error as Error).message, {novu:false});
+    return new Failure((error as Error).message, {serviceName:"novu", ack:false});
   }
 }
 
