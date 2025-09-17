@@ -10,7 +10,7 @@ export async function upsertOutboxRecordInCache(eventType: string, outboxRecordI
   // the id MUST be initialised with an empty {} in the section
 
   await upsertRedisJson(CACHE_KEY, `.${eventType}`, {}, "NX");
-  await upsertRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}`, data);
+  await upsertRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}.${Object.keys(data)[0]}`, Object.values(data)[0]);
 }
 
 export async function getOutboxRecordsFromCache(): Promise<OutboxRecordsInfo> {
