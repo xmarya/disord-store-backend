@@ -1,12 +1,12 @@
 import { MongoId } from "@Types/Schema/MongoId";
-import { DomainEvent } from "./DomainEvent";
 import { AssistantPermissions } from "@Types/Schema/Users/StoreAssistant";
 import { NovuSubscriberData } from "@Types/externalAPIs/NovuSubscriberData";
+import { OutboxEvent } from "./OutboxEvents";
 
-export interface AssistantCreatedEvent extends DomainEvent {
+export interface AssistantCreatedEvent extends OutboxEvent {
   type: "assistant-created";
+  outboxRecordId: string;
   payload: {
-    outboxRecordId: string;
     storeId: MongoId;
     novuSubscriber: NovuSubscriberData;
     permissions: AssistantPermissions;
@@ -14,10 +14,10 @@ export interface AssistantCreatedEvent extends DomainEvent {
   occurredAt: Date;
 }
 
-export interface AssistantUpdatedEvent extends DomainEvent {
+export interface AssistantUpdatedEvent extends OutboxEvent {
   type: "assistant-updated";
+  outboxRecordId: string;
   payload: {
-    outboxRecordId: string;
     assistantId: MongoId;
     storeId: MongoId;
     novuSubscriber?: NovuSubscriberData;
@@ -26,11 +26,12 @@ export interface AssistantUpdatedEvent extends DomainEvent {
   occurredAt: Date;
 }
 
-export interface AssistantDeletedEvent extends DomainEvent {
+export interface AssistantDeletedEvent extends OutboxEvent {
   type: "assistant-deleted";
+  outboxRecordId: string;
   payload: {
-    outboxRecordId: string;
-    assistantId: MongoId;
+    storeId:MongoId
+    assistantId: Array<MongoId>;
   };
   occurredAt: Date;
 }
