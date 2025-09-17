@@ -27,6 +27,26 @@ export type UserDeletedType = {
   routingKey: "user-deleted";
 };
 
+export type AssistantCreatedType = {
+  type: "assistant-created";
+  exchangeName: "assistant-events";
+  queueName: `assistant-created-queue-${string}`;
+  routingKey: "assistant-created";
+};
+
+export type AssistantUpdatedType = {
+  type: "assistant-updated";
+  exchangeName: "assistant-events";
+  queueName: `assistant-updated-queue-${string}`;
+  routingKey: "assistant-updated";
+};
+
+export type AssistantDeletedType = {
+  type: "assistant-deleted";
+  exchangeName: "assistant-events";
+  queueName: `assistant-deleted-queue-${string}`;
+  routingKey: "assistant-deleted";
+};
 
 export type ProductCreatedType = {
   type: "product-created";
@@ -49,16 +69,16 @@ export type ProductDeletedType = {
   routingKey: "product-deleted";
 };
 
-export type AllOutbox = 
-  | UserCreatedType 
-  | UserUpdatedType 
-  | UserDeletedType 
-  | ProductCreatedType 
-  | ProductUpdatedType 
-  | ProductDeletedType;
+export type AllOutbox =
+  | UserCreatedType
+  | UserUpdatedType
+  | UserDeletedType
+  | ProductCreatedType
+  | ProductUpdatedType
+  | ProductDeletedType
+  | AssistantCreatedType
+  | AssistantUpdatedType
+  | AssistantDeletedType;
 
 export type OutboxEventTypesMap = AllOutbox["type"];
 export type OutboxEventQueueNamesMap<T extends AllOutbox> = T["queueName"];
-
-
-
