@@ -2,7 +2,7 @@ import { MongoId } from "@Types/Schema/MongoId";
 import { createRedisHash } from "../redisOperations/redisHash";
 
 async function cacheStoreAndPlan(storeId: MongoId, planId: MongoId, isPaid: boolean, planExpiryDate: Date) {
-  const data = { store:storeId, plan:planId, isPaid, planExpiryDate };
+  const data = { store:storeId.toString(), plan:planId.toString(), isPaid, planExpiryDate };
 
   await createRedisHash(`StoreAndPlan:${storeId}`, data, "one-hour");
 }
