@@ -7,10 +7,10 @@ import ratelimit from "express-rate-limit";
 import helmet from "helmet";
 
 const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", "https://sa-ss-project.vercel.app"];
-export default async function expressLoader(app: Application) {
+export default function expressLoader(app: Application) {
   // app.set("trust proxy", true);
   const limiter = ratelimit({
-    max: 100, // #requests per hour.
+    max: process.env.NODE_ENV === "development"? 1000 : 100, // #requests per hour.
     windowMs: 60 * 60 * 100, // the calculation of 1 hour.
     message: "We've got too many requests from this IP, Try again after 1 hour",
   });
