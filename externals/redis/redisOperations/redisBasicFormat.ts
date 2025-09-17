@@ -1,4 +1,4 @@
-import redis from "@config/node-redis";
+import redis from "@config/redis";
 
 export async function setRedisKeyValuePair(key: string, data: string, TTL?: number) {
   const result = await redis.set(key, data);
