@@ -31,7 +31,7 @@ export interface AssistantDeletedEvent extends OutboxEvent {
   outboxRecordId: string;
   payload: {
     storeId:MongoId
-    assistantId: Array<MongoId>;
+    assistantsId: Array<MongoId>;
   };
   occurredAt: Date;
 }
