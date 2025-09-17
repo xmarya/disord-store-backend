@@ -36,7 +36,7 @@ async function bullmq(queueName: string, processor: any, concurrency?:number) {
   const worker = createWorker(queueName, processor, concurrency);
 
   worker.on("ready", () => console.log(`worker for ${queueName} is ready...`));
-  worker.on("active", () => console.log(`worker is active...`));
+  worker.on("active", () => console.log(`worker for ${queueName}is active...`));
   worker.on("stalled", () => console.log("stalled worker"));
   worker.on("resumed", () => console.log("worker resumed the job"));
   worker.on("progress", (job, progress) => console.log("worker is progressing the job"));

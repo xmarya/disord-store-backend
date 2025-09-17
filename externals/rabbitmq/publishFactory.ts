@@ -4,11 +4,12 @@ import { OutboxRecordDocument } from "@Types/Schema/OutboxRecord";
 import userDeletedPublisher from "./userDeleted/userDeletedPublisher";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
 import { Success } from "@Types/ResultTypes/Success";
+import userCreatedPublisher from "./userCreated/userCreatedPublisher";
 
 type PublisherFunction = (event: any) => Promise<Success<any> | Failure>;
 
 const publishers: Record<OutboxEventTypesMap, PublisherFunction> = {
-  "user-created": userDeletedPublisher, /* CHANGE LATER:  */
+  "user-created": userCreatedPublisher,
   "user-updated": userDeletedPublisher, /* CHANGE LATER:  */
   "user-deleted": userDeletedPublisher,
   "product-created": userDeletedPublisher, /* CHANGE LATER:  */
@@ -17,6 +18,7 @@ const publishers: Record<OutboxEventTypesMap, PublisherFunction> = {
 };
 
 async function publishFactory(outboxRecord: OutboxRecordDocument) {
+  console.log("inside publishFactory", outboxRecord.type);
   const { type, payload, id } = outboxRecord;
   const event = {
     type,
@@ -30,6 +32,7 @@ async function publishFactory(outboxRecord: OutboxRecordDocument) {
   }
 
   await publisher(event);
+  console.log("event passed to publisher");
 }
 
 export default publishFactory;
