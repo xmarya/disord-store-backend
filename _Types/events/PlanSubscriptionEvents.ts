@@ -14,5 +14,4 @@ export interface PlanSubscriptionUpdateEvent extends DomainEvent {
     planExpiryDate: Date;
     subscriptionType: SubscriptionTypes | "cancellation";
   };
-  occurredAt: Date;
 }

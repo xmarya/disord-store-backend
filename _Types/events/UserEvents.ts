@@ -7,7 +7,6 @@ export interface UserCreatedEvent extends OutboxEvent {
   outboxRecordId: string;
   type: "user-created";
   payload: { user: AllUsers; credentialsId: string; confirmUrl: string; randomToken: string };
-  occurredAt: Date;
 }
 
 export interface EmailConfirmationSentEvent extends DomainEvent {
@@ -23,7 +22,6 @@ export interface UserUpdatedEvent extends OutboxEvent {
     user: AllUsers;
     emailConfirmed?: boolean;
   };
-  occurredAt: Date;
 }
 
 export interface UserDeletedEvent extends OutboxEvent {
@@ -31,7 +29,6 @@ export interface UserDeletedEvent extends OutboxEvent {
   type: "user-deleted";
 
   payload: { usersId: Array<string>; userType:UserTypes, emailsToDelete: Array<string> };
-  occurredAt: Date;
 }
 
 export interface UserLoggedInEvent extends DomainEvent {
@@ -40,7 +37,6 @@ export interface UserLoggedInEvent extends DomainEvent {
     user: AllUsers;
     emailConfirmed?: boolean;
   };
-  occurredAt: Date;
 }
 export interface UserCredentialsUpdatedEvent extends OutboxEvent {
   outboxRecordId: string;
@@ -49,5 +45,4 @@ export interface UserCredentialsUpdatedEvent extends OutboxEvent {
     user: AllUsers;
     emailConfirmed?: boolean;
   };
-  occurredAt: Date;
 }

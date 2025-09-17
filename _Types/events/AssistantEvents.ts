@@ -11,7 +11,6 @@ export interface AssistantCreatedEvent extends OutboxEvent {
     novuSubscriber: NovuSubscriberData;
     permissions: AssistantPermissions;
   };
-  occurredAt: Date;
 }
 
 export interface AssistantUpdatedEvent extends OutboxEvent {
@@ -23,7 +22,6 @@ export interface AssistantUpdatedEvent extends OutboxEvent {
     novuSubscriber?: NovuSubscriberData;
     permissions?: AssistantPermissions;
   };
-  occurredAt: Date;
 }
 
 export interface AssistantDeletedEvent extends OutboxEvent {
@@ -33,5 +31,4 @@ export interface AssistantDeletedEvent extends OutboxEvent {
     storeId:MongoId
     assistantsId: Array<MongoId>;
   };
-  occurredAt: Date;
 }

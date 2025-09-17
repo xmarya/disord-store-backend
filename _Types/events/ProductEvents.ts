@@ -8,7 +8,6 @@ export interface ProductUpdatedEvent extends DomainEvent {
     categories: Array<MongoId>;
     productId: MongoId;
   };
-  occurredAt: Date;
 }
 export interface ProductDeletedEvent extends DomainEvent {
   type: "product-deleted";
@@ -17,5 +16,4 @@ export interface ProductDeletedEvent extends DomainEvent {
     categories: Array<MongoId>;
     productId: MongoId;
   };
-  occurredAt: Date;
 }
