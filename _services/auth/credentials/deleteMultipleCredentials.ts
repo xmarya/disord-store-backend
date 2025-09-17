@@ -1,13 +1,15 @@
 import { deleteBulkCredentials } from "@repositories/credentials/credentialsRepo";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
 import { CredentialsDocument } from "@Types/Schema/Users/UserCredentials";
-import { AnyBulkWriteOperation, startSession } from "mongoose";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import safeThrowable from "@utils/safeThrowable";
+import { AnyBulkWriteOperation } from "mongoose";
 
 // NOTE: run this using worker, it's a consumer function
-async function deleteMultipleCredentials<T extends UserDeletedEvent>(payload:T["payload"]) {
- 
-  
-  const session = await startSession();
+async function deleteMultipleCredentials(event: UserDeletedEvent) {
+  const {payload} = event;
   const bulkOps: Array<AnyBulkWriteOperation<CredentialsDocument>> = [
     {
       deleteMany: {
@@ -15,17 +17,16 @@ async function deleteMultipleCredentials<T extends UserDeletedEvent>(payload:T["
       },
     },
   ];
+  const safeBulk = safeThrowable(
+    () => deleteBulkCredentials(bulkOps),
+    (error) => new Failure((error as Error).message)
+  );
 
-  await session.withTransaction(async () => {
-    const bulkResult = await deleteBulkCredentials(bulkOps, session);
-    const hasError = await Promise.resolve(bulkResult.hasWriteErrors());
-    const errorList = await Promise.resolve(bulkResult.getWriteErrors());
-    // mark outbox record as completed
-    const status = hasError ? "completed" : "failed";
-    
-    // return { hasError, errorList };
-  });
+  const bulkResult = await extractSafeThrowableResult(() => safeBulk);
 
+  if (!bulkResult.ok) return new Failure(bulkResult.message, { credentialsCollection: false });
+
+  return new Success({ credentialsCollection: true });
 }
 
 export default deleteMultipleCredentials;
