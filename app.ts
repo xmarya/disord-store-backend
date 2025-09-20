@@ -1,10 +1,11 @@
 import { dbStartConnection } from "@config/db";
+import { initialiseRabbitMQConsumingChannel } from "@config/rabbitmq/consumingChannel";
+import { initialiseRabbitMQPublishingChannel } from "@config/rabbitmq/publishingChannel";
 import initiateBullMQJobs from "@loaders/bullmqJobs";
 import expressLoader from "@loaders/express";
+import initRabbitConsumers from "@loaders/initRabbitConsumers";
 import routerLoader from "@loaders/routers";
 import express from "express";
-import { initialiseRabbitMQ } from "@config/rabbitmq";
-import registerEventConsumers from "@loaders/registerEventConsumers";
 
 const app = express();
 async function startApp() {
@@ -12,8 +13,9 @@ async function startApp() {
   routerLoader(app);
   await dbStartConnection();
   await initiateBullMQJobs();
-  await initialiseRabbitMQ();
-  await registerEventConsumers();
+  await initialiseRabbitMQPublishingChannel();
+  await initialiseRabbitMQConsumingChannel();
+  await initRabbitConsumers();
 }
 
 await startApp();
