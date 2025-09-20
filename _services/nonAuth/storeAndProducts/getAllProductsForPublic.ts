@@ -1,4 +1,3 @@
-import eventBus from "@config/EventBus";
 import Product from "@models/productModel";
 import { getAllDocs } from "@repositories/global";
 import { QueryResultsFetchedEvent } from "@Types/events/QueryResultsFetchedEvent";
@@ -9,6 +8,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import { QueryParams } from "@Types/helperTypes/Request";
+import eventBus from "@config/EventBus";
 
 async function getAllProductsForPublic(query: QueryParams, storeId?: MongoId) {
   const fields: QueryOptions<ProductDocument>["select"] = ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"];
@@ -29,10 +29,9 @@ async function getAllProductsForPublic(query: QueryParams, storeId?: MongoId) {
         queryResults: result.result,
       },
 
-      occurredAt: new Date(),
     };
 
-    eventBus.publish(event);
+  eventBus.publish(event);
   }
 
   return result;
