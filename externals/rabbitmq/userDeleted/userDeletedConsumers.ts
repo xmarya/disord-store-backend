@@ -1,12 +1,10 @@
+import { CRITICAL_QUEUE_OPTIONS } from "@constants/rabbitmq";
 import novuDeleteSubscriber from "@externals/novu/subscribers/deleteSubscriber";
-import userDeletedRegister from "./userDeletedRegister";
 import deleteUserFromCache from "@externals/redis/cacheControllers/deleteUserFromCache";
 import deleteMultipleCredentials from "@services/auth/credentials/deleteMultipleCredentials";
-import { CRITICAL_QUEUE_OPTIONS } from "@constants/rabbitmq";
-import { AllOutbox, ConsumerRegister, DeadLetterOptions, OutboxEventQueueNamesMap, QueueOptions, UserDeletedType } from "@Types/events/OutboxEvents";
+import { ConsumerRegister, UserDeletedType } from "@Types/events/OutboxEvents";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
-import { Success } from "@Types/ResultTypes/Success";
-import { Failure } from "@Types/ResultTypes/errors/Failure";
+import userDeletedRegister from "./userDeletedRegister";
 
 
 const consumers = {
