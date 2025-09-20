@@ -6,7 +6,6 @@ import { ConsumerRegister, UserDeletedType } from "@Types/events/OutboxEvents";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
 import userDeletedRegister from "./userDeletedRegister";
 
-
 const consumers = {
   novu: {
     receiver: novuDeleteSubscriber,
