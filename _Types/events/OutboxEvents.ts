@@ -19,16 +19,6 @@ export type PriorityLevelMap = {
 
 export type PriorityLevel = keyof PriorityLevelMap;
 
-const priority:PriorityLevelMap = {
-  "no-priority": 0,
-  "background": 1,
-  "low":3,
-  "normal": 5,
-  "hight": 7,
-  "urgent": 9,
-  "critical": 10
-}
-
 export type QueueOptions = {
   durable?: boolean,
   maxPriority?:PriorityLevel,
@@ -41,20 +31,12 @@ export type QueueOptions = {
 
 }
 
-export const QUEUE_OPTIONS = (options?:QueueOptions) => {
-  const {durable = true, maxLength = 1000, messageTtl = ms("3m"), queueMode = "default", maxPriority, deadLetterExchange, deadLetterRoutingKey, expires} = options ?? {};
-  return {
-    durable, 
-    maxPriority: maxPriority ? priority[maxPriority] : priority["no-priority"],
-    arguments: {"x-queue-mode": queueMode},
-    messageTtl,
-    maxLength,
-    ...(deadLetterExchange && {deadLetterExchange}),
-    ...(deadLetterRoutingKey && {deadLetterRoutingKey}),
-    ...(expires && {expires}),
-
-  }
+export type DeadLetterOptions<T extends AllOutbox> = {
+  deadExchangeName:T["deadExchangeName"], // If a message expires or is rejected → RabbitMQ republishes it to dead-letter-exchange with routing key user-deleted-redis.DLQ.
+  deadRoutingKey:T["deadRoutingKey"], // if not ser, RabbitMQ will reuse the original routing key.
+  deadQueueName:T["deadQueueName"]
 }
+
 
 export type UserCreatedType = {
   type: "user-created";
@@ -62,9 +44,9 @@ export type UserCreatedType = {
   queueName: `user-created-queue-${string}`;
   routingKey: "user-created";
 
-  // deadExchangeName: "dead-user-events";
-  // deadQueueName: `dead-user-created-queue-${string}`;
-  // deadRoutingKey: "dead-user-created";
+  deadExchangeName: "dead-user-events";
+  deadQueueName: `dead-user-created-queue-${string}`;
+  deadRoutingKey: "dead-user-created";
 
   // retryExchangeName?: "retry-user-events";
   // retryQueueName?: `retry-user-created-queue-${string}`;
@@ -76,6 +58,14 @@ export type UserUpdatedType = {
   exchangeName: "user-events";
   queueName: `user-updated-queue-${string}`;
   routingKey: "user-updated";
+
+  deadExchangeName: "dead-user-events";
+  deadQueueName: `dead-user-updated-queue-${string}`;
+  deadRoutingKey: "dead-user-updated";
+
+  // retryExchangeName?: "retry-user-events";
+  // retryQueueName?: `retry-user-updated-queue-${string}`;
+  // retryRoutingKey?: "retry-user-updated";
 };
 
 export type UserDeletedType = {
@@ -83,6 +73,14 @@ export type UserDeletedType = {
   exchangeName: "user-events";
   queueName: `user-deleted-queue-${string}`;
   routingKey: "user-deleted";
+
+  deadExchangeName: "dead-user-events";
+  deadQueueName: `dead-user-deleted-queue-${string}`;
+  deadRoutingKey: "dead-user-deleted";
+
+  // retryExchangeName?: "retry-user-events";
+  // retryQueueName?: `retry-user-deleted-queue-${string}`;
+  // retryRoutingKey?: "retry-user-deleted";
 };
 
 export type AssistantCreatedType = {
@@ -90,6 +88,14 @@ export type AssistantCreatedType = {
   exchangeName: "assistant-events";
   queueName: `assistant-created-queue-${string}`;
   routingKey: "assistant-created";
+
+  deadExchangeName: "dead-assistant-events";
+  deadQueueName: `dead-assistant-created-queue-${string}`;
+  deadRoutingKey: "dead-assistant-created";
+
+  // retryExchangeName?: "retry-assistant-events";
+  // retryQueueName?: `retry-assistant-created-queue-${string}`;
+  // retryRoutingKey?: "retry-assistant-created";
 };
 
 export type AssistantUpdatedType = {
@@ -97,6 +103,14 @@ export type AssistantUpdatedType = {
   exchangeName: "assistant-events";
   queueName: `assistant-updated-queue-${string}`;
   routingKey: "assistant-updated";
+
+  deadExchangeName: "dead-assistant-events";
+  deadQueueName: `dead-assistant-updated-queue-${string}`;
+  deadRoutingKey: "dead-assistant-updated";
+
+  // retryExchangeName?: "retry-assistant-events";
+  // retryQueueName?: `retry-assistant-updated-queue-${string}`;
+  // retryRoutingKey?: "retry-assistant-updated";
 };
 
 export type AssistantDeletedType = {
@@ -104,6 +118,14 @@ export type AssistantDeletedType = {
   exchangeName: "assistant-events";
   queueName: `assistant-deleted-queue-${string}`;
   routingKey: "assistant-deleted";
+
+  deadExchangeName: "dead-assistant-events";
+  deadQueueName: `dead-assistant-deleted-queue-${string}`;
+  deadRoutingKey: "dead-assistant-deleted";
+
+  // retryExchangeName?: "retry-assistant-events";
+  // retryQueueName?: `retry-assistant-deleted-queue-${string}`;
+  // retryRoutingKey?: "retry-assistant-deleted";
 };
 
 export type ProductCreatedType = {
@@ -111,6 +133,14 @@ export type ProductCreatedType = {
   exchangeName: "product-events";
   queueName: `product-created-queue-${string}`;
   routingKey: "product-created";
+
+  deadExchangeName: "dead-product-events";
+  deadQueueName: `dead-product-created-queue-${string}`;
+  deadRoutingKey: "dead-product-created";
+
+  // retryExchangeName?: "retry-product-events";
+  // retryQueueName?: `retry-product-created-queue-${string}`;
+  // retryRoutingKey?: "retry-product-created";
 };
 
 export type ProductUpdatedType = {
@@ -118,6 +148,14 @@ export type ProductUpdatedType = {
   exchangeName: "product-events";
   queueName: `product-updated-queue-${string}`;
   routingKey: "product-updated";
+
+  deadExchangeName: "dead-product-events";
+  deadQueueName: `dead-product-updated-queue-${string}`;
+  deadRoutingKey: "dead-product-updated";
+
+  // retryExchangeName?: "retry-product-events";
+  // retryQueueName?: `retry-product-updated-queue-${string}`;
+  // retryRoutingKey?: "retry-product-updated";
 };
 
 export type ProductDeletedType = {
@@ -125,6 +163,14 @@ export type ProductDeletedType = {
   exchangeName: "product-events";
   queueName: `product-deleted-queue-${string}`;
   routingKey: "product-deleted";
+
+  deadExchangeName: "dead-product-events";
+  deadQueueName: `dead-product-deleted-queue-${string}`;
+  deadRoutingKey: "dead-product-deleted";
+
+  // retryExchangeName?: "retry-product-events";
+  // retryQueueName?: `retry-product-created-queue-${string}`;
+  // retryRoutingKey?: "retry-product-created";
 };
 
 export type AllOutbox =
