@@ -1,4 +1,4 @@
-import getRabbitChannel from "@config/rabbitmq";
+import getRabbitPublishingChannel from "@config/rabbitmq/publishingChannel";
 import { UserCreatedType } from "@Types/events/OutboxEvents";
 import { UserCreatedEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
@@ -9,7 +9,7 @@ const routingKey: UserCreatedType["routingKey"] = "user-created";
 
 async function userCreatedPublisher(event: UserCreatedEvent) {
   try {
-  const result = getRabbitChannel();
+  const result = getRabbitPublishingChannel();
   if (!result.ok) throw result;
   const { result: channel } = result;
 

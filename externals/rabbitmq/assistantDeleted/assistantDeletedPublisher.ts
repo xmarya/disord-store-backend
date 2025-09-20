@@ -1,4 +1,4 @@
-import getRabbitChannel from "@config/rabbitmq";
+import getRabbitPublishingChannel from "@config/rabbitmq/publishingChannel";
 import { AssistantDeletedEvent } from "@Types/events/AssistantEvents";
 import { AssistantDeletedType } from "@Types/events/OutboxEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
@@ -7,7 +7,7 @@ import { Success } from "@Types/ResultTypes/Success";
 const exchangeName: AssistantDeletedType["exchangeName"] = "assistant-events";
 const routingKey: AssistantDeletedType["routingKey"] = "assistant-deleted";
 async function assistantDeletedPublisher(event: AssistantDeletedEvent) {
-  const result = getRabbitChannel();
+  const result = getRabbitPublishingChannel();
   if (!result.ok) return new Failure(result.message);
 
   const { result: channel } = result;

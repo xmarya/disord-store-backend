@@ -1,4 +1,4 @@
-import getRabbitChannel from "@config/rabbitmq";
+import getRabbitPublishingChannel from "@config/rabbitmq/publishingChannel";
 import { UserDeletedType } from "@Types/events/OutboxEvents";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
@@ -10,7 +10,7 @@ const routingKey:UserDeletedType["routingKey"] = "user-deleted";
 
 async function userDeletedPublisher(event: UserDeletedEvent) {
 
-  const result = getRabbitChannel();
+  const result = getRabbitPublishingChannel();
   if (!result.ok) return result;
   const { result: channel } = result;
   try {
