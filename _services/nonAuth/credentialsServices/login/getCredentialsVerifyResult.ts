@@ -34,7 +34,6 @@ async function getCredentialsVerifyResult(loginMethod: LoginMethod, password: st
       user: loggedInUser.result,
       emailConfirmed,
     },
-    occurredAt: new Date(),
   };
 
   eventBus.publish(event);

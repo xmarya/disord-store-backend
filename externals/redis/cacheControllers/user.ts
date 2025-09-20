@@ -1,10 +1,7 @@
-import { AdminDocument } from "@Types/Schema/Users/admin/AdminUser";
-import { RegularUserDocument } from "@Types/Schema/Users/RegularUser";
+import { AllUsers } from "@Types/Schema/Users/AllUser";
 import { setCompressedCacheData } from "./globalCache";
-import { StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
-import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 
-async function cacheUser(user: RegularUserDocument | StoreOwnerDocument | AdminDocument | StoreAssistantDocument, emailConfirmed?: boolean) {
+async function cacheUser(user: AllUsers, emailConfirmed?: boolean) {
   const data = {
     id: user.id,
     userType: user.userType,
