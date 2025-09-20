@@ -8,10 +8,10 @@ import { UserCreatedEvent } from "@Types/events/UserEvents";
 const consumers = {
 
   redis: {
-    receiver: emailConfirmationTokenCache, queueName: `user-created-queue-redis`, requeue: true, queueOptions: { queueMode: "lazy", maxPriority: "normal" } 
+    receiver: emailConfirmationTokenCache, queueName: `user-created-queue-redis`, requeue: true, queueOptions: { queueMode: "lazy", maxPriority: "hight" } 
   },
    novu: {
-    receiver: novuSendWelcome, queueName: `user-created-queue-novu`, requeue: true, queueOptions: { queueMode: "lazy", maxPriority: "normal" }
+    receiver: novuSendWelcome, queueName: `user-created-queue-novu`, requeue: true, queueOptions: { queueMode: "lazy", maxPriority: "hight" }
    }
 } satisfies Record<string, ConsumerRegister<UserCreatedType, UserCreatedEvent>>
 function userCreatedConsumers() {
