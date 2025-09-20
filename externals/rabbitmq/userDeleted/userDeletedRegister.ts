@@ -3,16 +3,19 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import getConsumerACK from "../getConsumerACK";
 import userDeletedQueue from "./userDeletedQueue";
-import { AllOutbox, OutboxEventQueueNamesMap, UserDeletedType } from "@Types/events/OutboxEvents";
+import { AllOutbox, DeadLetterOptions, OutboxEventQueueNamesMap, QueueOptions, UserDeletedType } from "@Types/events/OutboxEvents";
 
 
 type ConsumerRegister<T extends AllOutbox> = {
   receiver: (event: UserDeletedEvent) => Promise<Success<any> | Failure>,
   queueName:OutboxEventQueueNamesMap<T>,
   requeue?:boolean
+  queueOptions?:QueueOptions,
+  deadLetterOptions?:DeadLetterOptions<UserDeletedType>
+  
 }
-async function userDeletedRegister({receiver, queueName, requeue}:ConsumerRegister<UserDeletedType>) {
-  const result = await userDeletedQueue(queueName);
+async function userDeletedRegister({receiver, queueName, requeue, queueOptions, deadLetterOptions}:ConsumerRegister<UserDeletedType>) {
+  const result = await userDeletedQueue(queueName, queueOptions, deadLetterOptions);
   if (!result.ok) return result;
   const {
     result: {channel },
