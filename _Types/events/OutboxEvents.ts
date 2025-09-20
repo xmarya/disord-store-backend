@@ -189,7 +189,7 @@ export type OutboxEventTypesMap = AllOutbox["type"];
 export type OutboxEventQueueNamesMap<T extends AllOutbox> = T["queueName"];
 
 export type ConsumerRegister<T extends AllOutbox, P extends OutboxEvent> = {
-  receiver: (event: P) => Promise<Success<any> | Failure>;
+  receiver: (event: P) => Promise<Success<{serviceName:string, ack:boolean}> | Failure>;
   queueName: OutboxEventQueueNamesMap<T>;
   requeue?: boolean;
   queueOptions?: QueueOptions;
