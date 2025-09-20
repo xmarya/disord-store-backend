@@ -1,11 +1,10 @@
 import { TokenSlicer } from "@constants/dataStructures";
 import { EmailConfirmationSentEvent, UserCreatedEvent } from "@Types/events/UserEvents";
-import { createRedisHash } from "../redisOperations/redisHash";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { ResultAsync } from "neverthrow";
-import safeThrowable from "@utils/safeThrowable";
-import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import { Success } from "@Types/ResultTypes/Success";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import safeThrowable from "@utils/safeThrowable";
+import { createRedisHash } from "../redisOperations/redisHash";
 
 async function emailConfirmationTokenCache(event: UserCreatedEvent | EmailConfirmationSentEvent) {
     console.log("📍emailConfirmationTokenCache");
