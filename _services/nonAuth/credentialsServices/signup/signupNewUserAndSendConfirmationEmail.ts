@@ -5,6 +5,7 @@ import { UserCreatedEvent } from "@Types/events/UserEvents";
 import { CredentialsSignupData } from "@Types/Schema/Users/SignupData";
 import generateEmailConfirmationToken from "@utils/generators/generateEmailConfirmationToken";
 import { startSession } from "mongoose";
+import createCredentialsAndEmailConfirmation from "./createCredentialsAndEmailConfirmation";
 
 async function signupNewUserAndSendConfirmationEmail(signupData: CredentialsSignupData, emailTokenGenerator: { hostname: string; protocol: string }) {
   const { firstName, lastName, email, userType, phoneNumber } = signupData;
@@ -13,13 +14,16 @@ async function signupNewUserAndSendConfirmationEmail(signupData: CredentialsSign
   const signupFn = getSignupFunctionOf(userType);
 
   const session = await startSession();
-  const { newUser, newCredentials } = await session.withTransaction(async () => {
+  const { newUser } = await session.withTransaction(async () => {
     const newUser = await signupFn(data, session);
-    const newCredentials = await createNewCredentials(signupData, session);
-    // confirmUrl for novu, randomToken from redis
-    const { confirmUrl, randomToken } = await generateEmailConfirmationToken(newCredentials, emailTokenGenerator); // FIX remove it from here after testing
-    await createOutboxRecord<UserCreatedEvent>("user-created", { user: newUser, credentialsId: newCredentials.id, confirmUrl, randomToken }, session)
-    return { newUser, newCredentials };
+    const result = await createCredentialsAndEmailConfirmation(signupData, session, emailTokenGenerator);
+    if (result.ok) {
+      const {
+        result: { credentialsId, confirmUrl, randomToken },
+      } = result;
+      await createOutboxRecord<[UserCreatedEvent]>([{ type: "user-created", payload: { user: newUser, credentialsId, confirmUrl, randomToken } }], session);
+    }
+    return { newUser };
   });
 
   return newUser;
