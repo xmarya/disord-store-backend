@@ -3,17 +3,9 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import userCreatedQueue from "./userCreatedQueue";
 import getConsumerACK from "../getConsumerACK";
-import { AllOutbox, DeadLetterOptions, OutboxEventQueueNamesMap, QueueOptions, UserCreatedType } from "@Types/events/OutboxEvents";
+import { AllOutbox, ConsumerRegister, DeadLetterOptions, OutboxEventQueueNamesMap, QueueOptions, UserCreatedType } from "@Types/events/OutboxEvents";
 
-type ConsumerRegister<T extends AllOutbox> = {
-  receiver: (event: UserCreatedEvent) => Promise<Success<any> | Failure>,
-  queueName:OutboxEventQueueNamesMap<T>,
-  requeue?:boolean,
-  queueOptions?:QueueOptions,
-  deadLetterOptions?:DeadLetterOptions<UserCreatedType>
-}
-
-async function userCreatedRegister<T extends UserCreatedType>({receiver, queueName, requeue, queueOptions, deadLetterOptions}:ConsumerRegister<T>) {
+async function userCreatedRegister({receiver, queueName, requeue, queueOptions, deadLetterOptions}:ConsumerRegister<UserCreatedType, UserCreatedEvent>) {
 
   try {
     const result = await userCreatedQueue(queueName, queueOptions, deadLetterOptions);

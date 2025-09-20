@@ -1,19 +1,12 @@
 import { AssistantDeletedEvent } from "@Types/events/AssistantEvents";
-import { AssistantDeletedType, DeadLetterOptions, QueueOptions } from "@Types/events/OutboxEvents";
+import { AssistantDeletedType, ConsumerRegister, DeadLetterOptions, QueueOptions } from "@Types/events/OutboxEvents";
 import { Failure, RabbitConsumerDTO } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import getConsumerACK from "../getConsumerACK";
 import assistantDeletedQueue from "./assistantDeletedQueue";
 
-type Arguments = {
-  receiver: (event: AssistantDeletedEvent) => Promise<Success<RabbitConsumerDTO> | Failure>;
-  queueName: AssistantDeletedType["queueName"];
-  requeue: boolean;
-  queueOptions?: QueueOptions;
-  deadLetterOptions?:DeadLetterOptions<AssistantDeletedType>
-  
-};
-async function assistantDeletedRegister({ receiver, queueName, requeue, queueOptions, deadLetterOptions }: Arguments) {
+
+async function assistantDeletedRegister({ receiver, queueName, requeue, queueOptions, deadLetterOptions }: ConsumerRegister<AssistantDeletedType, AssistantDeletedEvent>) {
   const result = await assistantDeletedQueue(queueName, queueOptions, deadLetterOptions);
   if (!result.ok) return result;
   const {

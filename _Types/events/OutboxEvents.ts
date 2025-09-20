@@ -1,5 +1,6 @@
-import { ms } from "ms";
 import { DomainEvent } from "./DomainEvent";
+import { Success } from "@Types/ResultTypes/Success";
+import { Failure, RabbitConsumerDTO } from "@Types/ResultTypes/errors/Failure";
 
 export type OutboxRecordsInfo = Record<string, Record<string, Record<string, boolean>>>;
 
@@ -186,3 +187,11 @@ export type AllOutbox =
 
 export type OutboxEventTypesMap = AllOutbox["type"];
 export type OutboxEventQueueNamesMap<T extends AllOutbox> = T["queueName"];
+
+export type ConsumerRegister<T extends AllOutbox, P extends OutboxEvent> = {
+  receiver: (event: P) => Promise<Success<any> | Failure>;
+  queueName: OutboxEventQueueNamesMap<T>;
+  requeue?: boolean;
+  queueOptions?: QueueOptions;
+  deadLetterOptions?: DeadLetterOptions<T>;
+};
