@@ -6,11 +6,8 @@ import safeThrowable from "@utils/safeThrowable";
 import { concatMap } from "rxjs";
 
 eventBus.ofType<UserLoggedInEvent>("user-loggedIn").pipe(concatMap(async(event) => {
-  
-  const { user, emailConfirmed } = event.payload;
-
   safeThrowable(
-    () => cacheUser(user, emailConfirmed),
+    () => cacheUser(event),
     (error) => new Failure((error as Error).message)
   );
 })).subscribe();
