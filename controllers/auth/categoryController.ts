@@ -69,19 +69,3 @@ export const deleteCategoryController = catchAsync(async (request, response, nex
     success: true,
   });
 });
-
-export async function categoriesInCache(productId: MongoId): Promise<CategoryBasic[]> {
-  let categories;
-
-  // STEP 1) look in cache:
-  categories = await getDecompressedCacheData<CategoryBasic[]>(`Category:${productId}`);
-
-  // STEP 2) nothing? get from db:
-  if (!categories) {
-    categories = await getAllProductCategories(productId);
-
-    await setCompressedCacheData(`Category:${productId}`, categories, "fifteen-minutes");
-  }
-
-  return categories;
-}

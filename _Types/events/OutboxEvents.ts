@@ -127,35 +127,6 @@ export type AssistantDeletedType = {
   // retryRoutingKey?: "retry-assistant-deleted";
 };
 
-export type ProductCreatedType = {
-  type: "product-created";
-  exchangeName: "product-events";
-  queueName: `product-created-queue-${string}`;
-  routingKey: "product-created";
-
-  deadExchangeName: "dead-product-events";
-  deadQueueName: `dead-product-created-queue-${string}`;
-  deadRoutingKey: "dead-product-created";
-
-  // retryExchangeName?: "retry-product-events";
-  // retryQueueName?: `retry-product-created-queue-${string}`;
-  // retryRoutingKey?: "retry-product-created";
-};
-
-export type ProductUpdatedType = {
-  type: "product-updated";
-  exchangeName: "product-events";
-  queueName: `product-updated-queue-${string}`;
-  routingKey: "product-updated";
-
-  deadExchangeName: "dead-product-events";
-  deadQueueName: `dead-product-updated-queue-${string}`;
-  deadRoutingKey: "dead-product-updated";
-
-  // retryExchangeName?: "retry-product-events";
-  // retryQueueName?: `retry-product-updated-queue-${string}`;
-  // retryRoutingKey?: "retry-product-updated";
-};
 
 export type ProductDeletedType = {
   type: "product-deleted";
@@ -191,8 +162,6 @@ export type AllOutbox =
   | UserCreatedType
   | UserUpdatedType
   | UserDeletedType
-  | ProductCreatedType
-  | ProductUpdatedType
   | ProductDeletedType
   | AssistantCreatedType
   | AssistantUpdatedType
