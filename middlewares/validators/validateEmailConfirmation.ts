@@ -15,6 +15,7 @@ const validateEmailConfirmation = catchAsync(async (request, response, next) => 
   const { emailConfirmed } = credentials;
   if (!emailConfirmed) return next(returnError(new Forbidden("the email address has not been confirmed yet. Please confirm the email address and try again")));
 
+  request.emailConfirmed = emailConfirmed;
   next();
 });
 
