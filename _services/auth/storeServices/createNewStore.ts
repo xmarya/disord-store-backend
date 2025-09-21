@@ -1,5 +1,6 @@
 import { createStore } from "@repositories/store/storeRepo";
 import { assignStoreToOwner } from "@repositories/storeOwner/storeOwnerRepo";
+import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
@@ -18,22 +19,23 @@ async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDa
     const newStore = await createStore(data, session);
     const updatedOwner = await assignStoreToOwner(data.owner, newStore.id, session);
 
+    await createOutboxRecord<[UserUpdatedEvent]>(
+      [
+        {
+          type: "user-updated",
+          payload: {
+            user: updatedOwner as AllUsers,
+            emailConfirmed,
+          },
+        },
+      ],
+      session
+    );
     return { newStore, updatedOwner };
   });
 
-  if(!newStore.id || !updatedOwner?.myStore) return new Failure("حدثت مشكلة أثناء انشاء متجرك");
-  const event: UserUpdatedEvent = {
-    type: "user-updated",
-    payload: {
-      user: updatedOwner as AllUsers,
-      emailConfirmed,
-    },
+  if (!newStore.id || !updatedOwner?.myStore) return new Failure("حدثت مشكلة أثناء انشاء متجرك");
 
-    occurredAt: new Date(),
-  };
-
-//FIX using outbox pattern
-  // eventBus.publish(event);
   return new Success(newStore);
 }
 

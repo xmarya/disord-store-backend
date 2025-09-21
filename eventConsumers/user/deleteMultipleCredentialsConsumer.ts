@@ -8,7 +8,7 @@ import safeThrowable from "@utils/safeThrowable";
 import { AnyBulkWriteOperation } from "mongoose";
 
 // NOTE: run this using worker, it's a consumer function
-async function deleteMultipleCredentials(event: UserDeletedEvent) {
+async function deleteMultipleCredentialsConsumer(event: UserDeletedEvent) {
   const {payload} = event;
   const bulkOps: Array<AnyBulkWriteOperation<CredentialsDocument>> = [
     {
@@ -24,9 +24,9 @@ async function deleteMultipleCredentials(event: UserDeletedEvent) {
 
   const bulkResult = await extractSafeThrowableResult(() => safeBulk);
 
-  if (!bulkResult.ok) return new Failure(bulkResult.message, { credentialsCollection: false });
+  if (!bulkResult.ok) return new Failure(bulkResult.message, { serviceName:"credentialsCollection", ack:false });
 
-  return new Success({ credentialsCollection: true });
+  return new Success({ serviceName:"credentialsCollection", ack:true });
 }
 
-export default deleteMultipleCredentials;
+export default deleteMultipleCredentialsConsumer;

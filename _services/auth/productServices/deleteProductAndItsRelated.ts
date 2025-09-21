@@ -1,4 +1,3 @@
-import eventBus from "@config/EventBus";
 import Product from "@models/productModel";
 import { deleteDoc } from "@repositories/global";
 import { ProductDeletedEvent } from "@Types/events/ProductEvents";
@@ -20,13 +19,15 @@ async function deleteProductAndItsRelated(productId: MongoId) {
   const event: ProductDeletedEvent = {
     type: "product-deleted",
     payload: {
+      outboxRecordId:"",
       productId: deletedProduct.id,
       categories: deletedProduct.categories as MongoId[],
     },
     occurredAt: new Date(),
   };
 
-  eventBus.publish(event);
+  //FIX using outbox pattern
+  // eventBus.publish(event);  
 
   return deleteProductResult;
 }

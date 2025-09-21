@@ -1,4 +1,3 @@
-import eventBus from "@config/EventBus";
 import { updateAssistant } from "@repositories/assistant/assistantRepo";
 import { AssistantUpdatedEvent } from "@Types/events/AssistantEvents";
 import { MongoId } from "@Types/Schema/MongoId";
@@ -8,6 +7,8 @@ import { StoreAssistant } from "@Types/Schema/Users/StoreAssistant";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
+
+// TODO write the event to outbox collection
 async function updateStoreAssistant(assistantId: MongoId, storeId: MongoId, updatedData: Partial<Omit<StoreAssistant, "credentials" | "userType" | "inStore" | "inPlan">>) {
   if (!Object.keys(updatedData).length) return new BadRequest("no data was provided in the request.body");
 
@@ -36,26 +37,6 @@ async function updateStoreAssistant(assistantId: MongoId, storeId: MongoId, upda
 
   if (!updateAssistantResult.ok) return updateAssistantResult;
 
-  const { result } = updateAssistantResult;
-  const event: AssistantUpdatedEvent = {
-    type: "assistant-updated",
-    payload: {
-      assistantId, // FIX duplicated values
-      storeId,
-      permissions: result.permissions,
-      novuSubscriber: {
-        firstName: result.firstName,
-        lastName: result.lastName,
-        email: result.email,
-        phoneNumber: result.phoneNumber,
-        userType: result.userType,
-        id: assistantId, // FIX duplicated values
-      },
-    },
-    occurredAt: new Date(),
-  };
-
-  eventBus.publish(event);
 
   return updateAssistantResult;
 }
