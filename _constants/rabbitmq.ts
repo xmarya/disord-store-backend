@@ -32,5 +32,5 @@ export const CRITICAL_QUEUE_OPTIONS:Pick<QueueOptions, "queueMode"| "maxPriority
 
 export const CACHE_INVALIDATION_QUEUE_OPTIONS:QueueOptions = {
   maxLength:500, // old invalidations aren’t critical once superseded
-  maxPriority: "low"
+  maxPriority: "hight"
 }
