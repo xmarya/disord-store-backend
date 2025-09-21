@@ -47,6 +47,10 @@ export async function updateAssistant(assistantId: MongoId, storeId: MongoId, pe
   );
 }
 
+export async function updateInPlanForAssistants(storeId:MongoId, planId:MongoId) {
+  return await StoreAssistant.updateMany({inStore: storeId}, {inPlan: planId});
+}
+
 export async function deleteAssistant(assistantId: MongoId, storeId: MongoId, session:mongoose.ClientSession) {
   return await StoreAssistant.findOneAndDelete({ _id: assistantId, inStore: storeId }, { session });
 }
