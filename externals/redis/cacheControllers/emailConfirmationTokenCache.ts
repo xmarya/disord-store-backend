@@ -29,7 +29,7 @@ async function emailConfirmationTokenCache(event: UserCreatedEvent | EmailConfir
 
   if(!createRedisCacheResult.ok && createRedisCacheResult.reason === "error") return new Failure(createRedisCacheResult.message, {serviceName:"redis", ack: false});
 
-  return new Success({redis: true});
+  return new Success({serviceName:"redis", ack:true});
 }
 
 export default emailConfirmationTokenCache;
