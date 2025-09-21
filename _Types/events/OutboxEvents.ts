@@ -9,35 +9,33 @@ export interface OutboxEvent extends DomainEvent {
 }
 
 export type PriorityLevelMap = {
-  "no-priority": number,
-  "background": number,
-  "low":number,
-  "normal": number,
-  "hight":number,
-  "urgent": number,
-  "critical": number
+  "no-priority": number;
+  background: number;
+  low: number;
+  normal: number;
+  hight: number;
+  urgent: number;
+  critical: number;
 };
 
 export type PriorityLevel = keyof PriorityLevelMap;
 
 export type QueueOptions = {
-  durable?: boolean,
-  maxPriority?:PriorityLevel,
-  queueMode?: "default" | "lazy",
-  messageTtl?:number, // in milliseconds
-  maxLength?:number,
-  deadLetterExchange?:string, // If a message expires or is rejected → RabbitMQ republishes it to dead-letter-exchange with routing key user-deleted-redis.DLQ.
-  deadLetterRoutingKey?:string, // if not ser, RabbitMQ will reuse the original routing key.
-  expires?:number // for temporary queues
-
-}
+  durable?: boolean;
+  maxPriority?: PriorityLevel;
+  queueMode?: "default" | "lazy";
+  messageTtl?: number; // in milliseconds
+  maxLength?: number;
+  deadLetterExchange?: string; // If a message expires or is rejected → RabbitMQ republishes it to dead-letter-exchange with routing key user-deleted-redis.DLQ.
+  deadLetterRoutingKey?: string; // if not ser, RabbitMQ will reuse the original routing key.
+  expires?: number; // for temporary queues
+};
 
 export type DeadLetterOptions<T extends AllOutbox> = {
-  deadExchangeName:T["deadExchangeName"], // If a message expires or is rejected → RabbitMQ republishes it to dead-letter-exchange with routing key user-deleted-redis.DLQ.
-  deadRoutingKey:T["deadRoutingKey"], // if not ser, RabbitMQ will reuse the original routing key.
-  deadQueueName:T["deadQueueName"]
-}
-
+  deadExchangeName: T["deadExchangeName"]; // If a message expires or is rejected → RabbitMQ republishes it to dead-letter-exchange with routing key user-deleted-redis.DLQ.
+  deadRoutingKey: T["deadRoutingKey"]; // if not ser, RabbitMQ will reuse the original routing key.
+  deadQueueName: T["deadQueueName"];
+};
 
 export type UserCreatedType = {
   type: "user-created";
@@ -174,6 +172,21 @@ export type ProductDeletedType = {
   // retryRoutingKey?: "retry-product-created";
 };
 
+export type PlanSubscriptionUpdatedType = {
+  type: "planSubscription-updated";
+  exchangeName: "planSubscription-events";
+  queueName: `planSubscription-updated-queue-${string}`;
+  routingKey: "planSubscription-updated";
+
+  deadExchangeName: "dead-planSubscription-events";
+  deadQueueName: `dead-planSubscription-updated-queue-${string}`;
+  deadRoutingKey: "dead-planSubscription-updated";
+
+  // retryExchangeName?: "retry-planSubscription-events";
+  // retryQueueName?: `retry-planSubscription-updated-queue-${string}`;
+  // retryRoutingKey?: "retry-planSubscription-updated";
+};
+
 export type AllOutbox =
   | UserCreatedType
   | UserUpdatedType
@@ -183,7 +196,8 @@ export type AllOutbox =
   | ProductDeletedType
   | AssistantCreatedType
   | AssistantUpdatedType
-  | AssistantDeletedType;
+  | AssistantDeletedType
+  | PlanSubscriptionUpdatedType;
 
 export type OutboxEventTypesMap = AllOutbox["type"];
 export type OutboxEventQueueNamesMap<T extends AllOutbox> = T["queueName"];

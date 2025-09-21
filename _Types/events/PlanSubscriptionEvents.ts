@@ -1,12 +1,11 @@
 import { PlansNames, SubscriptionTypes } from "@Types/Schema/Plan";
-import { DomainEvent } from "./DomainEvent";
 import { MongoId } from "@Types/Schema/MongoId";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
+import { OutboxEvent } from "./OutboxEvents";
 
-export interface PlanSubscriptionUpdateEvent extends DomainEvent {
+export interface PlanSubscriptionUpdatedEvent extends OutboxEvent {
   type: "planSubscription-updated";
   payload: {
-    outboxRecordId: string;
     storeOwner: StoreOwnerDocument;
     planName: PlansNames;
     planId: MongoId;
