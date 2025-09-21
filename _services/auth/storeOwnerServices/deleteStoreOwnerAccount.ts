@@ -14,14 +14,17 @@ async function deleteStoreOwnerAccount(storeOwnerId: MongoId, storeId: MongoId) 
     const deletedStoreOwner = await deleteDoc(StoreOwner, storeOwnerId, { session });
     await deleteStoreAndItsRelatedResourcePermanently(storeId, session);
     if (deletedStoreOwner) {
-      await createOutboxRecord<UserDeletedEvent>("user-deleted", 
-        { usersId: [deletedStoreOwner.id], emailsToDelete: [deletedStoreOwner.email], userType: deletedStoreOwner.userType }, 
-        session);
+      const payload: UserDeletedEvent["payload"] = {
+        usersId: [deletedStoreOwner.id],
+        emailsToDelete: [deletedStoreOwner.email],
+        userType: deletedStoreOwner.userType,
+      };
+      await createOutboxRecord<[UserDeletedEvent]>([{ type: "user-deleted", payload }], session);
     }
-    
+
     return deletedStoreOwner;
   });
-  
+
   // TODO: publish to rabbit to delete credentials
   // ADD FEATURE for adding the deleted data to an AdminLog
 
