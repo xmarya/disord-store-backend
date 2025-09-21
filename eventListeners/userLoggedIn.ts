@@ -7,10 +7,10 @@ import { concatMap } from "rxjs";
 
 eventBus.ofType<UserLoggedInEvent>("user-loggedIn").pipe(concatMap(async(event) => {
   
-  const { user } = event.payload;
+  const { user, emailConfirmed } = event.payload;
 
   safeThrowable(
-    () => cacheUser(user),
+    () => cacheUser(user, emailConfirmed),
     (error) => new Failure((error as Error).message)
   );
 })).subscribe();
