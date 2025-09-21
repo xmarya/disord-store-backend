@@ -27,7 +27,7 @@ console.log("assignPlanIdToRequest");
 
   // since the code progressed until this point, that mean the data are not available in the cache.
   // so, cache them without awaiting:
-  await cacheStoreAndPlan(request.store, request.plan, request.isPlanPaid, request.planExpiryDate);
+  await cacheStoreAndPlan({store: request.store, plan: request.plan, isPaid: request.isPlanPaid, planExpiryDate:request.planExpiryDate});
   next();
 });
 
