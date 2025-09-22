@@ -1,7 +1,8 @@
 import bullmq from "@config/bullmq";
 import publishFactory from "@externals/rabbitmq/publishFactory";
-import { getOneOutboxRecord } from "@repositories/outboxRecord/outboxRecordRepo";
+import { getOneOutboxRecord, resetOneOutboxRecordToPendingStatus } from "@repositories/outboxRecord/outboxRecordRepo";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { MongoId } from "@Types/Schema/MongoId";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import { ms } from "ms";
@@ -20,7 +21,8 @@ async function getPendingOutboxRecordProcessor() {
   const result = await extractSafeThrowableResult(() => getResult);
   if (!result.ok) return;
   const { result: event } = result;
-  await publishFactory(event);
+  const hasPublished = await publishFactory(event);
+  if(!hasPublished.ok) await resetOneOutboxRecordToPendingStatus(event._id as MongoId);
 }
 
 export default pendingOutboxRecordBullMQ;
