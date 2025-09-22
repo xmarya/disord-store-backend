@@ -20,6 +20,10 @@ export async function getOneOutboxRecord() {
   return await OutboxRecord.findOneAndUpdate({ status: "pending" }, {status:"processing", sent: new Date()});
 }
 
+export async function resetOneOutboxRecordToPendingStatus(recordId:MongoId) {
+  await OutboxRecord.findByIdAndUpdate(recordId, {status: "pending", $unset: {sent: ""}});
+}
+
 export async function updateOutboxRecordStatusToCompleted<T extends DomainEvent>(type: T["type"], recordId: MongoId) {
   
   return await OutboxRecord.findOneAndUpdate({ _id: recordId, type }, {status: "completed"}, { new: true });
