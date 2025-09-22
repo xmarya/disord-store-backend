@@ -158,6 +158,21 @@ export type PlanSubscriptionUpdatedType = {
   // retryRoutingKey?: "retry-planSubscription-updated";
 };
 
+export type StoreDeletedType = {
+  type: "store-deleted";
+  exchangeName: "store-events";
+  queueName: `store-deleted-queue-${string}`;
+  routingKey: "store-deleted";
+
+  deadExchangeName: "dead-store-events";
+  deadQueueName: `dead-store-deleted-queue-${string}`;
+  deadRoutingKey: "dead-store-deleted";
+
+  // retryExchangeName?: "retry-store-events";
+  // retryQueueName?: `retry-store-deleted-queue-${string}`;
+  // retryRoutingKey?: "retry-store-deleted";
+};
+
 export type AllOutbox =
   | UserCreatedType
   | UserUpdatedType
@@ -166,7 +181,8 @@ export type AllOutbox =
   | AssistantCreatedType
   | AssistantUpdatedType
   | AssistantDeletedType
-  | PlanSubscriptionUpdatedType;
+  | PlanSubscriptionUpdatedType
+  | StoreDeletedType;
 
 export type OutboxEventTypesMap = AllOutbox["type"];
 export type OutboxEventQueueNamesMap<T extends AllOutbox> = T["queueName"];
