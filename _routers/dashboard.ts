@@ -1,31 +1,29 @@
 import express from "express";
-import { router as settingsRouter } from "./auth/settingsRouter";
-import { router as adminRouter } from "./auth/adminRoutes";
-import { router as storeRouter } from "./auth/storeRoutes";
-import { router as assistantRouter } from "./auth/assistantRoutes";
-import { router as categoryRouter } from "./auth/categoryRoutes";
-import { router as meRouter } from "./auth/meRoutes";
-import { router as orderRouter } from "./auth/orderRoutes";
-import { router as couponsRouter } from "./auth/couponRoutes";
-import { router as platformReviewsRouter } from "./auth/reviews/platformReviewsRoutes";
-import { router as productRouter } from "./auth/productRoutes";
-import { router as subscriptionsRouter } from "./auth/subscriptionsRoutes";
-import { verifyPlanSubscription } from "../middlewares/validators/verifyPlanSubscription";
-import validateJwtToken from "../middlewares/validators/validateJwtToken";
-import getUserFromPayload from "../middlewares/protectors/getUserFromPayload";
-import { logout } from "../controllers/auth/userAuthController";
-import restrict from "../middlewares/protectors/restrict";
-import sanitisedData from "../middlewares/validators/sanitisedData";
-import { createStoreController } from "../controllers/auth/storeControllers";
+import canCreateStore from "middlewares/protectors/canCreateStore";
 import { testInvoiceController } from "../controllers/auth/invoiceController";
+import { createReviewController } from "../controllers/auth/reviews/publicReviewController";
+import { createStoreController } from "../controllers/auth/storeControllers";
+import { logout } from "../controllers/auth/userAuthController";
+import getUserFromPayload from "../middlewares/protectors/getUserFromPayload";
+import restrict from "../middlewares/protectors/restrict";
+import assignFromCacheToRequest from "../middlewares/requestModifiers/assignFromCacheToRequest";
+import assignPlanIdToRequest from "../middlewares/requestModifiers/assignPlanIdToRequest";
 import refreshToken from "../middlewares/requestModifiers/refreshToken";
 import { sendConfirmationEmail } from "../middlewares/sendConfirmationEmail";
-import { createReviewController } from "../controllers/auth/reviews/publicReviewController";
-import assignFromCacheToRequest from "../middlewares/requestModifiers/assignFromCacheToRequest";
-import { assignStoreIdToRequest } from "../middlewares/requestModifiers/assignStoreIdToRequest";
-import assignPlanIdToRequest from "../middlewares/requestModifiers/assignPlanIdToRequest";
-import canCreateStore from "middlewares/protectors/canCreateStore";
-import { createNewSubscribeController, getMySubscriptionsLogController } from "@controllers/auth/subscriptionController";
+import sanitisedData from "../middlewares/validators/sanitisedData";
+import validateJwtToken from "../middlewares/validators/validateJwtToken";
+import { verifyPlanSubscription } from "../middlewares/validators/verifyPlanSubscription";
+import { router as adminRouter } from "./auth/adminRoutes";
+import { router as assistantRouter } from "./auth/assistantRoutes";
+import { router as categoryRouter } from "./auth/categoryRoutes";
+import { router as couponsRouter } from "./auth/couponRoutes";
+import { router as meRouter } from "./auth/meRoutes";
+import { router as orderRouter } from "./auth/orderRoutes";
+import { router as productRouter } from "./auth/productRoutes";
+import { router as platformReviewsRouter } from "./auth/reviews/platformReviewsRoutes";
+import { router as settingsRouter } from "./auth/settingsRouter";
+import { router as storeRouter } from "./auth/storeRoutes";
+import { router as subscriptionsRouter } from "./auth/subscriptionsRoutes";
 
 export const router = express.Router();
 
@@ -54,6 +52,4 @@ router.use("/orders", orderRouter);
 
 /* TODO
     1- blocking the assistants accounts if any in case the owner downgraded the plan to basic
-    2- check Novu settings in the production, the welcome email, registering new subscribers don't work
-$2b$13$O3gPBrQKLvwcD5zz/1Q3x.irXBOyCTcIYEH9.YGmRG/vke2pMJl/i
 */
