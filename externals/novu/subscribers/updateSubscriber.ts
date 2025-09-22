@@ -7,14 +7,6 @@ import { AssistantPermissions, StoreAssistantDocument } from "@Types/Schema/User
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-type NovuUpdatedData = {
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
-  permissions?: AssistantPermissions;
-};
-
 async function novuUpdateSubscriber(event:UserUpdatedEvent) {
   const {_id, id, email, firstName, lastName, phoneNumber} = event.payload.user;
   const {permissions} = event.payload.user as StoreAssistantDocument;
