@@ -4,7 +4,7 @@ import { StoreDeletedEvent } from "@Types/events/StoreEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 
-const exchangeName: StoreDeletedType["exchangeName"] = "store-events";
+const exchangeName: StoreDeletedType["exchangeName"] = "main-store-events";
 const routingKey: StoreDeletedType["routingKey"] = "store-deleted";
 
 async function storeDeletedPublisher(event: StoreDeletedEvent) {

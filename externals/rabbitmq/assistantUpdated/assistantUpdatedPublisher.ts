@@ -5,7 +5,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 
 
-const exchangeName: AssistantUpdatedType["exchangeName"] = "assistant-events";
+const exchangeName: AssistantUpdatedType["exchangeName"] = "main-assistant-events";
 const routingKey: AssistantUpdatedType["routingKey"] = "assistant-updated";
 
 

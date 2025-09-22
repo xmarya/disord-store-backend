@@ -39,7 +39,7 @@ export type DeadLetterOptions<T extends AllOutbox> = {
 
 export type UserCreatedType = {
   type: "user-created";
-  exchangeName: "user-events";
+  exchangeName: "main-user-events";
   queueName: `user-created-queue-${string}`;
   routingKey: "user-created";
 
@@ -54,7 +54,7 @@ export type UserCreatedType = {
 
 export type UserUpdatedType = {
   type: "user-updated";
-  exchangeName: "user-events";
+  exchangeName: "main-user-events";
   queueName: `user-updated-queue-${string}`;
   routingKey: "user-updated";
 
@@ -69,7 +69,7 @@ export type UserUpdatedType = {
 
 export type UserDeletedType = {
   type: "user-deleted";
-  exchangeName: "user-events";
+  exchangeName: "main-user-events";
   queueName: `user-deleted-queue-${string}`;
   routingKey: "user-deleted";
 
@@ -84,7 +84,7 @@ export type UserDeletedType = {
 
 export type AssistantCreatedType = {
   type: "assistant-created";
-  exchangeName: "assistant-events";
+  exchangeName: "main-assistant-events";
   queueName: `assistant-created-queue-${string}`;
   routingKey: "assistant-created";
 
@@ -99,7 +99,7 @@ export type AssistantCreatedType = {
 
 export type AssistantUpdatedType = {
   type: "assistant-updated";
-  exchangeName: "assistant-events";
+  exchangeName: "main-assistant-events";
   queueName: `assistant-updated-queue-${string}`;
   routingKey: "assistant-updated";
 
@@ -114,7 +114,7 @@ export type AssistantUpdatedType = {
 
 export type AssistantDeletedType = {
   type: "assistant-deleted";
-  exchangeName: "assistant-events";
+  exchangeName: "main-assistant-events";
   queueName: `assistant-deleted-queue-${string}`;
   routingKey: "assistant-deleted";
 
@@ -130,7 +130,7 @@ export type AssistantDeletedType = {
 
 export type ProductDeletedType = {
   type: "product-deleted";
-  exchangeName: "product-events";
+  exchangeName: "main-product-events";
   queueName: `product-deleted-queue-${string}`;
   routingKey: "product-deleted";
 
@@ -145,7 +145,7 @@ export type ProductDeletedType = {
 
 export type PlanSubscriptionUpdatedType = {
   type: "planSubscription-updated";
-  exchangeName: "planSubscription-events";
+  exchangeName: "main-planSubscription-events";
   queueName: `planSubscription-updated-queue-${string}`;
   routingKey: "planSubscription-updated";
 
@@ -160,7 +160,7 @@ export type PlanSubscriptionUpdatedType = {
 
 export type StoreDeletedType = {
   type: "store-deleted";
-  exchangeName: "store-events";
+  exchangeName: "main-store-events";
   queueName: `store-deleted-queue-${string}`;
   routingKey: "store-deleted";
 

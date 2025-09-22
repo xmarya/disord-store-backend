@@ -5,7 +5,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import deadLetterQueue from "../deadLetterQueue";
 import { Success } from "@Types/ResultTypes/Success";
 
-const exchangeName: AssistantCreatedType["exchangeName"] = "assistant-events";
+const exchangeName: AssistantCreatedType["exchangeName"] = "main-assistant-events";
 const routingKey: AssistantCreatedType["routingKey"] = "assistant-created";
 
 async function assistantCreatedQueue(queueName: AssistantCreatedType["queueName"], queueOptions?: QueueOptions, deadLetterOptions?: DeadLetterOptions<AssistantCreatedType>) {

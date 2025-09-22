@@ -5,7 +5,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import deadLetterQueue from "../deadLetterQueue";
 
-const exchangeName: ProductDeletedType["exchangeName"] = "product-events";
+const exchangeName: ProductDeletedType["exchangeName"] = "main-product-events";
 const routingKey: ProductDeletedType["routingKey"] = "product-deleted";
 
 async function productDeletedQueue(queueName: ProductDeletedType["queueName"], queueOptions?: QueueOptions, deadLetterOptions?: DeadLetterOptions<ProductDeletedType>) {

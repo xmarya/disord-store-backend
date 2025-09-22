@@ -4,7 +4,7 @@ import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 
-const exchangeName: UserUpdatedType["exchangeName"] = "user-events";
+const exchangeName: UserUpdatedType["exchangeName"] = "main-user-events";
 const routingKey: UserUpdatedType["routingKey"] = "user-updated";
 
 async function userUpdatedPublisher(event: UserUpdatedEvent) {

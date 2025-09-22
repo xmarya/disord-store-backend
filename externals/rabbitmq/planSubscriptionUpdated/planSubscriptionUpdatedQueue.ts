@@ -5,7 +5,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import deadLetterQueue from "../deadLetterQueue";
 import { Success } from "@Types/ResultTypes/Success";
 
-const exchangeName: PlanSubscriptionUpdatedType["exchangeName"] = "planSubscription-events";
+const exchangeName: PlanSubscriptionUpdatedType["exchangeName"] = "main-planSubscription-events";
 const routingKey: PlanSubscriptionUpdatedType["routingKey"] = "planSubscription-updated";
 
 async function planSubscriptionUpdatedQueue(queueName: PlanSubscriptionUpdatedType["queueName"], queueOptions?: QueueOptions, deadLetterOptions?: DeadLetterOptions<PlanSubscriptionUpdatedType>) {

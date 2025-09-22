@@ -5,7 +5,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import deadLetterQueue from "../deadLetterQueue";
 import { Success } from "@Types/ResultTypes/Success";
 
-const exchangeName: StoreDeletedType["exchangeName"] = "store-events";
+const exchangeName: StoreDeletedType["exchangeName"] = "main-store-events";
 const routingKey: StoreDeletedType["routingKey"] = "store-deleted";
 
 async function storeDeletedQueue(queueName: StoreDeletedType["queueName"], queueOptions?: QueueOptions, deadLetterOptions?: DeadLetterOptions<StoreDeletedType>) {

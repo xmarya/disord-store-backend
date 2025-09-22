@@ -4,7 +4,7 @@ import { PlanSubscriptionUpdatedEvent } from "@Types/events/PlanSubscriptionEven
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 
-const exchangeName: PlanSubscriptionUpdatedType["exchangeName"] = "planSubscription-events";
+const exchangeName: PlanSubscriptionUpdatedType["exchangeName"] = "main-planSubscription-events";
 const routingKey: PlanSubscriptionUpdatedType["routingKey"] = "planSubscription-updated";
 
 async function planSubscriptionUpdatedPublisher(event: PlanSubscriptionUpdatedEvent) {

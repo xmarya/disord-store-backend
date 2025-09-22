@@ -5,7 +5,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import deadLetterQueue from "../deadLetterQueue";
 import { Success } from "@Types/ResultTypes/Success";
 
-const exchangeName: UserUpdatedType["exchangeName"] = "user-events";
+const exchangeName: UserUpdatedType["exchangeName"] = "main-user-events";
 const routingKey: UserUpdatedType["routingKey"] = "user-updated";
 async function userUpdatedQueue(queueName: UserUpdatedType["queueName"], queueOptions?: QueueOptions, deadLetterOptions?: DeadLetterOptions<UserUpdatedType>) {
   const result = getRabbitConsumingChannel();

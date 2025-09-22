@@ -5,7 +5,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 
 
-const exchangeName:UserDeletedType["exchangeName"] = "user-events";
+const exchangeName:UserDeletedType["exchangeName"] = "main-user-events";
 const routingKey:UserDeletedType["routingKey"] = "user-deleted";
 
 async function userDeletedPublisher(event: UserDeletedEvent) {

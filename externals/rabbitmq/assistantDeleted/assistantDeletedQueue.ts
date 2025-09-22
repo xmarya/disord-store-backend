@@ -5,7 +5,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import deadLetterQueue from "../deadLetterQueue";
 
-const exchangeName: AssistantDeletedType["exchangeName"] = "assistant-events";
+const exchangeName: AssistantDeletedType["exchangeName"] = "main-assistant-events";
 const routingKey: AssistantDeletedType["routingKey"] = "assistant-deleted";
 async function assistantDeletedQueue(queueName: AssistantDeletedType["queueName"], queueOptions?: QueueOptions, deadLetterOptions?:DeadLetterOptions<AssistantDeletedType>) {
   const result = getRabbitConsumingChannel();
