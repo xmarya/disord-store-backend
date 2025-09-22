@@ -8,6 +8,7 @@ import assistantDeletedPublisher from "./assistantDeleted/assistantDeletedPublis
 import assistantCreatedPublisher from "./assistantCreated/assistantCreatedPublisher";
 import planSubscriptionUpdatedPublisher from "./planSubscriptionUpdated/planSubscriptionUpdatedPublisher";
 import userUpdatedPublisher from "./userUpdated/userUpdatedPublisher";
+import assistantUpdatedPublisher from "./assistantUpdated/assistantUpdatedPublisher";
 
 type PublisherFunction = (event: any) => Promise<Success<any> | Failure>;
 
@@ -16,7 +17,7 @@ const publishers: Record<OutboxEventTypesMap, PublisherFunction> = {
   "user-updated": userUpdatedPublisher,
   "user-deleted": userDeletedPublisher,
   "assistant-created": assistantCreatedPublisher,
-  "assistant-updated": assistantDeletedPublisher, /* CHANGE LATER:  */
+  "assistant-updated": assistantUpdatedPublisher,
   "assistant-deleted": assistantDeletedPublisher,
   "product-deleted": userDeletedPublisher, /* CHANGE LATER:  */
   "planSubscription-updated": planSubscriptionUpdatedPublisher
