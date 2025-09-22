@@ -5,6 +5,7 @@ import deleteMultipleCredentials from "eventConsumers/user/deleteMultipleCredent
 import { ConsumerRegister, UserDeletedType } from "@Types/events/OutboxEvents";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
 import userDeletedRegister from "./userDeletedRegister";
+import deleteRegularUserRelatedResources from "eventConsumers/user/deleteRegularUserRelatedResources";
 
 const consumers = {
   novu: {
@@ -24,12 +25,29 @@ const consumers = {
     queueName: "user-deleted-queue-credentialsCollection",
     requeue: true,
     queueOptions: CRITICAL_QUEUE_OPTIONS,
+    deadLetterOptions: {
+      deadExchangeName:"dead-user-events",
+      deadQueueName:"dead-user-deleted-queue-credentialsCollection",
+      deadRoutingKey:"dead-user-deleted"
+    }
   },
+  regularUserRelatedResources: {
+    receiver: deleteRegularUserRelatedResources,
+    queueName: "user-deleted-queue-regularUserRelatedResources",
+    requeue: true,
+    queueOptions: CRITICAL_QUEUE_OPTIONS,
+    deadLetterOptions: {
+      deadExchangeName:"dead-user-events",
+      deadQueueName:"dead-user-deleted-queue-regularUserRelatedResources",
+      deadRoutingKey:"dead-user-deleted"
+    }
+  }
 } satisfies Record<string, ConsumerRegister<UserDeletedType, UserDeletedEvent>>;
 function userDeletedConsumers() {
+  userDeletedRegister({ ...consumers["credentialsCollection"] });
+  userDeletedRegister({ ...consumers["regularUserRelatedResources"] });
   userDeletedRegister({ ...consumers["novu"] });
   userDeletedRegister({ ...consumers["redis"] });
-  userDeletedRegister({ ...consumers["credentialsCollection"] });
 }
 
 export default userDeletedConsumers;
