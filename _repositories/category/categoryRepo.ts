@@ -47,6 +47,6 @@ export async function deleteProductFromCategory(categories: Array<MongoId>, prod
   // await Category.find({products: "684ac7b49e4ba6351f4fa89d"});
 }
 
-export async function deleteAllCategories(storeId: MongoId, session: mongoose.ClientSession) {
-  return await Category.deleteMany({ store: storeId }).session(session);
+export async function deleteAllCategories(storeId: MongoId) {
+  return await Category.deleteMany({ store: storeId });
 }
