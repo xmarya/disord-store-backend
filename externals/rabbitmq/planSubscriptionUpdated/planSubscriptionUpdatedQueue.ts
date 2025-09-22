@@ -21,7 +21,6 @@ async function planSubscriptionUpdatedQueue(queueName: PlanSubscriptionUpdatedTy
     await channel.bindQueue(queueName, exchangeName, routingKey);
 
     if (deadLetterOptions) await deadLetterQueue(deadLetterOptions);
-    console.log(`Waiting for payload in ${queueName}...`);
 
     return new Success({ channel });
   } catch (error) {
