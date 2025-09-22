@@ -4,6 +4,7 @@ import extractUsersEmailAndId from "@utils/extractUsersEmailAndId";
 import { startSession } from "mongoose";
 import deleteAllAssistantsAccounts from "./storeAssistant/deleteAllAssistantsAccounts";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 
 async function deleteAllAssistantsByStoreOwner(storeId: MongoId) {
   const session = await startSession();
@@ -12,8 +13,10 @@ async function deleteAllAssistantsByStoreOwner(storeId: MongoId) {
     const deleteAllAssistantsResult = await deleteAllAssistantsAccounts(storeId, session);
 
     if (deleteAllAssistantsResult.ok) {
-      const { ids, emails } = await extractUsersEmailAndId(deleteAllAssistantsResult.result);
-      const userDeletedPayload = { usersId: ids, emailsToDelete: emails, userType: deleteAllAssistantsResult.result[0].userType };
+      const {result: {assistantsEmails, deletedAssistants}} = deleteAllAssistantsResult;
+      if(!deletedAssistants.acknowledged) return new Failure();
+      const { ids, emails } = await extractUsersEmailAndId(assistantsEmails);
+      const userDeletedPayload = { usersId: ids, emailsToDelete: emails, userType: "storeAssistant" };
       const assistantDeletedPayload = { assistantsId: ids, storeId };
       await createOutboxRecord(
         [
