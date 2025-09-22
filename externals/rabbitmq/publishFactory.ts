@@ -2,7 +2,6 @@ import { OutboxEventTypesMap } from "@Types/events/OutboxEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { OutboxRecordDocument } from "@Types/Schema/OutboxRecord";
 import userDeletedPublisher from "./userDeleted/userDeletedPublisher";
-import { UserDeletedEvent } from "@Types/events/UserEvents";
 import { Success } from "@Types/ResultTypes/Success";
 import userCreatedPublisher from "./userCreated/userCreatedPublisher";
 import assistantDeletedPublisher from "./assistantDeleted/assistantDeletedPublisher";
