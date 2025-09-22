@@ -10,7 +10,7 @@ async function userDeletedRegister({receiver, queueName, requeue, queueOptions, 
   const result = await userDeletedQueue(queueName, queueOptions, deadLetterOptions);
   if (!result.ok) return result;
   const {
-    result: {channel },
+    result: channel,
   } = result;
 
   try {

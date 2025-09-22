@@ -10,7 +10,7 @@ async function assistantDeletedRegister({ receiver, queueName, requeue, queueOpt
   const result = await assistantDeletedQueue(queueName, queueOptions, deadLetterOptions);
   if (!result.ok) return result;
   const {
-    result: { channel },
+    result: channel,
   } = result;
 
   try {

@@ -11,7 +11,7 @@ async function userCreatedRegister({receiver, queueName, requeue, queueOptions, 
     const result = await userCreatedQueue(queueName, queueOptions, deadLetterOptions);
     if (!result.ok) throw new Error(result.message);
     const {
-      result: { channel },
+      result: channel,
     } = result;
 
     channel.consume(

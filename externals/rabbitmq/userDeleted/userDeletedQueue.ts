@@ -23,7 +23,7 @@ async function userDeletedQueue(queueName: UserDeletedType["queueName"], queueOp
 
     console.log(`Waiting for payload in ${queueName}...`);
 
-    return new Success({ channel });
+    return new Success(channel);
   } catch (error) {
     console.log(error);
     return new Failure((error as Error).message);

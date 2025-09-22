@@ -1,4 +1,3 @@
-import getRabbitChannel from "@config/rabbitmq";
 import getRabbitConsumingChannel from "@config/rabbitmq/consumingChannel";
 import { QUEUE_OPTIONS } from "@constants/rabbitmq";
 import { DeadLetterOptions, QueueOptions, UserCreatedType } from "@Types/events/OutboxEvents";
@@ -24,7 +23,7 @@ async function userCreatedQueue(queueName: UserCreatedType["queueName"], queueOp
 
     console.log(`Waiting for payload in ${queueName}...`);
 
-    return new Success({ channel });
+    return new Success(channel);
   } catch (error) {
     console.log(error);
     return new Failure((error as Error).message);

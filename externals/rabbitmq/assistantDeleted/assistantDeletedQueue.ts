@@ -21,7 +21,7 @@ async function assistantDeletedQueue(queueName: AssistantDeletedType["queueName"
     if(deadLetterOptions) await deadLetterQueue(deadLetterOptions);
     console.log(`Waiting for payload in ${queueName}...`);
 
-    return new Success({ channel });
+    return new Success(channel);
   } catch (error) {
     console.log(error);
     return new Failure((error as Error).message);
