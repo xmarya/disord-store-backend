@@ -5,8 +5,8 @@ async function extractUsersEmailAndId(usersDocs:Array<AllUsers>) {
   const ids:Array<string> = [];
   const emails:Array<string> = [];
 
-  usersDocs.map(( {id, email} ) => {
-    ids.push(id);
+  usersDocs.map(( {_id, email} ) => {
+    ids.push(_id as string);
     emails.push(email);
   });
 
