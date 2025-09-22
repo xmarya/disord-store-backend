@@ -37,13 +37,13 @@ export async function getAssistantPermissions(assistantId: MongoId, storeId: Mon
   return await StoreAssistant.findOne({ _id: assistantId, inStore: storeId });
 }
 
-export async function updateAssistant(assistantId: MongoId, storeId: MongoId, permission: any, anotherData: any) {
+export async function updateAssistant(assistantId: MongoId, storeId: MongoId, permission: any, anotherData: any, session:mongoose.ClientSession) {
   return await StoreAssistant.findOneAndUpdate(
     { _id: assistantId, inStore: storeId },
     {
       $set: { ...permission, ...anotherData },
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true, session }
   );
 }
 
