@@ -7,6 +7,7 @@ import { Success } from "@Types/ResultTypes/Success";
 import userCreatedPublisher from "./userCreated/userCreatedPublisher";
 import assistantDeletedPublisher from "./assistantDeleted/assistantDeletedPublisher";
 import assistantCreatedPublisher from "./assistantCreated/assistantCreatedPublisher";
+import planSubscriptionUpdatedPublisher from "./planSubscriptionUpdated/planSubscriptionUpdatedPublisher";
 
 type PublisherFunction = (event: any) => Promise<Success<any> | Failure>;
 
@@ -17,9 +18,8 @@ const publishers: Record<OutboxEventTypesMap, PublisherFunction> = {
   "assistant-created": assistantCreatedPublisher,
   "assistant-updated": assistantDeletedPublisher, /* CHANGE LATER:  */
   "assistant-deleted": assistantDeletedPublisher,
-  "product-created": userDeletedPublisher, /* CHANGE LATER:  */
-  "product-updated": userDeletedPublisher, /* CHANGE LATER:  */
   "product-deleted": userDeletedPublisher, /* CHANGE LATER:  */
+  "planSubscription-updated": planSubscriptionUpdatedPublisher
 };
 
 async function publishFactory(outboxRecord: OutboxRecordDocument) {
