@@ -1,13 +1,14 @@
 import novu from "@config/novu";
+import { AssistantUpdatedEvent } from "@Types/events/AssistantEvents";
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
-import { AssistantPermissions, StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
+import { StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-async function novuUpdateSubscriber(event:UserUpdatedEvent) {
+async function novuUpdateSubscriber(event:UserUpdatedEvent | AssistantUpdatedEvent) {
   const {_id, id, email, firstName, lastName, phoneNumber} = event.payload.user;
   const {permissions} = event.payload.user as StoreAssistantDocument;
   const subscriberId = id ?? (_id as MongoId).toString();
