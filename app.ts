@@ -5,6 +5,7 @@ import initiateBullMQJobs from "@loaders/bullmqJobs";
 import expressLoader from "@loaders/express";
 import initRabbitConsumers from "@loaders/initRabbitConsumers";
 import routerLoader from "@loaders/routers";
+import "@loaders/eventListeners;"
 import express from "express";
 
 const app = express();
