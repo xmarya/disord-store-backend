@@ -3,8 +3,8 @@ import deleteRegularUserAccount from "@services/auth/usersServices/deleteRegular
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 import type { Request, Response } from "express";
-import { deleteFromCache } from "../../externals/redis/cacheControllers/globalCache";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
+import deleteUserFromCache from "@externals/redis/cacheControllers/deleteUserFromCache";
 
 export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -35,7 +35,7 @@ export const deleteUserAccountController = catchAsync(async (request, response, 
 });
 
 export function logout(request: Request, response: Response) {
-  deleteFromCache(`User:${request.user.id}`);
+  // deleteUserFromCache(`User:${request.user.id}`);
   request.user.userType === "storeOwner" && deleteRedisHash(`StoreAndPlan:${request.user.myStore}`);
   response.clearCookie("jwt");
   response.setHeader("Clear-Site-Data", "cookies"); // for browsers
