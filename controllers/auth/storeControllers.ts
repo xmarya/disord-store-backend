@@ -85,7 +85,8 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
 export const deleteMyStoreController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
 
-  await deleteMyStore(storeId);
+  const result = await deleteMyStore(storeId);
+  if(!result.ok) return next (returnError(result));
 
   response.status(204).json({
     success: true,

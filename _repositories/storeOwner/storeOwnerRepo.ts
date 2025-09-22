@@ -26,14 +26,14 @@ export async function createNewUnlimitedUser(data: Omit<UnlimitedStoreOwnerData,
 }
 
 export async function resetStoreOwnerToDefault(storeId: MongoId, session: mongoose.ClientSession) {
-  await StoreOwner.updateOne(
+  return await StoreOwner.findOneAndUpdate(
     { myStore: storeId },
     {
       $unset: {
         myStore: "",
       },
-    }
-  ).session(session);
+    }, {new: true, session}
+  );
 }
 
 export async function createNewSubscription(storeOwnerId: MongoId, data: Pick<StoreOwnerData, "subscribedPlanDetails">, session:mongoose.ClientSession) {

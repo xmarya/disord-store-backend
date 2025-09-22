@@ -24,6 +24,7 @@ async function deleteStoreOwnerAccount(storeOwnerId: MongoId, storeId: MongoId) 
 
     return deletedStoreOwner;
   });
+  await session.endSession();
 
   // TODO: publish to rabbit to delete credentials
   // ADD FEATURE for adding the deleted data to an AdminLog
