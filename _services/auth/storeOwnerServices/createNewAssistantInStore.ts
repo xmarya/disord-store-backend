@@ -11,28 +11,29 @@ async function createNewAssistantInStore(storeId: MongoId, assistantData: Assist
   const data: StoreAssistant = { userType: "storeAssistant", inStore: storeId, inPlan: planId, firstName, lastName, email, phoneNumber, permissions, image };
 
   const session = await startSession();
-  const { newAssistantResult } = await session.withTransaction(async () => {
+  const newAssistantResult = await session.withTransaction(async () => {
     const newAssistantResult = await createNewAssistant(data, session);
     await createNewCredentials({ email, password, firstName, lastName, userType: data.userType, phoneNumber }, session);
-    const payload:AssistantCreatedEvent["payload"] = {
-      storeId,
-      permissions: newAssistant.permissions,
-      novuSubscriber: {
-        firstName,
-        lastName,
-        email,
-        phoneNumber,
-        userType: newAssistant.userType,
-        id: newAssistant.id,
-      },
+    if(newAssistantResult.ok) {
+
+      const payload:AssistantCreatedEvent["payload"] = {
+        storeId,
+        permissions: newAssistantResult.result.permissions,
+        novuSubscriber: {
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          userType: newAssistantResult.result.userType,
+          id: newAssistantResult.result.id,
+        },
+      }
+      await createOutboxRecord<[AssistantCreatedEvent]>([{type:"assistant-created", payload }],session)
     }
-    await createOutboxRecord<[AssistantCreatedEvent]>([{type:"assistant-created", payload }],session)
-    return { newAssistantResult };
+    return newAssistantResult;
   });
 
-  if (!newAssistantResult.ok) return newAssistantResult;
-
-  const { result: newAssistant } = newAssistantResult;  
+  await session.endSession();
 
   return newAssistantResult;
 }

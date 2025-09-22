@@ -31,6 +31,8 @@ async function confirmChangedEmail(newEmail: string, user: NotAssistant) {
     return { updateUserEmailResult };
   });
 
+  await session.endSession();
+
   return updateUserEmailResult;
 }
 

@@ -29,27 +29,27 @@ async function createNewSubscriptionsLog(storeOwnerId: MongoId, newPlan: PlanDoc
 
   const session = await startSession();
   const storeOwnerPlanDetails = await session.withTransaction(async () => {
-
     const storeOwnerPlanDetails = await createNewSubscription(storeOwnerId, userData, session);
-    if(storeOwnerPlanDetails) {
+    if (storeOwnerPlanDetails) {
       const payload: PlanSubscriptionUpdatedEvent["payload"] = {
-      storeOwner: storeOwnerPlanDetails,
-      planName: newPlan.planName,
-      planId: newPlan.id,
-      profit: paidPrice,
-      subscriptionType,
-      planExpiryDate: storeOwnerPlanDetails.subscribedPlanDetails.subscribeEnds,
-    };
-    await createOutboxRecord<[PlanSubscriptionUpdatedEvent]>([{type:"planSubscription-updated", payload}],session);
+        storeOwner: storeOwnerPlanDetails,
+        planName: newPlan.planName,
+        planId: newPlan.id,
+        profit: paidPrice,
+        subscriptionType,
+        planExpiryDate: storeOwnerPlanDetails.subscribedPlanDetails.subscribeEnds,
+      };
+      await createOutboxRecord<[PlanSubscriptionUpdatedEvent]>([{ type: "planSubscription-updated", payload }], session);
     }
-    
 
     return storeOwnerPlanDetails;
   });
 
-  if(!storeOwnerPlanDetails) return new Failure();
-  
-  return new Success({storeOwnerPlanDetails});
+  await session.endSession();
+
+  if (!storeOwnerPlanDetails) return new Failure();
+
+  return new Success({ storeOwnerPlanDetails });
 }
 
 export default createNewSubscriptionsLog;

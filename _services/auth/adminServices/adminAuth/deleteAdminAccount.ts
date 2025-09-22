@@ -13,11 +13,12 @@ async function deleteAdminAccount(adminId: MongoId) {
   const deletedAdmin = await session.withTransaction(async () => {
     const deletedAdmin = await deleteDoc(Admin, adminId);
     if (deletedAdmin) {
-      await createOutboxRecord<UserDeletedEvent>("user-deleted", { usersId: [deletedAdmin.id], emailsToDelete: [deletedAdmin.email], userType: deletedAdmin.userType }, session);
+      await createOutboxRecord<[UserDeletedEvent]>([{ type: "user-deleted", payload: { usersId: [deletedAdmin.id], emailsToDelete: [deletedAdmin.email], userType: deletedAdmin.userType } }], session);
     }
     return deletedAdmin;
   });
 
+  await session.endSession();
   if (!deletedAdmin) return new Failure();
 
   return new Success(deletedAdmin);

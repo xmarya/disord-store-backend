@@ -25,6 +25,7 @@ async function signupNewUserAndSendConfirmationEmail(signupData: CredentialsSign
     }
     return { newUser };
   });
+  await session.endSession();
 
   return newUser;
 }

@@ -27,6 +27,8 @@ async function updateProfile(user: NotAssistant, updatedData: Partial<BaseUserDa
     return updatedUserResult
   });
 
+  await session.endSession();
+
   return updatedUserResult
 }
 

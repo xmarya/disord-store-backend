@@ -33,6 +33,7 @@ async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDa
     );
     return { newStore, updatedOwner };
   });
+  await session.endSession();
 
   if (!newStore.id || !updatedOwner?.myStore) return new Failure("حدثت مشكلة أثناء انشاء متجرك");
 

@@ -48,7 +48,7 @@ async function deleteOneAssistantByStoreOwner(data: Arguments) {
     return deletedAssistantResult;
   });
 
-  // TODO: publish to rabbit to delete credentials
+  await session.endSession();
 
   return deletedAssistantResult;
 }

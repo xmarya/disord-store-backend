@@ -28,6 +28,8 @@ async function createUnlimitedPlanAndOwnerByAdmin(unlimitedPlanDetails: Omit<Unl
     }
   );
 
+  await session.endSession();
+
   return { email: newUnlimitedStoreOwner?.email, subscribedPlanDetails: newUnlimitedStoreOwner?.subscribedPlanDetails };
 }
 

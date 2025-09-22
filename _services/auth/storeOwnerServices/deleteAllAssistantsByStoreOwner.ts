@@ -13,13 +13,21 @@ async function deleteAllAssistantsByStoreOwner(storeId: MongoId) {
 
     if (deleteAllAssistantsResult.ok) {
       const { ids, emails } = await extractUsersEmailAndId(deleteAllAssistantsResult.result);
-      const userDeletedPayload = { usersId: ids, emailsToDelete: emails, userType: deleteAllAssistantsResult.result[0].userType  };
-      const assistantDeletedPayload =  {assistantsId: ids, storeId}
-      await createOutboxRecord([{type:"user-deleted", payload:userDeletedPayload}, {type:"assistant-deleted", payload: assistantDeletedPayload}], session);
+      const userDeletedPayload = { usersId: ids, emailsToDelete: emails, userType: deleteAllAssistantsResult.result[0].userType };
+      const assistantDeletedPayload = { assistantsId: ids, storeId };
+      await createOutboxRecord(
+        [
+          { type: "user-deleted", payload: userDeletedPayload },
+          { type: "assistant-deleted", payload: assistantDeletedPayload },
+        ],
+        session
+      );
     }
 
     return deleteAllAssistantsResult;
   });
+
+  await session.endSession();
 
   return deleteAllAssistantsResult;
 }

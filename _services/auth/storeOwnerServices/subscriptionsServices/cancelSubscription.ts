@@ -43,12 +43,13 @@ async function cancelSubscription(storeOwnerId: MongoId, cancelledPlanId: MongoI
 
     return updatedStoreOwner;
   });
+  await session.endSession();
 
   //TODO: refund the money using the User's bank account.
   //TODO: add an admin log
 
   if (!updatedStoreOwner) return new Failure();
-  return new Success({updatedStoreOwner, planExpiryDate: new Date(), isPlanPaid: false, plan: "" });
+  return new Success({ updatedStoreOwner, planExpiryDate: new Date(), isPlanPaid: false, plan: "" });
 }
 
 export default cancelSubscription;
