@@ -57,7 +57,7 @@ export async function deleteAssistant(assistantId: MongoId, storeId: MongoId, se
 
 export async function deleteAllAssistants(storeId: MongoId, session: mongoose.ClientSession) {
   //STEP 1) get all the assistants emails based on the storeId to delete them from assistants collection:
-  const assistantsEmails = await StoreAssistant.find({ inStore: storeId }).select("email");
+  const assistantsEmails = await StoreAssistant.find({ inStore: storeId }).select("email").session(session);
   const deletedAssistants = await StoreAssistant.deleteMany({ inStore: storeId }).session(session);
   //TODO event for deleting all assistants credentials (HOW?)
 
