@@ -9,12 +9,12 @@ async function getConsumerACK<T extends OutboxEvent>(event: T, receiver: (event:
   const receiverResult = await receiver(event);
   if (!receiverResult.ok) {
     console.log("✨ FALSE ACK FROM",receiverResult.DTO);
-    await upsertOutboxRecordInCache(event.type, outboxRecordId, receiverResult.DTO as RabbitConsumerDTO);
+    await upsertOutboxRecordInCache(outboxRecordId, receiverResult.DTO as RabbitConsumerDTO);
     return new Failure(receiverResult.message);
   }
   
   console.log("✨ TRUE ACK FROM",receiverResult.result);
-  await upsertOutboxRecordInCache(event.type, outboxRecordId, receiverResult.result);
+  await upsertOutboxRecordInCache(outboxRecordId, receiverResult.result);
 
   return new Success(true);
 }

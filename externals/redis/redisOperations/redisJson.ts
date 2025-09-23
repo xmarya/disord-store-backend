@@ -14,6 +14,9 @@ export async function getRedisJson<T>(key: string, path?: string): Promise<T> {
   // return JSON.parse(result) as Array<T>;
 }
 
-export async function deleteRedisJson(key: string, path: string) {
-  return await redis.json.del(key, { path });
+export async function deleteRedisJson(key: string, paths: Array<string>) {
+  const pipeline = redis.multi();
+  paths.forEach(path => pipeline.json.del(key, {path: `.${path}`}));
+  return await pipeline.exec();
+
 }

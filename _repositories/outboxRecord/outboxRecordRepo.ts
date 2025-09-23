@@ -29,6 +29,6 @@ export async function updateOutboxRecordStatusToCompleted<T extends DomainEvent>
   return await OutboxRecord.findOneAndUpdate({ _id: recordId, type }, {status: "completed"}, { new: true });
 }
 
-export async function deleteCompletedOutboxRecord() {
-  await OutboxRecord.deleteMany({ status: "completed" });
+export async function deleteCompletedOutboxRecord(recordIds:Array<string>) {
+  return await OutboxRecord.deleteMany({ _id: {$in: recordIds}});
 }

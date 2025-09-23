@@ -4,17 +4,15 @@ import { RabbitConsumerDTO } from "@Types/ResultTypes/errors/Failure";
 
 const CACHE_KEY = "OutboxRecords";
 
-
-export async function upsertOutboxRecordInCache(eventType: string, outboxRecordId: string, data:RabbitConsumerDTO) {
+export async function upsertOutboxRecordInCache(outboxRecordId: string, data: RabbitConsumerDTO) {
   const keyCreating = await upsertRedisJson(CACHE_KEY, "$", {}, "NX");
   // the creation is in the root ".""
   // the id MUST be initialised with an empty {} in the section
 
-  const typeCreating = await upsertRedisJson(CACHE_KEY, `.${eventType}`, {}, "NX");
-  const recordCreating = await upsertRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}`, {}, "NX");
-  const serviceCreating = await upsertRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}.${data.serviceName}`, data.ack);
+  const recordCreating = await upsertRedisJson(CACHE_KEY, `.${outboxRecordId}`, {}, "NX");
+  const serviceCreating = await upsertRedisJson(CACHE_KEY, `.${outboxRecordId}.${data.serviceName}`, data.ack);
 
-  // return {keyCreating, typeCreating, recordCreating, serviceCreating}
+  // return {keyCreating, recordCreating, serviceCreating}
 }
 
 export async function getOutboxRecordsFromCache(): Promise<OutboxRecordsInfo> {
@@ -22,24 +20,6 @@ export async function getOutboxRecordsFromCache(): Promise<OutboxRecordsInfo> {
   return result;
 }
 
-export async function removeCompletedOutboxRecord(eventType: string, outboxRecordId: string) {
-  return await deleteRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}`);
+export async function removeCompletedOutboxRecord(outboxRecordIds: Array<string>) {
+  return await deleteRedisJson(CACHE_KEY, outboxRecordIds);
 }
-
-// export async function upsertOutboxRecordInCache2(eventType: string, outboxRecordId: string, serviceName: string, data: any) {
-//   const isKeyExist = await getRedisJson("newtest");
-//   if (!isKeyExist) {
-//     await upsertRedisJson("newtest", "$", {});
-//   }
-
-//   const isEventTypeExist = await getRedisJson("newtest", `$.${eventType}`);
-
-//   if (!isEventTypeExist.length) {
-//     console.log("insider");
-//     // the creation is in the root $
-//     // the id MUST be initialised with an empty {} in the section
-
-//     await upsertRedisJson("newtest", `.${eventType}`, {});
-//   }
-//   await upsertRedisJson("newtest", `.${eventType}.${outboxRecordId}`, data);
-// }
