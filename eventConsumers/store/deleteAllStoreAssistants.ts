@@ -10,30 +10,32 @@ import mongoose, { startSession } from "mongoose";
 async function deleteAllStoreAssistants(event: StoreDeletedEvent) {
   const { storeId } = event.payload;
   const store = new mongoose.Types.ObjectId(storeId);
+
   const session = await startSession();
+  try {
+    await session.withTransaction(async () => {
+      const { assistantsEmails, deletedAssistants } = await deleteAllAssistants(store, session);
+      if (deletedAssistants.deletedCount) {
+        const { ids, emails } = await extractUsersEmailAndId(assistantsEmails);
+        const userDeletedPayload = { usersId: ids, emailsToDelete: emails, userType: "storeAssistant" };
+        const assistantDeletedPayload = { assistantsId: ids, storeId };
+        await createOutboxRecord(
+          [
+            { type: "user-deleted", payload: userDeletedPayload },
+            { type: "assistant-deleted", payload: assistantDeletedPayload },
+          ],
+          session
+        );
+      }
 
-  const deleteResult = await session.withTransaction(async () => {
-    const { assistantsEmails, deletedAssistants } = await deleteAllAssistants(store, session);
-    if (!deletedAssistants.acknowledged) return new Failure(INTERNAL_ERROR_MESSAGE, { serviceName: "assistantsCollection", ack: false });
+    });
+    return new Success({ serviceName: "assistantsCollection", ack: true });
+  } catch (error) {
+    return new Failure((error as Error).message, { serviceName: "assistantsCollection", ack: false });
+  } finally {
+    await session.endSession();
+  }
 
-    const { ids, emails } = await extractUsersEmailAndId(assistantsEmails);
-    const userDeletedPayload = { usersId: ids, emailsToDelete: emails, userType: "storeAssistant" };
-    const assistantDeletedPayload = { assistantsId: ids, storeId };
-    await createOutboxRecord(
-      [
-        { type: "user-deleted", payload: userDeletedPayload },
-        { type: "assistant-deleted", payload: assistantDeletedPayload },
-      ],
-      session
-    );
-
-    return new Success({ serviceName: "assistantsCollection", ack: false });;
-  });
-
-  await session.endSession();
-
-
-  return deleteResult;
 }
 
 export default deleteAllStoreAssistants;
