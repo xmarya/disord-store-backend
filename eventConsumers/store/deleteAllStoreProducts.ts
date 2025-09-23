@@ -18,7 +18,7 @@ async function deleteAllStoreProducts(event: StoreDeletedEvent) {
 
   if (!deleteResult.ok) return new Failure(deleteResult.message, { serviceName: "productsCollection", ack: false });
 
-  return new Success({ serviceName: "productsCollection", ack: false });
+  return new Success({ serviceName: "productsCollection", ack: true });
 }
 
 export default deleteAllStoreProducts;

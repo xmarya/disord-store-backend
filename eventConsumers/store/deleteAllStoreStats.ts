@@ -18,7 +18,7 @@ async function deleteAllStoreStats(event: StoreDeletedEvent) {
 
   if (!deleteResult.ok) return new Failure(deleteResult.message, { serviceName: "storeStatsCollection", ack: false });
 
-  return new Success({ serviceName: "storeStatsCollection", ack: false });
+  return new Success({ serviceName: "storeStatsCollection", ack: true });
 }
 
 export default deleteAllStoreStats;
