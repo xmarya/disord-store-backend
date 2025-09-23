@@ -1,5 +1,5 @@
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
-import createUnlimitedPlanAndStoreOwner from "@services/auth/adminServices/user/createUnlimitedPlanAndOwnerByAdmin";
+import createUnlimitedPlanAndOwnerByAdmin from "@services/auth/adminServices/user/createUnlimitedPlanAndOwnerByAdmin";
 import getAllUsersForAdmin from "@services/auth/adminServices/user/getAllUsersForAdmin";
 import getOneUserForAdmin from "@services/auth/adminServices/user/getOneUserForAdmin";
 import createNewUserAndSendConfirmationEmail from "@services/nonAuth/credentialsServices/signup/signupNewUserAndSendConfirmationEmail";
@@ -28,7 +28,7 @@ export const createUnlimitedUserController = catchAsync(async (request, response
   if (!priceRiyal || !priceDollar) return next(new AppError(400, "Please enter the plan's prices in riyals and dollars."));
 
   const unlimitedPlanData: Omit<UnlimitedPlanDataBody, "planName"> = { price: { riyal: priceRiyal, dollar: priceDollar }, features, quota };
-  const { email, subscribedPlanDetails } = await createUnlimitedPlanAndStoreOwner(unlimitedPlanData, request.body.user);
+  const { email, subscribedPlanDetails } = await createUnlimitedPlanAndOwnerByAdmin(unlimitedPlanData, request.body.user);
 
   if (!email || !subscribedPlanDetails) return next(new AppError(500, INTERNAL_ERROR_MESSAGE));
   //TODO: create an invoice and send its link and details to the email:

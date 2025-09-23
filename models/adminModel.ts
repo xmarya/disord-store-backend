@@ -32,22 +32,6 @@ const adminSchema = new Schema<AdminDocument>(
         message: (props) => `${props.value} isn't a valid phone number. it must starts with +966`,
       },
     },
-    credentials: {
-      password: {
-        type: String,
-        minLength: [8, "your password must be at least 8 characters"],
-        select: false,
-      },
-      emailConfirmed: {
-        type: Boolean,
-        default: false,
-      },
-      emailConfirmationToken: String,
-      emailConfirmationExpires: Date,
-      passwordResetToken: String,
-      passwordResetExpires: Date,
-      passwordChangedAt: Date,
-    },
     userType: {
       type: String,
       default: "admin",
@@ -63,12 +47,6 @@ const adminSchema = new Schema<AdminDocument>(
   }
 );
 
-// pre(save) for encrypting the password:
-adminSchema.pre("save", async function (next) {
-  if (!this.isNew) return next();
-  this.credentials.password = await bcrypt.hash(this.credentials.password, HASHING_SALT);
-  next();
-});
 
 const Admin = mongoose.model<AdminDocument, AdminModel>("Admin", adminSchema);
 
