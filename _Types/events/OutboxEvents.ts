@@ -2,7 +2,7 @@ import { DomainEvent } from "./DomainEvent";
 import { Success } from "@Types/ResultTypes/Success";
 import { Failure, RabbitConsumerDTO } from "@Types/ResultTypes/errors/Failure";
 
-export type OutboxRecordsInfo = Record<string, Record<string, Record<string, boolean>>>;
+export type OutboxRecordsInfo = Record<string, Record<string, boolean>>;
 
 export interface OutboxEvent extends DomainEvent {
   outboxRecordId: string;

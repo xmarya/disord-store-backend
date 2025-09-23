@@ -1,7 +1,9 @@
 import bullmq from "@config/bullmq";
+import { getOutboxRecordsFromCache, removeCompletedOutboxRecord } from "@externals/redis/cacheControllers/outboxRecordsCache";
 import { deleteCompletedOutboxRecord } from "@repositories/outboxRecord/outboxRecordRepo";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import safeThrowable from "@utils/safeThrowable";
+import mongoose from "mongoose";
 import {ms} from "ms";
 
 
@@ -13,11 +15,21 @@ async function completedOutboxRecordBullMQ() {
 }
 
 async function completedOutboxRecordProcessor() {
-  // ask the tracker
-    safeThrowable(
-        () => deleteCompletedOutboxRecord(),
-        (error) => new Failure((error as Error).message)
-    );
+  const outboxMap = await getOutboxRecordsFromCache()
+  const completedRecordIds:Array<string> = [];
+    Object.entries(outboxMap).forEach(([id, services]) => {
+      if(Object.values(services).every(ack => ack === true)){
+        const recordId = new mongoose.Types.ObjectId(id) as unknown as string;
+        console.log(recordId);
+        completedRecordIds.push(recordId);
+      }
+    });
+  
+    if(completedRecordIds.length) {
+      console.log(completedRecordIds);
+      const result = await deleteCompletedOutboxRecord(completedRecordIds);
+      result.deletedCount && await removeCompletedOutboxRecord(completedRecordIds)
+    }
 }
 
 export default completedOutboxRecordBullMQ;
