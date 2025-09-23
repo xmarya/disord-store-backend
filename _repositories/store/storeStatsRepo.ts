@@ -243,5 +243,5 @@ soldProductsUpdate.$inc =>  {
 }
 
 export async function deleteStoreStats(storeId: MongoId) {
-  return await StoreStats.deleteOne({ store: storeId });
+  return await StoreStats.deleteMany({ store: storeId });
 }
