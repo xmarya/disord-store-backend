@@ -1,5 +1,5 @@
 import { TokenSlicer } from "@constants/dataStructures";
-import { getRedisHash } from "@externals/redis/redisOperations/redisHash";
+import { deleteRedisHash, getRedisHash } from "@externals/redis/redisOperations/redisHash";
 import { confirmUserEmail } from "@repositories/credentials/credentialsRepo";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
@@ -25,6 +25,7 @@ async function confirmEmail(randomToken: string) {
   const confirmResult = await extractSafeThrowableResult(() => safeConfirmEmail);
   if (!confirmResult.ok) return confirmResult;
 
+  await deleteRedisHash(`EmailConfirm:${slicedToken}`);
   return new Success("تم تأكيد بريدك الإلكتروني بنجاح");
 }
 
