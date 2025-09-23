@@ -6,12 +6,15 @@ const CACHE_KEY = "OutboxRecords";
 
 
 export async function upsertOutboxRecordInCache(eventType: string, outboxRecordId: string, data:RabbitConsumerDTO) {
-  await upsertRedisJson(CACHE_KEY, "$", {}, "NX");
+  const keyCreating = await upsertRedisJson(CACHE_KEY, "$", {}, "NX");
   // the creation is in the root ".""
   // the id MUST be initialised with an empty {} in the section
 
-  await upsertRedisJson(CACHE_KEY, `.${eventType}`, {}, "NX");
-  await upsertRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}.${data.serviceName}`, data.ack);
+  const typeCreating = await upsertRedisJson(CACHE_KEY, `.${eventType}`, {}, "NX");
+  const recordCreating = await upsertRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}`, {}, "NX");
+  const serviceCreating = await upsertRedisJson(CACHE_KEY, `.${eventType}.${outboxRecordId}.${data.serviceName}`, data.ack);
+
+  // return {keyCreating, typeCreating, recordCreating, serviceCreating}
 }
 
 export async function getOutboxRecordsFromCache(): Promise<OutboxRecordsInfo> {
