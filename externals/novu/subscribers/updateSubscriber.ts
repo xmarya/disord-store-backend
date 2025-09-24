@@ -10,7 +10,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 async function novuUpdateSubscriber(event:UserUpdatedEvent | AssistantUpdatedEvent) {
-  const {_id, id, email, firstName, lastName, phoneNumber} = event.payload.user;
+  const {_id, id, email, firstName, lastName, phoneNumber, userType} = event.payload.user;
   const {permissions, inStore} = event.payload.user as StoreAssistantDocument;
   const {myStore} = event.payload.user as StoreOwnerDocument;
   const subscriberId = id ?? (_id as MongoId).toString();
@@ -24,11 +24,12 @@ async function novuUpdateSubscriber(event:UserUpdatedEvent | AssistantUpdatedEve
 
   const store = (myStore || inStore)
   const moreData = {
+    userType,
     ...(store && { store: store.toString() }),
     ...(permissions && { permissions }),
   };
 
-  if (Object.keys(moreData).length) payload.user = moreData;
+  if (Object.keys(moreData).length) payload.data = moreData;
 
   const safeUpdateNovu = safeThrowable(
     () => novu.subscribers.patch(payload, subscriberId),
