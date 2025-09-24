@@ -7,7 +7,7 @@ import safeThrowable from "@utils/safeThrowable";
 
 async function updateStorePlanConsumer(event: PlanSubscriptionUpdatedEvent) {
   const { storeOwner, planName, subscriptionType } = event.payload;
-  if (subscriptionType === "renewal" || planName === "unlimited") return new Success({ serviceName: "storesCollection", ack: true });
+  if (!storeOwner.myStore || subscriptionType === "renewal" || planName === "unlimited") return new Success({ serviceName: "storesCollection", ack: true });
 
   const safeUpdateStore = safeThrowable(
     () => updateStoreInPlan(storeOwner._id as string, planName),

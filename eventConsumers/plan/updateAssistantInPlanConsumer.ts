@@ -9,6 +9,7 @@ import safeThrowable from "@utils/safeThrowable";
 async function updateAssistantInPlanConsumer(event:PlanSubscriptionUpdatedEvent) {
     const {planId, storeOwner: {myStore}} = event.payload;
 
+    if(!myStore) return new Success({serviceName: "assistants-collection", ack: true});
     const safeUpdateAssistants = safeThrowable(
         () => updateInPlanForAssistants(myStore, planId),
         (error) => new Failure((error as Error).message)

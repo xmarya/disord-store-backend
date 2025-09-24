@@ -11,7 +11,7 @@ async function assignStoreOwnerToUnlimitedPlanConsumer(event: PlanSubscriptionUp
 
   if (planName !== "unlimited") return new Success({ serviceName: "plansCollection", ack: true });
   const safeUpdateUnlimitedPlan = safeThrowable(
-    () => updateDoc(Plan, planId, { unlimitedUser: storeOwner.id }),
+    () => updateDoc(Plan, planId, { unlimitedUser: storeOwner._id }),
     (error) => new Failure((error as Error).message)
   );
 

@@ -7,10 +7,9 @@ import safeThrowable from "@utils/safeThrowable";
 
 async function cacheStoreAndPlanConsumer(event: PlanSubscriptionUpdatedEvent) {
   const { subscriptionType, planId, planName, planExpiryDate, storeOwner } = event.payload;
-  const doesHaveStore = !!storeOwner.myStore;
   const isUnlimitedPlan = planName === "unlimited";
   const isRenewal = subscriptionType === "renewal";
-  if (!doesHaveStore || isRenewal || isUnlimitedPlan) return new Success({ serviceName: "redisStoreAndPlan", ack: true });
+  if (!storeOwner.myStore || isRenewal || isUnlimitedPlan) return new Success({ serviceName: "redisStoreAndPlan", ack: true });
 
   const isPaid = subscriptionType === "cancellation" ? false : true;
 
