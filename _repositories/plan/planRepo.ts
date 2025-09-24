@@ -74,7 +74,7 @@ export async function updatePlanMonthlyStats(planName: PlansNames, profit: numbe
   const isUpgrade = operationType === "upgrade" ? 1 : 0;
   const isDowngrade = operationType === "downgrade" ? 1 : 0;
 
-  await PlanStats.findOneAndUpdate(
+  return await PlanStats.findOneAndUpdate(
     { planName, date: { $gte: firstDayOfCurrentMonth, $lte: lastDayOfCurrentMonth } }, // condition
     {
       // update data
