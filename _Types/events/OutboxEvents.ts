@@ -26,8 +26,8 @@ export type QueueOptions = {
   queueMode?: "default" | "lazy";
   messageTtl?: number; // in milliseconds
   maxLength?: number;
-  deadLetterExchange?: string; // If a message expires or is rejected → RabbitMQ republishes it to dead-letter-exchange with routing key user-deleted-redis.DLQ.
-  deadLetterRoutingKey?: string; // if not ser, RabbitMQ will reuse the original routing key.
+  // deadLetterExchange?: string; // If a message expires or is rejected → RabbitMQ republishes it to dead-letter-exchange with routing key user-deleted-redis.DLQ.
+  // deadLetterRoutingKey?: string; // if not ser, RabbitMQ will reuse the original routing key.
   expires?: number; // for temporary queues
 };
 
@@ -37,15 +37,14 @@ export type DeadLetterOptions<T extends AllOutbox> = {
   deadQueueName: T["deadQueueName"];
 };
 
-/*
 export type RetryLetterOptions<T extends AllOutbox> = {
-  mainExchangeName: T["exchangeName"]; // redirect to the main exchange in deadExchange's queue option
-  mainRoutingKey: T["routingKey"]; // redirect to the main exchange using the main routing key
-  deadExchangeName: T["deadExchangeName"];
-  retryQueueName: T["retryQueueName"];
-  retryRoutingKey: T["retryRoutingKey"];
+  mainExchangeName: T["exchangeName"]; // redirect to the main exchange in bindQueue()
+  mainRoutingKey: T["routingKey"]; // redirect to the main exchange using the main routing key in bindQueue()
+  deadExchangeName: T["deadExchangeName"]; // in the deadLetterExchange option
+  deadQueueName:T["deadQueueName"]
+  deadRoutingKey: T["deadRoutingKey"]; // in the deadLetterRoutingKey
 };
-*/
+
 export type UserCreatedType = {
   type: "user-created";
   exchangeName: "main-user-events";
@@ -56,9 +55,6 @@ export type UserCreatedType = {
   deadQueueName: `dead-user-created-queue-${string}`;
   deadRoutingKey: "dead-user-created";
 
-  // retryExchangeName: "retry-user-events";
-  // retryQueueName: `retry-user-created-queue-${string}`;
-  // retryRoutingKey: "retry-user-created";
 };
 
 export type UserUpdatedType = {
@@ -71,9 +67,6 @@ export type UserUpdatedType = {
   deadQueueName: `dead-user-updated-queue-${string}`;
   deadRoutingKey: "dead-user-updated";
 
-  // retryExchangeName: "retry-user-events";
-  // retryQueueName: `retry-user-updated-queue-${string}`;
-  // retryRoutingKey: "retry-user-updated";
 };
 
 export type UserDeletedType = {
@@ -86,9 +79,6 @@ export type UserDeletedType = {
   deadQueueName: `dead-user-deleted-queue-${string}`;
   deadRoutingKey: "dead-user-deleted";
 
-  // retryExchangeName: "retry-user-events";
-  // retryQueueName: `retry-user-deleted-queue-${string}`;
-  // retryRoutingKey: "retry-user-deleted";
 };
 
 export type AssistantCreatedType = {
@@ -101,9 +91,6 @@ export type AssistantCreatedType = {
   deadQueueName: `dead-assistant-created-queue-${string}`;
   deadRoutingKey: "dead-assistant-created";
 
-  // retryExchangeName: "retry-assistant-events";
-  // retryQueueName: `retry-assistant-created-queue-${string}`;
-  // retryRoutingKey: "retry-assistant-created";
 };
 
 export type AssistantUpdatedType = {
@@ -116,9 +103,6 @@ export type AssistantUpdatedType = {
   deadQueueName: `dead-assistant-updated-queue-${string}`;
   deadRoutingKey: "dead-assistant-updated";
 
-  // retryExchangeName: "retry-assistant-events";
-  // retryQueueName: `retry-assistant-updated-queue-${string}`;
-  // retryRoutingKey: "retry-assistant-updated";
 };
 
 export type AssistantDeletedType = {
@@ -131,9 +115,6 @@ export type AssistantDeletedType = {
   deadQueueName: `dead-assistant-deleted-queue-${string}`;
   deadRoutingKey: "dead-assistant-deleted";
 
-  // retryExchangeName: "retry-assistant-events";
-  // retryQueueName: `retry-assistant-deleted-queue-${string}`;
-  // retryRoutingKey: "retry-assistant-deleted";
 };
 
 export type ProductDeletedType = {
@@ -146,9 +127,6 @@ export type ProductDeletedType = {
   deadQueueName: `dead-product-deleted-queue-${string}`;
   deadRoutingKey: "dead-product-deleted";
 
-  // retryExchangeName: "retry-product-events";
-  // retryQueueName: `retry-product-created-queue-${string}`;
-  // retryRoutingKey: "retry-product-created";
 };
 
 export type PlanSubscriptionUpdatedType = {
@@ -161,9 +139,6 @@ export type PlanSubscriptionUpdatedType = {
   deadQueueName: `dead-planSubscription-updated-queue-${string}`;
   deadRoutingKey: "dead-planSubscription-updated";
 
-  // retryExchangeName: "retry-planSubscription-events";
-  // retryQueueName: `retry-planSubscription-updated-queue-${string}`;
-  // retryRoutingKey: "retry-planSubscription-updated";
 };
 
 export type StoreDeletedType = {
@@ -176,9 +151,6 @@ export type StoreDeletedType = {
   deadQueueName: `dead-store-deleted-queue-${string}`;
   deadRoutingKey: "dead-store-deleted";
 
-  // retryExchangeName: "retry-store-events";
-  // retryQueueName: `retry-store-deleted-queue-${string}`;
-  // retryRoutingKey: "retry-store-deleted";
 };
 
 export type AllOutbox =
@@ -200,5 +172,6 @@ export type ConsumerRegister<T extends AllOutbox, P extends OutboxEvent> = {
   queueName: OutboxEventQueueNamesMap<T>;
   requeue?: boolean;
   queueOptions?: QueueOptions;
+  retryLetterOptions: RetryLetterOptions<T>;
   deadLetterOptions?: DeadLetterOptions<T>;
 };
