@@ -5,12 +5,14 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
 import { StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
+import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 async function novuUpdateSubscriber(event:UserUpdatedEvent | AssistantUpdatedEvent) {
   const {_id, id, email, firstName, lastName, phoneNumber} = event.payload.user;
-  const {permissions} = event.payload.user as StoreAssistantDocument;
+  const {permissions, inStore} = event.payload.user as StoreAssistantDocument;
+  const {myStore} = event.payload.user as StoreOwnerDocument;
   const subscriberId = id ?? (_id as MongoId).toString();
 
   const payload: Record<string, any> = {
@@ -20,7 +22,9 @@ async function novuUpdateSubscriber(event:UserUpdatedEvent | AssistantUpdatedEve
     ...(phoneNumber && { phone: phoneNumber }),
   };
 
+  const store = (myStore || inStore)
   const moreData = {
+    ...(store && { store: store.toString() }),
     ...(permissions && { permissions }),
   };
 
