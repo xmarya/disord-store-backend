@@ -40,7 +40,7 @@ async function bullmq(queueName: string, processor: any, concurrency?:number) {
   // worker.on("stalled", () => console.log("stalled worker"));
   // worker.on("resumed", () => console.log("worker resumed the job"));
   // worker.on("progress", (job, progress) => console.log("worker is progressing the job"));
-  worker.on("completed", (job, result) => console.log("A JOB HAS COMPLETED 🎉"));
+  // worker.on("completed", (job, result) => console.log("A JOB HAS COMPLETED 🎉"));
   worker.on("failed", (job, error) => console.log(`${job} has failed during this error ${error.name}: ${error.message}`));
   worker.on("error", (error) => console.log("BullMQ ERROR 🔴: ", error.message));
   // worker.on("closing", () => console.log("the worker is closing"));
