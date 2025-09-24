@@ -1,5 +1,4 @@
 import { upsertOutboxRecordInCache } from "@externals/redis/cacheControllers/outboxRecordsCache";
-import { DomainEvent } from "@Types/events/DomainEvent";
 import { OutboxEvent } from "@Types/events/OutboxEvents";
 import { Failure, RabbitConsumerDTO } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
@@ -16,7 +15,7 @@ async function getConsumerACK<T extends OutboxEvent>(event: T, receiver: (event:
   console.log("✨ TRUE ACK FROM",receiverResult.result);
   await upsertOutboxRecordInCache(outboxRecordId, receiverResult.result);
 
-  return new Success(true);
+  return new Success({ok:true});
 }
 
 export default getConsumerACK;
