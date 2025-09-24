@@ -11,7 +11,7 @@ const {queue} = await bullmq("completedOutboxRecord", completedOutboxRecordProce
 
 async function completedOutboxRecordBullMQ() {
   // STEP 1) add job to the queue:
-  await queue.add("dbDeleteJob", {}, { repeat: { every: ms("2m") }, jobId: "outboxRecord-delete-job" });
+  await queue.add("dbDeleteJob", {}, { repeat: { every: ms("30m") }, jobId: "outboxRecord-delete-job" });
 }
 
 async function completedOutboxRecordProcessor() {
