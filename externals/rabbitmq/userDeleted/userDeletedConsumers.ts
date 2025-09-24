@@ -11,37 +11,40 @@ const consumers = {
   novu: {
     receiver: novuDeleteSubscriber,
     queueName: "user-deleted-queue-novu",
-    requeue: true,
+
     queueOptions: { queueMode: "lazy", maxPriority: "normal" },
   },
   redis: {
     receiver: deleteUserFromCache,
     queueName: "user-deleted-queue-redis",
-    requeue: false,
   },
 
   credentialsCollection: {
     receiver: deleteMultipleCredentials,
     queueName: "user-deleted-queue-credentialsCollection",
-    requeue: true,
+
     queueOptions: CRITICAL_QUEUE_OPTIONS,
-    deadLetterOptions: {
-      deadExchangeName:"dead-user-events",
-      deadQueueName:"dead-user-deleted-queue-credentialsCollection",
-      deadRoutingKey:"dead-user-deleted"
-    }
+    retryLetterOptions: {
+      mainExchangeName:"main-user-events",
+      mainRoutingKey:"user-deleted",
+      deadExchangeName: "dead-user-events",
+      deadQueueName: "dead-user-deleted-queue-credentialsCollection",
+      deadRoutingKey: "dead-user-deleted",
+    },
   },
   regularUserRelatedResources: {
     receiver: deleteRegularUserRelatedResources,
     queueName: "user-deleted-queue-regularUserRelatedResources",
-    requeue: true,
+
     queueOptions: CRITICAL_QUEUE_OPTIONS,
-    deadLetterOptions: {
-      deadExchangeName:"dead-user-events",
-      deadQueueName:"dead-user-deleted-queue-regularUserRelatedResources",
-      deadRoutingKey:"dead-user-deleted"
-    }
-  }
+    retryLetterOptions: {
+      mainExchangeName:"main-user-events",
+      mainRoutingKey:"user-deleted",
+      deadExchangeName: "dead-user-events",
+      deadQueueName: "dead-user-deleted-queue-regularUserRelatedResources",
+      deadRoutingKey: "dead-user-deleted",
+    },
+  },
 } satisfies Record<string, ConsumerRegister<UserDeletedType, UserDeletedEvent>>;
 function userDeletedConsumers() {
   userDeletedRegister({ ...consumers["credentialsCollection"] });

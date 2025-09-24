@@ -1,17 +1,15 @@
+import { ConsumerRegister, UserDeletedType } from "@Types/events/OutboxEvents";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { Success } from "@Types/ResultTypes/Success";
+import deadLetterQueue from "../deadLetterQueue";
 import getConsumerACK from "../getConsumerACK";
+import retryQueue from "../retryQueue";
 import userDeletedQueue from "./userDeletedQueue";
-import { AllOutbox, ConsumerRegister, DeadLetterOptions, OutboxEventQueueNamesMap, QueueOptions, UserDeletedType } from "@Types/events/OutboxEvents";
 
-
-async function userDeletedRegister({receiver, queueName, requeue, queueOptions, deadLetterOptions}:ConsumerRegister<UserDeletedType, UserDeletedEvent>) {
-  const result = await userDeletedQueue(queueName, queueOptions, deadLetterOptions);
+async function userDeletedRegister({ receiver, queueName, queueOptions,retryLetterOptions }: ConsumerRegister<UserDeletedType, UserDeletedEvent>) {
+  const result = await userDeletedQueue(queueName, queueOptions);
   if (!result.ok) return result;
-  const {
-    result: channel,
-  } = result;
+  const { result: channel } = result;
 
   try {
     channel.consume(
@@ -22,16 +20,17 @@ async function userDeletedRegister({receiver, queueName, requeue, queueOptions, 
 
         const ack = await getConsumerACK(event, receiver);
         if (!ack.ok) {
-          channel.nack(message, false, requeue);
-          return new Failure(ack.message);
+          const headers = message.properties.headers || {};
+          const deathCounts = headers["x-death"]?.length ?? 1; // Rabbit's x-death is 1 based
+          retryLetterOptions && await retryQueue(deathCounts, retryLetterOptions);
+          channel.nack(message, false, false);
         }
         channel.ack(message);
       },
       { noAck: false }
     );
   } catch (error) {
-    console.log(error);
-    return new Failure((error as Error).message);
+    retryLetterOptions && (await deadLetterQueue(retryLetterOptions));
   }
 }
 
