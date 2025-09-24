@@ -1,11 +1,10 @@
+import { ConsumerRegister, UserCreatedType } from "@Types/events/OutboxEvents";
 import { UserCreatedEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { Success } from "@Types/ResultTypes/Success";
-import userCreatedQueue from "./userCreatedQueue";
-import getConsumerACK from "../getConsumerACK";
-import { AllOutbox, ConsumerRegister, DeadLetterOptions, OutboxEventQueueNamesMap, QueueOptions, UserCreatedType } from "@Types/events/OutboxEvents";
 import deadLetterQueue from "../deadLetterQueue";
+import getConsumerACK from "../getConsumerACK";
 import retryQueue from "../retryQueue";
+import userCreatedQueue from "./userCreatedQueue";
 
 async function userCreatedRegister({ receiver, queueName, queueOptions, retryLetterOptions }: ConsumerRegister<UserCreatedType, UserCreatedEvent>) {
   try {

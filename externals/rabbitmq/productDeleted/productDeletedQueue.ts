@@ -1,9 +1,8 @@
 import getRabbitConsumingChannel from "@config/rabbitmq/consumingChannel";
 import { QUEUE_OPTIONS } from "@constants/rabbitmq";
-import { DeadLetterOptions, ProductDeletedType, QueueOptions } from "@Types/events/OutboxEvents";
+import { ProductDeletedType, QueueOptions } from "@Types/events/OutboxEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
-import deadLetterQueue from "../deadLetterQueue";
 
 const exchangeName: ProductDeletedType["exchangeName"] = "main-product-events";
 const routingKey: ProductDeletedType["routingKey"] = "product-deleted";

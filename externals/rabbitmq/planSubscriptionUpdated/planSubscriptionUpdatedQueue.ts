@@ -1,8 +1,7 @@
 import getRabbitConsumingChannel from "@config/rabbitmq/consumingChannel";
 import { QUEUE_OPTIONS } from "@constants/rabbitmq";
-import { DeadLetterOptions, PlanSubscriptionUpdatedType, QueueOptions } from "@Types/events/OutboxEvents";
+import { PlanSubscriptionUpdatedType, QueueOptions } from "@Types/events/OutboxEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import deadLetterQueue from "../deadLetterQueue";
 import { Success } from "@Types/ResultTypes/Success";
 
 const exchangeName: PlanSubscriptionUpdatedType["exchangeName"] = "main-planSubscription-events";

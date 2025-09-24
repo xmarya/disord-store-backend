@@ -1,9 +1,8 @@
 import getRabbitConsumingChannel from "@config/rabbitmq/consumingChannel";
 import { QUEUE_OPTIONS } from "@constants/rabbitmq";
-import { AssistantDeletedType, DeadLetterOptions, QueueOptions } from "@Types/events/OutboxEvents";
+import { AssistantDeletedType, QueueOptions } from "@Types/events/OutboxEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
-import deadLetterQueue from "../deadLetterQueue";
 
 const exchangeName: AssistantDeletedType["exchangeName"] = "main-assistant-events";
 const routingKey: AssistantDeletedType["routingKey"] = "assistant-deleted";

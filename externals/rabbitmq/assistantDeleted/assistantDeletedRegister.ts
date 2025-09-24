@@ -1,10 +1,10 @@
 import { AssistantDeletedEvent } from "@Types/events/AssistantEvents";
-import { AssistantDeletedType, ConsumerRegister, DeadLetterOptions, QueueOptions } from "@Types/events/OutboxEvents";
-import { Failure, RabbitConsumerDTO } from "@Types/ResultTypes/errors/Failure";
-import { Success } from "@Types/ResultTypes/Success";
+import { AssistantDeletedType, ConsumerRegister } from "@Types/events/OutboxEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 import getConsumerACK from "../getConsumerACK";
-import assistantDeletedQueue from "./assistantDeletedQueue";
 import retryQueue from "../retryQueue";
+import assistantDeletedQueue from "./assistantDeletedQueue";
+import deadLetterQueue from "../deadLetterQueue";
 
 async function assistantDeletedRegister({ receiver, queueName, queueOptions, retryLetterOptions }: ConsumerRegister<AssistantDeletedType, AssistantDeletedEvent>) {
   const result = await assistantDeletedQueue(queueName, queueOptions);
@@ -30,8 +30,8 @@ async function assistantDeletedRegister({ receiver, queueName, queueOptions, ret
       { noAck: false }
     );
   } catch (error) {
-    console.log(error);
-    return new Failure((error as Error).message);
+    retryLetterOptions && (await deadLetterQueue(retryLetterOptions));
+
   }
 }
 
