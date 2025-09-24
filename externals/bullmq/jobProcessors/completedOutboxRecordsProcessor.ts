@@ -20,13 +20,11 @@ async function completedOutboxRecordProcessor() {
     Object.entries(outboxMap).forEach(([id, services]) => {
       if(Object.values(services).every(ack => ack === true)){
         const recordId = new mongoose.Types.ObjectId(id) as unknown as string;
-        console.log(recordId);
         completedRecordIds.push(recordId);
       }
     });
   
     if(completedRecordIds.length) {
-      console.log(completedRecordIds);
       const result = await deleteCompletedOutboxRecord(completedRecordIds);
       result.deletedCount && await removeCompletedOutboxRecord(completedRecordIds)
     }
