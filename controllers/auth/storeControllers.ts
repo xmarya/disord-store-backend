@@ -10,6 +10,7 @@ import isErr from "@utils/isErr";
 import returnError from "@utils/returnError";
 import { Forbidden } from "@Types/ResultTypes/errors/Forbidden";
 import getStoreOf from "@services/auth/storeServices/getStoreOfOwner";
+import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   const storeOwner = request.user as StoreOwnerDocument;
@@ -49,8 +50,8 @@ export const getMyStoreController = catchAsync(async (request, response, next) =
 export const updateMyStoreController = catchAsync(async (request, response, next) => {
   console.log("updateMyStoreController");
   // only allow storeName, description, logo
-  const { storeName, description }: StoreDataBody = request.body;
-  if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "request.body must contain the storeName description"));
+  const { storeName, description, productsType }: StoreDataBody = request.body;
+  if (!storeName?.trim() || !description?.trim() || !productsType?.trim()) return new BadRequest("request.body must contain the storeName, description, and productsType");
 
   const result = await updateStore(request.store, request.body);
   if (!result.ok) return next(returnError(result));
