@@ -12,15 +12,13 @@ const priority:PriorityLevelMap = {
 }
 
 export const QUEUE_OPTIONS = (options?:QueueOptions) => {
-  const {durable = true, maxLength = 1000, messageTtl = ms("3m"), queueMode = "default", maxPriority, expires, deadLetterExchange, deadLetterRoutingKey} = options ?? {};
+  const {durable = true, maxLength = 1000, messageTtl = ms("3m"), queueMode = "default", maxPriority, expires} = options ?? {};
   return {
     durable, 
     maxPriority: maxPriority ? priority[maxPriority] : priority["no-priority"],
     arguments: {"x-queue-mode": queueMode},
     messageTtl,
     maxLength,
-    ...(deadLetterExchange && {deadLetterExchange}),
-    ...(deadLetterRoutingKey && {deadLetterRoutingKey}),
     ...(expires && {expires}),
 
   }
