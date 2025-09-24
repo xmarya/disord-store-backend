@@ -6,14 +6,16 @@ import { UserLoggedInEvent, UserUpdatedEvent } from "@Types/events/UserEvents";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import { Success } from "@Types/ResultTypes/Success";
 import { PlanSubscriptionUpdatedEvent } from "@Types/events/PlanSubscriptionEvents";
+import { MongoId } from "@Types/Schema/MongoId";
 
 async function cacheUser(event: UserLoggedInEvent | UserUpdatedEvent | PlanSubscriptionUpdatedEvent) {
   let user: AllUsers;
   const payload = event.payload;
   user = ((payload as PlanSubscriptionUpdatedEvent["payload"]).storeOwner as AllUsers) || (payload as UserUpdatedEvent["payload"]).user;
 
+  const userId = (user._id as MongoId).toString();
   const data = {
-    id: user._id,
+    id: userId,
     userType: user.userType,
     firstName: user.firstName,
     lastName: user.lastName,
