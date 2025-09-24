@@ -3,7 +3,6 @@ import { ttl } from "@constants/ttl";
 import { RedisTTL } from "@Types/externalAPIs/RedisCache";
 
 export async function createRedisHash(hashKey: string, data: any, TTL: RedisTTL) {
-  console.log("createRedisHash", data);
   const result = await redis.hset(hashKey, data);
   // if TTL is anything except "no-ttl"
   if (ttl[TTL]) await redis.expire(hashKey, ttl[TTL]);
