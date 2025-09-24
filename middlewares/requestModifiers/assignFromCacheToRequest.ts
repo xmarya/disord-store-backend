@@ -6,7 +6,6 @@ import returnError from "@utils/returnError";
 import { getRedisHash } from "../../externals/redis/redisOperations/redisHash";
 
 export const assignFromCacheToRequest = catchAsync(async (request, response, next) => {
-  console.log("assignFromCacheToRequest");
   if (request.user.userType !== "storeOwner" && request.user.userType !== "storeAssistant") return new Forbidden();
 
   const userType = request.user.userType;

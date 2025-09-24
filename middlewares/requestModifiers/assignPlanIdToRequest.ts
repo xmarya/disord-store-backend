@@ -5,7 +5,6 @@ import returnError from "@utils/returnError";
 import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPlan";
 
 const assignPlanIdToRequest = catchAsync(async (request, response, next) => {
-console.log("assignPlanIdToRequest");
   // if the plan is exist from the previous cache middleware
   if (request.plan) return next();
   // NOTE: I'm only checking using the plan, as it the only value that tells me if the user has
