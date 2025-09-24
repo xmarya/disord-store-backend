@@ -15,8 +15,8 @@ import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 export const createStoreController = catchAsync(async (request, response, next) => {
   const storeOwner = request.user as StoreOwnerDocument;
   // TODO: complete the store data
-  const { storeName, description }: StoreDataBody = request.body;
-  if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
+  const { storeName, description , productsType}: StoreDataBody = request.body;
+  if (!storeName?.trim() || !description?.trim() || !productsType?.trim()) return (new BadRequest("الرجاء تعبئة جميع الحقول"));
 
   const result = await createNewStore(storeOwner, request.body, request.emailConfirmed);
 

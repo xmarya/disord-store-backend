@@ -10,9 +10,9 @@ import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 import { startSession } from "mongoose";
 
 async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDataBody, emailConfirmed: boolean) {
-  const { storeName, description, logo } = storeData;
+  const { storeName, description,productsType, logo } = storeData;
   //TODO: handling logo and uploading it to cloudflare
-  const data: FullStoreDataBody = { storeName, description, logo, owner: storeOwner.id, inPlan: storeOwner.subscribedPlanDetails.planName };
+  const data: FullStoreDataBody = { storeName, productsType, description, logo, owner: storeOwner.id, inPlan: storeOwner.subscribedPlanDetails.planName };
   const session = await startSession();
 
   const { newStore, updatedOwner } = await session.withTransaction(async () => {
