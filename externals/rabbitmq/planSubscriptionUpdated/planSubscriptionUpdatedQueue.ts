@@ -8,19 +8,19 @@ import { Success } from "@Types/ResultTypes/Success";
 const exchangeName: PlanSubscriptionUpdatedType["exchangeName"] = "main-planSubscription-events";
 const routingKey: PlanSubscriptionUpdatedType["routingKey"] = "planSubscription-updated";
 
-async function planSubscriptionUpdatedQueue(queueName: PlanSubscriptionUpdatedType["queueName"], queueOptions?: QueueOptions, deadLetterOptions?: DeadLetterOptions<PlanSubscriptionUpdatedType>) {
+async function planSubscriptionUpdatedQueue(queueName: PlanSubscriptionUpdatedType["queueName"], queueOptions?: QueueOptions) {
   const result = getRabbitConsumingChannel();
   if (!result.ok) return new Failure(result.message);
   const { result: channel } = result;
 
-  const options = QUEUE_OPTIONS({ ...queueOptions, ...deadLetterOptions });
+  const options = QUEUE_OPTIONS(queueOptions);
 
   try {
     await channel.assertExchange(exchangeName, "direct", { durable: true });
     await channel.assertQueue(queueName, options);
     await channel.bindQueue(queueName, exchangeName, routingKey);
 
-    if (deadLetterOptions) await deadLetterQueue(deadLetterOptions);
+    // if (deadLetterOptions) await deadLetterQueue(deadLetterOptions);
 
     return new Success({ channel });
   } catch (error) {

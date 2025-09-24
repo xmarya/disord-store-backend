@@ -14,9 +14,11 @@ const consumers = {
   planStatsCollection: {
     receiver: updatePlanStatsConsumer,
     queueName: "planSubscription-updated-queue-planStatsCollection",
-    requeue: true,
+
     queueOptions: { maxPriority: "urgent", queueMode: "lazy", messageTtl: ms("15m") },
-    deadLetterOptions: {
+    retryLetterOptions: {
+      mainExchangeName:"main-planSubscription-events",
+      mainRoutingKey:"planSubscription-updated",
       deadExchangeName: "dead-planSubscription-events",
       deadQueueName: "dead-planSubscription-updated-queue-planStatsCollection",
       deadRoutingKey: "dead-planSubscription-updated",
@@ -26,9 +28,11 @@ const consumers = {
   storesCollection: {
     receiver: updateStorePlanConsumer,
     queueName: "planSubscription-updated-queue-storesCollection",
-    requeue: true,
+
     queueOptions: CRITICAL_QUEUE_OPTIONS,
-    deadLetterOptions: {
+    retryLetterOptions: {
+      mainExchangeName: "main-planSubscription-events",
+      mainRoutingKey:"planSubscription-updated",
       deadExchangeName: "dead-planSubscription-events",
       deadQueueName: "dead-planSubscription-updated-queue-storesCollection",
       deadRoutingKey: "dead-planSubscription-updated",
@@ -37,9 +41,11 @@ const consumers = {
   plansCollection: {
     receiver: assignStoreOwnerToUnlimitedPlanConsumer,
     queueName: "planSubscription-updated-queue-plansCollection",
-    requeue: true,
+
     queueOptions: CRITICAL_QUEUE_OPTIONS,
-    deadLetterOptions: {
+    retryLetterOptions: {
+      mainExchangeName:"main-planSubscription-events",
+      mainRoutingKey:"planSubscription-updated",
       deadExchangeName: "dead-planSubscription-events",
       deadQueueName: "dead-planSubscription-updated-queue-plansCollection",
       deadRoutingKey: "dead-planSubscription-updated",
@@ -48,9 +54,11 @@ const consumers = {
   assistantsCollection: {
     receiver: updateAssistantInPlanConsumer,
     queueName: "planSubscription-updated-queue-assistantsCollection",
-    requeue: true,
+
     queueOptions: CRITICAL_QUEUE_OPTIONS,
-    deadLetterOptions: {
+    retryLetterOptions: {
+      mainExchangeName:"main-planSubscription-events",
+      mainRoutingKey:"planSubscription-updated",
       deadExchangeName: "dead-planSubscription-events",
       deadQueueName: "dead-planSubscription-updated-queue-assistantsCollection",
       deadRoutingKey: "dead-planSubscription-updated",

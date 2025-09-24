@@ -3,9 +3,11 @@ import { PlanSubscriptionUpdatedEvent } from "@Types/events/PlanSubscriptionEven
 import planSubscriptionUpdatedQueue from "./planSubscriptionUpdatedQueue";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import getConsumerACK from "../getConsumerACK";
+import retryQueue from "../retryQueue";
+import deadLetterQueue from "../deadLetterQueue";
 
-async function planSubscriptionUpdatedRegister({ receiver, queueName, requeue, queueOptions, deadLetterOptions }: ConsumerRegister<PlanSubscriptionUpdatedType, PlanSubscriptionUpdatedEvent>) {
-  const result = await planSubscriptionUpdatedQueue(queueName, queueOptions, deadLetterOptions);
+async function planSubscriptionUpdatedRegister({ receiver, queueName, queueOptions, retryLetterOptions }: ConsumerRegister<PlanSubscriptionUpdatedType, PlanSubscriptionUpdatedEvent>) {
+  const result = await planSubscriptionUpdatedQueue(queueName, queueOptions);
   if (!result.ok) return new Failure(result.message);
   const {
     result: { channel },
@@ -19,14 +21,18 @@ async function planSubscriptionUpdatedRegister({ receiver, queueName, requeue, q
 
         const ack = await getConsumerACK(event, receiver);
         if (!ack.ok) {
-          channel.nack(message, false, requeue);
-          return new Failure(ack.message);
+          const headers = message.properties.headers || {};
+          const deathCounts = headers["x-death"]?.length ?? 1; // Rabbit's x-death is 1 based
+          retryLetterOptions && await retryQueue(deathCounts, retryLetterOptions);
+          channel.nack(message, false, false);
         }
         channel.ack(message);
       },
       { noAck: false }
     );
-  } catch (error) {}
+  } catch (error) {
+    retryLetterOptions && (await deadLetterQueue(retryLetterOptions));
+  }
 }
 
 export default planSubscriptionUpdatedRegister;
