@@ -3,9 +3,11 @@ import getConsumerACK from "../getConsumerACK";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { ProductDeletedEvent } from "@Types/events/ProductEvents";
 import productDeletedQueue from "./productDeletedQueue";
+import retryQueue from "../retryQueue";
+import deadLetterQueue from "../deadLetterQueue";
 
-async function productDeletedRegister({ receiver, queueName, requeue, queueOptions, deadLetterOptions }: ConsumerRegister<ProductDeletedType, ProductDeletedEvent>) {
-  const result = await productDeletedQueue(queueName, queueOptions, deadLetterOptions);
+async function productDeletedRegister({ receiver, queueName, queueOptions, retryLetterOptions }: ConsumerRegister<ProductDeletedType, ProductDeletedEvent>) {
+  const result = await productDeletedQueue(queueName, queueOptions);
   if (!result.ok) return result;
   const {
     result: { channel },
@@ -20,16 +22,17 @@ async function productDeletedRegister({ receiver, queueName, requeue, queueOptio
 
         const ack = await getConsumerACK(event, receiver);
         if (!ack.ok) {
-          channel.nack(message, false, requeue);
-          return new Failure(ack.message);
+          const headers = message.properties.headers || {};
+          const deathCounts = headers["x-death"]?.length ?? 1; // Rabbit's x-death is 1 based
+          retryLetterOptions && await retryQueue(deathCounts, retryLetterOptions);
+          channel.nack(message, false, false);
         }
         channel.ack(message);
       },
       { noAck: false }
     );
   } catch (error) {
-    console.log(error);
-    return new Failure((error as Error).message);
+    retryLetterOptions && (await deadLetterQueue(retryLetterOptions));
   }
 }
 

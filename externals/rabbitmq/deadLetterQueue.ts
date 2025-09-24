@@ -1,6 +1,6 @@
 import getRabbitConsumingChannel from "@config/rabbitmq/consumingChannel";
 import { AllOutbox, DeadLetterOptions } from "@Types/events/OutboxEvents";
-import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { ms } from "ms";
 
 async function deadLetterQueue<T extends AllOutbox>(options: DeadLetterOptions<T>) {
   const result = getRabbitConsumingChannel();
@@ -13,8 +13,7 @@ async function deadLetterQueue<T extends AllOutbox>(options: DeadLetterOptions<T
     await channel.assertQueue(deadQueueName, { durable: true });
     await channel.bindQueue(deadQueueName, deadExchangeName, deadRoutingKey);
   } catch (error) {
-    console.log(error);
-    return new Failure((error as Error).message);
+    setTimeout(() => deadLetterQueue(options), ms("30s"));
   }
 }
 
