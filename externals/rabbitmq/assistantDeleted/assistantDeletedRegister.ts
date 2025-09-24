@@ -4,14 +4,12 @@ import { Failure, RabbitConsumerDTO } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import getConsumerACK from "../getConsumerACK";
 import assistantDeletedQueue from "./assistantDeletedQueue";
+import retryQueue from "../retryQueue";
 
-
-async function assistantDeletedRegister({ receiver, queueName, requeue, queueOptions, deadLetterOptions }: ConsumerRegister<AssistantDeletedType, AssistantDeletedEvent>) {
-  const result = await assistantDeletedQueue(queueName, queueOptions, deadLetterOptions);
+async function assistantDeletedRegister({ receiver, queueName, queueOptions, retryLetterOptions }: ConsumerRegister<AssistantDeletedType, AssistantDeletedEvent>) {
+  const result = await assistantDeletedQueue(queueName, queueOptions);
   if (!result.ok) return result;
-  const {
-    result: channel,
-  } = result;
+  const { result: channel } = result;
 
   try {
     channel.consume(
@@ -22,8 +20,10 @@ async function assistantDeletedRegister({ receiver, queueName, requeue, queueOpt
 
         const ack = await getConsumerACK(event, receiver);
         if (!ack.ok) {
-          channel.nack(message, false, requeue);
-          return new Failure(ack.message);
+          const headers = message.properties.headers || {};
+          const deathCounts = headers["x-death"]?.length ?? 1; // Rabbit's x-death is 1 based
+          retryLetterOptions && await retryQueue(deathCounts, retryLetterOptions);
+          channel.nack(message, false, false);
         }
         channel.ack(message);
       },
