@@ -13,7 +13,7 @@ async function cacheUser(event: UserLoggedInEvent | UserUpdatedEvent | PlanSubsc
   user = ((payload as PlanSubscriptionUpdatedEvent["payload"]).storeOwner as AllUsers) || (payload as UserUpdatedEvent["payload"]).user;
 
   const data = {
-    id: user.id,
+    id: user._id,
     userType: user.userType,
     firstName: user.firstName,
     lastName: user.lastName,
