@@ -7,7 +7,7 @@ import { resetPassword } from "../../middlewares/resetPassword";
 import { forgetPassword } from "../../middlewares/forgetPassword";
 import { getAuthenticaBalance } from "@config/authentica";
 import verifyLoginData from "../../middlewares/validators/verifyLoginData";
-import confirmUserEmail from "../../middlewares/validators/confirmUserEmail";
+// import confirmUserEmail from "../../middlewares/validators/confirmUserEmail";
 import restrict from "@middlewares/protectors/restrict";
 
 export const router = express.Router();
@@ -20,7 +20,7 @@ router.post("/storeOwner-signup", validateNewUserData, createNewUserController("
 router.post("/login", credentialsLogin, verifyLoginData, restrict("user", "storeOwner", "storeAssistant"), getAuthenticaBalance, sendOTP);
 router.post("/otpVerify", verifyOTP);
 router.post("/discord", createNewDiscordUserController);
-router.patch("/confirmEmail/:randomToken", validateRequestParams("randomToken"), confirmUserEmail);
+// router.patch("/confirmEmail/:randomToken", validateRequestParams("randomToken"), confirmUserEmail);
 router.patch("/resetPassword/:randomToken", validateRequestParams("randomToken"), resetPassword);
 router.post("/forgetPassword", forgetPassword);
 

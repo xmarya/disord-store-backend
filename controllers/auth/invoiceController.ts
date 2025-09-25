@@ -11,7 +11,7 @@ import { catchAsync } from "@utils/catchAsync";
 import Invoice from "@models/invoiceModel";
 import Order from "@models/orderModel";
 import { updateStoreStatsController } from "./storeStatsController";
-import addJob from "../../externals/bullmq/addJob";
+// import addJob from "../../externals/bullmq/addJob";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -128,10 +128,10 @@ export async function createNewInvoiceController(data: InvoiceDataBody) {
   await updateStoreStatsController(fullData, operationType);
 
   // STEP 2) save the data in the cache be batched and to be handled later by bullmq:
-  const success = await addJob("Invoices", invoiceId, fullData);
+  // const success = await addJob("Invoices", invoiceId, fullData);
 
   // STEP 3) in case of failure, save it directly to the db.
-  if (!success) createNewInvoices(fullData);
+  /*if (!success) */createNewInvoices(fullData);
   // NOTE: no need to await this too. let it do its job in the background;
   // the most important part is to show the profits ASAP in the store's dashboard.
 
@@ -165,10 +165,10 @@ export const testInvoiceController = catchAsync(async (request, response, next) 
   await updateStoreStatsController(data, operationType);
 
   // STEP 2) save the data in the cache be batched and to be handled later by bullmq:
-  const success = await addJob("Invoice", invoiceId, data);
+  // const success = await addJob("Invoice", invoiceId, data);
 
   // STEP 3) in case of failure, save it directly to the db.
-  if (!success) createNewInvoices(data);
+  /*if (!success)*/ createNewInvoices(data);
   // NOTE: no need to await this too. let it do its job in the background;
   // the most important part is to show the profits ASAP in the store's dashboard.
 

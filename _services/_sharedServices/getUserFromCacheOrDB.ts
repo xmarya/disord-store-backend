@@ -1,4 +1,4 @@
-import { getDecompressedCacheData } from "@externals/redis/cacheControllers/globalCache";
+// import { getDecompressedCacheData } from "@externals/redis/cacheControllers/globalCache";
 import Admin from "@models/adminModel";
 import StoreAssistant from "@models/storeAssistantModel";
 import StoreOwner from "@models/storeOwnerModel";
@@ -12,14 +12,14 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 async function getUserFromCacheOrDB(idFromPayload: string, userTypeFromPayload: UserTypes) {
-  const safeGetFromCache = safeThrowable(
-    () => getDecompressedCacheData<AllUsers>(`User:${idFromPayload}`),
-    (error) => new Failure((error as Error).message)
-  );
+  // const safeGetFromCache = safeThrowable(
+  //   () => getDecompressedCacheData<AllUsers>(`User:${idFromPayload}`),
+  //   (error) => new Failure((error as Error).message)
+  // );
 
-  const getCacheResult = await extractSafeThrowableResult(() => safeGetFromCache);
+  // const getCacheResult = await extractSafeThrowableResult(() => safeGetFromCache);
 
-  if (getCacheResult.ok) return getCacheResult;
+  // if (getCacheResult.ok) return getCacheResult;
 
   const safeGetFromDB = safeThrowable(
     () => getUserFromDB(idFromPayload, userTypeFromPayload),

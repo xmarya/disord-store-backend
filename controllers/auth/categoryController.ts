@@ -3,7 +3,7 @@ import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from 
 import { CategoryBasic } from "@Types/Schema/Category";
 import { MongoId } from "@Types/Schema/MongoId";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
-import { getDecompressedCacheData, setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
+// import { getDecompressedCacheData, setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
 import { catchAsync } from "@utils/catchAsync";
 import Category from "@models/categoryModel";
 
@@ -74,13 +74,13 @@ export async function categoriesInCache(productId: MongoId): Promise<CategoryBas
   let categories;
 
   // STEP 1) look in cache:
-  categories = await getDecompressedCacheData<CategoryBasic[]>(`Category:${productId}`);
+  // categories = await getDecompressedCacheData<CategoryBasic[]>(`Category:${productId}`);
 
   // STEP 2) nothing? get from db:
   if (!categories) {
     categories = await getAllProductCategories(productId);
 
-    await setCompressedCacheData(`Category:${productId}`, categories, "fifteen-minutes");
+    // await setCompressedCacheData(`Category:${productId}`, categories, "fifteen-minutes");
   }
 
   return categories;

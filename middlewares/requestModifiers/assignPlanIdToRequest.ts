@@ -2,7 +2,7 @@ import getStoreOwnerSubscriptionsLog from "@services/auth/storeOwnerServices/sub
 import getStoreOf from "@services/auth/storeServices/getStoreOfOwner";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
-import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPlan";
+// import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPlan";
 
 const assignPlanIdToRequest = catchAsync(async (request, response, next) => {
 console.log("assignPlanIdToRequest");
@@ -27,7 +27,7 @@ console.log("assignPlanIdToRequest");
 
   // since the code progressed until this point, that mean the data are not available in the cache.
   // so, cache them without awaiting:
-  await cacheStoreAndPlan(request.store, request.plan, request.isPlanPaid, request.planExpiryDate);
+  // await cacheStoreAndPlan(request.store, request.plan, request.isPlanPaid, request.planExpiryDate);
   next();
 });
 
