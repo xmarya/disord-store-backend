@@ -35,9 +35,7 @@ export async function deleteStore(storeId: MongoId, session: mongoose.ClientSess
   const deletedStore = await Store.findByIdAndUpdate(storeId,
     {
       $unset:{
-          inPlan:"",
-        storeName:"",
-        description:"",
+        inPlan:"",
         logo:"",
         productsType:"",
         colourTheme:"",
@@ -52,6 +50,7 @@ export async function deleteStore(storeId: MongoId, session: mongoose.ClientSess
       },
       $set:{
         status:"deleted",
+        description:"deleted store"
       },
 
   }, { new: true, runValidators:false, session });
