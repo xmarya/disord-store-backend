@@ -5,7 +5,7 @@ import OutboxRecordBase from "@Types/Schema/OutboxRecord";
 import mongoose from "mongoose";
 
 export async function createNewOutboxRecord(data: Array<OutboxRecordBase>, session: mongoose.ClientSession) {
-  const newOutBoxRecord = await OutboxRecord.create(data, { session });
+  const newOutBoxRecord = await OutboxRecord.create(data, { session, ordered:true }); // this throws an error without setting order option to be true
 
   return newOutBoxRecord[0];
 }
