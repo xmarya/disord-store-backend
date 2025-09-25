@@ -8,7 +8,6 @@ import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import isErr from "@utils/isErr";
 import returnError from "@utils/returnError";
-import { Forbidden } from "@Types/ResultTypes/errors/Forbidden";
 import getStoreOf from "@services/auth/storeServices/getStoreOfOwner";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 
