@@ -63,6 +63,7 @@ const consumers = {
 function userDeletedConsumers() {
   userDeletedRegister({ ...consumers["credentialsCollection"] });
   userDeletedRegister({ ...consumers["regularUserRelatedResources"] });
+  userDeletedRegister({ ...consumers["reviewsCollection"] });
   userDeletedRegister({ ...consumers["novu"] });
   userDeletedRegister({ ...consumers["redis"] });
 }
