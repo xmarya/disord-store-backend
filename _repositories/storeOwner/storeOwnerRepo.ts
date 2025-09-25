@@ -113,5 +113,5 @@ export async function deleteStoreOwner(ownerId:MongoId, session:mongoose.ClientS
       discord:"",
       signMethod:"",
     }
-  }, {new: true, runValidators:false, session})
+  }, {new: false, runValidators:false, session}); // new is false in order to get the owner email to delete the credentials
 }

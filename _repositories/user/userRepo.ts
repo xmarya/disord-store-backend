@@ -27,5 +27,5 @@ export async function deleteRegularUser(userId:MongoId, session:mongoose.ClientS
       phoneNumber:"",
 
     }
-  }, {new: true, runValidators:false, session})
+  }, {new: false, runValidators:false, session});  // new is false in order to get the user email to delete the credentials
 }
