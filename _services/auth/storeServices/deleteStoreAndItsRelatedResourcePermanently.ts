@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 // NOTE: this function must run inside a TRANSACTION
 async function deleteStoreAndItsRelatedResourcePermanently(storeId: MongoId, session: mongoose.ClientSession) {
   //STEP 7) delete the store:
-  await deleteStore(storeId, session);
+  return await deleteStore(storeId, session);
 
 }
 

@@ -4,6 +4,7 @@ import { MongoId } from "@Types/Schema/MongoId";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
+// TODO: send a noti to the store owner about the admin action
 
 async function deleteStoreByAdmin(storeId:MongoId) {
     const safeDeleteStore = safeThrowable(

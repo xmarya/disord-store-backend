@@ -1,25 +1,29 @@
 import StoreOwner from "@models/storeOwnerModel";
 import { deleteDoc } from "@repositories/global";
 import { MongoId } from "@Types/Schema/MongoId";
-import { startSession } from "mongoose";
+import mongoose, { startSession } from "mongoose";
 import { Success } from "@Types/ResultTypes/Success";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import deleteStoreAndItsRelatedResourcePermanently from "../storeServices/deleteStoreAndItsRelatedResourcePermanently";
 import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
+import { StoreDeletedEvent } from "@Types/events/StoreEvents";
 
 async function deleteStoreOwnerAccount(storeOwnerId: MongoId, storeId: MongoId) {
   const session = await startSession();
   const deletedStoreOwner = await session.withTransaction(async () => {
     const deletedStoreOwner = await deleteDoc(StoreOwner, storeOwnerId, { session });
-    await deleteStoreAndItsRelatedResourcePermanently(storeId, session);
-    if (deletedStoreOwner) {
-      const payload: UserDeletedEvent["payload"] = {
+    const deletedStore = await deleteStoreAndItsRelatedResourcePermanently(storeId, session);
+    if (deletedStoreOwner && deletedStore) {
+      const ownerPayload: UserDeletedEvent["payload"] = {
         usersId: [deletedStoreOwner.id],
         emailsToDelete: [deletedStoreOwner.email],
         userType: deletedStoreOwner.userType,
       };
-      await createOutboxRecord<[UserDeletedEvent]>([{ type: "user-deleted", payload }], session);
+      const storePayload:StoreDeletedEvent["payload"] = {
+        storeId: deletedStoreOwner.myStore || new mongoose.Types.ObjectId(storeId)
+      }
+      await createOutboxRecord<[UserDeletedEvent, StoreDeletedEvent]>([{ type: "user-deleted", payload:ownerPayload }, {type:"store-deleted", payload:storePayload}], session);
     }
 
     return deletedStoreOwner;
