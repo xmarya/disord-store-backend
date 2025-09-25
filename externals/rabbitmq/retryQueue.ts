@@ -11,8 +11,10 @@ const retryIn = [ms("30s"), ms("90s"), ms("4m")];
 
 // the retry queue's job is to hold the massage for a period of time, then sending it to the main queue
 async function retryQueue<T extends AllOutbox>(deathCounts: number, options: RetryLetterOptions<T>) {
+  console.log("inside retryQueue");
   const result = getRabbitConsumingChannel();
   if (!result.ok) return new Failure(result.message);
+  console.log("0");
   const { result: channel } = result;
   const { mainExchangeName, mainRoutingKey, deadExchangeName, deadQueueName, deadRoutingKey } = options;
 
@@ -24,12 +26,17 @@ async function retryQueue<T extends AllOutbox>(deathCounts: number, options: Ret
   const nextRoutingKey = hasRetriesLeft ? mainRoutingKey : deadRoutingKey;
 
   try {
+    console.log("1");
     await channel.assertExchange(nextExchange, "direct", { durable: true });
+    console.log("2");
     await channel.assertQueue(nextQueue, { durable: true, messageTtl: retryIn[index], deadLetterExchange: mainExchangeName, deadLetterRoutingKey: mainRoutingKey });
+    console.log("3");
     await channel.bindQueue(nextQueue, nextExchange, nextRoutingKey);
+    console.log("4");
   } catch (error) {
-    console.log(error);
+    console.log("retryQueue",error);
     await deadLetterQueue({ deadExchangeName, deadQueueName, deadRoutingKey });
+    console.log("5");
   }
 }
 
