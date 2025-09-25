@@ -11,7 +11,7 @@ import { QueryParams } from "@Types/helperTypes/Request";
 import eventBus from "@config/EventBus";
 
 async function getAllProductsForPublic(query: QueryParams, storeId?: MongoId) {
-  const fields: QueryOptions<ProductDocument>["select"] = ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"];
+  const fields: QueryOptions<ProductDocument>["select"] = ["name", "description","stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"];
 
   const safeGetProducts = safeThrowable(
     () => getAllDocs(Product, query, { select: fields, ...(storeId && { condition: { store: storeId } }) }),
@@ -20,7 +20,6 @@ async function getAllProductsForPublic(query: QueryParams, storeId?: MongoId) {
 
   const result = await extractSafeThrowableResult(() => safeGetProducts);
   if (result.ok) {
-    /*REQUIRES TESTING*/
     const queryPart = storeId ? JSON.stringify({ store: storeId, ...query }) : JSON.stringify(query);
     const event: QueryResultsFetchedEvent = {
       type: "queryResults-fetched",
