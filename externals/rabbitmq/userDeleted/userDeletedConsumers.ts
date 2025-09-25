@@ -1,11 +1,12 @@
 import { CRITICAL_QUEUE_OPTIONS } from "@constants/rabbitmq";
 import novuDeleteSubscriber from "@externals/novu/subscribers/deleteSubscriber";
 import deleteUserFromCache from "@externals/redis/cacheControllers/deleteUserFromCache";
-import deleteMultipleCredentials from "eventConsumers/user/deleteMultipleCredentialsConsumer";
 import { ConsumerRegister, UserDeletedType } from "@Types/events/OutboxEvents";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
 import userDeletedRegister from "./userDeletedRegister";
-import deleteRegularUserRelatedResources from "eventConsumers/user/deleteRegularUserRelatedResources";
+import deleteRegularUserRelatedResourcesConsumer from "eventConsumers/user/deleteRegularUserRelatedResourcesConsumer";
+import deleteMultipleCredentialsConsumer from "eventConsumers/user/deleteMultipleCredentialsConsumer";
+import updateDeletedUserReviewsConsumer from "eventConsumers/user/updateDeletedUserReviewsConsumer";
 
 const consumers = {
   novu: {
@@ -20,7 +21,7 @@ const consumers = {
   },
 
   credentialsCollection: {
-    receiver: deleteMultipleCredentials,
+    receiver: deleteMultipleCredentialsConsumer,
     queueName: "user-deleted-queue-credentialsCollection",
 
     queueOptions: CRITICAL_QUEUE_OPTIONS,
@@ -33,7 +34,7 @@ const consumers = {
     },
   },
   regularUserRelatedResources: {
-    receiver: deleteRegularUserRelatedResources,
+    receiver: deleteRegularUserRelatedResourcesConsumer,
     queueName: "user-deleted-queue-regularUserRelatedResources",
 
     queueOptions: CRITICAL_QUEUE_OPTIONS,
@@ -45,6 +46,19 @@ const consumers = {
       deadRoutingKey: "dead-user-deleted",
     },
   },
+
+  reviewsCollection: {
+    receiver:updateDeletedUserReviewsConsumer,
+    queueName:"user-deleted-queue-reviewsCollection",
+    queueOptions: {queueMode:"lazy", maxPriority:"hight" },
+    retryLetterOptions: {
+      mainExchangeName:"main-user-events",
+      mainRoutingKey:"user-deleted",
+      deadExchangeName: "dead-user-events",
+      deadQueueName: "dead-user-deleted-queue-reviewsCollection",
+      deadRoutingKey: "dead-user-deleted",
+    },
+  }
 } satisfies Record<string, ConsumerRegister<UserDeletedType, UserDeletedEvent>>;
 function userDeletedConsumers() {
   userDeletedRegister({ ...consumers["credentialsCollection"] });
