@@ -12,11 +12,9 @@ const app = express();
 async function startApp() {
   expressLoader(app);
   routerLoader(app);
+  initiateBullMQJobs();
+  initRabbitConsumers();
   await dbStartConnection();
-  await initiateBullMQJobs();
-  await initialiseRabbitMQPublishingChannel();
-  await initialiseRabbitMQConsumingChannel();
-  await initRabbitConsumers();
 }
 
 await startApp();
