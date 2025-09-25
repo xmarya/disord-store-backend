@@ -1,13 +1,13 @@
 import getRabbitPublishingChannel from "@config/rabbitmq/publishingChannel";
 import { ProductDeletedType } from "@Types/events/OutboxEvents";
-import { StoreDeletedEvent } from "@Types/events/StoreEvents";
+import { ProductDeletedEvent } from "@Types/events/ProductEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 
 const exchangeName: ProductDeletedType["exchangeName"] = "main-product-events";
 const routingKey: ProductDeletedType["routingKey"] = "product-deleted";
 
-async function productDeletedPublisher(event: StoreDeletedEvent) {
+async function productDeletedPublisher(event: ProductDeletedEvent) {
   const result = getRabbitPublishingChannel();
   if (!result.ok) return new Failure(result.message);
   const { result: channel } = result;
