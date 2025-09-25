@@ -41,7 +41,7 @@ export async function updateProductInCategories(categories: Array<MongoId>, prod
 
 // NOTE: this is going to be called when deleting a product permanently.
 export async function deleteProductFromCategory(categories: Array<MongoId>, productId: MongoId) {
-  await Category.updateMany({ _id: { $in: categories } }, { $pull: { products: productId } });
+  return await Category.updateMany({ _id: { $in: categories } }, { $pull: { products: productId } });
   // get all the cats that have this product id,
   // remove the one that is not in the new cats array
   // await Category.find({products: "684ac7b49e4ba6351f4fa89d"});
