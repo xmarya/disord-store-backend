@@ -96,3 +96,22 @@ export async function getUserSubscriptionsLog(storeOwnerId: MongoId) {
 
   return logs;
 }
+
+export async function deleteStoreOwner(ownerId:MongoId, session:mongoose.ClientSession) {
+  return await StoreOwner.findByIdAndUpdate(ownerId,{
+    $set: {
+      status:"deleted",
+      firstName:"deleted storeOwner",
+      image:"default.jpge"
+    },
+    $unset: {
+      email:"",
+      phoneNumber:"",
+      lastName:"",
+      defaultAddressId:"",
+      defaultCreditCardId:"",
+      discord:"",
+      signMethod:"",
+    }
+  }, {new: true, runValidators:false, session})
+}

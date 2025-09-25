@@ -53,6 +53,11 @@ const userSchema = new Schema<RegularUserDocument>(
       type: String,
       default: "user",
     },
+    status: {
+      type:String,
+      enum: ["active", "blocked", "deleted"],
+      default: "active"
+    },
     image: String,
     /* SOLILOQUY: 
         1- should I make it an array? because may be the user wants to add more than one card...?
