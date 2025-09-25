@@ -23,11 +23,8 @@ async function deleteOneAssistantByStoreOwner(data: Arguments) {
       };
 
       const assistantDeletedEventPayload = {
-        type: "assistant-deleted",
-        payload: {
           storeId,
           assistantsId: [assistantId],
-        },
       };
 
       await createOutboxRecord(
