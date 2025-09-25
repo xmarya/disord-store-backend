@@ -24,9 +24,11 @@ import { createReviewController } from "../controllers/auth/reviews/publicReview
 import assignFromCacheToRequest from "../middlewares/requestModifiers/assignFromCacheToRequest";
 import assignPlanIdToRequest from "../middlewares/requestModifiers/assignPlanIdToRequest";
 import canCreateStore from "middlewares/protectors/canCreateStore";
+// import { testAnything } from "@controllers/test";
 
 export const router = express.Router();
 
+// router.post("/test", testAnything)
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
 router.get("/logout", logout);
