@@ -1,6 +1,6 @@
 import novuCreateAssistantSubscriber from "@externals/novu/subscribers/createSubscriber";
-import { AssistantCreatedEvent, AssistantDeletedEvent } from "@Types/events/AssistantEvents";
-import { AssistantCreatedType, AssistantDeletedType, ConsumerRegister } from "@Types/events/OutboxEvents";
+import { AssistantCreatedEvent } from "@Types/events/AssistantEvents";
+import { AssistantCreatedType, ConsumerRegister } from "@Types/events/OutboxEvents";
 import { ms } from "ms";
 import assistantCreatedRegister from "./assistantCreatedRegister";
 

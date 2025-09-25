@@ -1,16 +1,16 @@
 import { ConsumerRegister, StoreDeletedType } from "@Types/events/OutboxEvents";
 import storeDeletedRegister from "./storeDeletedRegister";
 import { StoreDeletedEvent } from "@Types/events/StoreEvents";
-import deleteAllReviewsOfResource from "eventConsumers/deleteAllReviewsOfResource";
+import deleteAllReviewsOfResourceConsumer from "eventConsumers/deleteAllReviewsOfResourceConsumer";
 import { CRITICAL_QUEUE_OPTIONS } from "@constants/rabbitmq";
-import deleteAllStoreCategories from "eventConsumers/store/deleteAllStoreCategories";
-import deleteAllStoreProducts from "eventConsumers/store/deleteAllStoreProducts";
-import deleteAllStoreAssistants from "eventConsumers/store/deleteAllStoreAssistants";
-import deleteAllStoreStats from "eventConsumers/store/deleteAllStoreStats";
+import deleteAllStoreCategoriesConsumer from "eventConsumers/store/deleteAllStoreCategoriesConsumer";
+import deleteAllStoreProductsConsumer from "eventConsumers/store/deleteAllStoreProductsConsumer";
+import deleteAllStoreAssistantsConsumer from "eventConsumers/store/deleteAllStoreAssistantsConsumer";
+import deleteAllStoreStatsConsumer from "eventConsumers/store/deleteAllStoreStatsConsumer";
 
 const consumers = {
   assistantsCollection: {
-    receiver: deleteAllStoreAssistants,
+    receiver: deleteAllStoreAssistantsConsumer,
     queueName: "store-deleted-queue-assistantsCollection",
 
     queueOptions: CRITICAL_QUEUE_OPTIONS,
@@ -23,7 +23,7 @@ const consumers = {
     },
   },
   productsCollection: {
-    receiver: deleteAllStoreProducts,
+    receiver: deleteAllStoreProductsConsumer,
     queueName: "store-deleted-queue-productsCollection",
 
     queueOptions: CRITICAL_QUEUE_OPTIONS,
@@ -36,7 +36,7 @@ const consumers = {
     },
   },
   categoriesCollection: {
-    receiver: deleteAllStoreCategories,
+    receiver: deleteAllStoreCategoriesConsumer,
     queueName: "store-deleted-queue-categoriesCollection",
 
     queueOptions: CRITICAL_QUEUE_OPTIONS,
@@ -49,7 +49,7 @@ const consumers = {
     },
   },
   reviewsCollection: {
-    receiver: deleteAllReviewsOfResource,
+    receiver: deleteAllReviewsOfResourceConsumer,
     queueName: "store-deleted-queue-reviewsCollection",
 
     queueOptions: CRITICAL_QUEUE_OPTIONS,
@@ -62,7 +62,7 @@ const consumers = {
     },
   },
   storeStatsCollection: {
-    receiver: deleteAllStoreStats,
+    receiver: deleteAllStoreStatsConsumer,
     queueName: "store-deleted-queue-storeStatsCollection",
 
     queueOptions: CRITICAL_QUEUE_OPTIONS,

@@ -5,7 +5,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import { startSession } from "mongoose";
 
-async function deleteRegularUserRelatedResources(event: UserDeletedEvent) {
+async function deleteRegularUserRelatedResourcesConsumer(event: UserDeletedEvent) {
   const { userType, usersId } = event.payload;
   if (userType !== "user") return new Success({ serviceName: "regularUserRelatedResources", ack: true });
 
@@ -32,4 +32,4 @@ async function deleteRegularUserRelatedResources(event: UserDeletedEvent) {
   return new Failure(wishlistErrorMessage || cartErrorMessage, { serviceName: "regularUserRelatedResources", ack: false });
 }
 
-export default deleteRegularUserRelatedResources;
+export default deleteRegularUserRelatedResourcesConsumer;

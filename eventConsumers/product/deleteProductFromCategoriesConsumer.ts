@@ -6,7 +6,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 
-async function deleteProductFromCategories(event:ProductDeletedEvent){
+async function deleteProductFromCategoriesConsumer(event:ProductDeletedEvent){
     const {categories, productId} = event.payload;
 
     const safeDeleteProduct = safeThrowable(
@@ -21,4 +21,4 @@ async function deleteProductFromCategories(event:ProductDeletedEvent){
     return new Success({serviceName:"categoriesCollection", ack:true});
 }
 
-export default deleteProductFromCategories;
+export default deleteProductFromCategoriesConsumer;

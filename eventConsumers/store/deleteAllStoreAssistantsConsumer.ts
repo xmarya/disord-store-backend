@@ -7,7 +7,7 @@ import { Success } from "@Types/ResultTypes/Success";
 import extractUsersEmailAndId from "@utils/extractUsersEmailAndId";
 import mongoose, { startSession } from "mongoose";
 
-async function deleteAllStoreAssistants(event: StoreDeletedEvent) {
+async function deleteAllStoreAssistantsConsumer(event: StoreDeletedEvent) {
   const { storeId } = event.payload;
   const store = new mongoose.Types.ObjectId(storeId);
 
@@ -38,4 +38,4 @@ async function deleteAllStoreAssistants(event: StoreDeletedEvent) {
 
 }
 
-export default deleteAllStoreAssistants;
+export default deleteAllStoreAssistantsConsumer;

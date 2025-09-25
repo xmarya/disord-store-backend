@@ -3,7 +3,7 @@ import cacheUser from "@externals/redis/cacheControllers/user";
 import { ConsumerRegister, PlanSubscriptionUpdatedType } from "@Types/events/OutboxEvents";
 import { PlanSubscriptionUpdatedEvent } from "@Types/events/PlanSubscriptionEvents";
 import assignStoreOwnerToUnlimitedPlanConsumer from "eventConsumers/plan/assignStoreOwnerToUnlimitedPlanConsumer";
-import cacheStoreAndPlanConsumer from "eventConsumers/plan/cacheUpdatedStoreAndPlan";
+import cacheStoreAndPlanConsumer from "eventConsumers/plan/cacheUpdatedStoreAndPlanConsumer";
 import updateAssistantInPlanConsumer from "eventConsumers/plan/updateAssistantInPlanConsumer";
 import updatePlanStatsConsumer from "eventConsumers/plan/updatePlanStatsConsumer";
 import updateStorePlanConsumer from "eventConsumers/plan/updateStorePlanConsumer";

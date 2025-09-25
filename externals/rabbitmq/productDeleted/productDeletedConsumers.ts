@@ -1,13 +1,13 @@
 import { CRITICAL_QUEUE_OPTIONS } from "@constants/rabbitmq";
 import { ConsumerRegister, ProductDeletedType } from "@Types/events/OutboxEvents";
 import { ProductDeletedEvent } from "@Types/events/ProductEvents";
-import deleteAllReviewsOfResource from "eventConsumers/deleteAllReviewsOfResource";
-import deleteProductFromCategories from "eventConsumers/product/deleteProductFromCategories";
+import deleteAllReviewsOfResourceConsumer from "eventConsumers/deleteAllReviewsOfResourceConsumer";
+import deleteProductFromCategoriesConsumer from "eventConsumers/product/deleteProductFromCategoriesConsumer";
 import productDeletedRegister from "./productDeletedRegister";
 
 const consumers = {
   reviewsCollection: {
-    receiver: deleteAllReviewsOfResource,
+    receiver: deleteAllReviewsOfResourceConsumer,
     queueName: "product-deleted-queue-reviewsCollection",
 
     queueOptions: CRITICAL_QUEUE_OPTIONS,
@@ -20,7 +20,7 @@ const consumers = {
     },
   },
   categoriesCollection: {
-    receiver: deleteProductFromCategories,
+    receiver: deleteProductFromCategoriesConsumer,
     queueName: "product-deleted-queue-categoriesCollection",
 
     queueOptions: CRITICAL_QUEUE_OPTIONS,

@@ -7,7 +7,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import mongoose from "mongoose";
 
-async function deleteAllReviewsOfResource(event: ProductDeletedEvent | StoreDeletedEvent) {
+async function deleteAllReviewsOfResourceConsumer(event: ProductDeletedEvent | StoreDeletedEvent) {
   const { productId } = event.payload as ProductDeletedEvent["payload"];
   const { storeId } = event.payload as StoreDeletedEvent["payload"];
   const resourceId = productId ? new mongoose.Types.ObjectId(productId) : new mongoose.Types.ObjectId(storeId);
@@ -22,4 +22,4 @@ async function deleteAllReviewsOfResource(event: ProductDeletedEvent | StoreDele
   return new Success({serviceName:"reviewsCollection", ack:true});
 }
 
-export default deleteAllReviewsOfResource;
+export default deleteAllReviewsOfResourceConsumer;

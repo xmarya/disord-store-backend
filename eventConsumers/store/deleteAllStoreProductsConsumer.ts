@@ -6,7 +6,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import mongoose from "mongoose";
 
-async function deleteAllStoreProducts(event: StoreDeletedEvent) {
+async function deleteAllStoreProductsConsumer(event: StoreDeletedEvent) {
   const { storeId } = event.payload;
   const store = new mongoose.Types.ObjectId(storeId);
   const safeDelete = safeThrowable(
@@ -21,4 +21,4 @@ async function deleteAllStoreProducts(event: StoreDeletedEvent) {
   return new Success({ serviceName: "productsCollection", ack: true });
 }
 
-export default deleteAllStoreProducts;
+export default deleteAllStoreProductsConsumer;
