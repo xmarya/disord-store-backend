@@ -35,6 +35,7 @@ export const deleteUserAccountController = catchAsync(async (request, response, 
 });
 
 export function logout(request: Request, response: Response) {
+  // TODO create service that deletes the cache
   // deleteUserFromCache(`User:${request.user.id}`);
   request.user.userType === "storeOwner" && deleteRedisHash(`StoreAndPlan:${request.user.myStore}`);
   response.clearCookie("jwt");
