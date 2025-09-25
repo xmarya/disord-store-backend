@@ -22,10 +22,10 @@ const redis = createClient({
   password: process.env.REDIS_PASSWORD,
 });
 
-redis.on("connect", () => console.log("Redis is connecting..."));
-redis.on("ready", () => console.log("Redis is ready, waiting for commands..."));
-redis.on("reconnecting", () => console.log("client is trying to reconnect to Redis"));
-redis.on("error", (error) => console.log("Redis error 🔴:" + error));
+redis.on("connect", () => console.log("(node-redis) Redis is connecting..."));
+redis.on("ready", () => console.log("(node-redis) Redis is ready, waiting for commands..."));
+redis.on("reconnecting", () => console.log("(node-redis) client is trying to reconnect to Redis"));
+redis.on("error", (error) => console.log("(node-redis) Redis error 🔴:" + error));
 
 await redis.connect();
 export default redis;
