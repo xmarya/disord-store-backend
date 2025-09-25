@@ -73,11 +73,8 @@ export const deleteProductController = catchAsync(async (request, response, next
   const result = await deleteProductAndItsRelated(productId);
   if (!result.ok) return next(returnError(result));
 
-  const { result: deletedProduct } = result;
-
   response.status(204).json({
     success: true,
-    message: "product was deleted successfully",
-    data: { deletedProduct },
+    message: result.result,
   });
 });
