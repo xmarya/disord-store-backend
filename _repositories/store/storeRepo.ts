@@ -32,7 +32,29 @@ export async function updateStoreAssistantArray(storeId:MongoId, assistantsId:Ar
   await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: {$in: assistantsId} } }, { new:true });
 }
 export async function deleteStore(storeId: MongoId, session: mongoose.ClientSession) {
-  const deletedStore = await Store.findByIdAndDelete(storeId, { session });
+  const deletedStore = await Store.findByIdAndUpdate(storeId,
+    {
+      $unset:{
+          inPlan:"",
+        storeName:"",
+        description:"",
+        logo:"",
+        productsType:"",
+        colourTheme:"",
+        address:"",
+        shipmentCompanies:"",
+        verified:"",
+        storeAssistants:"",
+        ranking:"",
+        ratingsAverage:"",
+        ratingsQuantity:"",
+        socialMedia:""
+      },
+      $set:{
+        status:"deleted",
+      },
+
+  }, { new: true, runValidators:false, session });
 
   return deletedStore;
 }

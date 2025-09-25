@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { ProductDocument } from "./Product";
 import { MongoId } from "./MongoId";
 import { PlansNames } from "./Plan";
 
+type StoreStatus = "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
 export interface IStoreAddress {
   street: string;
   city: string;
@@ -28,7 +28,7 @@ export interface FullStoreDataBody extends StoreDataBody {
 }
 
 export interface StoreBasic extends FullStoreDataBody {
-  status: "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
+  status: Exclude<StoreStatus, "deleted">;
   verified: boolean;
   ratingsAverage: number;
   ratingsQuantity: number;
