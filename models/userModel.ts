@@ -22,16 +22,15 @@ const userSchema = new Schema<RegularUserDocument>(
       discordId: {
         type: String,
         unique: true,
+        sparse: true,
         trim: true,
       },
       name: {
         type: String,
-        unique: true,
         trim: true,
       },
       username: {
         type: String,
-        unique: true,
         trim: true,
       },
     },
