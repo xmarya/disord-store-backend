@@ -25,11 +25,11 @@ export async function confirmAuthorization(userId: string, storeId: MongoId): Pr
 }
 
 export async function updateStoreInPlan(storeOwnerId: string, planName: PlansNames) {
-  await Store.findOneAndUpdate({ owner: storeOwnerId }, { inPlan: planName });
+  return await Store.findOneAndUpdate({ owner: storeOwnerId }, { inPlan: planName }, {new:true});
 }
 
 export async function updateStoreAssistantArray(storeId:MongoId, assistantsId:Array<MongoId>) {
-  await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: {$in: assistantsId} } }, { new:true });
+  return await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: {$in: assistantsId} } }, { new:true });
 }
 export async function deleteStore(storeId: MongoId, session: mongoose.ClientSession) {
   const deletedStore = await Store.findByIdAndUpdate(storeId,

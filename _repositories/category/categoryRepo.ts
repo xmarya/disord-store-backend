@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-import { CategoryBasic } from "@Types/Schema/Category";
 import { MongoId } from "@Types/Schema/MongoId";
 import Category from "@models/categoryModel";
 
