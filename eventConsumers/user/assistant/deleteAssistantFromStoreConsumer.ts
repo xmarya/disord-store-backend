@@ -5,7 +5,6 @@ import { Success } from "@Types/ResultTypes/Success";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-// TODO convert this to consumer
 async function deleteAssistantFromStoreConsumer(event: AssistantDeletedEvent) {
   const { assistantsId, storeId } = event.payload;
   const safeDeleteFromStore = safeThrowable(
