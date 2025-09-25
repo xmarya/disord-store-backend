@@ -1,18 +1,17 @@
-import StoreOwner from "@models/storeOwnerModel";
-import { deleteDoc } from "@repositories/global";
+import { deleteStoreOwner } from "@repositories/storeOwner/storeOwnerRepo";
+import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
+import { StoreDeletedEvent } from "@Types/events/StoreEvents";
+import { UserDeletedEvent } from "@Types/events/UserEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
 import mongoose, { startSession } from "mongoose";
-import { Success } from "@Types/ResultTypes/Success";
-import { Failure } from "@Types/ResultTypes/errors/Failure";
 import deleteStoreAndItsRelatedResourcePermanently from "../storeServices/deleteStoreAndItsRelatedResourcePermanently";
-import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
-import { UserDeletedEvent } from "@Types/events/UserEvents";
-import { StoreDeletedEvent } from "@Types/events/StoreEvents";
 
 async function deleteStoreOwnerAccount(storeOwnerId: MongoId, storeId: MongoId) {
   const session = await startSession();
   const deletedStoreOwner = await session.withTransaction(async () => {
-    const deletedStoreOwner = await deleteDoc(StoreOwner, storeOwnerId, { session });
+    const deletedStoreOwner = await deleteStoreOwner(storeOwnerId, session);
     const deletedStore = await deleteStoreAndItsRelatedResourcePermanently(storeId, session);
     if (deletedStoreOwner && deletedStore) {
       const ownerPayload: UserDeletedEvent["payload"] = {
