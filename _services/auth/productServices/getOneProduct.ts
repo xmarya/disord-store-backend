@@ -6,6 +6,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import getCategoryFromCacheOrDB from "../categoryServices/getCategoryFromCacheOrDB";
 import { CategoryBasic} from "@Types/Schema/Category";
+import { Success } from "@Types/ResultTypes/Success";
 
 async function getOneProduct(productId: MongoId) {
   const safeGetProduct = safeThrowable(
@@ -23,7 +24,7 @@ async function getOneProduct(productId: MongoId) {
 
   product.categories = categories ?? [];
 
-  return { ...getProductResult, result: product };
+  return new Success(product);
 }
 
 export default getOneProduct;

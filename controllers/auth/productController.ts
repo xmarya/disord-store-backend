@@ -38,7 +38,7 @@ export const getAllStoreProducts = catchAsync(async (request, response, next) =>
 
 export const getOneProductController = catchAsync(async (request, response, next) => {
   const result = await getOneProduct(request.params.productId);
-  if (!result?.ok) return next(returnError(result));
+  if (!result.ok) return next(returnError(result));
 
   const { result: product } = result;
 
