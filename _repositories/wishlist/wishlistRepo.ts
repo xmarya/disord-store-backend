@@ -23,6 +23,6 @@ export async function updateWishlist(products: Array<MongoId>, user: MongoId) {
   const wishlist = await Wishlist.bulkWrite(bulkOps);
 }
 
-export async function deleteWishlist(user: MongoId, session:mongoose.ClientSession) {
+export async function deleteWishlist(user: MongoId, session?:mongoose.ClientSession) {
   return await Wishlist.deleteMany({ user }, {session});
 }
