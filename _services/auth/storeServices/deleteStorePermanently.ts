@@ -8,6 +8,8 @@ import { StoreDeletedEvent } from "@Types/events/StoreEvents";
 import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
 import { deleteStore } from "@repositories/store/storeRepo";
 
+
+// this service if for storeOwner and admin to DELETE A STORE AND RESET THE OWNER TO DEFAULTS;
 async function deleteStorePermanently(storeId: MongoId) {
   const session = await startSession();
   const updatedOwner = await session.withTransaction(async () => {
