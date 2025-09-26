@@ -1,9 +1,8 @@
 import StoreAssistant from "@models/storeAssistantModel";
 import Store from "@models/storeModel";
-import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { MongoId } from "@Types/Schema/MongoId";
-import { StoreAssistant as StoreAssistantData, StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
-import mongoose, { startSession } from "mongoose";
+import { StoreAssistant as StoreAssistantData } from "@Types/Schema/Users/StoreAssistant";
+import mongoose from "mongoose";
 
 /*NOTE: Why I had to  use : user[0].id instead of user.id as usual?
     tha reason is because this is a service layer function, not the controller that always returns response,
@@ -34,33 +33,37 @@ export async function getOneAssistant(assistantId: string):Promise<StoreAssistan
 }
 */
 
-export async function deleteAssistant(assistantId: MongoId, storeId: MongoId, session:mongoose.ClientSession) {
-  return await StoreAssistant.findOneAndDelete({ id: assistantId, inStore: storeId }, { session });
-}
-
 export async function getAssistantPermissions(assistantId: MongoId, storeId: MongoId) {
-  return await StoreAssistant.findOne({ id: assistantId, inStore: storeId });
+  return await StoreAssistant.findOne({ _id: assistantId, inStore: storeId });
 }
 
-export async function updateAssistant(assistantId: MongoId, storeId: MongoId, permission: any, anotherData: any) {
+export async function updateAssistant(assistantId: MongoId, storeId: MongoId, permission: any, anotherData: any, session:mongoose.ClientSession) {
   return await StoreAssistant.findOneAndUpdate(
     { _id: assistantId, inStore: storeId },
     {
       $set: { ...permission, ...anotherData },
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true, session }
   );
+}
+
+export async function updateInPlanForAssistants(storeId:MongoId, planId:MongoId) {
+  return await StoreAssistant.updateMany({inStore: storeId}, {inPlan: planId});
+}
+
+export async function deleteAssistant(assistantId: MongoId, storeId: MongoId, session:mongoose.ClientSession) {
+  return await StoreAssistant.findOneAndDelete({ _id: assistantId, inStore: storeId }, { session });
 }
 
 export async function deleteAllAssistants(storeId: MongoId, session: mongoose.ClientSession) {
   //STEP 1) get all the assistants emails based on the storeId to delete them from assistants collection:
-  const assistantsEmails = await StoreAssistant.find({ inStore: "68be82576336d2e9102279ef" }).select("email");
-  await StoreAssistant.deleteMany({ inStore: storeId }).session(session);
+  const assistantsEmails = await StoreAssistant.find({ inStore: storeId }).select("email").session(session);
+  const deletedAssistants = await StoreAssistant.deleteMany({ inStore: storeId }).session(session);
   //TODO event for deleting all assistants credentials (HOW?)
 
   //STEP 2) delete them using the same assistants ids from users collection:
   // const userIds = assistantsId.map((a) => a.assistant); // to only extract the assistant filed that holds a reference to the User
   // await User.deleteMany({ _id: { $in: userIds }, userType: "storeAssistant" }).session(session);
 
-  return assistantsEmails;
+  return {deletedAssistants, assistantsEmails};
 }

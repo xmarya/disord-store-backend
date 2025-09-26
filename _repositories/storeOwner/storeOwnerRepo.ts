@@ -11,40 +11,33 @@ export async function createNewStoreOwner(signupData: Omit<CredentialsSignupData
   return newStoreOwner[0];
 }
 
-export async function assignStoreToOwner(storeOwnerId: MongoId, storeId: MongoId) {
+export async function assignStoreToOwner(storeOwnerId: MongoId, storeId: MongoId, session: mongoose.ClientSession) {
   return await StoreOwner.findByIdAndUpdate(
     storeOwnerId,
     {
       myStore: storeId,
     },
-    {new: true}
+    { new: true, session }
   );
 }
 
-export async function createNewUnlimitedUser(data: UnlimitedStoreOwnerData, session: mongoose.ClientSession) {
+export async function createNewUnlimitedUser(data: Omit<UnlimitedStoreOwnerData, "password" |"image" | "myStore" | "defaultAddressId" | "defaultCreditCardId">, session: mongoose.ClientSession) {
   return await StoreOwner.findOneAndUpdate({ email: data.email }, { ...data }, { runValidators: true, new: true, upsert: true, setDefaultsOnInsert: true }).session(session);
 }
 
 export async function resetStoreOwnerToDefault(storeId: MongoId, session: mongoose.ClientSession) {
-  // await User.updateOne({_id: storeOwnerId}, {
-  //     userType:"user",
-  //     $unset: {
-  //         myStore: ""
-  //     }
-  // }).session(session);
-  await StoreOwner.updateOne(
+  return await StoreOwner.findOneAndUpdate(
     { myStore: storeId },
     {
-      // userType: "user",
       $unset: {
         myStore: "",
       },
-    }
-  ).session(session);
+    }, {new: true, session}
+  );
 }
 
-export async function createNewSubscription(storeOwnerId: MongoId, data: Pick<StoreOwnerData, "subscribedPlanDetails">) {
-  const updatedUser = await StoreOwner.findByIdAndUpdate(storeOwnerId, data, { runValidators: true, new: true });
+export async function createNewSubscription(storeOwnerId: MongoId, data: Pick<StoreOwnerData, "subscribedPlanDetails">, session:mongoose.ClientSession) {
+  const updatedUser = await StoreOwner.findByIdAndUpdate(storeOwnerId, data, { runValidators: true, new: true, session });
   return updatedUser;
 }
 
@@ -102,4 +95,23 @@ export async function getUserSubscriptionsLog(storeOwnerId: MongoId) {
   ]);
 
   return logs;
+}
+
+export async function deleteStoreOwner(ownerId:MongoId, session:mongoose.ClientSession) {
+  return await StoreOwner.findByIdAndUpdate(ownerId,{
+    $set: {
+      status:"deleted",
+      firstName:"deleted storeOwner",
+      image:"default.jpge"
+    },
+    $unset: {
+      email:"",
+      phoneNumber:"",
+      lastName:"",
+      defaultAddressId:"",
+      defaultCreditCardId:"",
+      discord:"",
+      signMethod:"",
+    }
+  }, {new: false, runValidators:false, session}); // new is false in order to get the owner email to delete the credentials
 }

@@ -1,4 +1,3 @@
-import eventBus from "@config/EventBus";
 import Product from "@models/productModel";
 import { getAllDocs } from "@repositories/global";
 import { QueryResultsFetchedEvent } from "@Types/events/QueryResultsFetchedEvent";
@@ -9,9 +8,10 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import { QueryParams } from "@Types/helperTypes/Request";
+import eventBus from "@config/EventBus";
 
 async function getAllProductsForPublic(query: QueryParams, storeId?: MongoId) {
-  const fields: QueryOptions<ProductDocument>["select"] = ["name", "description", "store", "stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"];
+  const fields: QueryOptions<ProductDocument>["select"] = ["name", "description","stock", "price", "image", "ratingsAverage", "ratingsQuantity", "ranking", "productType"];
 
   const safeGetProducts = safeThrowable(
     () => getAllDocs(Product, query, { select: fields, ...(storeId && { condition: { store: storeId } }) }),
@@ -20,7 +20,6 @@ async function getAllProductsForPublic(query: QueryParams, storeId?: MongoId) {
 
   const result = await extractSafeThrowableResult(() => safeGetProducts);
   if (result.ok) {
-    /*REQUIRES TESTING*/
     const queryPart = storeId ? JSON.stringify({ store: storeId, ...query }) : JSON.stringify(query);
     const event: QueryResultsFetchedEvent = {
       type: "queryResults-fetched",
@@ -29,10 +28,9 @@ async function getAllProductsForPublic(query: QueryParams, storeId?: MongoId) {
         queryResults: result.result,
       },
 
-      occurredAt: new Date(),
     };
 
-    eventBus.publish(event);
+  eventBus.publish(event);
   }
 
   return result;

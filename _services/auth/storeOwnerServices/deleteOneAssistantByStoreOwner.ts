@@ -1,43 +1,53 @@
+import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
 import { MongoId } from "@Types/Schema/MongoId";
 import { startSession } from "mongoose";
 import deleteAssistantAccount from "./storeAssistant/deleteAssistantAccount";
-import deleteAssistantFromStore from "../storeServices/deleteAssistantFromStore";
-import { deleteCredentials } from "@repositories/credentials/credentialsRepo";
-import { UserDeletedEvent } from "@Types/events/UserEvents";
-import eventBus from "@config/EventBus";
 
 type Arguments = {
   storeId: MongoId;
   assistantId: MongoId;
 };
 
-async function deleteOneAssistantByStoreOwner(data:Arguments) {
-    const {assistantId, storeId} = data
-    const session = await startSession();
+async function deleteOneAssistantByStoreOwner(data: Arguments) {
+  const { assistantId, storeId } = data;
+  const session = await startSession();
 
-    const deletedAssistantResult =  await session.withTransaction(async() => {
-        const deletedAssistantResult = await deleteAssistantAccount({assistantId, storeId, session});
-        await deleteAssistantFromStore({storeId, assistantId, session});
-        if(deletedAssistantResult.ok) await deleteCredentials(deletedAssistantResult.result.email, session);
+  const deletedAssistantResult = await session.withTransaction(async () => {
+    const deletedAssistantResult = await deleteAssistantAccount({ assistantId, storeId, session });
+    // await deleteAssistantFromStore({ storeId, assistantId, session }); // NOTE: this now a consumer
+    if (deletedAssistantResult.ok) {
+      const userDeletedEventPayload = {
+        usersId: [assistantId as string],
+        emailsToDelete: [deletedAssistantResult.result.email],
+        userType: deletedAssistantResult.result.userType,
+      };
 
-        return deletedAssistantResult
-    });
+      const assistantDeletedEventPayload = {
+          storeId,
+          assistantsId: [assistantId],
+      };
 
-    if(!deletedAssistantResult.ok) return deletedAssistantResult;
-
-    const {result: deletedAssistant} = deletedAssistantResult;
-
-    const event:UserDeletedEvent = {
-        type:"user.deleted",
-        payload: {
-            usersId:[assistantId as string]
-        },
-        occurredAt: new Date()
+      await createOutboxRecord(
+        [
+          {
+            type: "user-deleted",
+            payload: userDeletedEventPayload,
+          },
+          {
+            type: "assistant-deleted",
+            payload: assistantDeletedEventPayload,
+          },
+        ],
+        session
+      );
     }
 
-    eventBus.publish(event);
-
     return deletedAssistantResult;
+  });
+
+  await session.endSession();
+
+  return deletedAssistantResult;
 }
 
 export default deleteOneAssistantByStoreOwner;

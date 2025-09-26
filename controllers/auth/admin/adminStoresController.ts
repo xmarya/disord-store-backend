@@ -5,6 +5,8 @@ import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import Store from "@models/storeModel";
 import Product from "@models/productModel";
+import deleteStoreByAdmin from "@services/auth/adminServices/store/deleteStoreByAdmin";
+import returnError from "@utils/returnError";
 
 export const getAllStoresInfo = catchAsync(async (request, response, next) => {
   const { sortBy, sortOrder, plan, verified } = request.body;
@@ -15,7 +17,7 @@ export const getAllStoresInfo = catchAsync(async (request, response, next) => {
   response.status(200).json({
     success: true,
     result: storesStats.length,
-    data: {storesStats},
+    data: { storesStats },
   });
 });
 
@@ -33,13 +35,15 @@ export const getOneStoreInfo = catchAsync(async (request, response, next) => {
     return { store, products, stats };
   });
 
+  await session.endSession();
+
   response.status(200).json({
     success: true,
     data: {
       store,
-    products,
-    stats,
-    }
+      products,
+      stats,
+    },
   });
 });
 
@@ -52,16 +56,13 @@ export const suspendStore = catchAsync(async (request, response, next) => {
 });
 
 export const deleteStore = catchAsync(async (request, response, next) => {
-  const session = await startSession();
-  // FIX
-  // const deletedStore = await session.withTransaction(async () => {
-  //   return await deleteStorePermanently(request.params.storeId, session);
-  // });
-  // await session.endSession();
+  
+  const result = await deleteStoreByAdmin(request.params.storeId);
+  if(!result.ok) return next(returnError(result));
 
   //TODO: create a new adminLog
   response.status(204).json({
     success: true,
-    // data: {deletedStore},
+    message: "تم حذف المتجر و جميع ملحاقته بنجاح",
   });
 });

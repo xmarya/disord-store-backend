@@ -4,10 +4,10 @@ import { PlansNames } from "@Types/Schema/Plan";
 import { FullStoreDataBody } from "@Types/Schema/Store";
 import mongoose from "mongoose";
 
-export async function createStore(data: FullStoreDataBody) {
-  const newStore = await Store.create(data);
+export async function createStore(data: FullStoreDataBody, session?:mongoose.ClientSession) {
+  const newStore = await Store.create([data], {session});
 
-  return newStore;
+  return newStore[0];
 }
 
 export async function confirmAuthorization(userId: string, storeId: MongoId): Promise<boolean> {
@@ -25,14 +25,35 @@ export async function confirmAuthorization(userId: string, storeId: MongoId): Pr
 }
 
 export async function updateStoreInPlan(storeOwnerId: string, planName: PlansNames) {
-  await Store.findOneAndUpdate({ owner: storeOwnerId }, { inPlan: planName });
+  return await Store.findOneAndUpdate({ owner: storeOwnerId }, { inPlan: planName }, {new:true});
 }
 
-export async function updateStoreAssistantArray(storeId:MongoId, assistantId:MongoId, session:mongoose.ClientSession) {
-  await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: assistantId } }, { new:true, session: session });
+export async function updateStoreAssistantArray(storeId:MongoId, assistantsId:Array<MongoId>) {
+  return await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: {$in: assistantsId} } }, { new:true });
 }
 export async function deleteStore(storeId: MongoId, session: mongoose.ClientSession) {
-  const deletedStore = await Store.findByIdAndDelete(storeId, { session });
+  const deletedStore = await Store.findByIdAndUpdate(storeId,
+    {
+      $unset:{
+        inPlan:"",
+        logo:"",
+        productsType:"",
+        colourTheme:"",
+        address:"",
+        shipmentCompanies:"",
+        verified:"",
+        storeAssistants:"",
+        ranking:"",
+        ratingsAverage:"",
+        ratingsQuantity:"",
+        socialMedia:""
+      },
+      $set:{
+        status:"deleted",
+        description:"deleted store"
+      },
+
+  }, { new: true, runValidators:false, session });
 
   return deletedStore;
 }

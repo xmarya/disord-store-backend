@@ -4,7 +4,6 @@ import { isFuture } from "date-fns";
 import type { Request, Response, NextFunction } from "express";
 
 export async function verifyPlanSubscription(request: Request, response: Response, next: NextFunction) {
-  console.log("verifyPlanSubscription");
   if (!request.isPlanPaid) return next(returnError(new Unauthorised("this action is unautorised. you are not subscribed to any plan or haven't paid yet.")));
   // has the subscription end?
   //NOTE: what if the user was an assistant? which doesn't have subscribeEnds field?

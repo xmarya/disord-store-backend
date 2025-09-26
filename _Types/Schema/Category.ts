@@ -3,7 +3,6 @@ import { MongoId } from "./MongoId";
 
 export interface CategoryBasic {
   name: string;
-  colour: string;
   createdBy: {
     name: string;
     id: MongoId;

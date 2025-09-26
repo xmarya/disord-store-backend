@@ -1,12 +1,13 @@
-import eventBus from "@config/EventBus";
 import { updateAssistant } from "@repositories/assistant/assistantRepo";
+import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
 import { AssistantUpdatedEvent } from "@Types/events/AssistantEvents";
-import { MongoId } from "@Types/Schema/MongoId";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
+import { MongoId } from "@Types/Schema/MongoId";
 import { StoreAssistant } from "@Types/Schema/Users/StoreAssistant";
-import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
-import safeThrowable from "@utils/safeThrowable";
+import { startSession } from "mongoose";
+
 
 async function updateStoreAssistant(assistantId: MongoId, storeId: MongoId, updatedData: Partial<Omit<StoreAssistant, "credentials" | "userType" | "inStore" | "inPlan">>) {
   if (!Object.keys(updatedData).length) return new BadRequest("no data was provided in the request.body");
@@ -27,37 +28,29 @@ async function updateStoreAssistant(assistantId: MongoId, storeId: MongoId, upda
     ...(updatedData.email && { email: updatedData.email }),
   };
 
-  const safeUpdateAssistant = safeThrowable(
-    () => updateAssistant(assistantId, storeId, updatedPermissions, updatedDataObj),
-    (error) => new Failure((error as Error).message)
-  );
+  const session = await startSession();
 
-  const updateAssistantResult = await extractSafeThrowableResult(() => safeUpdateAssistant);
+  const updatedAssistants = await session.withTransaction(async() => {
 
-  if (!updateAssistantResult.ok) return updateAssistantResult;
+    const updatedAssistants = await updateAssistant(assistantId, storeId, updatedPermissions, updatedDataObj, session);
+    if(updatedAssistants) {
+      const payload:AssistantUpdatedEvent["payload"] = {
+        user:updatedAssistants,
+        storeId,
+        permissions:updatedAssistants?.permissions
+      }
+      await createOutboxRecord<[AssistantUpdatedEvent]>([{type:"assistant-updated", payload}], session);
+    }
 
-  const { result } = updateAssistantResult;
-  const event: AssistantUpdatedEvent = {
-    type: "assistant.updated",
-    payload: {
-      assistantId, // FIX duplicated values
-      storeId,
-      permissions: result.permissions,
-      novuSubscriber: {
-        firstName: result.firstName,
-        lastName: result.lastName,
-        email: result.email,
-        phoneNumber: result.phoneNumber,
-        userType: result.userType,
-        id: assistantId, // FIX duplicated values
-      },
-    },
-    occurredAt: new Date(),
-  };
+    return updatedAssistants;
+  })
 
-  eventBus.publish(event);
+  await session.endSession();
 
-  return updateAssistantResult;
+  if (!updatedAssistants) return new Failure()
+
+
+  return new Success({updatedAssistants});
 }
 
 export default updateStoreAssistant;

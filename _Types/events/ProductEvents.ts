@@ -1,19 +1,19 @@
 import { MongoId } from "@Types/Schema/MongoId";
 import { DomainEvent } from "./DomainEvent";
+import { OutboxEvent } from "./OutboxEvents";
 
 export interface ProductUpdatedEvent extends DomainEvent {
-  type: "product.updated";
+  type: "product-updated";
   payload: {
     categories: Array<MongoId>;
     productId: MongoId;
   };
-  occurredAt: Date;
 }
-export interface ProductDeletedEvent extends DomainEvent {
-  type: "product.deleted";
+export interface ProductDeletedEvent extends OutboxEvent {
+  type: "product-deleted";
   payload: {
+    outboxRecordId: string;
     categories: Array<MongoId>;
     productId: MongoId;
   };
-  occurredAt: Date;
 }

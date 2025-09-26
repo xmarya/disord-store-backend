@@ -39,7 +39,6 @@
       "@routers/*": ["./_routers/*"],
       "@middlewares/*": ["./middlewares/*"],
       "@controllers/*": ["./controllers/*"],
-      "@eventSubscribers/*": ["./eventSubscribers/*"],
       "@utils/*": ["./_utils/*"],
       "@externals/*": ["./externals/*"],
     } /* Specify a set of entries that re-map imports to additional lookup locations. */,

@@ -1,2 +1,0 @@
-import "./productUpdated";
-import "./productDeleted";

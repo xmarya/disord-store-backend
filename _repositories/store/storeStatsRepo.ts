@@ -242,6 +242,6 @@ soldProductsUpdate.$inc =>  {
   return cleanedStats ?? updatedStats;
 }
 
-export async function deleteStoreStats(storeId: MongoId, session: mongoose.ClientSession) {
-  return await StoreStats.deleteOne({ store: storeId }).session(session);
+export async function deleteStoreStats(storeId: MongoId) {
+  return await StoreStats.deleteMany({ store: storeId });
 }

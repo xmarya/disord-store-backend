@@ -12,6 +12,7 @@ const userSchema = new Schema<RegularUserDocument>(
       type: String,
       unique: true,
       required: [true, "the email field is required"],
+      sparse: true,
     },
     signMethod: {
       type: String,
@@ -22,16 +23,15 @@ const userSchema = new Schema<RegularUserDocument>(
       discordId: {
         type: String,
         unique: true,
+        sparse: true,
         trim: true,
       },
       name: {
         type: String,
-        unique: true,
         trim: true,
       },
       username: {
         type: String,
-        unique: true,
         trim: true,
       },
     },
@@ -53,6 +53,11 @@ const userSchema = new Schema<RegularUserDocument>(
     userType: {
       type: String,
       default: "user",
+    },
+    status: {
+      type:String,
+      enum: ["active", "blocked", "deleted"],
+      default: "active"
     },
     image: String,
     /* SOLILOQUY: 

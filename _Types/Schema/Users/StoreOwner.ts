@@ -21,13 +21,10 @@ export interface StoreOwner extends BaseUserData {
   subscriptionsLog: Map<string, { planName: string; price: number }>;
 }
 
-export type UnlimitedStoreOwnerData = {
-  userType: Extract<UserTypes, "storeOwner">;
-  email: string;
+export interface UnlimitedStoreOwnerData extends Omit<StoreOwner, "subscribedPlanDetails">{
+  subscribedPlanDetails: Omit<StoreOwnerPlan, "subscriptionType">;
   subscriptionType: Exclude<SubscriptionTypes, "downgrade">;
-  firstName?: string;
-  lastName?: string;
-  password?: string;
+  password: string;
   signMethod?: "credentials";
 };
 
