@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 
 async function deleAllStats(storeId:MongoId, session:mongoose.ClientSession) {
       const safeDeleteAllStats = safeThrowable(
-    () => deleteStoreStats(storeId, session),
+    () => deleteStoreStats(storeId),
     (error) => new Failure((error as Error).message)
   );
 
