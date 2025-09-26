@@ -7,8 +7,7 @@ import mongoose from "mongoose";
 import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 
 export async function createNewCredentials(credentialsData: Omit<CredentialsSignupData, "passwordConfirm">, session: mongoose.ClientSession) {
-  const newCredentials = await Credentials.create([credentialsData], { session }); // in case the create must accept a session option, the data must be inside [], for mongoose not to mistake the {session} as another document
-
+  const newCredentials = await Credentials.create([credentialsData], {session});
   return newCredentials[0];
 }
 export async function getCredentials(condition: QueryOptions<CredentialsDocument>["condition"]) {
@@ -21,8 +20,6 @@ export async function updateEmail(oldEmail:string, newEmail:string, session: mon
   return await Credentials.findOneAndUpdate({email: oldEmail}, {email: newEmail, emailConfirmed:false}, {new:true, runValidators:true, session});
   // TODO: downgrading the plan to basic deleting all the assistant data
 }
-
-export async function deleteCredentials(session: mongoose.ClientSession) {}
 
 export async function getResetPasswordCredentials(hashedToken: string) {
   return await Credentials.findOne({ passwordResetToken: hashedToken, passwordResetExpires: { $gt: new Date() } });
@@ -49,4 +46,12 @@ export async function confirmUserEmail(credentialsId: MongoId, hashedToken: stri
       },
     }
   );
+}
+
+export async function deleteCredentials(email:string) {
+  return await Credentials.findOneAndDelete({email});
+}
+
+export async function deleteBulkCredentials(bulk:any) {
+  return await Credentials.bulkWrite(bulk);
 }

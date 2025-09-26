@@ -1,4 +1,3 @@
-import eventBus from "@config/EventBus";
 import Credentials from "@models/credentialsModel";
 import { getOneDocByFindOne } from "@repositories/global";
 import { EmailConfirmationSentEvent } from "@Types/events/UserEvents";
@@ -8,11 +7,11 @@ import generateEmailConfirmationToken from "@utils/generators/generateEmailConfi
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import returnError from "@utils/returnError";
 import safeThrowable from "@utils/safeThrowable";
+import eventBus from "@config/EventBus";
 
 export const sendConfirmationEmail = catchAsync(async (request, response, next) => {
   const { email } = request.user;
 
-  // REFACTOR
   const safeGetCredentials = safeThrowable(
     () => getOneDocByFindOne(Credentials, { condition: { email } }),
     (error) => new Failure((error as Error).message)
@@ -24,7 +23,7 @@ export const sendConfirmationEmail = catchAsync(async (request, response, next) 
   const { confirmUrl, randomToken } = await generateEmailConfirmationToken(credentialsResult.result, emailTokenGenerator);
 
   const event: EmailConfirmationSentEvent = {
-    type: "emailConfirmation.sent",
+    type: "emailConfirmation-sent",
     payload: {
       credentialsId: credentialsResult.result.id,
       userType: credentialsResult.result.userType,

@@ -38,6 +38,10 @@ export const storeSchema = new Schema<StoreDocument>(
       type: String,
       required: [true, "the description field is required"],
     },
+    productsType:{
+      type:String,
+      required:[true, "the productsType field is required"]
+    },
     logo: String,
     storeAssistants: [
       {

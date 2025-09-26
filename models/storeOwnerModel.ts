@@ -4,7 +4,6 @@ import { formatDistanceStrict, lightFormat } from "date-fns";
 import mongoose, { Schema } from "mongoose";
 import { arSA } from "date-fns/locale/ar-SA";
 
-
 interface StoreOwnerVirtual {
   planExpiresInDays: string;
 }
@@ -21,6 +20,7 @@ const storeOwnerSchema = new Schema<StoreOwnerDocument, {}, {}, StoreOwnerVirtua
       type: String,
       unique: true,
       required: [true, "the email field is required"],
+      sparse:true
     },
     firstName: String,
     lastName: String,
@@ -41,6 +41,11 @@ const storeOwnerSchema = new Schema<StoreOwnerDocument, {}, {}, StoreOwnerVirtua
       type: String,
       enum: ["admin", "storeOwner", "storeAssistant", "user"] /* SOLILOQUY: what if the user can be both an owner and an assistant? in this case the type should be [String] */,
       required: [true, "the userType field is required"],
+    },
+    status: {
+      type: String,
+      enum: ["active", "blocked", "deleted"],
+      default: "active",
     },
     image: String,
     defaultAddressId: {
@@ -98,12 +103,12 @@ const storeOwnerSchema = new Schema<StoreOwnerDocument, {}, {}, StoreOwnerVirtua
 // this pre(findOneAndUpdate) for accumulating the count in subscriptionsLog whenever the subscribeStarts field has been modified during a new/renewal subscribing process
 storeOwnerSchema.pre("findOneAndUpdate", async function (next) {
   // STEP 1) get the original doc in order to access the userType and its subscriptionsLog field:
-  const doc: StoreOwnerDocument = await this.model.findOne(this.getFilter()).select("userType subscriptionsLog");
+  const doc: StoreOwnerDocument = await this.model.findOne(this.getFilter()).select("subscriptionsLog");
 
   // STEP 2) get the to-be-updated fields:
   /*✅*/ const updatedFields = this.getUpdate() as mongoose.UpdateQuery<StoreOwnerDocument>;
 
-  if (doc?.userType !== "storeOwner" || !updatedFields?.subscribedPlanDetails?.subscribeStarts) return next(); // don't enter if the updated fields has nothing to do with the subscription
+  if (!updatedFields?.subscribedPlanDetails?.subscribeStarts) return next(); // don't enter if the updated fields has nothing to do with the subscription
 
   const { subscribeStarts, planName, paidPrice } = updatedFields.subscribedPlanDetails;
   const logsMap = doc.subscriptionsLog;

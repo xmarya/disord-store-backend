@@ -5,8 +5,9 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import { BaseUserData } from "@Types/Schema/Users/BasicUserTypes";
 import mongoose from "mongoose";
+import { MongoId } from "@Types/Schema/MongoId";
 
-async function updateAdminProfile(adminId: string, updatedData: Partial<BaseUserData>, session?:mongoose.ClientSession) {
+async function updateAdminProfile(adminId: MongoId, updatedData: Partial<BaseUserData>, session?:mongoose.ClientSession) {
   const safeUpdatedAdmin = safeThrowable(
     () => updateDoc(Admin, adminId, updatedData, {session}),
     (error) => new Failure((error as Error).message)

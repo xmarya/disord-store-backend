@@ -22,12 +22,13 @@ import refreshToken from "../middlewares/requestModifiers/refreshToken";
 import { sendConfirmationEmail } from "../middlewares/sendConfirmationEmail";
 import { createReviewController } from "../controllers/auth/reviews/publicReviewController";
 import assignFromCacheToRequest from "../middlewares/requestModifiers/assignFromCacheToRequest";
-import { assignStoreIdToRequest } from "../middlewares/requestModifiers/assignStoreIdToRequest";
 import assignPlanIdToRequest from "../middlewares/requestModifiers/assignPlanIdToRequest";
 import canCreateStore from "middlewares/protectors/canCreateStore";
+// import { testAnything } from "@controllers/test";
 
 export const router = express.Router();
 
+// router.post("/test", testAnything)
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
 router.get("/logout", logout);
@@ -52,8 +53,6 @@ router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
 
-
 /* TODO
     1- blocking the assistants accounts if any in case the owner downgraded the plan to basic
-    2- check Novu settings in the production, the welcome email, registering new subscribers don't work
 */

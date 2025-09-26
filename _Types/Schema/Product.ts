@@ -10,6 +10,7 @@ export interface ProductDataBody {
   image: Array<string>;
   description: string;
   stock: number | null;
+  limitPerCart?: number;
   categories?: Array<MongoId>;
 }
 

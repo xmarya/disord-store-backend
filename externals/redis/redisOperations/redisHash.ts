@@ -2,14 +2,7 @@ import redis from "@config/redis";
 import { ttl } from "@constants/ttl";
 import { RedisTTL } from "@Types/externalAPIs/RedisCache";
 
-/*TODO:
-    - Caching the stores' products (id, name, price, first image only, productType, discounted price)
-    - Caching the product-category relationship
-    - Remove any updated resource from the cache
-    - Set a short TTL for stores' stats
-    - Batching the stores' profit (cache them => write into the db at one query operation)
-*/
-export async function createRedisHash(hashKey: string, data: object, TTL: RedisTTL) {
+export async function createRedisHash(hashKey: string, data: any, TTL: RedisTTL) {
   const result = await redis.hset(hashKey, data);
   // if TTL is anything except "no-ttl"
   if (ttl[TTL]) await redis.expire(hashKey, ttl[TTL]);

@@ -1,14 +1,14 @@
-import { ms } from "../../../_constants/primitives";
 import { createNewInvoices } from "@repositories/invoice/invoiceRepo";
 import { InvoiceDocument } from "@Types/Schema/Invoice";
 import bullmq from "@config/bullmq";
 import { getAllCachedData } from "../../redis/cacheControllers/globalCache";
+import { ms } from "ms";
 
 const { queue } = await bullmq("Invoice", invoiceWriteProcessor);
 
 async function invoiceBullMQ() {
   // STEP 1) add job to the queue:
-  await queue.add("dbWriteBatch", {}, { repeat: { every: 2 * ms }, jobId: "invoice-batch-writer" });
+  await queue.add("dbWriteBatch", {}, { repeat: { every: ms("2m") }, jobId: "invoice-batch-writer" });
 }
 
 async function invoiceWriteProcessor() {

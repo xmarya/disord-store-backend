@@ -1,6 +1,8 @@
+import { MongoId } from "@Types/Schema/MongoId";
+
 export type CacheStoreAndPlan = {
-  store: string;
-  plan: string;
+  store: MongoId;
+  plan: MongoId;
   isPaid: boolean;
   planExpiryDate: Date;
 };

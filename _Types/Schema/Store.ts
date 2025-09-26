@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { ProductDocument } from "./Product";
 import { MongoId } from "./MongoId";
 import { PlansNames } from "./Plan";
 
+type StoreStatus = "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
 export interface IStoreAddress {
   street: string;
   city: string;
@@ -18,6 +18,7 @@ export interface IShipmentCompany {
 export interface StoreDataBody {
   storeName: string;
   description: string;
+  productsType: "clothes" | "electronics" | "digital products" | "food" | "cosmetic" | "accessories" | "sports"| string
   logo?: string;
 }
 
@@ -27,7 +28,7 @@ export interface FullStoreDataBody extends StoreDataBody {
 }
 
 export interface StoreBasic extends FullStoreDataBody {
-  status: "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
+  status: Exclude<StoreStatus, "deleted">;
   verified: boolean;
   ratingsAverage: number;
   ratingsQuantity: number;
@@ -40,7 +41,7 @@ export interface StoreOptionals {
   storeAssistants?: Array<MongoId>;
   // categories?: Array<CategoryDocument>;
   colourTheme?: MongoId; // reference to one of the themes that defined inside ColourTheme Model, the user is going to select one theme
-  products: Array<ProductDocument>;
+  // products: Array<ProductDocument>;
   socialMedia: {
     instagram?: string;
     tiktok?: string;
