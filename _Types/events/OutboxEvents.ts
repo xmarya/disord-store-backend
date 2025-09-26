@@ -1,6 +1,6 @@
 import { DomainEvent } from "./DomainEvent";
 import { Success } from "@Types/ResultTypes/Success";
-import { Failure, RabbitConsumerDTO } from "@Types/ResultTypes/errors/Failure";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
 
 export type OutboxRecordsInfo = Record<string, Record<string, boolean>>;
 
@@ -41,7 +41,7 @@ export type RetryLetterOptions<T extends AllOutbox> = {
   mainExchangeName: T["exchangeName"]; // redirect to the main exchange in bindQueue()
   mainRoutingKey: T["routingKey"]; // redirect to the main exchange using the main routing key in bindQueue()
   deadExchangeName: T["deadExchangeName"]; // in the deadLetterExchange option
-  deadQueueName:T["deadQueueName"]
+  deadQueueName: T["deadQueueName"];
   deadRoutingKey: T["deadRoutingKey"]; // in the deadLetterRoutingKey
 };
 
@@ -54,7 +54,6 @@ export type UserCreatedType = {
   deadExchangeName: "dead-user-events";
   deadQueueName: `dead-user-created-queue-${string}`;
   deadRoutingKey: "dead-user-created";
-
 };
 
 export type UserUpdatedType = {
@@ -66,7 +65,6 @@ export type UserUpdatedType = {
   deadExchangeName: "dead-user-events";
   deadQueueName: `dead-user-updated-queue-${string}`;
   deadRoutingKey: "dead-user-updated";
-
 };
 
 export type UserDeletedType = {
@@ -78,7 +76,17 @@ export type UserDeletedType = {
   deadExchangeName: "dead-user-events";
   deadQueueName: `dead-user-deleted-queue-${string}`;
   deadRoutingKey: "dead-user-deleted";
+};
 
+export type StoreOwnerDeletedType = {
+  type: "storeOwner-deleted";
+  exchangeName: "main-storeOwner-events";
+  queueName: `storeOwner-deleted-queue-${string}`;
+  routingKey: "storeOwner-deleted";
+
+  deadExchangeName: "dead-storeOwner-events";
+  deadQueueName: `dead-storeOwner-deleted-queue-${string}`;
+  deadRoutingKey: "dead-storeOwner-deleted";
 };
 
 export type AssistantCreatedType = {
@@ -90,7 +98,6 @@ export type AssistantCreatedType = {
   deadExchangeName: "dead-assistant-events";
   deadQueueName: `dead-assistant-created-queue-${string}`;
   deadRoutingKey: "dead-assistant-created";
-
 };
 
 export type AssistantUpdatedType = {
@@ -102,7 +109,6 @@ export type AssistantUpdatedType = {
   deadExchangeName: "dead-assistant-events";
   deadQueueName: `dead-assistant-updated-queue-${string}`;
   deadRoutingKey: "dead-assistant-updated";
-
 };
 
 export type AssistantDeletedType = {
@@ -114,7 +120,6 @@ export type AssistantDeletedType = {
   deadExchangeName: "dead-assistant-events";
   deadQueueName: `dead-assistant-deleted-queue-${string}`;
   deadRoutingKey: "dead-assistant-deleted";
-
 };
 
 export type ProductDeletedType = {
@@ -126,7 +131,6 @@ export type ProductDeletedType = {
   deadExchangeName: "dead-product-events";
   deadQueueName: `dead-product-deleted-queue-${string}`;
   deadRoutingKey: "dead-product-deleted";
-
 };
 
 export type PlanSubscriptionUpdatedType = {
@@ -138,7 +142,6 @@ export type PlanSubscriptionUpdatedType = {
   deadExchangeName: "dead-planSubscription-events";
   deadQueueName: `dead-planSubscription-updated-queue-${string}`;
   deadRoutingKey: "dead-planSubscription-updated";
-
 };
 
 export type StoreDeletedType = {
@@ -150,7 +153,6 @@ export type StoreDeletedType = {
   deadExchangeName: "dead-store-events";
   deadQueueName: `dead-store-deleted-queue-${string}`;
   deadRoutingKey: "dead-store-deleted";
-
 };
 
 export type AllOutbox =
@@ -162,6 +164,7 @@ export type AllOutbox =
   | AssistantUpdatedType
   | AssistantDeletedType
   | PlanSubscriptionUpdatedType
+  | StoreOwnerDeletedType
   | StoreDeletedType;
 
 export type OutboxEventTypesMap = AllOutbox["type"];
