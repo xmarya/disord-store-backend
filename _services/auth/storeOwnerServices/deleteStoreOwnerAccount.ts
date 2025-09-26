@@ -5,10 +5,11 @@ import { UserDeletedEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
-import mongoose, { startSession } from "mongoose";
+import { startSession } from "mongoose";
 
 // this service function is to DELETE A STORE OWNER ACCOUNT BY THE OWNER OR THE ADMIN
-async function deleteStoreOwnerAccount({ storeOwnerId, storeId }: { storeOwnerId: MongoId; storeId: MongoId }) {
+async function deleteStoreOwnerAccount({ storeOwnerId, storeId }: { storeOwnerId: MongoId; storeId: MongoId | undefined }) {
+
   const session = await startSession();
   const deletedStoreOwner = await session.withTransaction(async () => {
     const deletedStoreOwner = await deleteStoreOwner(storeOwnerId, session);
@@ -20,8 +21,8 @@ async function deleteStoreOwnerAccount({ storeOwnerId, storeId }: { storeOwnerId
         userType: deletedStoreOwner.userType,
       };
       const ownerDeletedPayload: StoreOwnerDeletedEvent["payload"] = {
-        storeId: deletedStoreOwner.myStore || new mongoose.Types.ObjectId(storeId),
-        storeOwnerId: deletedStoreOwner._id as MongoId || new mongoose.Types.ObjectId(storeOwnerId)
+        storeId: storeId ?? undefined,
+        storeOwnerId: deletedStoreOwner._id as MongoId
       };
       await createOutboxRecord<[StoreOwnerDeletedEvent, UserDeletedEvent]>(
         [

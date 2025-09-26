@@ -5,7 +5,7 @@ import { OutboxEvent } from "./OutboxEvents";
 export interface StoreOwnerDeletedEvent extends OutboxEvent {
     type: "storeOwner-deleted",
     payload:{
-        storeId:MongoId,
+        storeId:MongoId | undefined,
         storeOwnerId:MongoId
     }
 }

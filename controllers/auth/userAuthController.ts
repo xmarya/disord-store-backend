@@ -39,7 +39,7 @@ export const deleteUserAccountController = catchAsync(async (request, response, 
 export const deleteStoreOwnerAccountController = catchAsync(async (request, response, next) => {
   const { storeOwnerId } = request.params;
 
-  const storeId = (request.user as StoreOwnerDocument).myStore
+  const storeId = (request.user as StoreOwnerDocument)?.myStore ?? undefined;
   const result = await deleteStoreOwnerAccount({storeOwnerId, storeId});
 
   if (!result.ok) return next(returnError(result));
