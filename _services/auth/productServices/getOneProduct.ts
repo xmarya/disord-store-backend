@@ -19,11 +19,12 @@ async function getOneProduct(productId: MongoId) {
 
   const catsResult = await getCategoryFromCacheOrDB(productId);
   if (!catsResult.ok && catsResult.reason === "error") return new Failure(catsResult.message);
-  const { result: product } = getProductResult;
+  const {result: productResult} = getProductResult;
   const { result: categories } = catsResult as {result: Array<CategoryBasic>};
 
-  product.categories = categories ?? [];
-
+  const product = productResult.toObject();
+  product.categories = categories;
+  
   return new Success(product);
 }
 
