@@ -11,6 +11,7 @@ import userUpdatedPublisher from "./userUpdated/userUpdatedPublisher";
 import assistantUpdatedPublisher from "./assistantUpdated/assistantUpdatedPublisher";
 import productDeletedPublisher from "./productDeleted/productDeletedPublisher";
 import storeDeletedPublisher from "./storeDeleted/storeDeletedPublisher";
+import storeOwnerDeletedPublisher from "./storeOwnerDeleted/storeOwnerDeletedPublisher";
 
 type PublisherFunction = (event: any) => Promise<Success<any> | Failure>;
 
@@ -21,13 +22,14 @@ const publishers: Record<OutboxEventTypesMap, PublisherFunction> = {
   "assistant-created": assistantCreatedPublisher,
   "assistant-updated": assistantUpdatedPublisher,
   "assistant-deleted": assistantDeletedPublisher,
+  "storeOwner-deleted":storeOwnerDeletedPublisher,
   "store-deleted": storeDeletedPublisher,
   "product-deleted": productDeletedPublisher,
   "planSubscription-updated": planSubscriptionUpdatedPublisher
 };
 
 async function publishFactory(outboxRecord: OutboxRecordDocument) {
-  console.log("inside publishFactory", outboxRecord.type);
+  // console.log("inside publishFactory", outboxRecord.type);
   const { type, payload, id } = outboxRecord;
   const event = {
     type,
