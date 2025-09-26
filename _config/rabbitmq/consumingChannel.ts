@@ -1,3 +1,5 @@
+import dotenv from "dotenv"
+dotenv.config({path: "./.env"});
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import amqp, {ConfirmChannel} from "amqplib";
