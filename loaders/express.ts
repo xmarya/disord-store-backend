@@ -11,6 +11,7 @@ export default function expressLoader(app: Application) {
   // app.set("trust proxy", true);
   const limiter = ratelimit({
     max: 1000, // #requests per hour.
+
     windowMs: 60 * 60 * 100, // the calculation of 1 hour.
     message: "We've got too many requests from this IP, Try again after 1 hour",
   });
