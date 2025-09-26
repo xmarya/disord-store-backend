@@ -1,22 +1,18 @@
-import { getAllProductCategories } from "@repositories/category/categoryRepo";
-import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from "@repositories/global";
-import { CategoryBasic } from "@Types/Schema/Category";
-import { MongoId } from "@Types/Schema/MongoId";
-import { AppError } from "@Types/ResultTypes/errors/AppError";
-import { getDecompressedCacheData, setCompressedCacheData } from "../../externals/redis/cacheControllers/globalCache";
-import { catchAsync } from "@utils/catchAsync";
 import Category from "@models/categoryModel";
+import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from "@repositories/global";
+import { AppError } from "@Types/ResultTypes/errors/AppError";
+import { catchAsync } from "@utils/catchAsync";
 
 // protected
 export const createCategoryController = catchAsync(async (request, response, next) => {
-  const { name, colour } = request.body;
+  const { name } = request.body;
   if (!name?.trim()) return next(new AppError(400, "Please add a name to the category"));
 
   const userName = `${request.user.firstName} ${request.user.lastName}`;
   const userId = request.user.id;
   const storeId = request.store;
   const createdBy = { name: userName, id: userId };
-  const data = { name, colour, createdBy, store: storeId };
+  const data = { name, createdBy, store: storeId };
   const newCategory = await createDoc(Category, data);
 
   response.status(201).json({
@@ -51,11 +47,10 @@ export const getCategoryController = catchAsync(async (request, response, next) 
 
 export const updateCategoryController = catchAsync(async (request, response, next) => {
   /*✅*/
-  // NOTE: only allow the category's name and colour to be editable:
-  const { name, colour } = request.body;
+  const { name } = request.body;
   const { categoryId } = request.params;
   const updatedBy = { name: `${request.user.firstName} ${request.user.lastName}`, id: request.user.id, date: new Date() };
-  const updatedCategory = await updateDoc(Category, categoryId, { name, colour, updatedBy }, { condition: { store: request.store } });
+  const updatedCategory = await updateDoc(Category, categoryId, { name, updatedBy }, { condition: { store: request.store } });
 
   response.status(201).json({
     success: true,
