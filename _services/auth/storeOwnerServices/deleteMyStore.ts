@@ -1,6 +1,6 @@
 import { resetStoreOwnerToDefault } from "@repositories/storeOwner/storeOwnerRepo";
 import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
-import deleteStoreAndItsRelatedResourcePermanently from "@services/auth/storeServices/deleteStoreAndItsRelatedResourcePermanently";
+import deleteStorePermanently from "@services/auth/storeServices/deleteStorePermanently";
 import { StoreDeletedEvent } from "@Types/events/StoreEvents";
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
@@ -13,7 +13,7 @@ async function deleteMyStore(storeId: MongoId) {
 
   const updatedOwner = await session.withTransaction(async () => {
     const updatedOwner = await resetStoreOwnerToDefault(storeId, session);
-    const deletedStore = await deleteStoreAndItsRelatedResourcePermanently(storeId, session);
+    const deletedStore = await deleteStorePermanently(storeId, session);
     if (updatedOwner && deletedStore) {
       const ownerPayload: UserUpdatedEvent["payload"] = {
         user: updatedOwner,
