@@ -5,8 +5,9 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import mongoose from "mongoose";
 
-
-async function deleAllStats(storeId:MongoId, session:mongoose.ClientSession) {
+// TODO this should be run under conditions after the full integration with the payment gateway
+// so the owner's unwithdrawn profits wouldn't be deleted
+async function deleteAllStats(storeId:MongoId, session:mongoose.ClientSession) {
       const safeDeleteAllStats = safeThrowable(
     () => deleteStoreStats(storeId),
     (error) => new Failure((error as Error).message)
@@ -15,4 +16,4 @@ async function deleAllStats(storeId:MongoId, session:mongoose.ClientSession) {
   return extractSafeThrowableResult(() => safeDeleteAllStats);
 }
 
-export default deleAllStats;
+export default deleteAllStats;
