@@ -16,4 +16,4 @@ router.route("/changeEmail").patch(changeEmailController);
 // router.route("/creditCard").post(validatePaymentData, createNewCreditCardController).get(getAllCreditCardsController);
 // router.route("/creditCard/:cardId").get(getOneCreditCardController).patch(validatePaymentData, updateCreditCardController).delete(deleteCreditCardController);
 router.route("/deleteAccount/user/:userId").delete(restrict("user"),validateRequestParams("userId"), deleteUserAccountController);
-router.route("/deleteAccount/storeOwner/:storeOwner").delete(restrict("storeOwner"),validateRequestParams("storeOwner"), deleteStoreOwnerAccountController);
+router.route("/deleteAccount/storeOwner/:storeOwnerId").delete(restrict("storeOwner"),validateRequestParams("storeOwnerId"), deleteStoreOwnerAccountController);
