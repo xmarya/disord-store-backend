@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 async function deleteAllStoreProducts(storeId:MongoId, session:mongoose.ClientSession) {
 
     const safeDeleteAllProducts = safeThrowable(
-        () => deleteAllProducts(storeId, session),
+        () => deleteAllProducts(storeId),
         (error) => new Failure((error as Error).message)
     );
 

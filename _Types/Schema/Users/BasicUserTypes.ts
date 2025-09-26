@@ -12,5 +12,5 @@ export interface BaseUserData {
   image: string;
   defaultAddressId: MongoId;
   defaultCreditCardId: MongoId;
-  status:"active"
+  status?:"active"
 }
