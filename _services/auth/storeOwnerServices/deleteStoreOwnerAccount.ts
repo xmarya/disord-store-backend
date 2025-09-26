@@ -8,11 +8,13 @@ import { MongoId } from "@Types/Schema/MongoId";
 import mongoose, { startSession } from "mongoose";
 import deleteStoreAndItsRelatedResourcePermanently from "../storeServices/deleteStoreAndItsRelatedResourcePermanently";
 
-async function deleteStoreOwnerAccount(storeOwnerId: MongoId, storeId: MongoId) {
+async function deleteStoreOwnerAccount({storeOwnerId, storeId}:{storeOwnerId: MongoId, storeId: MongoId}) {
   const session = await startSession();
-  const deletedStoreOwner = await session.withTransaction(async () => {
+  const {deletedStoreOwner, deletedStore} = await session.withTransaction(async () => {
+
     const deletedStoreOwner = await deleteStoreOwner(storeOwnerId, session);
     const deletedStore = await deleteStoreAndItsRelatedResourcePermanently(storeId, session);
+
     if (deletedStoreOwner && deletedStore) {
       const ownerPayload: UserDeletedEvent["payload"] = {
         usersId: [deletedStoreOwner.id],
@@ -25,7 +27,7 @@ async function deleteStoreOwnerAccount(storeOwnerId: MongoId, storeId: MongoId) 
       await createOutboxRecord<[UserDeletedEvent, StoreDeletedEvent]>([{ type: "user-deleted", payload:ownerPayload }, {type:"store-deleted", payload:storePayload}], session);
     }
 
-    return deletedStoreOwner;
+    return {deletedStoreOwner, deletedStore};
   });
   await session.endSession();
 
@@ -33,7 +35,7 @@ async function deleteStoreOwnerAccount(storeOwnerId: MongoId, storeId: MongoId) 
   // ADD FEATURE for adding the deleted data to an AdminLog
 
   if (!deletedStoreOwner) return new Failure();
-  return new Success("تم حذف مالك المتجر والمتجر بنجاح");
+  return new Success({deletedStoreOwner, deletedStore});
 }
 
 export default deleteStoreOwnerAccount;
