@@ -7,7 +7,6 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 async function getCategoryFromCacheOrDB(productId: MongoId) {
-  let categories;
 
   const safeGetCachedCategory = safeThrowable(
     () => getDecompressedCacheData<CategoryBasic[]>(`Category:${productId.toString()}`),
