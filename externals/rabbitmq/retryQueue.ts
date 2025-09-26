@@ -11,7 +11,6 @@ const retryIn = [ms("30s"), ms("90s"), ms("4m")];
 
 // the retry queue's job is to hold the massage for a period of time, then sending it to the main queue
 async function retryQueue<T extends AllOutbox>(deathCounts: number, options: RetryLetterOptions<T>) {
-  console.log("inside retryQueue");
   const result = getRabbitConsumingChannel();
   if (!result.ok) return new Failure(result.message);
   const { result: channel } = result;
@@ -20,7 +19,7 @@ async function retryQueue<T extends AllOutbox>(deathCounts: number, options: Ret
   const hasRetriesLeft = deathCounts <= retryIn.length; // 1, 2, 3 <= 3
   const index = hasRetriesLeft ? deathCounts - 1 : retryIn.length - 1;
 
-  const nextQueue = hasRetriesLeft ? `retry-queue-${mainRoutingKey}-${index}` : deadQueueName; // retry-queue name should be unique, otherwise it would throw an error since RabbitMQ doesn't allow any change to queue setting after initialising ti.
+  const nextQueue = hasRetriesLeft ? `retry-queue-${mainRoutingKey}-${index + 1}` : deadQueueName; // retry-queue name should be unique, otherwise it would throw an error since RabbitMQ doesn't allow any change to queue setting after initialising ti.
   const nextExchange = hasRetriesLeft ? mainExchangeName : deadExchangeName;
   const nextRoutingKey = hasRetriesLeft ? mainRoutingKey : deadRoutingKey;
 
