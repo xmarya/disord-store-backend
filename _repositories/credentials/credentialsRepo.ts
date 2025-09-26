@@ -21,8 +21,6 @@ export async function updateEmail(oldEmail:string, newEmail:string, session: mon
   // TODO: downgrading the plan to basic deleting all the assistant data
 }
 
-export async function deleteCredentials(session: mongoose.ClientSession) {}
-
 export async function getResetPasswordCredentials(hashedToken: string) {
   return await Credentials.findOne({ passwordResetToken: hashedToken, passwordResetExpires: { $gt: new Date() } });
 }
@@ -48,4 +46,12 @@ export async function confirmUserEmail(credentialsId: MongoId, hashedToken: stri
       },
     }
   );
+}
+
+export async function deleteCredentials(email:string) {
+  return await Credentials.findOneAndDelete({email});
+}
+
+export async function deleteBulkCredentials(bulk:any) {
+  return await Credentials.bulkWrite(bulk);
 }

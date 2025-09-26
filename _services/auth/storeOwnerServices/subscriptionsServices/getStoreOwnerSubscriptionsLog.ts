@@ -1,4 +1,3 @@
-import User from "@models/userModel";
 import { getOneDocById } from "@repositories/global";
 import { MongoId } from "@Types/Schema/MongoId";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";

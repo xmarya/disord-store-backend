@@ -117,7 +117,11 @@ export async function getUserCart(user: MongoId) {
 }
 
 export async function deleteProductFromCart(user: MongoId, product: MongoId) {
-  await Cart.deleteOne({ user, product });
+  await Cart.findOneAndDelete({ user, product });
+}
+
+export async function deleteCart(user: MongoId, session:mongoose.ClientSession) {
+  return await Cart.deleteMany({user}, {session});
 }
 
 /* OLD CODE (kept for reference): 

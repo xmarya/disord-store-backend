@@ -13,6 +13,7 @@ process.on("warning", (warn) => console.log(warn));
 process.on("unhandledRejection", (error) => {
   if (error instanceof Error) {
     console.log("unhandledRejection 🔶🔶🔶🔶", error.name, "\n", error.message);
+    console.log("unhandledRejection 🔶🔶🔶🔶", error.stack);
     server.close(() => process.exit(1));
   }
 });

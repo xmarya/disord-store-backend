@@ -1,8 +1,5 @@
-import mongoose from "mongoose";
 import { AdminDocument } from "@Types/Schema/Users/admin/AdminUser";
-import { Schema } from "mongoose";
-import bcrypt from "bcryptjs";
-import { HASHING_SALT } from "../_constants/primitives";
+import mongoose, { Schema } from "mongoose";
 
 type AdminModel = mongoose.Model<AdminDocument>;
 const adminSchema = new Schema<AdminDocument>(
@@ -18,6 +15,7 @@ const adminSchema = new Schema<AdminDocument>(
     email: {
       type: String,
       required: [true, "the email field is required"],
+      sparse: true,
     },
     phoneNumber: {
       type: String,

@@ -1,6 +1,7 @@
 import { MongoId } from "../MongoId";
 
 export type UserTypes = "user" | "storeOwner" | "storeAssistant" | "admin";
+export type UserStatus = "active" | "blocked" | "deleted";
 
 export interface BaseUserData {
   userType:UserTypes
@@ -11,4 +12,5 @@ export interface BaseUserData {
   image: string;
   defaultAddressId: MongoId;
   defaultCreditCardId: MongoId;
+  status?:"active"
 }

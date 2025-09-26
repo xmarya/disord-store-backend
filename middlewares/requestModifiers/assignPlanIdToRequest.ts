@@ -5,7 +5,6 @@ import returnError from "@utils/returnError";
 import cacheStoreAndPlan from "../../externals/redis/cacheControllers/storeAndPlan";
 
 const assignPlanIdToRequest = catchAsync(async (request, response, next) => {
-console.log("assignPlanIdToRequest");
   // if the plan is exist from the previous cache middleware
   if (request.plan) return next();
   // NOTE: I'm only checking using the plan, as it the only value that tells me if the user has
@@ -27,7 +26,7 @@ console.log("assignPlanIdToRequest");
 
   // since the code progressed until this point, that mean the data are not available in the cache.
   // so, cache them without awaiting:
-  await cacheStoreAndPlan(request.store, request.plan, request.isPlanPaid, request.planExpiryDate);
+  await cacheStoreAndPlan({store: request.store, plan: request.plan, isPaid: request.isPlanPaid, planExpiryDate:request.planExpiryDate});
   next();
 });
 

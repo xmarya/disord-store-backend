@@ -51,7 +51,8 @@ export const createNewUserController = (userType: Extract<UserTypes, "user" | "s
 
 export const credentialsLogin = catchAsync(async (request, response, next) => {
   const result = loginMethodValidator(request.body);
-  if (!result.ok && result.reason === "not-found") return next(returnError(new NotFound("لم يتم العثور على هذا المستخدم")));
+  // FIX result.reason === "not-found" ???
+  // if (!result.ok && result.reason === "not-found") return next(returnError(new NotFound("لم يتم العثور على هذا المستخدم")));
   if (!result.ok) return next(returnError(result));
   const { result: loginMethod } = result;
 

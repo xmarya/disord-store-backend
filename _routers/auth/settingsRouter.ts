@@ -2,7 +2,7 @@ import express from "express";
 import restrict from "../../middlewares/protectors/restrict";
 import { validateChangePassword } from "../../middlewares/validators/validateChangePassword";
 import validateRequestParams from "../../middlewares/validators/validateRequestParams";
-import { deleteUserAccountController, getUserProfileController } from "../../controllers/auth/userAuthController";
+import { deleteStoreOwnerAccountController, deleteUserAccountController, getUserProfileController } from "../../controllers/auth/userAuthController";
 import { changeEmailController, changePasswordController, updateProfileController } from "controllers/auth/authSettingsController";
 
 export const router = express.Router();
@@ -15,4 +15,5 @@ router.route("/changeEmail").patch(changeEmailController);
 // router.route("/creditCard").post(validatePaymentData);
 // router.route("/creditCard").post(validatePaymentData, createNewCreditCardController).get(getAllCreditCardsController);
 // router.route("/creditCard/:cardId").get(getOneCreditCardController).patch(validatePaymentData, updateCreditCardController).delete(deleteCreditCardController);
-router.route("/deleteAccount/:userId").delete(validateRequestParams("userId"), deleteUserAccountController);
+router.route("/deleteAccount/user/:userId").delete(validateRequestParams("userId"), deleteUserAccountController);
+router.route("/deleteAccount/storeOwner/:storeOwnerId").delete(validateRequestParams("storeOwnerId"), deleteStoreOwnerAccountController);

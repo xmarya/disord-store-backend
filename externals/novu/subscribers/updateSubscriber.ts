@@ -1,29 +1,46 @@
 import novu from "@config/novu";
-import { AssistantPermissions } from "@Types/Schema/Users/StoreAssistant";
+import { AssistantUpdatedEvent } from "@Types/events/AssistantEvents";
+import { UserUpdatedEvent } from "@Types/events/UserEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
+import { MongoId } from "@Types/Schema/MongoId";
+import { StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
+import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import safeThrowable from "@utils/safeThrowable";
 
-type NovuUpdatedData = {
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
-  permissions?: AssistantPermissions;
-};
+async function novuUpdateSubscriber(event:UserUpdatedEvent | AssistantUpdatedEvent) {
+  const {_id, id, email, firstName, lastName, phoneNumber, userType} = event.payload.user;
+  const {permissions, inStore} = event.payload.user as StoreAssistantDocument;
+  const {myStore} = event.payload.user as StoreOwnerDocument;
+  const subscriberId = id ?? (_id as MongoId).toString();
 
-async function novuUpdateSubscriber(subscriberId: string, data: NovuUpdatedData) {
   const payload: Record<string, any> = {
-    ...(data.email && { email: data.email }),
-    ...(data.firstName && { firstName: data.firstName }),
-    ...(data.lastName && { lastName: data.lastName }),
-    ...(data.phoneNumber && { phone: data.phoneNumber }),
+    ...(email && { email }),
+    ...(firstName && { firstName }),
+    ...(lastName && { lastName }),
+    ...(phoneNumber && { phone: phoneNumber }),
   };
 
+  const store = (myStore || inStore)
   const moreData = {
-    ...(data.permissions && { permissions: data.permissions }),
+    userType,
+    ...(store && { store: store.toString() }),
+    ...(permissions && { permissions }),
   };
 
   if (Object.keys(moreData).length) payload.data = moreData;
 
-  await novu.subscribers.patch(payload, subscriberId);
+  const safeUpdateNovu = safeThrowable(
+    () => novu.subscribers.patch(payload, subscriberId),
+    (error) => new Failure((error as Error).message, {serviceName:"novu", ack: false})
+  );
+
+  const novuResult = await extractSafeThrowableResult(() => safeUpdateNovu);
+  if(!novuResult.ok) return new Failure(novuResult.message, {serviceName:"novu", ack: false});
+
+  return new Success({serviceName:"novu", ack: true})
+
 }
 
 export default novuUpdateSubscriber;

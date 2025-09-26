@@ -9,10 +9,6 @@ export const categorySchema = new Schema<CategoryDocument>({
     required: [true, "the category name is required"],
     unique: true,
   },
-  colour: {
-    type: String,
-    required: [true, "the category colour is required"],
-  },
   createdBy: {
     name: String,
     id: Schema.Types.ObjectId,

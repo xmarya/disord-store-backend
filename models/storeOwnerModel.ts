@@ -4,7 +4,6 @@ import { formatDistanceStrict, lightFormat } from "date-fns";
 import mongoose, { Schema } from "mongoose";
 import { arSA } from "date-fns/locale/ar-SA";
 
-
 interface StoreOwnerVirtual {
   planExpiresInDays: string;
 }
@@ -21,6 +20,7 @@ const storeOwnerSchema = new Schema<StoreOwnerDocument, {}, {}, StoreOwnerVirtua
       type: String,
       unique: true,
       required: [true, "the email field is required"],
+      sparse:true
     },
     firstName: String,
     lastName: String,
@@ -41,6 +41,11 @@ const storeOwnerSchema = new Schema<StoreOwnerDocument, {}, {}, StoreOwnerVirtua
       type: String,
       enum: ["admin", "storeOwner", "storeAssistant", "user"] /* SOLILOQUY: what if the user can be both an owner and an assistant? in this case the type should be [String] */,
       required: [true, "the userType field is required"],
+    },
+    status: {
+      type: String,
+      enum: ["active", "blocked", "deleted"],
+      default: "active",
     },
     image: String,
     defaultAddressId: {

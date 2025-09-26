@@ -1,10 +1,10 @@
+import updateProfile from "@services/_sharedServices/updateProfile";
+import confirmChangedEmail from "@services/auth/credentials/confirmChangedEmail";
 import confirmChangedPassword from "@services/auth/credentials/confirmChangedPassword";
-import updateProfileFactory from "@services/_sharedServices/updateProfileFactory";
 import { NotAssistant } from "@Types/Schema/Users/NotAssistant";
 import { catchAsync } from "@utils/catchAsync";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import returnError from "@utils/returnError";
-import confirmChangedEmail from "@services/auth/credentials/confirmChangedEmail";
 
 export const changePasswordController = catchAsync(async (request, response, next) => {
   const { currentPassword, newPassword } = request.body;
@@ -35,7 +35,7 @@ export const changeEmailController = catchAsync(async (request, response, next) 
 
 export const updateProfileController = catchAsync(async (request, response, next) => {
   const user = request.user;
-  const result = await updateProfileFactory(user as NotAssistant, request.body);
+  const result = await updateProfile(user as NotAssistant, request.body, request.emailConfirmed);
 
   if (!result.ok) return next(returnError(result));
 
