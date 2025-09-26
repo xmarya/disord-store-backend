@@ -19,7 +19,7 @@ async function userCreatedPublisher(event: UserCreatedEvent) {
 
     return new Success(`the payload was published to the exchange: ${exchangeName}`);
   } catch (error) {
-    console.log("userCreatedPublisheruserCreatedPublishererror", error);
+    console.log(error);
     return new Failure((error as Error).message);
   }
 }
