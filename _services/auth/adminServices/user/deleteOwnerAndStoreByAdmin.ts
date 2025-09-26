@@ -7,7 +7,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 
-async function deleteStoreOwnerAndStoreByAdmin(storeOwnerId:MongoId, storeId:MongoId){
+async function deleteStoreOwnerAndStoreByAdmin({storeOwnerId, storeId}:{storeOwnerId:MongoId, storeId:MongoId}){
 
     if(!(storeOwnerId as string)?.trim() || !(storeId as string)?.trim()) return new BadRequest("الرجاء تعبئة جميع الحقول المطلوبة")
     const getStoreResult = await getStoreOf(storeOwnerId);
@@ -17,7 +17,7 @@ async function deleteStoreOwnerAndStoreByAdmin(storeOwnerId:MongoId, storeId:Mon
     
     if(store.id !== storeId) return new BadRequest(`the provided storeId doesn't belong to the storeOwner with id ${storeOwnerId}`)
     const safeDeleteOwnerAndStore = safeThrowable(
-        () => deleteStoreOwnerAccount(storeOwnerId, storeId),
+        () => deleteStoreOwnerAccount({storeOwnerId, storeId}),
         (error) => new Failure((error as Error).message),
     );
 

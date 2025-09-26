@@ -3,7 +3,6 @@ import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 
 const confirmUserEmail = catchAsync(async (request, response, next) => {
-  console.log("confirmUserEmail");
   const { randomToken } = request.params;
   const result = await confirmEmail(randomToken);
 

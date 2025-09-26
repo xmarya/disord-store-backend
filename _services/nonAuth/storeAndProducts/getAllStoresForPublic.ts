@@ -19,10 +19,9 @@ async function getAllStoresForPublic(query: QueryParams) {
     const event: QueryResultsFetchedEvent = {
       type: "queryResults-fetched",
       payload: { key: `Stores:${JSON.stringify(query)}`, queryResults: result.result },
-      occurredAt: new Date(),
     };
 
-    eventBus.publish(event);
+  eventBus.publish(event);
   }
 
   return result;

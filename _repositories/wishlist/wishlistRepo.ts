@@ -1,5 +1,6 @@
 import { MongoId } from "@Types/Schema/MongoId";
 import Wishlist from "@models/wishlistModel";
+import mongoose from "mongoose";
 
 export async function updateWishlist(products: Array<MongoId>, user: MongoId) {
   const bulkOps: any[] = [];
@@ -22,6 +23,6 @@ export async function updateWishlist(products: Array<MongoId>, user: MongoId) {
   const wishlist = await Wishlist.bulkWrite(bulkOps);
 }
 
-export async function deleteWishlist(user: MongoId) {
-  await Wishlist.deleteMany({ user });
+export async function deleteWishlist(user: MongoId, session?:mongoose.ClientSession) {
+  return await Wishlist.deleteMany({ user }, {session});
 }

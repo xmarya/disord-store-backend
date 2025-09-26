@@ -1,10 +1,10 @@
 import { PlansNames, SubscriptionTypes } from "@Types/Schema/Plan";
-import { DomainEvent } from "./DomainEvent";
 import { MongoId } from "@Types/Schema/MongoId";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
+import { OutboxEvent } from "./OutboxEvents";
 
-export interface PlanSubscriptionUpdateEvent extends DomainEvent {
-  type: "planSubscription.updated";
+export interface PlanSubscriptionUpdatedEvent extends OutboxEvent {
+  type: "planSubscription-updated";
   payload: {
     storeOwner: StoreOwnerDocument;
     planName: PlansNames;
@@ -13,5 +13,4 @@ export interface PlanSubscriptionUpdateEvent extends DomainEvent {
     planExpiryDate: Date;
     subscriptionType: SubscriptionTypes | "cancellation";
   };
-  occurredAt: Date;
 }

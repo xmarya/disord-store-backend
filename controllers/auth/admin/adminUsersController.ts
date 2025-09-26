@@ -95,7 +95,7 @@ export const getOneStoreOwnerController = catchAsync(async (request, response, n
 export const deleteStoreOwnerAndStore = catchAsync(async (request, response, next) => {
   const { storeOwnerId, storeId } = request.body;
 
-  const result = await deleteStoreOwnerAndStoreByAdmin(storeOwnerId, storeId);
+  const result = await deleteStoreOwnerAndStoreByAdmin({storeOwnerId, storeId});
   if (!result.ok) return next(returnError(result));
 
   response.status(204).json({

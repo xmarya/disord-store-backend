@@ -1,5 +1,5 @@
 import express from "express";
-import { createAssistantController, deleteAssistantController, getAllAssistantsController, getOneAssistantController, updateAssistantController } from "../../controllers/auth/assistantController";
+import { createAssistantController, deleteAllAssistantsController, deleteAssistantController, getAllAssistantsController, getOneAssistantController, updateAssistantController } from "../../controllers/auth/assistantController";
 import verifyUsedQuota from "../../middlewares/validators/verifyUsedQuota";
 import restrict from "../../middlewares/protectors/restrict";
 import validateNewUserData from "../../middlewares/validators/validateNewUserData";
@@ -11,7 +11,10 @@ export const router = express.Router({ mergeParams: true });
 
 router.use(restrict("storeOwner"),validateEmailConfirmation);
 
-router.route("/").get(getAllAssistantsController).post(verifyUsedQuota("ofStoreAssistants"), sanitisedData, validateNewUserData, createAssistantController);
+router.route("/")
+.get(getAllAssistantsController)
+.post(verifyUsedQuota("ofStoreAssistants"), sanitisedData, validateNewUserData, createAssistantController)
+.delete(deleteAllAssistantsController);
 router
   .route("/:assistantId")
   .get(validateRequestParams("assistantId"), getOneAssistantController)

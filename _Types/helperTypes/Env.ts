@@ -21,6 +21,9 @@ declare global {
       NOVU_DEVELOPMENT_APPLICATION_IDENTIFIER: string;
       NOVU_PRODUCTION_KEY: string;
       NOVU_PRODUCTION_APPLICATION_IDENTIFIER: string;
+      CLOUDAMQP_URL:string
+      CLOUDAMQP_DEVELOPMENT_PORT:string
+      CLOUDAMQP_PRODUCTION_PORT:string
     }
   }
 }

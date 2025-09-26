@@ -9,13 +9,13 @@ const createQueue = (queueName: string) => {
   const options: Partial<QueueOptions> = { defaultJobOptions: { removeOnComplete: true, removeOnFail: false, attempts: 10, backoff: { type: "exponential", delay: 3500 } } };
   return new Queue(queueName, { connection, ...options });
 };
-const createWorker = (queueName: string, processor: any) => {
+const createWorker = (queueName: string, processor: any, concurrency?:number) => {
   return new Worker(
     queueName,
     async (job) => {
       await processor(job.data); // the data is whatever passed when initialising/using queue.add()
     },
-    { connection }
+    { connection, concurrency: concurrency ?? 1 }
   );
 };
 
@@ -31,20 +31,20 @@ return worker;
 }
 */
 
-async function bullmq(queueName: string, processor: any) {
+async function bullmq(queueName: string, processor: any, concurrency?:number) {
   const queue = createQueue(queueName);
-  const worker = createWorker(queueName, processor);
+  const worker = createWorker(queueName, processor, concurrency);
 
-  worker.on("ready", () => console.log(`worker for ${queueName} is ready...`));
-  worker.on("active", () => console.log(`worker is active...`));
-  worker.on("stalled", () => console.log("stalled worker"));
-  worker.on("resumed", () => console.log("worker resumed the job"));
-  worker.on("progress", (job, progress) => console.log("worker is progressing the job"));
-  worker.on("completed", (job, result) => console.log("A JOB HAS COMPLETED 🎉"));
+  // worker.on("ready", () => console.log(`worker for ${queueName} is ready...`));
+  // worker.on("active", () => console.log(`worker for ${queueName}is active...`));
+  // worker.on("stalled", () => console.log("stalled worker"));
+  // worker.on("resumed", () => console.log("worker resumed the job"));
+  // worker.on("progress", (job, progress) => console.log("worker is progressing the job"));
+  // worker.on("completed", (job, result) => console.log("A JOB HAS COMPLETED 🎉"));
   worker.on("failed", (job, error) => console.log(`${job} has failed during this error ${error.name}: ${error.message}`));
   worker.on("error", (error) => console.log("BullMQ ERROR 🔴: ", error.message));
-  worker.on("closing", () => console.log("the worker is closing"));
-  worker.on("closed", () => console.log("the worker closed"));
+  // worker.on("closing", () => console.log("the worker is closing"));
+  // worker.on("closed", () => console.log("the worker closed"));
 
   return { queue };
 }

@@ -1,5 +1,6 @@
 import createNewAssistantInStore from "@services/auth/storeOwnerServices/createNewAssistantInStore";
-import deleteStoreAssistant from "@services/auth/storeOwnerServices/storeAssistant/deleteStoreAssistantAccount";
+import deleteAllAssistantsByStoreOwner from "@services/auth/storeOwnerServices/deleteAllAssistantsByStoreOwner";
+import deleteOneAssistantByStoreOwner from "@services/auth/storeOwnerServices/deleteOneAssistantByStoreOwner";
 import getAllStoreAssistants from "@services/auth/storeOwnerServices/storeAssistant/getAllStoreAssistants";
 import getOneAssistant from "@services/auth/storeOwnerServices/storeAssistant/getAssistantProfile";
 import updateStoreAssistant from "@services/auth/storeOwnerServices/storeAssistant/updateStoreAssistant";
@@ -62,11 +63,24 @@ export const updateAssistantController = catchAsync(async (request, response, ne
   });
 });
 
+export const deleteAllAssistantsController = catchAsync(async (request, response, next) => {
+  const storeId = request.store;
+
+  const result = await deleteAllAssistantsByStoreOwner(storeId);
+  if (!result.ok) return next(returnError(result));
+  
+  response.status(204).json({
+    success: true,
+    message: "all assistants were deleted successfully",
+  });
+
+});
+
 export const deleteAssistantController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
   const { assistantId } = request.params;
 
-  const result = await deleteStoreAssistant(assistantId, storeId);
+  const result = await deleteOneAssistantByStoreOwner({assistantId, storeId});
 
   if (!result.ok) return next(returnError(result));
 

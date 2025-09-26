@@ -33,6 +33,7 @@ const productSchema = new Schema(
       type: [String],
       required: [true, "the image field is required"],
     },
+    limitPerCart:Number,
     categories: [
       {
         type: Schema.Types.ObjectId,
@@ -57,7 +58,7 @@ const productSchema = new Schema(
     filePath: String,
     discount: { type: Number, default: 0, min: 0, max: 100 },
     numberOfPurchases: {
-      //TODO: this counter should be increased once the users completed their payment process
+      // this counter should be increased once the users completed their payment process
       type: Number,
       default: 0,
     },
@@ -93,12 +94,10 @@ productSchema.index({ store: 1 });
 
 // this pre(/^find/) hook is for populating the categories:
 productSchema.pre(/^find/, function (this: mongoose.Query<any, any>, next) {
-  this.populate({ path: "categories", select: "name colour" });
+  // this.populate({ path: "categories", select: "name colour" });
   this.populate({ path: "store", select: "storeName verified" });
   next();
 });
-
-// TODO: pre hook for deleting all the reviews when deleting one/many product/s
 
 const Product = mongoose.model<ProductDocument, ProductModel>("Product", productSchema);
 

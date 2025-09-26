@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 
 async function deleteAllStoreCategories(storeId: MongoId, session:mongoose.ClientSession) {
   const safeDeleteAllCategories = safeThrowable(
-    () => deleteAllCategories(storeId, session),
+    () => deleteAllCategories(storeId),
     (error) => new Failure((error as Error).message)
   );
 

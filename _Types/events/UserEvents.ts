@@ -1,48 +1,48 @@
 import { AllUsers } from "@Types/Schema/Users/AllUser";
 import { UserTypes } from "@Types/Schema/Users/BasicUserTypes";
 import { DomainEvent } from "./DomainEvent";
-import { MongoId } from "@Types/Schema/MongoId";
+import { OutboxEvent } from "./OutboxEvents";
 
-export interface UserCreatedEvent extends DomainEvent {
-  type: "user.created";
+export interface UserCreatedEvent extends OutboxEvent {
+  outboxRecordId: string;
+  type: "user-created";
   payload: { user: AllUsers; credentialsId: string; confirmUrl: string; randomToken: string };
-  occurredAt: Date;
 }
 
 export interface EmailConfirmationSentEvent extends DomainEvent {
-  type: "emailConfirmation.sent";
+  type: "emailConfirmation-sent";
   payload: { userType: UserTypes; credentialsId: string; randomToken: string };
   occurredAt: Date;
 }
 
-export interface UserUpdatedEvent extends DomainEvent {
-  type: "user.updated";
+export interface UserUpdatedEvent extends OutboxEvent {
+  outboxRecordId: string;
+  type: "user-updated";
   payload: {
     user: AllUsers;
     emailConfirmed?: boolean;
   };
-  occurredAt: Date;
 }
 
-export interface UserDeletedEvent extends DomainEvent {
-  type: "user.deleted";
-  payload: { userId: MongoId };
-  occurredAt: Date;
+export interface UserDeletedEvent extends OutboxEvent {
+  outboxRecordId: string;
+  type: "user-deleted";
+
+  payload: { usersId: Array<string>; userType:UserTypes, emailsToDelete: Array<string> };
 }
 
 export interface UserLoggedInEvent extends DomainEvent {
-  type: "user.loggedIn";
+  type: "user-loggedIn";
   payload: {
     user: AllUsers;
     emailConfirmed?: boolean;
   };
-  occurredAt: Date;
 }
-export interface UserCredentialsUpdatedEvent extends DomainEvent {
-  type: "userCredentials.updated";
+export interface UserCredentialsUpdatedEvent extends OutboxEvent {
+  outboxRecordId: string;
+  type: "userCredentials-updated";
   payload: {
     user: AllUsers;
     emailConfirmed?: boolean;
   };
-  occurredAt: Date;
 }

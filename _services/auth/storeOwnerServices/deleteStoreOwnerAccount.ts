@@ -1,22 +1,46 @@
-import StoreOwner from "@models/storeOwnerModel";
-import { deleteDoc } from "@repositories/global";
+import { deleteStoreOwner } from "@repositories/storeOwner/storeOwnerRepo";
+import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
+import { StoreOwnerDeletedEvent } from "@Types/events/StoreOwnerEvents";
+import { UserDeletedEvent } from "@Types/events/UserEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
 import { startSession } from "mongoose";
-import deleteStoreAndItsRelatedResourcePermanently from "../storeServices/deleteStoreAndItsRelatedResourcePermanently";
-import { Success } from "@Types/ResultTypes/Success";
 
-async function deleteStoreOwnerAccount(storeOwnerId: MongoId, storeId:MongoId) {
+// this service function is to DELETE A STORE OWNER ACCOUNT BY THE OWNER OR THE ADMIN
+async function deleteStoreOwnerAccount({ storeOwnerId, storeId }: { storeOwnerId: MongoId; storeId: MongoId | undefined }) {
 
   const session = await startSession();
-  await session.withTransaction(async () => {
-    //STEP 1) change userType and remove myStore:
-    await deleteDoc(StoreOwner, storeOwnerId, { session });
-    await deleteStoreAndItsRelatedResourcePermanently(storeId, session);
+  const deletedStoreOwner = await session.withTransaction(async () => {
+    const deletedStoreOwner = await deleteStoreOwner(storeOwnerId, session);
 
-    //TODO: // ADD FEATURE for adding the deleted data to an AdminLog
+    if (deletedStoreOwner) {
+      const userDeletedPayload: UserDeletedEvent["payload"] = {
+        usersId: [deletedStoreOwner.id],
+        emailsToDelete: [deletedStoreOwner.email],
+        userType: deletedStoreOwner.userType,
+      };
+      const ownerDeletedPayload: StoreOwnerDeletedEvent["payload"] = {
+        storeId: storeId ?? undefined,
+        storeOwnerId: deletedStoreOwner._id as MongoId
+      };
+      await createOutboxRecord<[StoreOwnerDeletedEvent, UserDeletedEvent]>(
+        [
+          { type: "user-deleted", payload: userDeletedPayload },
+          { type: "storeOwner-deleted", payload: ownerDeletedPayload },
+        ],
+        session
+      );
+    }
+
+    return deletedStoreOwner;
   });
+  await session.endSession();
 
-  return new Success("تم حذف مالك المتجر والمتجر بنجاح");
+  // ADD FEATURE for adding the deleted data to an AdminLog
+
+  if (!deletedStoreOwner) return new Failure();
+  return new Success(deletedStoreOwner);
 }
 
 export default deleteStoreOwnerAccount;

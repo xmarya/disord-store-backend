@@ -4,19 +4,23 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import mongoSanitize from "express-mongo-sanitize";
 import ratelimit from "express-rate-limit";
+import helmet from "helmet";
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "https://sa-ss-project.vercel.app"
-]
-export default async function expressLoader(app: Application) {
-  app.set("trust proxy", true);
+const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", "https://sa-ss-project.vercel.app"];
+export default function expressLoader(app: Application) {
+  // app.set("trust proxy", true);
   const limiter = ratelimit({
     max: 1000, // #requests per hour.
+    max: 1000, // #requests per hour.
+
     windowMs: 60 * 60 * 100, // the calculation of 1 hour.
     message: "We've got too many requests from this IP, Try again after 1 hour",
   });
+  // app.use(
+  //   helmet({
+  //     crossOriginResourcePolicy: { policy: "cross-origin" },
+  //   })
+  // );
   app.use("/api", limiter);
 
   // express doesn't't support sending json format in the request, must use express.json() md,
@@ -33,11 +37,13 @@ export default async function expressLoader(app: Application) {
   app.use(express.urlencoded({ limit: "1.5mb", extended: true })); // parsing HTML for submission (extended:true to allow nested objects)
   app.use(cookieParser()); // the above line parsers the data from the body, this line parses the data from the cookies .
   app.use(mongoSanitize());
-  app.use(cors({
-    credentials:true,
-    origin(requestOrigin, callback) {
-      if(!requestOrigin || allowedOrigins.includes(requestOrigin)) callback(null, requestOrigin);
-      else callback(new Error("this request origin isn't allowed"))
-    },
-  }));
-};
+  app.use(
+    cors({
+      credentials: true,
+      origin(requestOrigin, callback) {
+        if (!requestOrigin || allowedOrigins.includes(requestOrigin)) callback(null, requestOrigin);
+        else callback(new Error("this request origin isn't allowed"));
+      },
+    })
+  );
+}

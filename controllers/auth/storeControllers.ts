@@ -8,14 +8,14 @@ import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import isErr from "@utils/isErr";
 import returnError from "@utils/returnError";
-import { Forbidden } from "@Types/ResultTypes/errors/Forbidden";
 import getStoreOf from "@services/auth/storeServices/getStoreOfOwner";
+import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   const storeOwner = request.user as StoreOwnerDocument;
   // TODO: complete the store data
-  const { storeName, description }: StoreDataBody = request.body;
-  if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "الرجاء تعبئة جميع الحقول"));
+  const { storeName, description , productsType}: StoreDataBody = request.body;
+  if (!storeName?.trim() || !description?.trim() || !productsType?.trim()) return (new BadRequest("الرجاء تعبئة جميع الحقول"));
 
   const result = await createNewStore(storeOwner, request.body, request.emailConfirmed);
 
@@ -49,8 +49,8 @@ export const getMyStoreController = catchAsync(async (request, response, next) =
 export const updateMyStoreController = catchAsync(async (request, response, next) => {
   console.log("updateMyStoreController");
   // only allow storeName, description, logo
-  const { storeName, description }: StoreDataBody = request.body;
-  if (!storeName?.trim() || !description?.trim()) return next(new AppError(400, "request.body must contain the storeName description"));
+  const { storeName, description, productsType }: StoreDataBody = request.body;
+  if (!storeName?.trim() || !description?.trim() || !productsType?.trim()) return new BadRequest("request.body must contain the storeName, description, and productsType");
 
   const result = await updateStore(request.store, request.body);
   if (!result.ok) return next(returnError(result));
@@ -85,7 +85,8 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
 export const deleteMyStoreController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
 
-  await deleteMyStore(storeId);
+  const result = await deleteMyStore(storeId);
+  if(!result.ok) return next (returnError(result));
 
   response.status(204).json({
     success: true,
