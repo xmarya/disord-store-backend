@@ -12,6 +12,7 @@ const userSchema = new Schema<RegularUserDocument>(
       type: String,
       unique: true,
       required: [true, "the email field is required"],
+      sparse: true,
     },
     signMethod: {
       type: String,

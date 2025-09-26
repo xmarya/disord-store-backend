@@ -20,6 +20,7 @@ const storeOwnerSchema = new Schema<StoreOwnerDocument, {}, {}, StoreOwnerVirtua
       type: String,
       unique: true,
       required: [true, "the email field is required"],
+      sparse:true
     },
     firstName: String,
     lastName: String,

@@ -15,6 +15,7 @@ const adminSchema = new Schema<AdminDocument>(
     email: {
       type: String,
       required: [true, "the email field is required"],
+      sparse: true,
     },
     phoneNumber: {
       type: String,
