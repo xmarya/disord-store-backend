@@ -10,22 +10,22 @@ export async function createNewRegularUser(signupData: Omit<CredentialsSignupDat
   return newUser[0];
 }
 
-export async function deleteRegularUser(userId:MongoId, session:mongoose.ClientSession) {
-  return await User.findByIdAndUpdate(userId,{
-    $set: {
-      status:"deleted",
-      firstName:"deleted user",
-      image:"default.jpge"
-    },
-    $unset: {
-      email:"",
-      lastName:"",
-      defaultAddressId:"",
-      defaultCreditCardId:"",
-      discord:"",
-      signMethod:"",
-      phoneNumber:"",
+// export async function deleteRegularUser(userId:MongoId, session:mongoose.ClientSession) {
+//   return await User.findByIdAndUpdate(userId,{
+//     $set: {
+//       status:"deleted",
+//       firstName:"deleted user",
+//       image:"default.jpge"
+//     },
+//     $unset: {
+//       email:"",
+//       lastName:"",
+//       defaultAddressId:"",
+//       defaultCreditCardId:"",
+//       discord:"",
+//       signMethod:"",
+//       phoneNumber:"",
 
-    }
-  }, {new: false, runValidators:false, session});  // new is false in order to get the user email to delete the credentials
-}
+//     }
+//   }, {new: false, runValidators:false, session});  // new is false in order to get the user email to delete the credentials
+// }
