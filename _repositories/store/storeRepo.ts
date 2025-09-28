@@ -4,8 +4,8 @@ import { PlansNames } from "@Types/Schema/Plan";
 import { FullStoreDataBody } from "@Types/Schema/Store";
 import mongoose from "mongoose";
 
-export async function createStore(data: FullStoreDataBody, session?:mongoose.ClientSession) {
-  const newStore = await Store.create([data], {session});
+export async function createStore(data: FullStoreDataBody, session?: mongoose.ClientSession) {
+  const newStore = await Store.create([data], { session });
 
   return newStore[0];
 }
@@ -25,35 +25,14 @@ export async function confirmAuthorization(userId: string, storeId: MongoId): Pr
 }
 
 export async function updateStoreInPlan(storeOwnerId: string, planName: PlansNames) {
-  return await Store.findOneAndUpdate({ owner: storeOwnerId }, { inPlan: planName }, {new:true});
+  return await Store.findOneAndUpdate({ owner: storeOwnerId }, { inPlan: planName }, { new: true });
 }
 
-export async function updateStoreAssistantArray(storeId:MongoId, assistantsId:Array<MongoId>) {
-  return await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: {$in: assistantsId} } }, { new:true });
+export async function updateStoreAssistantArray(storeId: MongoId, assistantsId: Array<MongoId>) {
+  return await Store.findByIdAndUpdate(storeId, { $pull: { storeAssistants: { $in: assistantsId } } }, { new: true });
 }
 export async function deleteStore(storeId: MongoId, session: mongoose.ClientSession) {
-  const deletedStore = await Store.findByIdAndUpdate(storeId,
-    {
-      $unset:{
-        inPlan:"",
-        logo:"",
-        productsType:"",
-        colourTheme:"",
-        address:"",
-        shipmentCompanies:"",
-        verified:"",
-        storeAssistants:"",
-        ranking:"",
-        ratingsAverage:"",
-        ratingsQuantity:"",
-        socialMedia:""
-      },
-      $set:{
-        status:"deleted",
-        description:"deleted store"
-      },
-
-  }, { new: true, runValidators:false, session });
+  const deletedStore = await Store.findByIdAndDelete(storeId, { session });
 
   return deletedStore;
 }

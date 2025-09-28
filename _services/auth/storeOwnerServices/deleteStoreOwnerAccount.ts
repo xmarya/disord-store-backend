@@ -1,4 +1,5 @@
-import { deleteStoreOwner } from "@repositories/storeOwner/storeOwnerRepo";
+import StoreOwner from "@models/storeOwnerModel";
+import { deleteDoc } from "@repositories/global";
 import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
 import { StoreOwnerDeletedEvent } from "@Types/events/StoreOwnerEvents";
 import { UserDeletedEvent } from "@Types/events/UserEvents";
@@ -12,7 +13,7 @@ async function deleteStoreOwnerAccount({ storeOwnerId, storeId }: { storeOwnerId
 
   const session = await startSession();
   const deletedStoreOwner = await session.withTransaction(async () => {
-    const deletedStoreOwner = await deleteStoreOwner(storeOwnerId, session);
+    const deletedStoreOwner = await deleteDoc(StoreOwner, storeOwnerId, {session});
 
     if (deletedStoreOwner) {
       const userDeletedPayload: UserDeletedEvent["payload"] = {
