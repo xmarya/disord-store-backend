@@ -17,4 +17,7 @@ router.get("/stores/:storeId", validateRequestParams("storeId"), isStoreActive, 
 router.get("/products/:productId/reviews", validateRequestParams("productId"), getAllReviewsController);
 router.get("/stores/:storeId/reviews", validateRequestParams("storeId"), getAllReviewsController);
 
-router.get("/plans", getAllPlansController);
+router.get("/plans",(request, response, next) => {
+    request.query = {planName:{$not: {$eq:"unlimited"}}};
+    next();
+}, getAllPlansController);
