@@ -1,9 +1,7 @@
 import eventBus from "@config/EventBus";
-import { FailedOperationDto$inboundSchema } from "@novu/api/models/components";
 import { updateProductInCategories } from "@repositories/category/categoryRepo";
 import { ProductUpdatedEvent } from "@Types/events/ProductEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
-import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
