@@ -1,19 +1,18 @@
-import Category from "@models/categoryModel";
-import { createDoc, deleteDoc, getAllDocs, getOneDocByFindOne, updateDoc } from "@repositories/global";
-import { AppError } from "@Types/ResultTypes/errors/AppError";
+import createNewCategory from "@services/auth/categoryServices/createNewCategory";
+import deleteCategory from "@services/auth/categoryServices/deleteCategory";
+import getAllCategories from "@services/auth/categoryServices/getAllCategories";
+import getOneCategory from "@services/auth/categoryServices/getOneCategory";
+import updateCategory from "@services/auth/categoryServices/updateCategory";
+import { StoreAssistantDocument } from "@Types/Schema/Users/StoreAssistant";
+import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 import { catchAsync } from "@utils/catchAsync";
+import returnError from "@utils/returnError";
 
-// protected
 export const createCategoryController = catchAsync(async (request, response, next) => {
-  const { name } = request.body;
-  if (!name?.trim()) return next(new AppError(400, "Please add a name to the category"));
+  const result = await createNewCategory(request.body, request.user as StoreOwnerDocument | StoreAssistantDocument, request.store);
+  if (!result.ok) return next(returnError(result));
 
-  const userName = `${request.user.firstName} ${request.user.lastName}`;
-  const userId = request.user.id;
-  const storeId = request.store;
-  const createdBy = { name: userName, id: userId };
-  const data = { name, createdBy, store: storeId };
-  const newCategory = await createDoc(Category, data);
+  const { result: newCategory } = result;
 
   response.status(201).json({
     success: true,
@@ -22,8 +21,9 @@ export const createCategoryController = catchAsync(async (request, response, nex
 });
 
 export const getAllCategoriesController = catchAsync(async (request, response, next) => {
-  const categories = await getAllDocs(Category, request.query, { condition: { store: request.store } });
-  if (!categories) return next(new AppError(404, "لا يوجد فئات في هذا المتجر"));
+  const result = await getAllCategories(request.store, request.query);
+  if (!result.ok) return next(returnError(result));
+    const { result: categories } = result;
 
   response.status(200).json({
     success: true,
@@ -33,11 +33,12 @@ export const getAllCategoriesController = catchAsync(async (request, response, n
 });
 
 export const getCategoryController = catchAsync(async (request, response, next) => {
-  // const category = await getOneDocById(Category, request.params.categoryId);
-  // another way of doing it. it is not a duplicated step for hasAuthorisation middleware.
-  // without this extra condition the user can use a categoryId of a different store and still can get it
-  const category = await getOneDocByFindOne(Category, { condition: { id: request.params.categoryId, store: request.store } });
-  if (!category) return next(new AppError(404, "لا توجد بيانات مرتبطة برقم المعرف"));
+  const { categoryId } = request.params;
+
+  const result = await getOneCategory(categoryId, request.store);
+  if (!result.ok) return next(returnError(result));
+
+  const { result: category } = result;
 
   response.status(200).json({
     success: true,
@@ -46,20 +47,21 @@ export const getCategoryController = catchAsync(async (request, response, next) 
 });
 
 export const updateCategoryController = catchAsync(async (request, response, next) => {
-  /*✅*/
-  const { name } = request.body;
   const { categoryId } = request.params;
-  const updatedBy = { name: `${request.user.firstName} ${request.user.lastName}`, id: request.user.id, date: new Date() };
-  const updatedCategory = await updateDoc(Category, categoryId, { name, updatedBy }, { condition: { store: request.store } });
+  const result = await updateCategory(request.body, categoryId, request.user as StoreOwnerDocument | StoreAssistantDocument, request.store);
+  if (!result.ok) return next(returnError(result));
 
+  const { result: updatedCategory } = result;
   response.status(201).json({
     success: true,
     data: { updatedCategory },
   });
 });
+
 export const deleteCategoryController = catchAsync(async (request, response, next) => {
   const { categoryId } = request.params;
-  await deleteDoc(Category, categoryId);
+  const result = await deleteCategory(categoryId);
+  if (!result.ok) return next(returnError(result));
   response.status(204).json({
     success: true,
   });
