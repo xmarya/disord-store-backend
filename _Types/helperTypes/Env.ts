@@ -22,9 +22,16 @@ declare global {
       NOVU_DEVELOPMENT_APPLICATION_IDENTIFIER: string;
       NOVU_PRODUCTION_KEY: string;
       NOVU_PRODUCTION_APPLICATION_IDENTIFIER: string;
-      CLOUDAMQP_URL:string
-      CLOUDAMQP_DEVELOPMENT_PORT:string
-      CLOUDAMQP_PRODUCTION_PORT:string
+      CLOUDAMQP_URL: string;
+      CLOUDAMQP_DEVELOPMENT_PORT: string;
+      CLOUDAMQP_PRODUCTION_PORT: string;
+      CLOUDFLARE_BUCKET_NAME_: string;
+      CLOUDFLARE_R2_API_TOKEN_: string;
+      CLOUDFLARE_R2_ACCESS_ID_: string;
+      CLOUDFLARE_R2_SECRET_ACCESS_KEY_: string;
+      CLOUDFLARE_ENDPOINT_: string;
+      CLOUDFLARE_ACCOUNT_ID_: string;
+      CLOUDFLARE_S3_API_: string;
     }
   }
 }
