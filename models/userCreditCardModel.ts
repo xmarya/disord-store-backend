@@ -44,7 +44,7 @@ creditCardSchema.pre("save", async function (next) {
 // this pre(save) hook for encrypting all the creditCard info
 creditCardSchema.pre("save", async function (next) {
   let encryptedDigits = this.cardNumber.slice(0, 12); // it doesn't include the last digit, so, it actually ends where I want it to end, which is index 11.
-  encryptedDigits = await bcrypt.hash(encryptedDigits, HASHING_SALT);
+  encryptedDigits = await bcrypt.hash(encryptedDigits, HASHING_SALT_ROUNDS);
   
   const finalResult = encryptedDigits + this.cardNumber.slice(12);
   this.cardNumber = finalResult;

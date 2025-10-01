@@ -4,6 +4,7 @@ declare global {
       NODE_ENV: "development" | "production";
       LOCAL_DB: string;
       ATLAS_DB: string;
+      HASHING_SALT_ROUNDS: string;
       JWT_SALT: string;
       JWT_EXPIRING_TIME: string;
       COOKIE_EXPIREING_TIME: string;
