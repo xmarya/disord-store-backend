@@ -1,7 +1,6 @@
 import { CredentialsDocument } from "@Types/Schema/Users/UserCredentials";
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
-import { HASHING_SALT } from "@constants/primitives";
 
 type CredentialsModel = mongoose.Model<CredentialsDocument>;
 const credentialsSchema = new Schema<CredentialsDocument>(
@@ -60,7 +59,7 @@ const credentialsSchema = new Schema<CredentialsDocument>(
 // this pre hook is for encrypting the pass before saving it for NEW USERS:
 credentialsSchema.pre("save", async function (next) {
   if (this.isNew && this.password) {
-    this.password = await bcrypt.hash(this.password, HASHING_SALT);
+    this.password = await bcrypt.hash(this.password, Number(process.env.HASHING_SALT_ROUNDS));
   }
   next();
 });
@@ -68,7 +67,7 @@ credentialsSchema.pre("save", async function (next) {
 // this pre hook for forget/rest or change password, it encrypts the password and sets the changeAt
 credentialsSchema.pre("save", async function (next) {
   if (!this.isNew && this.password && this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, HASHING_SALT);
+    this.password = await bcrypt.hash(this.password, Number(process.env.HASHING_SALT_ROUNDS));
     this.passwordChangedAt = new Date();
   }
 
