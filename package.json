@@ -32,6 +32,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.13.0",
     "ms": "3.0.0-canary.202508252038",
+    "multer": "^2.0.2",
     "neverthrow": "^8.2.0",
     "node-cache": "^5.1.2",
     "pdfkit": "^0.16.0",
