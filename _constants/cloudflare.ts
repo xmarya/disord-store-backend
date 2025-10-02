@@ -22,6 +22,6 @@ const cloudflare: CloudflareConfig = {
   },
 };
 
-const getCloudflareConfig = <T extends NodeJS.ProcessEnv["NODE_ENV"]> (env:T ) => cloudflare[env];
+const getCloudflareConfig = () => cloudflare[process.env.NODE_ENV];
 
 export default getCloudflareConfig;

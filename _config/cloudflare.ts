@@ -3,11 +3,9 @@ dotenv.config({ path: "./.env" });
 import { ListBucketsCommand, S3Client } from "@aws-sdk/client-s3";
 import getCloudflareConfig from "@constants/cloudflare";
 
-const environment = process.env.NODE_ENV;
-const {accessId:accessKeyId, accountId, endpoint, secretAccessKey} = getCloudflareConfig(environment);
+const {accessId:accessKeyId, accountId, endpoint, secretAccessKey} = getCloudflareConfig();
 
-console.log(environment);
-console.log(getCloudflareConfig(environment));
+console.log(getCloudflareConfig());
 const s3 = new S3Client({
   region: "auto",
   endpoint,
