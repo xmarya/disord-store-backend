@@ -15,6 +15,9 @@ function getCodeStatus(reason: ErrorNames) {
     case "forbidden":
       return 403;
 
+    case "unprocessable-content":
+      return 422;
+
     default:
       return 500;
   }
