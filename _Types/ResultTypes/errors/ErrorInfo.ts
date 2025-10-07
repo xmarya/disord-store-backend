@@ -1,4 +1,4 @@
-export type ErrorNames = "not-found" | "bad-request" | "unauthorised" | "forbidden" | "unprocessable-content" | "error";
+export type ErrorNames = "not-found" | "bad-request" | "unauthorised" | "forbidden" | "content-too-large" | "unprocessable-content" | "error";
 export type ErrorInfo = {
   reason: ErrorNames;
   message: string;
