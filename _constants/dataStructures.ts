@@ -12,3 +12,17 @@ export const TokenSlicer = {
     to:12
 }
 
+
+export const ACCEPTED_FILES_TYPES = ["application/pdf"];
+export const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"];
+
+
+export const FILES_SIGNATURES = {
+  jpg: "FFD8",
+  jpeg: "FFD8",
+  png: "89504E470D0A1A0A",
+  webp: "52494646",
+//   svg: "",
+  pdf: "25504446",
+}; // in hex
+

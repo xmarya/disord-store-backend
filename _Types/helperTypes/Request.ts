@@ -1,3 +1,4 @@
+import { ParsedFile } from "@externals/cloudflare/uploadFile";
 import { MongoId } from "@Types/Schema/MongoId";
 import { AllUsers } from "@Types/Schema/Users/AllUser";
 import { LoginMethod } from "@Types/Schema/Users/UserCredentials";
@@ -19,6 +20,7 @@ declare global {
         sortBy: any;
         sortOrder: "desc" | "asc";
       };
+      parsedFile:Array<ParsedFile>
     }
   }
 }
