@@ -1,4 +1,4 @@
-import { AcceptedFilesMIME, AcceptedImagesMIME } from "@Types/helperTypes/Files";
+import { AcceptedTextFilesMIME, AcceptedImagesMIME } from "@Types/helperTypes/Files";
 
 // for dates
 export const SUPPORTED_DATE_FORMATS = ["yyyy-MM-dd", "MM/dd/yyyy", "dd/MM/yyyy", "MMMM d, yyyy", "d MMMM, yyyy", "yyyy/MM/dd"];
@@ -14,7 +14,7 @@ export const TokenSlicer = {
   to: 12,
 };
 
-export const ACCEPTED_FILES_MIME:Array<AcceptedFilesMIME> = ["application/pdf"];
+export const ACCEPTED_FILES_MIME:Array<AcceptedTextFilesMIME> = ["application/pdf"];
 export const ACCEPTED_IMAGE_MIME: Array<Exclude<AcceptedImagesMIME, "application/pdf">> = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"];
 
 export const FILES_SIGNATURES_IN_HEX = {
