@@ -1,4 +1,5 @@
-import { AcceptedDocumentsMIME, AcceptedImagesMIME } from "@Types/helperTypes/Files";
+import { AcceptedDocumentsMIME, AcceptedImagesMIME, AcceptedSVGMIME } from "@Types/helperTypes/Files";
+import { MAX_DOCUMENT_SIZE_BYTES, MAX_DOCUMENT_SIZE_MB, MAX_IMAGE_SIZE_BYTES, MAX_IMAGE_SIZE_MB } from "./primitives";
 
 // for dates
 export const SUPPORTED_DATE_FORMATS = ["yyyy-MM-dd", "MM/dd/yyyy", "dd/MM/yyyy", "MMMM d, yyyy", "d MMMM, yyyy", "yyyy/MM/dd"];
@@ -15,7 +16,19 @@ export const TokenSlicer = {
 };
 
 export const ACCEPTED_FILES_MIME:Array<AcceptedDocumentsMIME> = ["application/pdf"];
-export const ACCEPTED_IMAGE_MIME: Array<Exclude<AcceptedImagesMIME, "application/pdf">> = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"];
+export const ACCEPTED_IMAGE_MIME: Array<AcceptedImagesMIME> = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+export const ACCEPTED_SVG_MIME: Array<AcceptedSVGMIME> = ["image/svg+xml"];
+
+export const MAX_SIZE = {
+  image: {
+    bytes:MAX_IMAGE_SIZE_BYTES,
+    megabytes:MAX_IMAGE_SIZE_MB
+  },
+  document: {
+    bytes:MAX_DOCUMENT_SIZE_BYTES,
+    megabytes:MAX_DOCUMENT_SIZE_MB
+  }
+}
 
 export const FILES_SIGNATURES_IN_HEX = {
   jpg: "FFD8",

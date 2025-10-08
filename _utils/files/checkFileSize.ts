@@ -1,8 +1,7 @@
-import { MAX_IMAGE_SIZE_BYTES, MAX_PDF_SIZE_BYTES } from "@constants/primitives";
-import { MIME } from "@Types/helperTypes/Files";
+import { MAX_SIZE } from "@constants/dataStructures";
 
-function checkFileSize(mimeType: MIME.Any, fileBuffer: Buffer) {
-  const fileMaxSize = mimeType.includes("pdf") ? MAX_PDF_SIZE_BYTES : MAX_IMAGE_SIZE_BYTES;
+function checkFileSize(fileType: "image" | "document", fileBuffer: Buffer) {
+  const fileMaxSize = MAX_SIZE[fileType].bytes;
   const fileSizeInBytes = fileBuffer.byteLength;
   return fileSizeInBytes < fileMaxSize;
 }
