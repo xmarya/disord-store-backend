@@ -9,7 +9,7 @@ export namespace MIME {
   export type Any = Image | SVG | Document;
 }
 
-export type ParsedFile = Record<string, Image | SVG | PDF>;
+export type ParsedFile = Record<string, BaseFile<MIME.Any>>;
 
 interface BaseFile<T extends MIME.Any> {
   fileName: string;
