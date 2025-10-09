@@ -1,13 +1,13 @@
 import createDOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
 
-function checkSVGContent(fileBuffer: Buffer) {
+function cleanSVGContent(fileBuffer: Buffer) {
   const window = new JSDOM("").window;
   const DOMPurify = createDOMPurify(window);
   const svgElement = fileBuffer.toString("utf8");
 
   const cleanedSVG = DOMPurify.sanitize(svgElement);
-  return cleanedSVG
+  return Buffer.from(cleanedSVG, "utf8");
 }
 
-export default checkSVGContent;
+export default cleanSVGContent;
