@@ -1,7 +1,7 @@
-import { ParsedFile } from "@externals/cloudflare/uploadFile";
 import { MongoId } from "@Types/Schema/MongoId";
 import { AllUsers } from "@Types/Schema/Users/AllUser";
 import { LoginMethod } from "@Types/Schema/Users/UserCredentials";
+import { ParsedFile } from "./Files";
 
 
 declare global {
