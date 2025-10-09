@@ -24,7 +24,6 @@ export interface Image extends BaseFile<MIME.Image> {
 }
 export interface SVG extends BaseFile<MIME.SVG> {
   fileType: "image";
-  svgContent: string;
 }
 export interface PDF extends BaseFile<MIME.Document> {
   fileType: "document";
