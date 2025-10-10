@@ -25,7 +25,7 @@ function filesValidator(streamName: string, streamInfo: FileInfo, fileFullBuffer
   const content = mimeType === "image/svg+xml" ? cleanSVGContent(fileFullBuffer) : checkFileSignature(mimeType, fileFullBuffer);
   if (!Buffer.isBuffer(content)) return new UnprocessableContent(`uploaded ${fileType}: ${streamName} seems to be corrupted.`);
   
-  const fileInfo = getFileInfo(fileFullBuffer, mimeType);
+  const fileInfo = getFileInfo(content, mimeType);
   return new Success<ParsedFile>({ [streamName]: {fileType, ...fileInfo} });
 }
 
