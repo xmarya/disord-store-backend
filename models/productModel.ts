@@ -29,10 +29,8 @@ const productSchema = new Schema(
       type: String,
       required: [true, "the description field is required"],
     },
-    image: {
-      type: [String],
-      required: [true, "the image field is required"],
-    },
+    coverImage:String,
+    image: [String],
     limitPerCart:Number,
     categories: [
       {
