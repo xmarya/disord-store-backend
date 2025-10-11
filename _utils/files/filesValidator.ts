@@ -26,7 +26,7 @@ function filesValidator(streamName: string, streamInfo: FileInfo, fileFullBuffer
   if (!Buffer.isBuffer(content)) return new UnprocessableContent(`uploaded ${fileType}: ${streamName} seems to be corrupted.`);
   
   const fileInfo = getFileInfo(content, mimeType);
-  return new Success<ParsedFile>({ [streamName]: {fileType, ...fileInfo} });
+  return new Success<ParsedFile>( {streamName, fileType, ...fileInfo} );
 }
 
 export default filesValidator;

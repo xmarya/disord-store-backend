@@ -9,9 +9,8 @@ export namespace MIME {
   export type Any = Image | SVG | Document;
 }
 
-export type ParsedFile = Record<string, BaseFile<MIME.Any>>;
-
 interface BaseFile<T extends MIME.Any> {
+  streamName:string,
   fileName: string;
   fileType: "document" | "image";
   fileExtension: string;
@@ -28,3 +27,7 @@ export interface SVG extends BaseFile<MIME.SVG> {
 export interface PDF extends BaseFile<MIME.Document> {
   fileType: "document";
 }
+
+// export type ParsedFile = Record<string, BaseFile<MIME.Any>>;
+export type ParsedFile = BaseFile<MIME.Any>;
+
