@@ -1,4 +1,5 @@
 type CloudflareEnv = {
+  publicDomain:string | undefined
   bucketName: string;
   apiToken: string;
   accessId: string;

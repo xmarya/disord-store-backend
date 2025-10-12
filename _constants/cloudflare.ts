@@ -1,8 +1,8 @@
 import { CloudflareConfig } from "@Types/externalAPIs/Cloudflare";
 
-
 const cloudflare: CloudflareConfig = {
   development: {
+    publicDomain: process.env.CLOUDFLARE_PUBLIC_DOMAIN_DEVELOPMENT,
     bucketName: process.env.CLOUDFLARE_BUCKET_NAME_DEVELOPMENT,
     apiToken: process.env.CLOUDFLARE_R2_API_TOKEN_DEVELOPMENT,
     accessId: process.env.CLOUDFLARE_R2_ACCESS_ID_DEVELOPMENT,
@@ -12,6 +12,7 @@ const cloudflare: CloudflareConfig = {
     apiS3: process.env.CLOUDFLARE_S3_API_DEVELOPMENT,
   },
   production: {
+    publicDomain: process.env.CLOUDFLARE_PUBLIC_DOMAIN_PRODUCTION,
     bucketName: process.env.CLOUDFLARE_BUCKET_NAME_PRODUCTION,
     apiToken: process.env.CLOUDFLARE_R2_API_TOKEN_PRODUCTION,
     accessId: process.env.CLOUDFLARE_R2_ACCESS_ID_PRODUCTION,
