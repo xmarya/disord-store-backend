@@ -29,7 +29,7 @@ const storeAssistantSchema = new Schema<StoreAssistantDocument>(
       type: String,
       default: "storeAssistant",
     },
-    image: String,
+    avatar: String,
     inStore: {
       type: Schema.Types.ObjectId,
       ref: "Store",

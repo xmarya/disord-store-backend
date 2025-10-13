@@ -59,7 +59,7 @@ const userSchema = new Schema<RegularUserDocument>(
       enum: ["active", "blocked", "deleted"],
       default: "active"
     },
-    image: String,
+    avatar: String,
     /* SOLILOQUY: 
         1- should I make it an array? because may be the user wants to add more than one card...?
         2- what about paypal/apple pay/google accounts? these shouldn't be saved in our side right?
