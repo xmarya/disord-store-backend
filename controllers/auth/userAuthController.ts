@@ -17,7 +17,7 @@ export const getUserProfileController = catchAsync(async (request, response, nex
 
   response.status(200).json({
     success: true,
-    data: { userProfile },
+    data: userProfile
   });
 });
 

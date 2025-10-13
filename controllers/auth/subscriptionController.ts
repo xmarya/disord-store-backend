@@ -17,7 +17,7 @@ export const createNewSubscribeController = catchAsync(async (request, response,
 
   response.status(203).json({
     success: true,
-    data: { newSubscription: updatedStoreOwner.storeOwnerPlanDetails },
+    data: updatedStoreOwner.storeOwnerPlanDetails,
   });
 });
 
@@ -50,7 +50,7 @@ export const renewalSubscriptionController = catchAsync(async (request, response
   const { result: renewalData } = result;
   response.status(203).json({
     success: true,
-    data: { updatedUserSubscription: renewalData.storeOwnerPlanDetails },
+    data: renewalData.storeOwnerPlanDetails,
   });
 });
 
@@ -60,7 +60,9 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
 
   if (!result.ok) return next(returnError(result));
 
-  const { result: {updatedStoreOwner, plan, planExpiryDate, isPlanPaid} } = result;
+  const {
+    result: { updatedStoreOwner, plan, planExpiryDate, isPlanPaid },
+  } = result;
 
   request.plan = plan;
   request.isPlanPaid = isPlanPaid;
@@ -68,6 +70,6 @@ export const cancelSubscriptionController = catchAsync(async (request, response,
 
   response.status(200).json({
     success: true,
-    data: { updatedStoreOwner },
+    data: updatedStoreOwner,
   });
 });

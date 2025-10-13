@@ -42,6 +42,6 @@ export const updateProfileController = catchAsync(async (request, response, next
   const { result: updatedProfile } = result;
   response.status(201).json({
     success: true,
-    data: { updatedProfile },
+    data: updatedProfile,
   });
 });

@@ -16,6 +16,6 @@ export const addStoreReply = catchAsync(async (request, response, next) => {
 
   response.status(203).json({
     success: true,
-    data: { updatedReview },
+    data: updatedReview
   });
 });

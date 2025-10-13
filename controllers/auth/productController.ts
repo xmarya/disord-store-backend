@@ -20,7 +20,7 @@ export const createProductController = catchAsync(async (request, response, next
 
   response.status(201).json({
     success: true,
-    data: { newProd },
+    data: newProd,
   });
 });
 
@@ -32,7 +32,7 @@ export const getAllStoreProducts = catchAsync(async (request, response, next) =>
   response.status(200).json({
     success: true,
     result: productsList.length,
-    data: { productsList },
+    data: productsList,
   });
 });
 
@@ -44,7 +44,7 @@ export const getOneProductController = catchAsync(async (request, response, next
 
   response.status(200).json({
     success: true,
-    data: { product },
+    data: product,
   });
 });
 
@@ -63,7 +63,7 @@ export const updateProductController = catchAsync(async (request, response, next
 
   response.status(203).json({
     success: true,
-    data: { updatedProduct },
+    data: updatedProduct,
   });
 });
 

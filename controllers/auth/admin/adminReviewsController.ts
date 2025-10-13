@@ -11,6 +11,6 @@ export const displayReviewInHomePageController = catchAsync(async (request, resp
   const { result: updatedReview } = result;
   response.status(201).json({
     success: true,
-    data: { updatedReview },
+    data: updatedReview
   });
 });

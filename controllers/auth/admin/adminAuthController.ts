@@ -11,6 +11,6 @@ export const getAdminProfileController = catchAsync(async (request, response, ne
   const { result: adminProfile } = result;
   response.status(200).json({
     success: true,
-    data: { adminProfile },
+    data: adminProfile
   });
 });
