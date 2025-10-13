@@ -34,8 +34,8 @@ export const changeEmailController = catchAsync(async (request, response, next) 
 });
 
 export const updateProfileController = catchAsync(async (request, response, next) => {
-  const user = request.user;
-  const result = await updateProfile(user as NotAssistant, request.body, request.emailConfirmed);
+  const {user, parsedFile} = request;
+  const result = await updateProfile(user as NotAssistant, request.body, request.emailConfirmed, parsedFile);
 
   if (!result.ok) return next(returnError(result));
 
