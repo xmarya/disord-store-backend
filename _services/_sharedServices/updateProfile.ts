@@ -13,14 +13,10 @@ async function updateProfile(user: NotAssistant, updatedData: Partial<Omit<BaseU
   const { firstName, lastName } = updatedData;
   if (firstName?.trim() === "" || lastName?.trim() === "") return new BadRequest("الرجاء تعبئة حقول الاسم بالكامل");
 
-  let mergedData: typeof updatedData = updatedData;
+  const mergedDataResult = await uploadFileAndMergeIntoBodyData("users", id, parsedFile, updatedData);
+  if (!mergedDataResult.ok) return mergedDataResult;
   
-  if (parsedFile.length) {
-    const result = await uploadFileAndMergeIntoBodyData("users", id, parsedFile, updatedData);
-    if (!result.ok) return result;
-    const { result: updatedDataWithFile } = result;
-    mergedData = updatedDataWithFile;
-  }
+  const {result: mergedData} = mergedDataResult
 
   const updateProfileOfUserType = updateProfileFactory(userType);
   const session = await startSession();
