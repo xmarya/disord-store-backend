@@ -24,8 +24,12 @@ import { router as platformReviewsRouter } from "./auth/reviews/platformReviewsR
 import { router as settingsRouter } from "./auth/settingsRouter";
 import { router as storeRouter } from "./auth/storeRoutes";
 import { router as subscriptionsRouter } from "./auth/subscriptionsRoutes";
+import { router as fileRouter } from "./auth/fileRoutes";
+import streamParser from "@middlewares/streamParser";
 
 export const router = express.Router();
+
+router.use(streamParser);
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
 router.get("/logout", logout);
@@ -49,6 +53,7 @@ router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
+router.use("/files", fileRouter);
 
 /* TODO
     1- blocking the assistants accounts if any in case the owner downgraded the plan to basic
