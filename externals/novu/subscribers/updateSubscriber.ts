@@ -37,7 +37,7 @@ async function novuUpdateSubscriber(event:UserUpdatedEvent | AssistantUpdatedEve
   );
 
   const novuResult = await extractSafeThrowableResult(() => safeUpdateNovu);
-  if(!novuResult.ok) return new Failure(novuResult.message, {serviceName:"novu", ack: false});
+  if(!novuResult.ok && novuResult.reason === "error") return new Failure(novuResult.message, {serviceName:"novu", ack: false});
 
   return new Success({serviceName:"novu", ack: true})
 
