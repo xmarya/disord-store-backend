@@ -4,7 +4,7 @@ import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
 import extractObjectsFromArray from "@utils/extractObjectsFromArray";
 
-async function uploadFileAndMergeIntoBodyData<T>(resourceDirectory: UploadFileData["resourceDirectory"], resourceId: MongoId, parsedFile: Array<ParsedFile>, bodyData: T) {
+async function uploadFilesAndMergeIntoBodyData<T>(resourceDirectory: UploadFileData["resourceDirectory"], resourceId: MongoId, parsedFile: Array<ParsedFile>, bodyData: T) {
   if(!parsedFile.length) return new Success(bodyData);
 
   const uploadResult = await uploadResourceFile(resourceDirectory, resourceId.toString(), parsedFile);
@@ -14,4 +14,4 @@ async function uploadFileAndMergeIntoBodyData<T>(resourceDirectory: UploadFileDa
   return new Success({ ...bodyData, ...extractObjectsFromArray(uploadedFilesPaths) });
 }
 
-export default uploadFileAndMergeIntoBodyData
+export default uploadFilesAndMergeIntoBodyData
