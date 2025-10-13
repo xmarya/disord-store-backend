@@ -7,7 +7,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import mongoose from "mongoose";
 
-async function updateStoreOwnerProfile(storeOwnerId: MongoId, updatedData: Partial<BaseUserData>, session?:mongoose.ClientSession) {
+async function updateStoreOwnerProfile(storeOwnerId: MongoId, updatedData: Partial<Omit<BaseUserData, "email">>, session?:mongoose.ClientSession) {
   updatedData?.userType && delete updatedData.userType;
 
   const safeUpdateUser = safeThrowable(

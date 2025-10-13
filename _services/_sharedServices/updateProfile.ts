@@ -6,7 +6,7 @@ import { startSession } from "mongoose";
 import createOutboxRecord from "./outboxRecordServices/createOutboxRecord";
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
 
-async function updateProfile(user: NotAssistant, updatedData: Partial<BaseUserData>, emailConfirmed:boolean) {
+async function updateProfile(user: NotAssistant, updatedData: Partial<Omit<BaseUserData, "email">>, emailConfirmed:boolean) {
   const { userType, id } = user;
   const { firstName, lastName } = updatedData;
   if (firstName?.trim() === "" || lastName?.trim() === "") return new BadRequest("الرجاء تعبئة حقول الاسم بالكامل");
