@@ -34,8 +34,8 @@ export interface PDF extends BaseFile<MIME.Document> {
 export type ParsedFile = BaseFile<MIME.Any>;
 
 type MainDirectory = keyof typeof mainDirectories;
-type TempDirectory = `temp/${keyof typeof mainDirectories}`;
-export type FileDirectory = MainDirectory | TempDirectory
+/*type TempDirectory = `temp/${keyof typeof mainDirectories}`;*/
+export type FileDirectory = MainDirectory /*| TempDirectory*/
 
 export type UploadFileData = {
   fileDirectory: FileDirectory;
