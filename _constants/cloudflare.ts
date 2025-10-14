@@ -22,10 +22,3 @@ export const cloudflare: CloudflareConfig = {
     apiS3: process.env.CLOUDFLARE_S3_API_PRODUCTION,
   },
 };
-
-export const mainDirectories = {
-  user:"users" ,
-  store: "stores",
-  product: "products"
-} as const; 
-

@@ -10,12 +10,12 @@
 
 import { Upload } from "@aws-sdk/lib-storage";
 import s3 from "@config/S3Client";
-import { FileDirectory, UploadFileData } from "@Types/helperTypes/Files";
+import { UploadFileData } from "@Types/helperTypes/Files";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import getCloudflareConfig from "./getCloudflareConfig";
 
-const generateStoragePath = (fileDirectory: FileDirectory, resourceId: string, streamName: string, extension: string) => `${fileDirectory}/${resourceId}/${streamName}${extension}`;
+const generateStoragePath = (fileDirectory: UploadFileData["fileDirectory"], resourceId: string, streamName: string, extension: string) => `${fileDirectory}/${resourceId}/${streamName}${extension}`;
 /*
 
     examples:

@@ -1,4 +1,3 @@
-import { mainDirectories } from "@constants/cloudflare";
 
 export type AcceptedImagesMIME = "image/png" | "image/jpeg" | "image/jpg" | "image/webp";
 export type AcceptedSVGMIME = "image/svg+xml";
@@ -33,12 +32,8 @@ export interface PDF extends BaseFile<MIME.Document> {
 // export type ParsedFile = Record<string, BaseFile<MIME.Any>>;
 export type ParsedFile = BaseFile<MIME.Any>;
 
-type MainDirectory = keyof typeof mainDirectories;
-/*type TempDirectory = `temp/${keyof typeof mainDirectories}`;*/
-export type FileDirectory = MainDirectory /*| TempDirectory*/
-
 export type UploadFileData = {
-  fileDirectory: FileDirectory;
+  fileDirectory: "users" | "stores" | "products";
   resourceId: string;
   fileInfo: ParsedFile;
 };
