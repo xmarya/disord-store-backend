@@ -1,4 +1,3 @@
-import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import Store from "@models/storeModel";
 import { updateDoc } from "@repositories/global";
 import { MongoId } from "@Types/Schema/MongoId";
@@ -11,7 +10,7 @@ import uploadFileAndMergeIntoBodyData from "@utils/files/uploadFilesAndMergeInto
 
 async function updateStore(storeId: MongoId, updatedData: Partial<StoreDataBody>, parsedFiles: Array<ParsedFile>) {
 
-  const mergedDataResult = await uploadFileAndMergeIntoBodyData("users", storeId, parsedFiles, updatedData);
+  const mergedDataResult = await uploadFileAndMergeIntoBodyData("stores", storeId, parsedFiles, updatedData);
 
   if (!mergedDataResult.ok) return mergedDataResult;
   const { result: mergedData } = mergedDataResult;
