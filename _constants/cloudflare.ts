@@ -1,6 +1,6 @@
 import { CloudflareConfig } from "@Types/externalAPIs/Cloudflare";
 
-const cloudflare: CloudflareConfig = {
+export const cloudflare: CloudflareConfig = {
   development: {
     publicDomain: process.env.CLOUDFLARE_PUBLIC_DOMAIN_DEVELOPMENT,
     bucketName: process.env.CLOUDFLARE_BUCKET_NAME_DEVELOPMENT,
@@ -23,6 +23,3 @@ const cloudflare: CloudflareConfig = {
   },
 };
 
-const getCloudflareConfig = () => cloudflare[process.env.NODE_ENV];
-
-export default getCloudflareConfig;
