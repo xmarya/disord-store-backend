@@ -1,5 +1,7 @@
-export type AcceptedImagesMIME = "image/png" | "image/jpeg" | "image/jpg" | "image/webp" ;
-export type AcceptedSVGMIME = "image/svg+xml" ;
+import { mainDirectories } from "@constants/cloudflare";
+
+export type AcceptedImagesMIME = "image/png" | "image/jpeg" | "image/jpg" | "image/webp";
+export type AcceptedSVGMIME = "image/svg+xml";
 export type AcceptedDocumentsMIME = "application/pdf";
 
 export namespace MIME {
@@ -10,7 +12,7 @@ export namespace MIME {
 }
 
 interface BaseFile<T extends MIME.Any> {
-  streamName:string,
+  streamName: string;
   fileName: string;
   fileType: "document" | "image";
   fileExtension: string;
@@ -31,9 +33,12 @@ export interface PDF extends BaseFile<MIME.Document> {
 // export type ParsedFile = Record<string, BaseFile<MIME.Any>>;
 export type ParsedFile = BaseFile<MIME.Any>;
 
+type MainDirectory = keyof typeof mainDirectories;
+type TempDirectory = `temp/${keyof typeof mainDirectories}`;
+export type FileDirectory = MainDirectory | TempDirectory
+
 export type UploadFileData = {
-  resourceDirectory: "users" | "stores" | "products" | "temp";
+  fileDirectory: FileDirectory;
   resourceId: string;
   fileInfo: ParsedFile;
 };
-

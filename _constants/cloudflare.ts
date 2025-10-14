@@ -23,3 +23,9 @@ export const cloudflare: CloudflareConfig = {
   },
 };
 
+export const mainDirectories = {
+  user:"users" ,
+  store: "stores",
+  product: "products"
+} as const; 
+

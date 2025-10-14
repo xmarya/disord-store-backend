@@ -1,14 +1,13 @@
 import { ListObjectsV2Command, ListObjectsV2CommandInput } from "@aws-sdk/client-s3";
 import s3 from "@config/S3Client";
-import getCloudflareConfig from "@constants/cloudflare";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
+import getCloudflareConfig from "./getCloudflareConfig";
 
 async function getFilesList(filePath: string) {
-
-    const { bucketName } = getCloudflareConfig();
+  const { bucketName } = getCloudflareConfig();
   const params: ListObjectsV2CommandInput = {
     Bucket: bucketName,
     Prefix: filePath.startsWith("/") ? filePath.slice(1) : filePath,

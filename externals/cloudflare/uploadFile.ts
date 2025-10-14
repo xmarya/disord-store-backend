@@ -10,13 +10,12 @@
 
 import { Upload } from "@aws-sdk/lib-storage";
 import s3 from "@config/S3Client";
-import getCloudflareConfig from "@constants/cloudflare";
-import { UploadFileData } from "@Types/helperTypes/Files";
+import { FileDirectory, UploadFileData } from "@Types/helperTypes/Files";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
+import getCloudflareConfig from "./getCloudflareConfig";
 
-
-const generateStoragePath = (resourceDirectory: UploadFileData["resourceDirectory"], resourceId: string, streamName: string, extension:string) => `${resourceDirectory}/${resourceId}/${streamName}${extension}`;
+const generateStoragePath = (fileDirectory: FileDirectory, resourceId: string, streamName: string, extension: string) => `${fileDirectory}/${resourceId}/${streamName}${extension}`;
 /*
 
     examples:
@@ -32,8 +31,8 @@ const generateStoragePath = (resourceDirectory: UploadFileData["resourceDirector
 
   */
 
-async function cloudflareUpload({ resourceDirectory, resourceId, fileInfo }: UploadFileData) {
-  const storagePath = generateStoragePath(resourceDirectory, resourceId, fileInfo.streamName, fileInfo.fileExtension);
+async function cloudflareUpload({ fileDirectory, resourceId, fileInfo }: UploadFileData) {
+  const storagePath = generateStoragePath(fileDirectory, resourceId, fileInfo.streamName, fileInfo.fileExtension);
   const { bucketName, publicDomain } = getCloudflareConfig();
   try {
     const upload = new Upload({
