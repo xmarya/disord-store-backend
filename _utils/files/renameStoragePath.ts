@@ -2,8 +2,11 @@ import { MongoId } from "@Types/Schema/MongoId";
 import extractDataFromFileUrl from "@utils/files/extractDataFromFileUrl";
 import generateStoragePath from "./generateStoragePath";
 
-export const renameStoragePath = ({resourceId, fileUrl}:{resourceId:MongoId,fileUrl: string}) => {
-  const {fileDirectory, file} = extractDataFromFileUrl(fileUrl);
+export const renameStoragePath = ({ resourceId, oldFileUrl }: { resourceId: MongoId; oldFileUrl: string }) => {
+  const { filePath: oldPath, fileDirectory, file } = extractDataFromFileUrl(oldFileUrl);
+  
   const [fileName, extension] = file.split(".");
-  return generateStoragePath(fileDirectory, resourceId.toString(), fileName, `.${extension}`);
+  const newPath = generateStoragePath(fileDirectory, resourceId.toString(), fileName, `.${extension}`);
+
+  return { oldPath, newPath };
 };
