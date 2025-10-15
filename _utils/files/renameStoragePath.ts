@@ -5,5 +5,5 @@ import generateStoragePath from "./generateStoragePath";
 export const renameStoragePath = ({resourceId, fileUrl}:{resourceId:MongoId,fileUrl: string}) => {
   const {fileDirectory, file} = extractDataFromFileUrl(fileUrl);
   const [fileName, extension] = file.split(".");
-  return generateStoragePath(fileDirectory, resourceId.toString(), fileName, extension);
+  return generateStoragePath(fileDirectory, resourceId.toString(), fileName, `.${extension}`);
 };
