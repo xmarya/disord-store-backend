@@ -6,7 +6,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 import getCloudflareConfig from "./getCloudflareConfig";
 
-async function getFilesList(filePath: string) {
+async function cloudflareGetFilesList(filePath: string) {
   const { bucketName } = getCloudflareConfig();
   const params: ListObjectsV2CommandInput = {
     Bucket: bucketName,
@@ -28,4 +28,4 @@ async function getFilesList(filePath: string) {
   return new Success(Contents);
 }
 
-export default getFilesList;
+export default cloudflareGetFilesList;
