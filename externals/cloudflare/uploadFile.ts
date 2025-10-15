@@ -14,8 +14,8 @@ import { UploadFileData } from "@Types/helperTypes/Files";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import getCloudflareConfig from "./getCloudflareConfig";
+import generateStoragePath from "@utils/files/generateStoragePath";
 
-const generateStoragePath = (fileDirectory: UploadFileData["fileDirectory"], resourceId: string, streamName: string, extension: string) => `${fileDirectory}/${resourceId}/${streamName}${extension}`;
 /*
 
     examples:
