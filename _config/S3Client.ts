@@ -1,5 +1,5 @@
 import { S3Client } from "@aws-sdk/client-s3";
-import getCloudflareConfig from "@constants/cloudflare";
+import getCloudflareConfig from "@externals/cloudflare/getCloudflareConfig";
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 
