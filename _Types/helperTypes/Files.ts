@@ -29,11 +29,10 @@ export interface PDF extends BaseFile<MIME.Document> {
   fileType: "document";
 }
 
-// export type ParsedFile = Record<string, BaseFile<MIME.Any>>;
 export type ParsedFile = BaseFile<MIME.Any>;
 
 export type UploadFileData = {
-  fileDirectory: "users" | "stores" | "products";
+  fileDirectory: "users" | "stores" | `stores/${string}/product/${string}`;
   resourceId: string;
   fileInfo: ParsedFile;
 };

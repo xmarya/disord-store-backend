@@ -24,10 +24,16 @@ import generateStoragePath from "@utils/files/generateStoragePath";
     - stores/987654321/logo.svg
     - stores/987654321/certificate.pdf
 
-    - products/456718293/cover.jpeg
-    - products/456718293/product-name-1.jpeg
-    - products/456718293/product-name-2.jpeg
-    - products/456718293/product-name-3.jpeg
+    - products/987654321/456718293/cover.jpeg
+    - products/987654321/456718293/product-name-1.jpeg
+    - products/987654321/456718293/product-name-2.jpeg
+    - products/987654321/456718293/product-name-3.jpeg
+
+    or ?
+    - stores/987654321/products/456718293/cover.jpeg
+    - stores/987654321/products/456718293/product-name-1.jpeg
+    - stores/987654321/products/456718293/product-name-2.jpeg
+    - stores/987654321/products/456718293/product-name-3.jpeg
 
   */
 
