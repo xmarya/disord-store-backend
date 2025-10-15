@@ -1,4 +1,4 @@
-import cloudflareUpload from "@externals/cloudflare/uploadFile";
+import cloudflareUpload from "@externals/cloudflare/cloudflareUploadFile";
 import { ParsedFile, UploadFileData } from "@Types/helperTypes/Files";
 import { Success } from "@Types/ResultTypes/Success";
 import { MongoId } from "@Types/Schema/MongoId";
