@@ -1,6 +1,6 @@
 import { Success } from "@Types/ResultTypes/Success";
 import extractDataFromFileUrl from "../../../_utils/files/extractDataFromFileUrl";
-import cloudflareDeleteFile from "@externals/cloudflare/cloudflareDeleteFile";
+import cloudflareDeleteFile from "@externals/cloudflare/cloudflareDeleteSingleFile";
 
 async function deleteResourceFile(fileUrl: string) {
   const { filePath } = extractDataFromFileUrl(fileUrl);
