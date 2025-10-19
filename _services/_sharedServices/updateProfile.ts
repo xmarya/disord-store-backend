@@ -8,21 +8,16 @@ import { startSession } from "mongoose";
 import createOutboxRecord from "./outboxRecordServices/createOutboxRecord";
 import updateProfileFactory from "./updateProfileFactory";
 
-async function updateProfile(user: NotAssistant, updatedData: Partial<Omit<BaseUserData, "email">>, emailConfirmed: boolean, parsedFiles: Array<ParsedFile>) {
+async function updateProfile(user: NotAssistant, updatedData: Partial<Omit<BaseUserData, "email">>, emailConfirmed: boolean) {
   const { userType, id } = user;
   const { firstName, lastName } = updatedData;
   if (firstName?.trim() === "" || lastName?.trim() === "") return new BadRequest("الرجاء تعبئة حقول الاسم بالكامل");
-
-  const mergedDataResult = await uploadFilesAndMergeIntoBodyData("users", id, parsedFiles, updatedData);
-  if (!mergedDataResult.ok) return mergedDataResult;
-
-  const { result: mergedData } = mergedDataResult;
 
   const updateProfileOfUserType = updateProfileFactory(userType);
   const session = await startSession();
 
   const updatedUserResult = await session.withTransaction(async () => {
-    const updatedUserResult = await updateProfileOfUserType(id, mergedData, session);
+    const updatedUserResult = await updateProfileOfUserType(id, updatedData, session);
     if (updatedUserResult.ok) {
       const payload: UserUpdatedEvent["payload"] = {
         user: updatedUserResult.result,
