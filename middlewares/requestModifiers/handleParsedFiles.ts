@@ -7,7 +7,7 @@ import { format } from "date-fns";
 const handleParsedFiles = (fileDirectory: UploadFileData["fileDirectory"]) => catchAsync(async (request, response, next) => {
     if (!request.parsedFile.length) return next();
 
-    const id = Object.values(request.params)[0] ?? format(new Date(), "yyMMdd-HHmmssSSS");
+    const id:string = fileDirectory === "users" ? request.user.id : fileDirectory === "stores" ? request.store.toString() : format(new Date(), "yyMMdd-HHmmssSSS");
     const result = await uploadFilesAndMergeIntoBodyData(fileDirectory, id, request.parsedFile, request.body);
 
     if (!result.ok) return next(returnError(result));
