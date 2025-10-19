@@ -26,6 +26,7 @@ import { router as storeRouter } from "./auth/storeRoutes";
 import { router as subscriptionsRouter } from "./auth/subscriptionsRoutes";
 import { router as fileRouter } from "./auth/fileRoutes";
 import streamParser from "@middlewares/streamParser";
+import handleParsedFiles from "@middlewares/requestModifiers/handleParsedFiles";
 
 export const router = express.Router();
 
@@ -38,7 +39,7 @@ router.use("/me", meRouter);
 router.use("/settings", settingsRouter);
 router.post("/emailConfirmation", sendConfirmationEmail);
 router.use("/subscriptions", restrict("storeOwner"), subscriptionsRouter);
-router.post("/newStore", restrict("storeOwner"), canCreateStore, sanitisedData, createStoreController);
+router.post("/newStore", restrict("storeOwner"), canCreateStore, sanitisedData, handleParsedFiles("stores"), createStoreController);
 router.route("/store/:resourceId/reviews").post(restrict("user"), createReviewController);
 router.route("/products/:resourceId/reviews").post(restrict("user"), createReviewController);
 router.use("/platform/reviews", platformReviewsRouter);

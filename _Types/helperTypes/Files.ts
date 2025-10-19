@@ -32,7 +32,7 @@ export interface PDF extends BaseFile<MIME.Document> {
 export type ParsedFile = BaseFile<MIME.Any>;
 
 export type UploadFileData = {
-  fileDirectory: "users" | "stores" | "products";
+  fileDirectory: "users" | "stores";
   resourceId: string;
   fileInfo: ParsedFile;
 };
