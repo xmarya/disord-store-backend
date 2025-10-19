@@ -1,14 +1,14 @@
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
-import { ParsedFile } from "@Types/helperTypes/Files";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import { BaseUserData } from "@Types/Schema/Users/BasicUserTypes";
 import { NotAssistant } from "@Types/Schema/Users/NotAssistant";
-import uploadFilesAndMergeIntoBodyData from "@utils/files/uploadFilesAndMergeIntoBodyData";
 import { startSession } from "mongoose";
 import createOutboxRecord from "./outboxRecordServices/createOutboxRecord";
 import updateProfileFactory from "./updateProfileFactory";
 
-async function updateProfile(user: NotAssistant, updatedData: Partial<Omit<BaseUserData, "email">>, emailConfirmed: boolean) {
+async function updateProfile(user: NotAssistant, updatedData: Partial<BaseUserData>, emailConfirmed: boolean) {
+  updatedData?.email && delete updatedData.email;
+  
   const { userType, id } = user;
   const { firstName, lastName } = updatedData;
   if (firstName?.trim() === "" || lastName?.trim() === "") return new BadRequest("الرجاء تعبئة حقول الاسم بالكامل");
