@@ -1,5 +1,5 @@
-import { cloudflare } from "@constants/cloudflare";
+import { cloudflareConfig } from "@constants/cloudflare";
 
-const getCloudflareConfig = () => cloudflare[process.env.NODE_ENV];
+const getCloudflareConfig = () => cloudflareConfig[process.env.NODE_ENV];
 
 export default getCloudflareConfig;
