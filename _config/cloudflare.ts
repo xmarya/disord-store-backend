@@ -3,10 +3,9 @@ dotenv.config({path: "./.env"});
 import Cloudflare from "cloudflare";
 import getCloudflareConfig from "@externals/cloudflare/getCloudflareConfig";
 
-const {apiToken} = getCloudflareConfig();
-
+const {cacheToken} = getCloudflareConfig()
 const cloudflare = new Cloudflare({
-  apiToken,
+  apiToken: cacheToken
 });
 
 export default cloudflare;
