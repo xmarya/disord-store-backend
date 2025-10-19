@@ -12,7 +12,7 @@ import cleanSVGContent from "./checkSVGContent";
 import getFileInfo from "./getFileInfo";
 
 function filesValidator(streamName: string, streamInfo: FileInfo, fileFullBuffer: Buffer) {
-  const { mimeType } = streamInfo as { filename: string; mimeType: MIME.Any; encoding: string };
+  const { mimeType, filename:fileName } = streamInfo as { filename: string; mimeType: MIME.Any; encoding: string };
 
   const fileType = mimeType.includes("image") ? "image" : "document";
 
@@ -26,7 +26,7 @@ function filesValidator(streamName: string, streamInfo: FileInfo, fileFullBuffer
   if (!Buffer.isBuffer(content)) return new UnprocessableContent(`uploaded ${fileType}: ${streamName} seems to be corrupted.`);
   
   const fileInfo = getFileInfo(content, mimeType);
-  return new Success<ParsedFile>( {streamName, fileType, ...fileInfo} );
+  return new Success<ParsedFile>( {fileName, streamName, fileType, ...fileInfo} );
 }
 
 export default filesValidator;

@@ -4,7 +4,7 @@ import { format } from "date-fns";
 class FileInfo {
   constructor() {}
 
-  getName() {
+  getUploadDate() {
     return format(new Date(), "yyMMdd-HHmmssSSS");
   }
   getSizeInBytes(fileBuffer: Buffer) {
