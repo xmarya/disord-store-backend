@@ -14,7 +14,8 @@ async function renameProductFilesConsumer(event: ProductCreatedEvent) {
   const toBeRenamedFiles = getFilesToRename(resourceId, [coverImage, ...image]);
   if (!toBeRenamedFiles.length) return new Success({ serviceName: "cloudflare", ack: true });
 
-  const renameResult = await cloudflareRenameFile(toBeRenamedFiles, resourceId);
+  const storeId = store.toString();
+  const renameResult = await cloudflareRenameFile(toBeRenamedFiles, `stores/${storeId}/products/${resourceId}`); // in this format => stores/987654321/products/456718293/cover.jpeg
   if (!renameResult.ok) return new Failure(renameResult.message, { serviceName: "cloudflare", ack: false });
 
   const { toBeDeletedUrls, toBeUpdatedFields } = renameResult.result;
