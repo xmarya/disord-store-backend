@@ -5,11 +5,18 @@ import filesValidator from "@utils/files/filesValidator";
 import returnError from "@utils/returnError";
 import busboy from "busboy";
 
-
 const streamParser = catchAsync(async (request, response, next) => {
+  //multipart/form-data
+  if (!request.headers["content-type"]) return next();
 
-  let requestFiles:Array<ParsedFile>=  [];
+  let requestFiles: Array<ParsedFile> = [];
+  let requestBody:Record<string, any> = {}
   const bbParser = busboy({ headers: request.headers });
+
+  bbParser.on("field", (name, value, info) => {
+    console.log("what are the info?", info);
+    requestBody[name] = value;
+  });
 
   bbParser.on("file", async (streamName, stream, streamInfo) => {
     let streamedHeaderBuffer = Buffer.alloc(0); // this creates an empty buffer.  it's equivalent to const array = [];
@@ -28,10 +35,10 @@ const streamParser = catchAsync(async (request, response, next) => {
     stream.once("error", (error) => next(returnError(new Failure(error.message))));
   });
 
-
   bbParser.on("finish", () => {
     // finish event used when the entire process of parsing multipart/form-data using bb was completed
     console.log("finish");
+    request.body = requestBody;
     request.parsedFile = requestFiles;
     return next();
   });
@@ -42,7 +49,6 @@ const streamParser = catchAsync(async (request, response, next) => {
 
     return next(returnError(new Failure((error as Error).message)));
   });
-
 
   // NOTE TTR: pipe() is a CONNECTOR; it connects readable stream from one side, into the writable stream on the other side
   request.pipe(bbParser); // request.pipe() here, streams the multipart/form-data to the parser
