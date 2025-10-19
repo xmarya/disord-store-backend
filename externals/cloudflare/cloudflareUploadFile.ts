@@ -15,6 +15,7 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import getCloudflareConfig from "./getCloudflareConfig";
 import generateStoragePath from "@utils/files/generateStoragePath";
+import cloudflare from "@config/cloudflare";
 
 /*
 
@@ -38,9 +39,13 @@ import generateStoragePath from "@utils/files/generateStoragePath";
   */
 
 async function cloudflareUpload({ fileDirectory, resourceId, fileInfo }: UploadFileData) {
+  console.log("cloudflareUpload");
   const storagePath = generateStoragePath(fileDirectory, resourceId, fileInfo.streamName, fileInfo.fileExtension);
-  const { bucketName, publicDomain } = getCloudflareConfig();
+  const { bucketName, publicDomain, zoneId} = getCloudflareConfig();
   try {
+    // purge old file
+    await cloudflare.cache.purge({zone_id:zoneId as string, files: [{url: `${publicDomain}${storagePath}`}]});
+
     const upload = new Upload({
       client: s3,
       leavePartsOnError: false,
@@ -59,6 +64,7 @@ async function cloudflareUpload({ fileDirectory, resourceId, fileInfo }: UploadF
 
     return new Success(`${publicDomain}${Key}`);
   } catch (error) {
+    console.log(error);
     return new Failure((error as Error).message);
   }
 }
