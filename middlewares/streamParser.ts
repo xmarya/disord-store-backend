@@ -14,7 +14,6 @@ const streamParser = catchAsync(async (request, response, next) => {
   const bbParser = busboy({ headers: request.headers });
 
   bbParser.on("field", (name, value, info) => {
-    console.log("what are the info?", info);
     requestBody[name] = value;
   });
 
