@@ -7,7 +7,7 @@ import busboy from "busboy";
 
 const streamParser = catchAsync(async (request, response, next) => {
   //multipart/form-data
-  if (!request.headers["content-type"]) return next();
+  if (!request.headers["content-type"]?.includes("multipart/form-data")) return next();
 
   let requestFiles: Array<ParsedFile> = [];
   let requestBody:Record<string, any> = {}
