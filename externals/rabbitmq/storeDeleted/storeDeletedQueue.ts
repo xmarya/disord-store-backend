@@ -22,7 +22,6 @@ async function storeDeletedQueue(queueName: StoreDeletedType["queueName"], queue
     // if (deadLetterOptions) await deadLetterQueue(deadLetterOptions);
     return new Success({ channel });
   } catch (error) {
-    console.log(error);
     return new Failure((error as Error).message);
   }
 }
