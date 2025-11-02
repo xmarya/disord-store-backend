@@ -9,8 +9,8 @@ import { startSession } from "mongoose";
 
 async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDataBody) {
 
-  const { storeName, description, productsType } = storeData;
-  const data: FullStoreDataBody = { storeName, productsType, description, owner: storeOwner.id, inPlan: storeOwner.subscribedPlanDetails.planName };
+  const { storeName, description, productsType, logo } = storeData;
+  const data: FullStoreDataBody = { storeName, productsType, description,logo, owner: storeOwner.id, inPlan: storeOwner.subscribedPlanDetails.planName };
   
   const session = await startSession();
   const newStore = await session.withTransaction(async () => {
