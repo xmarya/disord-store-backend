@@ -1,5 +1,5 @@
 import { cloudflareConfig } from "@constants/cloudflare";
 
-const getCloudflareConfig = () => cloudflareConfig[process.env.NODE_ENV];
+const getCloudflareConfig = () => cloudflareConfig["production"];
 
 export default getCloudflareConfig;
