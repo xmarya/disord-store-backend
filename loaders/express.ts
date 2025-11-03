@@ -8,7 +8,7 @@ import helmet from "helmet";
 
 const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", "https://sa-ss-project.vercel.app"];
 export default function expressLoader(app: Application) {
-  // app.set("trust proxy", true);
+  app.set("trust proxy", true);
   const limiter = ratelimit({
     max: 1000, // #requests per hour.
 
