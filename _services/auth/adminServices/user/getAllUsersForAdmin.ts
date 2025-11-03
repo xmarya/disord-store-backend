@@ -7,7 +7,7 @@ import safeThrowable from "@utils/safeThrowable";
 
 async function getAllUsersForAdmin(query: QueryParams) {
   const safeGetAllUsers = safeThrowable(
-    () => getAllDocs(User, query, { select: ["firstName", "lastName", "email", "image", "userType"] }),
+    () => getAllDocs(User, query, { select: ["firstName", "lastName", "email", "avatar", "userType"] }),
     (error) => new Failure((error as Error).message)
   );
 

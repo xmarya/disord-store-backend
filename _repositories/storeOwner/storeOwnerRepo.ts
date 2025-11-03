@@ -21,7 +21,7 @@ export async function assignStoreToOwner(storeOwnerId: MongoId, storeId: MongoId
   );
 }
 
-export async function createNewUnlimitedUser(data: Omit<UnlimitedStoreOwnerData, "password" |"image" | "myStore" | "defaultAddressId" | "defaultCreditCardId">, session: mongoose.ClientSession) {
+export async function createNewUnlimitedUser(data: Omit<UnlimitedStoreOwnerData, "password" |"avatar" | "myStore" | "defaultAddressId" | "defaultCreditCardId">, session: mongoose.ClientSession) {
   return await StoreOwner.findOneAndUpdate({ email: data.email }, { ...data }, { runValidators: true, new: true, upsert: true, setDefaultsOnInsert: true }).session(session);
 }
 

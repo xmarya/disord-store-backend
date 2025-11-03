@@ -9,7 +9,7 @@ import safeThrowable from "@utils/safeThrowable";
 
 
 async function getStoreOwnerProfile(storeOwnerId:MongoId) {
-    const queryFields: QueryOptions<StoreOwnerDocument>["select"] = ["firstName", "lastName", "email", "image", "phoneNumber", "userType"];
+    const queryFields: QueryOptions<StoreOwnerDocument>["select"] = ["firstName", "lastName", "email", "avatar", "phoneNumber", "userType"];
     
       const safeGetProfile = safeThrowable(
         () => getOneDocById(StoreOwner, storeOwnerId, { select: queryFields }),

@@ -7,8 +7,8 @@ import createNewAssistant from "./storeAssistant/createNewAssistant";
 import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
 
 async function createNewAssistantInStore(storeId: MongoId, assistantData: AssistantDataBody, planId: MongoId) {
-  const { firstName, lastName, email, password, permissions, phoneNumber, image } = assistantData;
-  const data: StoreAssistant = { userType: "storeAssistant", inStore: storeId, inPlan: planId, firstName, lastName, email, phoneNumber, permissions, image };
+  const { firstName, lastName, email, password, permissions, phoneNumber, avatar } = assistantData;
+  const data: StoreAssistant = { userType: "storeAssistant", inStore: storeId, inPlan: planId, firstName, lastName, email, phoneNumber, permissions, avatar };
 
   const session = await startSession();
   const newAssistantResult = await session.withTransaction(async () => {
