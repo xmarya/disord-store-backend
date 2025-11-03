@@ -16,19 +16,19 @@ export const createCategoryController = catchAsync(async (request, response, nex
 
   response.status(201).json({
     success: true,
-    data: { newCategory },
+    data: newCategory,
   });
 });
 
 export const getAllCategoriesController = catchAsync(async (request, response, next) => {
   const result = await getAllCategories(request.store, request.query);
   if (!result.ok) return next(returnError(result));
-    const { result: categories } = result;
+  const { result: categories } = result;
 
   response.status(200).json({
     success: true,
     results: categories.length,
-    data: { categories },
+    data: categories,
   });
 });
 
@@ -42,7 +42,7 @@ export const getCategoryController = catchAsync(async (request, response, next) 
 
   response.status(200).json({
     success: true,
-    data: { category },
+    data: category,
   });
 });
 
@@ -54,7 +54,7 @@ export const updateCategoryController = catchAsync(async (request, response, nex
   const { result: updatedCategory } = result;
   response.status(201).json({
     success: true,
-    data: { updatedCategory },
+    data: updatedCategory,
   });
 });
 

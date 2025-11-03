@@ -19,7 +19,6 @@ async function storeDeletedPublisher(event: StoreDeletedEvent) {
 
     return new Success(`the payload was published to the exchange: ${exchangeName}`);
   } catch (error) {
-    console.log(error);
     return new Failure((error as Error).message);
   }
 }

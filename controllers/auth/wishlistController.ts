@@ -12,7 +12,7 @@ export const updateWishlistController = catchAsync(async (request, response, nex
 
   response.status(203).json({
     success: true,
-    data: { products },
+    data: products,
   });
 });
 export const getWishlistController = catchAsync(async (request, response, next) => {
@@ -20,6 +20,6 @@ export const getWishlistController = catchAsync(async (request, response, next) 
   const wishlist = await getAllDocs(Wishlist, request.query, { condition: { user } });
   response.status(200).json({
     success: true,
-    data: { wishlist },
+    data: wishlist,
   });
 });

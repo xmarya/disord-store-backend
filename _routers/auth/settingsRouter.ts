@@ -4,12 +4,13 @@ import { validateChangePassword } from "../../middlewares/validators/validateCha
 import validateRequestParams from "../../middlewares/validators/validateRequestParams";
 import { deleteStoreOwnerAccountController, deleteUserAccountController, getUserProfileController } from "../../controllers/auth/userAuthController";
 import { changeEmailController, changePasswordController, updateProfileController } from "controllers/auth/authSettingsController";
+import handleParsedFiles from "@middlewares/requestModifiers/handleParsedFiles";
 
 export const router = express.Router();
 
 // these below are only for userType for all types EXCEPT store assistant
 router.use(restrict("admin", "storeOwner", "user"));
-router.route("/").get(getUserProfileController).patch(updateProfileController);
+router.route("/").get(getUserProfileController).patch(handleParsedFiles("users"), updateProfileController);
 router.route("/changePassword").patch(validateChangePassword, changePasswordController);
 router.route("/changeEmail").patch(changeEmailController); 
 // router.route("/creditCard").post(validatePaymentData);

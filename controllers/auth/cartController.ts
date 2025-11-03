@@ -20,7 +20,7 @@ export const addToCartController = catchAsync(async (request, response, next) =>
 
   response.status(203).json({
     success: true,
-    data: { cart },
+    data: cart,
   });
 });
 
@@ -32,7 +32,7 @@ export const getMyCartController = catchAsync(async (request, response, next) =>
 
   response.status(200).json({
     success: true,
-    data: { cart },
+    data: cart,
   });
 });
 

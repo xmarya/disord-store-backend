@@ -18,7 +18,7 @@ export const getStoresListController = catchAsync(async (request, response, next
   response.status(200).json({
     success: true,
     result: storesList.length,
-    data: { storesList },
+    data: storesList
   });
 });
 
@@ -30,7 +30,7 @@ export const getProductsListController = catchAsync(async (request, response, ne
   response.status(200).json({
     success: true,
     result: productsList.length,
-    data: { productsList },
+    data: productsList
   });
 });
 
@@ -54,6 +54,6 @@ export const getAllPlansController = catchAsync(async (request, response, next) 
 
   response.status(200).json({
     success: true,
-    data: { plans },
+    data: plans
   });
 });

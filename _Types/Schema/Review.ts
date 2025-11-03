@@ -8,7 +8,7 @@ interface SharedReviewDataBody {
   userType: Extract<UserTypes, "user">;
   firstName: string;
   lastName: string;
-  image?: string;
+  avatar: string;
 }
 
 export interface ReviewDataBody extends SharedReviewDataBody {

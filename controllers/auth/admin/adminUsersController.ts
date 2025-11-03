@@ -17,7 +17,7 @@ export const createAdminController = catchAsync(async (request, response, next) 
   response.status(201).json({
     success: true,
     message: "a new admin was successfully created",
-    data: { newAdmin },
+    data: newAdmin
   });
 });
 
@@ -52,7 +52,7 @@ export const getAllUsersController = catchAsync(async (request, response, next) 
   const { result: users } = result;
   response.status(200).json({
     success: true,
-    data: { users },
+    data: users
   });
 });
 
@@ -76,7 +76,7 @@ export const getOneUserController = catchAsync(async (request, response, next) =
   const { result: user } = result;
   response.status(200).json({
     success: true,
-    data: { user },
+    data: user 
   });
 });
 

@@ -1,4 +1,3 @@
-import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import Store from "@models/storeModel";
 import { updateDoc } from "@repositories/global";
 import { MongoId } from "@Types/Schema/MongoId";
@@ -7,10 +6,10 @@ import { StoreDataBody } from "@Types/Schema/Store";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-async function updateStore(storeId: MongoId, updatedData: StoreDataBody) {
-  const { storeName, description, logo } = updatedData;
+async function updateStore(storeId: MongoId, updatedData: Partial<StoreDataBody>) {
+
   const safeUpdateStore = safeThrowable(
-    () => updateDoc(Store, storeId, { storeName, description, logo }),
+    () => updateDoc(Store, storeId, updatedData),
     (error) => new Failure((error as Error).message)
   );
 

@@ -17,8 +17,8 @@ export const createReviewController = catchAsync(async (request, response, next)
   const { reviewBody, rating }: ReviewDataBody = request.body;
   if (!reviewBody?.trim() || !rating) return next(new AppError(400, "الرجاء التأكد من كتابة جميع البيانات قبل الإرسال"));
 
-  const { id, firstName, lastName, userType, image } = request.user as RegularUserDocument;
-  const data: ReviewDataBody = { reviewedResourceId, storeOrProduct, reviewBody, rating, writer: id, firstName, lastName, userType, image };
+  const { id, firstName, lastName, userType, avatar } = request.user as RegularUserDocument;
+  const data: ReviewDataBody = { reviewedResourceId, storeOrProduct, reviewBody, rating, writer: id, firstName, lastName, userType, avatar };
   const result = await createNewReview(data);
 
   if (!result.ok) return next(returnError(result));
@@ -27,7 +27,7 @@ export const createReviewController = catchAsync(async (request, response, next)
 
   response.status(201).json({
     success: true,
-    data: { newReview },
+    data: newReview,
   });
 });
 
@@ -40,10 +40,7 @@ export const getAllReviewsController = catchAsync(async (request, response, next
 
   response.status(200).json({
     success: true,
-    data: {
-      result: reviews.length,
-      reviews,
-    },
+    data: reviews,
   });
 });
 
@@ -71,7 +68,7 @@ export const updateMyReviewController = catchAsync(async (request, response, nex
 
   response.status(203).json({
     success: true,
-    data: { updatedReview },
+    data: updatedReview,
   });
 });
 

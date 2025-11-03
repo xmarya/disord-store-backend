@@ -28,7 +28,7 @@ export type AssistantDataBody = {
   lastName: string;
   permissions: AssistantPermissions;
   phoneNumber: `+966${string}`;
-  image?: string;
+  avatar?: string;
 };
 
 export interface StoreAssistant extends Omit<AssistantDataBody, "password"> {

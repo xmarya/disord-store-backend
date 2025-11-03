@@ -47,7 +47,7 @@ const storeOwnerSchema = new Schema<StoreOwnerDocument, {}, {}, StoreOwnerVirtua
       enum: ["active", "blocked", "deleted"],
       default: "active",
     },
-    image: String,
+    avatar: String,
     defaultAddressId: {
       type: Schema.Types.ObjectId,
       ref: "UserAddress",

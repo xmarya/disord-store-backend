@@ -8,6 +8,7 @@ import checkAssistantPermissions from "@middlewares/validators/validateAssistant
 import sanitisedData from "@middlewares/validators/sanitisedData";
 import { validateProductBody } from "@middlewares/validators/validateProductBody";
 import { createProductController, deleteProductController, getAllStoreProducts, getOneProductController, updateProductController } from "@controllers/auth/productController";
+import handleParsedFiles from "@middlewares/requestModifiers/handleParsedFiles";
 
 export const router = express.Router();
 
@@ -17,11 +18,11 @@ router.use(restrict("storeOwner", "storeAssistant"), hasAuthorization); // this 
 
 router
   .route("/")
-  .post(verifyUsedQuota("ofProducts"), checkAssistantPermissions("addProduct"), sanitisedData, validateProductBody, createProductController)
+  .post(verifyUsedQuota("ofProducts"), checkAssistantPermissions("addProduct"), sanitisedData, handleParsedFiles("stores"), validateProductBody, createProductController)
   .get(getAllStoreProducts);
 
 router
   .route("/:productId")
   .get(validateRequestParams("productId"), getOneProductController)
-  .patch(validateRequestParams("productId"), checkAssistantPermissions("editProduct"), sanitisedData, updateProductController) /*✅*/
+  .patch(validateRequestParams("productId"), checkAssistantPermissions("editProduct"), sanitisedData, handleParsedFiles("stores"), updateProductController) /*✅*/
   .delete(validateRequestParams("productId"), checkAssistantPermissions("deleteProduct"), deleteProductController); /*✅*/

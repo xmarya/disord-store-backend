@@ -34,7 +34,7 @@ export const changeEmailController = catchAsync(async (request, response, next) 
 });
 
 export const updateProfileController = catchAsync(async (request, response, next) => {
-  const user = request.user;
+  const {user} = request;
   const result = await updateProfile(user as NotAssistant, request.body, request.emailConfirmed);
 
   if (!result.ok) return next(returnError(result));
@@ -42,6 +42,6 @@ export const updateProfileController = catchAsync(async (request, response, next
   const { result: updatedProfile } = result;
   response.status(201).json({
     success: true,
-    data: { updatedProfile },
+    data: updatedProfile,
   });
 });

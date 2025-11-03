@@ -9,6 +9,7 @@ import sanitisedData from "@middlewares/validators/sanitisedData";
 import restrict from "@middlewares/protectors/restrict";
 import validateEmailConfirmation from "@middlewares/validators/validateEmailConfirmation";
 import checkAssistantPermissions from "@middlewares/validators/validateAssistantPermissions";
+import handleParsedFiles from "@middlewares/requestModifiers/handleParsedFiles";
 
 export const router = express.Router();
 router.use(hasAuthorization);
@@ -18,7 +19,7 @@ router.use("/invoices", invoiceRouter);
 
 router
   .route("/")
-  .patch(restrict("storeOwner"), sanitisedData, updateMyStoreController)
+  .patch(restrict("storeOwner"), sanitisedData, handleParsedFiles("stores"), updateMyStoreController)
   .delete(restrict("storeOwner"), deleteMyStoreController)
   .get(restrict("storeOwner", "storeAssistant"), getMyStoreController);
 

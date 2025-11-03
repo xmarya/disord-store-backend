@@ -14,5 +14,5 @@ export type DiscordSignupData = {
   email: string;
   id: string;
   name: string;
-  image: string;
+  avatar: string;
 };

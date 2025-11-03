@@ -7,6 +7,7 @@ export interface ProductDataBody {
   productType: "digital" | "physical";
   name: string;
   price: number;
+  coverImage:string
   image: Array<string>;
   description: string;
   stock: number | null;
