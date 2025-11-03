@@ -19,7 +19,8 @@ async function createNewStore(storeOwner: StoreOwnerDocument, storeData: StoreDa
   const newStore = await session.withTransaction(async () => {
 
     const newStore = await createStore(data, session);
-    const updatedOwner = await assignStoreToOwner(storeOwner._id as MongoId, newStore._id as MongoId, session);
+    const updatedOwner = await assignStoreToOwner(storeOwner.id as MongoId, newStore.id as MongoId, session);
+
     if (newStore?.id && updatedOwner?.id) {
       await createOutboxRecord<[StoreCreatedEvent, UserUpdatedEvent]>([
         { type: "store-created", payload: { store: newStore } },

@@ -1,12 +1,3 @@
-/*
-    0- virus scan?
-    1- check file type (image, PDF) ✅ 
-    2- check th size ✅
-    3- encrypt the file (S3 does it internally by setting a specific header)
-    4- upload ✅
-    5- get uploaded file KEY ✅
-    6- store it in db
-*/
 
 import { Upload } from "@aws-sdk/lib-storage";
 import s3 from "@config/S3Client";
@@ -39,13 +30,12 @@ import cloudflare from "@config/cloudflare";
   */
 
 async function cloudflareUpload({ fileDirectory, resourceId, fileInfo }: UploadFileData) {
-  console.log("cloudflareUpload");
+
   const storagePath = generateStoragePath(fileDirectory, resourceId, fileInfo.streamName, fileInfo.fileExtension);
   const { bucketName, publicDomain, zoneId} = getCloudflareConfig();
   try {
     // purge old file
-    await cloudflare.cache.purge({zone_id:zoneId as string, files: [{url: `${publicDomain}${storagePath}`}]});
-
+    await cloudflare.cache.purge({zone_id:zoneId, files: [{url: `${publicDomain}${storagePath}`}]});
     const upload = new Upload({
       client: s3,
       leavePartsOnError: false,
