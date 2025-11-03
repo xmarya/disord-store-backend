@@ -13,11 +13,11 @@ import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 
 export const createStoreController = catchAsync(async (request, response, next) => {
   const storeOwner = request.user as StoreOwnerDocument;
-  // TODO: complete the store data
+
   const { storeName, description , productsType}: StoreDataBody = request.body;
   if (!storeName?.trim() || !description?.trim() || !productsType?.trim()) return (new BadRequest("الرجاء تعبئة جميع الحقول"));
 
-  const result = await createNewStore(storeOwner, request.body, request.emailConfirmed);
+  const result = await createNewStore(storeOwner, request.body);
 
   if(!result.ok) return next(returnError(result));
 
@@ -25,13 +25,11 @@ export const createStoreController = catchAsync(async (request, response, next) 
 
   response.status(201).json({
     success: true,
-    data: { newStore },
+    data: newStore,
   });
 });
 
 export const getMyStoreController = catchAsync(async (request, response, next) => {
-  // const storeId = request.store;
-  // const store = await getOneDocById(Store, storeId);
 
   const userId = request.user.id;
   const result = await getStoreOf(userId);
@@ -42,12 +40,11 @@ export const getMyStoreController = catchAsync(async (request, response, next) =
 
   response.status(200).json({
     success: true,
-    data: { store },
+    data: store,
   });
 });
 
 export const updateMyStoreController = catchAsync(async (request, response, next) => {
-  console.log("updateMyStoreController");
   // only allow storeName, description, logo
   const { storeName, description, productsType }: StoreDataBody = request.body;
   if (!storeName?.trim() || !description?.trim() || !productsType?.trim()) return new BadRequest("request.body must contain the storeName, description, and productsType");
@@ -58,7 +55,7 @@ export const updateMyStoreController = catchAsync(async (request, response, next
   const { result: updatedStore } = result;
   response.status(201).json({
     success: true,
-    data: { updatedStore },
+    data: updatedStore,
   });
 });
 
@@ -78,7 +75,7 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
 
   response.status(201).json({
     success: true,
-    data: { updatedStore },
+    data: updatedStore,
   });
 });
 

@@ -24,7 +24,7 @@ async function updateStoreAssistant(assistantId: MongoId, storeId: MongoId, upda
     ...(updatedData.firstName && { firstName: updatedData.firstName }),
     ...(updatedData.lastName && { lastName: updatedData.lastName }),
     ...(updatedData.phoneNumber && { phoneNumber: updatedData.phoneNumber }),
-    ...(updatedData.image && { image: updatedData.image }),
+    ...(updatedData.avatar && { avatar: updatedData.avatar }),
     ...(updatedData.email && { email: updatedData.email }),
   };
 

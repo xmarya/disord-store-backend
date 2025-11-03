@@ -18,7 +18,7 @@ export const getPlanController = catchAsync(async (request, response, next) => {
   const { result: plan } = result;
   response.status(200).json({
     success: true,
-    data: { plan },
+    data: plan,
   });
 });
 
@@ -33,7 +33,7 @@ export const updatePlanController = catchAsync(async (request, response, next) =
   const { result: updatedPlan } = result;
   response.status(201).json({
     success: true,
-    data: { updatedPlan },
+    data: updatedPlan,
   });
 });
 
@@ -45,7 +45,7 @@ export const getMonthlyPlansStatsController = catchAsync(async (request, respons
 
   response.status(200).json({
     success: true,
-    data: { allPlansStats },
+    data: allPlansStats,
   });
 });
 
@@ -57,6 +57,6 @@ export const getPlansStatsReportController = catchAsync(async (request, response
 
   response.status(200).json({
     success: true,
-    data: { reports },
+    data: reports,
   });
 });

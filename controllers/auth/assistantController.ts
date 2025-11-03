@@ -16,7 +16,7 @@ export const createAssistantController = catchAsync(async (request, response, ne
 
   response.status(201).json({
     success: true,
-    data: { newAssistant },
+    data: newAssistant,
   });
 });
 
@@ -30,7 +30,7 @@ export const getAllAssistantsController = catchAsync(async (request, response, n
 
   response.status(200).json({
     success: true,
-    data: { assistants },
+    data: assistants,
   });
 });
 
@@ -44,7 +44,7 @@ export const getOneAssistantController = catchAsync(async (request, response, ne
   const { result: assistant } = result;
   response.status(200).json({
     success: true,
-    data: { assistant },
+    data: assistant,
   });
 });
 
@@ -57,9 +57,7 @@ export const updateAssistantController = catchAsync(async (request, response, ne
   const { result: assistant } = result;
   response.status(203).json({
     success: true,
-    data: {
-      assistant,
-    },
+    data: assistant,
   });
 });
 
@@ -68,19 +66,18 @@ export const deleteAllAssistantsController = catchAsync(async (request, response
 
   const result = await deleteAllAssistantsByStoreOwner(storeId);
   if (!result.ok) return next(returnError(result));
-  
+
   response.status(204).json({
     success: true,
     message: "all assistants were deleted successfully",
   });
-
 });
 
 export const deleteAssistantController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
   const { assistantId } = request.params;
 
-  const result = await deleteOneAssistantByStoreOwner({assistantId, storeId});
+  const result = await deleteOneAssistantByStoreOwner({ assistantId, storeId });
 
   if (!result.ok) return next(returnError(result));
 

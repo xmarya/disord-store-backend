@@ -15,7 +15,7 @@ async function createUnlimitedStoreOwner(unlimitedStoreOwnerData: UnlimitedStore
   let logsMap: Map<string, { planName: string; price: number }> = new Map();
   logsMap.set(key, { planName, price: price.riyal });
 
-  const data:Omit<UnlimitedStoreOwnerData, "password" |"image" | "myStore" | "defaultAddressId" | "defaultCreditCardId"> = {
+  const data:Omit<UnlimitedStoreOwnerData, "password" |"avatar" | "myStore" | "defaultAddressId" | "defaultCreditCardId"> = {
     userType: "storeOwner",
     email,
     phoneNumber,

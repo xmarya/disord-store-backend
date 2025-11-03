@@ -7,9 +7,9 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 async function createNewPlatformReview(user: RegularUserDocument, reviewBody: string) {
-  const { id, firstName, lastName, userType, image } = user;
+  const { id, firstName, lastName, userType, avatar } = user;
 
-  const data: PlatformReviewDataBody = { reviewBody, writer: id, firstName, lastName, userType, image };
+  const data: PlatformReviewDataBody = { reviewBody, writer: id, firstName, lastName, userType, avatar };
   const safeCreateReview = safeThrowable(
     () => createDoc(PlatformReview, data),
     (error) => new Failure((error as Error).message)

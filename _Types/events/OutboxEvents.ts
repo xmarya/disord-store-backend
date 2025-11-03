@@ -144,6 +144,17 @@ export type PlanSubscriptionUpdatedType = {
   deadRoutingKey: "dead-planSubscription-updated";
 };
 
+export type StoreCreatedType = {
+  type: "store-created";
+  exchangeName: "main-store-events";
+  queueName: `store-created-queue-${string}`;
+  routingKey: "store-created";
+
+  deadExchangeName: "dead-store-events";
+  deadQueueName: `dead-store-created-queue-${string}`;
+  deadRoutingKey: "dead-store-created";
+};
+
 export type StoreDeletedType = {
   type: "store-deleted";
   exchangeName: "main-store-events";
@@ -165,6 +176,7 @@ export type AllOutbox =
   | AssistantDeletedType
   | PlanSubscriptionUpdatedType
   | StoreOwnerDeletedType
+  | StoreCreatedType
   | StoreDeletedType;
 
 export type OutboxEventTypesMap = AllOutbox["type"];

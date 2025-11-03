@@ -43,7 +43,7 @@ export const createNewUserController = (userType: Extract<UserTypes, "user" | "s
     response.status(201).json({
       success: true,
       message: "new user has been created successfully",
-      data: { newUser },
+      data: newUser,
     });
   });
 
@@ -89,16 +89,16 @@ export const verifyOTP = catchAsync(async (request, response, next) => {
 });
 
 export const createNewDiscordUserController = catchAsync(async (request, response, next) => {
-  const { email, id, name, image } = request.body;
+  const { email, id, name, avatar } = request.body;
 
-  if (!email || !id || !name || !image) return next(new AppError(400, "some data are missing. make sure to provide the user email, id, name, and image"));
+  if (!email || !id || !name || !avatar) return next(new AppError(400, "some data are missing. make sure to provide the user email, id, name, and image"));
 
-  const newDiscordUser = await createNewDiscordUser({ email, name, id, image });
+  const newDiscordUser = await createNewDiscordUser({ email, name, id, avatar });
   // TODO: give the user immediate access by generating the login token
 
   response.status(201).json({
     success: true,
     message: "new user has been created successfully",
-    data: { newDiscordUser },
+    data: newDiscordUser
   });
 });

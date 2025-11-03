@@ -12,6 +12,7 @@ import assistantUpdatedPublisher from "./assistantUpdated/assistantUpdatedPublis
 import productDeletedPublisher from "./productDeleted/productDeletedPublisher";
 import storeDeletedPublisher from "./storeDeleted/storeDeletedPublisher";
 import storeOwnerDeletedPublisher from "./storeOwnerDeleted/storeOwnerDeletedPublisher";
+import storeCreatedPublisher from "./storeCreated/storeCreatedPublisher";
 
 type PublisherFunction = (event: any) => Promise<Success<any> | Failure>;
 
@@ -23,6 +24,7 @@ const publishers: Record<OutboxEventTypesMap, PublisherFunction> = {
   "assistant-updated": assistantUpdatedPublisher,
   "assistant-deleted": assistantDeletedPublisher,
   "storeOwner-deleted":storeOwnerDeletedPublisher,
+  "store-created": storeCreatedPublisher,
   "store-deleted": storeDeletedPublisher,
   "product-deleted": productDeletedPublisher,
   "planSubscription-updated": planSubscriptionUpdatedPublisher
@@ -38,9 +40,7 @@ async function publishFactory(outboxRecord: OutboxRecordDocument) {
   };
 
   const publisher = publishers[type as OutboxEventTypesMap];
-  if (!publisher) {
-    throw new Error(`No publisher found for event type: ${type}`);
-  }
+  if (!publisher) return new Failure(`No publisher found for event type: ${type}`);
 
   return await publisher(event);
 }

@@ -19,7 +19,7 @@ async function cacheUser(event: UserLoggedInEvent | UserUpdatedEvent | PlanSubsc
     userType: user.userType,
     firstName: user.firstName,
     lastName: user.lastName,
-    image: user.image,
+    avatar: user.avatar,
     email: user.email,
     emailConfirmed: "emailConfirmed" in payload ? payload.emailConfirmed : undefined,
     ...(user.userType === "storeOwner" && { subscribedPlanDetails: user.subscribedPlanDetails, myStore: user.myStore }),

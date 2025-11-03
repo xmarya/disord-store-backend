@@ -3,12 +3,12 @@ import { createDoc } from "@repositories/global";
 import { DiscordSignupData } from "@Types/Schema/Users/SignupData";
 
 async function createNewDiscordUser(signupData: DiscordSignupData) {
-  const { email, name, id, image } = signupData;
+  const { email, name, id, avatar } = signupData;
   const newDiscordUser = await createDoc(User, {
     userType: "user",
     signMethod: "discord",
     email,
-    image,
+    avatar,
     firstName: name,
     discord: {
       discordId: id,

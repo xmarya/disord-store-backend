@@ -34,7 +34,7 @@ const adminSchema = new Schema<AdminDocument>(
       type: String,
       default: "admin",
     },
-    image: String,
+    avatar: String,
   },
   {
     timestamps: true,

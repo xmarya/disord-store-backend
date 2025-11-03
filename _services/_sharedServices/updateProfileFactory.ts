@@ -14,7 +14,7 @@ const updateFn = {
   storeOwner: updateStoreOwnerProfile,
   admin: updateAdminProfile,
 
-} satisfies Record<Exclude<UserTypes, "storeAssistant">, (id: MongoId, updatedData: Partial<BaseUserData>, session?: mongoose.ClientSession) => Promise<Failure | NotFound | Success<NotAssistant>>>;
+} satisfies Record<Exclude<UserTypes, "storeAssistant">, (id: MongoId, updatedData: Partial<Omit<BaseUserData, "email">>, session?: mongoose.ClientSession) => Promise<Failure | NotFound | Success<NotAssistant>>>;
 
 
 function updateProfileFactory(userType: Exclude<UserTypes, "storeAssistant">) {

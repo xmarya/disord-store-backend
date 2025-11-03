@@ -7,5 +7,5 @@ export interface AdminDocument extends mongoose.Document {
   email: string;
   phoneNumber: `+966${string}`;
   userType: Extract<UserTypes, "admin">;
-  image: string;
+  avatar: string;
 }

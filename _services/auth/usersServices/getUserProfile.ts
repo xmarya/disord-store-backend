@@ -8,7 +8,7 @@ import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
 async function getUserProfile(userId: MongoId) {
-  const queryFields: QueryOptions<RegularUser>["select"] = ["firstName", "lastName", "email", "image", "phoneNumber", "userType"];
+  const queryFields: QueryOptions<RegularUser>["select"] = ["firstName", "lastName", "email", "avatar", "phoneNumber", "userType"];
 
   const safeGetProfile = safeThrowable(
     () => getOneDocById(User, userId, { select: queryFields }),

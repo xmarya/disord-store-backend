@@ -24,8 +24,13 @@ import { router as platformReviewsRouter } from "./auth/reviews/platformReviewsR
 import { router as settingsRouter } from "./auth/settingsRouter";
 import { router as storeRouter } from "./auth/storeRoutes";
 import { router as subscriptionsRouter } from "./auth/subscriptionsRoutes";
+import { router as fileRouter } from "./auth/fileRoutes";
+import streamParser from "@middlewares/streamParser";
+import handleParsedFiles from "@middlewares/requestModifiers/handleParsedFiles";
 
 export const router = express.Router();
+
+router.use(streamParser);
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
 router.get("/logout", logout);
@@ -34,7 +39,7 @@ router.use("/me", meRouter);
 router.use("/settings", settingsRouter);
 router.post("/emailConfirmation", sendConfirmationEmail);
 router.use("/subscriptions", restrict("storeOwner"), subscriptionsRouter);
-router.post("/newStore", restrict("storeOwner"), canCreateStore, sanitisedData, createStoreController);
+router.post("/newStore", restrict("storeOwner"), canCreateStore, sanitisedData, handleParsedFiles("stores"), createStoreController);
 router.route("/store/:resourceId/reviews").post(restrict("user"), createReviewController);
 router.route("/products/:resourceId/reviews").post(restrict("user"), createReviewController);
 router.use("/platform/reviews", platformReviewsRouter);
@@ -49,6 +54,7 @@ router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/orders", orderRouter);
+router.use("/files", fileRouter);
 
 /* TODO
     1- blocking the assistants accounts if any in case the owner downgraded the plan to basic

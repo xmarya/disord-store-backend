@@ -8,7 +8,7 @@ import safeThrowable from "@utils/safeThrowable";
 import { MongoId } from "@Types/Schema/MongoId";
 
 async function getAdminProfile(adminId: MongoId) {
-  const fields: QueryOptions<AdminDocument>["select"] = ["firstName", "lastName", "email", "image", "userType"];
+  const fields: QueryOptions<AdminDocument>["select"] = ["firstName", "lastName", "email", "avatar", "userType"];
   const safeGetAdminProfile = safeThrowable(
     () => getOneDocById(Admin, adminId, { select: fields }),
     (error) => new Failure((error as Error).message)

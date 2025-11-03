@@ -17,7 +17,7 @@ export interface RegularUser extends BaseUserData {
   firstName: string;
   lastName: string;
   phoneNumber: `+966${string}`;
-  image: string;
+  avatar: string;
   defaultAddressId: MongoId;
   defaultCreditCardId: MongoId;
   createdAt: Date;

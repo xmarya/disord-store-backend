@@ -27,7 +27,7 @@ const platformReviewSchema = new mongoose.Schema<PlatformReviewDocument>(
       type: String,
       required: [true, "the lastName field is required"],
     },
-    image: String,
+    avatar: String,
     displayInHomePage: {
       type: Boolean,
       default: false,

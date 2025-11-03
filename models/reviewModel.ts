@@ -45,7 +45,7 @@ export const reviewSchema = new mongoose.Schema<ReviewDocument>(
       type: String,
       required: [true, "the lastName field is required"],
     },
-    image: String,
+    avatar: String,
     storeReply: {
       type: String,
       maxlength: [500, "maximum length is 500 characters"],
