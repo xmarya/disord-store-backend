@@ -1,9 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
-import xss from "xss";
+import DOMPurify from "dompurify";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
 
 function deepSanitise(data: any): any {
-  if (typeof data === "string") return xss(data);
+  if (typeof data === "string") return DOMPurify.sanitize(data);
   if (Array.isArray(data)) return data.map(deepSanitise);
   if (typeof data === "object" && data !== null) {
     const result: any = {};
