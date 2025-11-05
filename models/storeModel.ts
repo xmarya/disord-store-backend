@@ -53,18 +53,6 @@ export const storeSchema = new Schema<StoreDocument>(
         default: [], //is more intuitive than null.
       },
     ],
-    /* OLD CODE (kept for reference): unique in an array doesn't enforce uniqueness across documents!!!
-    categories: [{
-      type: String,
-      unique: true,
-      colour: String,
-      }],
-      */
-    // to be honest, I don't see any reasonable to store the categories inside the store doc
-    // categories: [{
-    //   type:Schema.Types.ObjectId,
-    //   ref:"Category"
-    // }],
     colourTheme: {
       /* SOLILOQUY: this should be one object not an array, 
       of course the plus users can views many theme but eventually they are going to select only one*/
@@ -134,13 +122,6 @@ export const storeSchema = new Schema<StoreDocument>(
   }
 );
 
-/* SOLILOQUY: I'm not sure about this virtual, since I can got all the store itself and its stats 
-from the StoreStats Model, also using the virtual won't allow to do date filtering process */
-// storeSchema.virtual<StoreStatsDocument[]>("stats", {
-//   ref: "StoreStats",
-//   localField: "_id",
-//   foreignField: "store",
-// });
 
 //NOTE: I'm not sure if commenting out the below hook would break the code somewhere. I searched to see if it is essential inside a controller or a service but didn't find any thing.
 // And for the reason why I commented it out is because the product model needs to populate the store,
@@ -151,17 +132,6 @@ from the StoreStats Model, also using the virtual won't allow to do date filteri
 //   next();
 // });
 
-// storeSchema.virtual<ProductDocument[]>("products", {
-//   ref: "Product",
-//   localField: "_id",
-//   foreignField: "store",
-// });
-
-// storeSchema.virtual<ReviewDocument[]>("reviews", {
-//   ref: "Review",
-//   localField: "_id",
-//   foreignField: "reviewedResourceId",
-// });
 
 // TODO: وثيقة العمل الحر أو اثبات التجارية
 
