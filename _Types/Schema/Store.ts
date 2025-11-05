@@ -3,6 +3,11 @@ import { MongoId } from "./MongoId";
 import { PlansNames } from "./Plan";
 
 type StoreStatus = "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
+type StorePagesLinks = {
+  pageTitle:string,
+  pageUrl:string,
+  pageMarkdown:string;
+}
 export interface IStoreAddress {
   street: string;
   city: string;
@@ -49,6 +54,7 @@ export interface StoreOptionals {
     whatsapp?: Array<string>;
     email?: string;
   };
+  storePagesLinks?:Array<StorePagesLinks>
 }
 
 export type StoreDocument = StoreBasic & StoreOptionals & mongoose.Document;

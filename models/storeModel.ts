@@ -96,6 +96,22 @@ export const storeSchema = new Schema<StoreDocument>(
       whatsapp: [String],
       email: String,
     },
+    storePagesLinks:[
+      {
+        pageTitle:{
+          type:String,
+          required: [true, "the title field inside storeLinks is required"]
+        },
+      pageUrl:{
+        type:String,
+        required: [true, "the url field inside storeLinks is required"]
+      },
+      pageMarkdown:{
+        type:String,
+        required: [true, "the markdown field inside storeLinks is required"]
+      },
+      }
+    ],
     ranking: {
       type: Number,
       default: null,
