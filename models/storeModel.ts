@@ -53,13 +53,6 @@ export const storeSchema = new Schema<StoreDocument>(
         default: [], //is more intuitive than null.
       },
     ],
-    colourTheme: {
-      /* SOLILOQUY: this should be one object not an array, 
-      of course the plus users can views many theme but eventually they are going to select only one*/
-      type: Schema.Types.ObjectId,
-      ref: "ColourTheme",
-      // default:"default-theme" //TODO: will be defined later
-    },
     status: {
       type: String,
       enum: ["inProgress", "active", "maintenance", "suspended", "deleted"],
@@ -70,45 +63,11 @@ export const storeSchema = new Schema<StoreDocument>(
       type: Boolean,
       default: false,
     },
-    shipmentCompanies: [
-      {
-        name: { type: String, required: true },
-        accountNumber: { type: String, required: true },
-      },
-    ],
-    address: {
-      street: { type: String },
-      city: { type: String },
-      state: { type: String },
-      postalCode: { type: String },
-      country: { type: String },
-      phone: { type: String },
-    },
     inPlan: {
       type: String,
       required: true,
       enum: ["basic", "plus", "unlimited"],
     },
-    socialMedia: {
-      instagram: String,
-      tiktok: String,
-      twitter: String,
-      whatsapp: [String],
-      email: String,
-    },
-    storePages:[
-      {
-        title:{
-          type:String,
-          required: [true, "the title field inside storeLinks is required"]
-        },
-      markdown:{
-        type:String,
-        required: [true, "the markdown field inside storeLinks is required"]
-      },
-      _id:false
-      },
-    ],
     ranking: {
       type: Number,
       default: null,
