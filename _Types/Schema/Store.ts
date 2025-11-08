@@ -4,8 +4,8 @@ import { PlansNames } from "./Plan";
 
 type StoreStatus = "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
 type StorePagesLinks = {
-  pageTitle:string,
-  pageMarkdown:string;
+  title:string,
+  markdown:string;
 }
 export interface IStoreAddress {
   street: string;
@@ -51,7 +51,7 @@ export interface StoreOptionals {
     whatsapp?: Array<string>;
     email?: string;
   };
-  storePagesLinks?:Array<StorePagesLinks>
+  storePages?:Array<StorePagesLinks>
 }
 
 export type UpdateStoreDataBody = StoreDataBody & Pick<StoreOptionals, "colourTheme" | "socialMedia"> & {

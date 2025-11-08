@@ -96,13 +96,13 @@ export const storeSchema = new Schema<StoreDocument>(
       whatsapp: [String],
       email: String,
     },
-    storePagesLinks:[
+    storePages:[
       {
-        pageTitle:{
+        title:{
           type:String,
           required: [true, "the title field inside storeLinks is required"]
         },
-      pageMarkdown:{
+      markdown:{
         type:String,
         required: [true, "the markdown field inside storeLinks is required"]
       },
