@@ -5,7 +5,6 @@ import { PlansNames } from "./Plan";
 type StoreStatus = "inProgress" | "active" | "maintenance" | "suspended" | "deleted";
 type StorePagesLinks = {
   pageTitle:string,
-  pageUrl:string,
   pageMarkdown:string;
 }
 export interface IStoreAddress {
@@ -44,9 +43,7 @@ export interface StoreBasic extends FullStoreDataBody {
 
 export interface StoreOptionals {
   storeAssistants?: Array<MongoId>;
-  // categories?: Array<CategoryDocument>;
   colourTheme?: MongoId; // reference to one of the themes that defined inside ColourTheme Model, the user is going to select one theme
-  // products: Array<ProductDocument>;
   socialMedia: {
     instagram?: string;
     tiktok?: string;
@@ -55,6 +52,11 @@ export interface StoreOptionals {
     email?: string;
   };
   storePagesLinks?:Array<StorePagesLinks>
+}
+
+export type UpdateStoreDataBody = StoreDataBody & Pick<StoreOptionals, "colourTheme" | "socialMedia"> & {
+  pageTitle:string
+  htmlContent:string
 }
 
 export type StoreDocument = StoreBasic & StoreOptionals & mongoose.Document;

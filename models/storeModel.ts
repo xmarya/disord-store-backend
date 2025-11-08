@@ -102,15 +102,12 @@ export const storeSchema = new Schema<StoreDocument>(
           type:String,
           required: [true, "the title field inside storeLinks is required"]
         },
-      pageUrl:{
-        type:String,
-        required: [true, "the url field inside storeLinks is required"]
-      },
       pageMarkdown:{
         type:String,
         required: [true, "the markdown field inside storeLinks is required"]
       },
-      }
+      _id:false
+      },
     ],
     ranking: {
       type: Number,
