@@ -1,6 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
-import DOMPurify from "dompurify";
+import { JSDOM } from "jsdom";
+import createDOMPurify from "dompurify";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
+
+const window = new JSDOM("").window;
+const DOMPurify = createDOMPurify(window);
 
 function deepSanitise(data: any): any {
   if (typeof data === "string") return DOMPurify.sanitize(data);
