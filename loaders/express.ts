@@ -15,11 +15,11 @@ export default function expressLoader(app: Application) {
     windowMs: 60 * 60 * 100, // the calculation of 1 hour.
     message: "We've got too many requests from this IP, Try again after 1 hour",
   });
-  // app.use(
-  //   helmet({
-  //     crossOriginResourcePolicy: { policy: "cross-origin" },
-  //   })
-  // );
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+    })
+  );
   app.use("/api", limiter);
 
   // express doesn't't support sending json format in the request, must use express.json() md,

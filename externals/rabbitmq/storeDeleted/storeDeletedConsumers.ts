@@ -7,6 +7,7 @@ import deleteAllStoreCategoriesConsumer from "eventConsumers/store/deleteAllStor
 import deleteAllStoreProductsConsumer from "eventConsumers/store/deleteAllStoreProductsConsumer";
 import deleteAllStoreAssistantsConsumer from "eventConsumers/store/deleteAllStoreAssistantsConsumer";
 import deleteAllStoreStatsConsumer from "eventConsumers/store/deleteAllStoreStatsConsumer";
+import deleteStoreSettingsConsumer from "eventConsumers/store/deleteStoreSettingsConsumer";
 
 const consumers = {
   assistantsCollection: {
@@ -74,6 +75,19 @@ const consumers = {
       deadRoutingKey: "dead-store-deleted",
     },
   },
+  storeSettingsCollection: {
+    receiver: deleteStoreSettingsConsumer,
+    queueName: "store-deleted-queue-storeSettingsCollection",
+
+    queueOptions: CRITICAL_QUEUE_OPTIONS,
+    retryLetterOptions: {
+      mainExchangeName: "main-store-events",
+      mainRoutingKey: "store-deleted",
+      deadExchangeName: "dead-store-events",
+      deadQueueName: "dead-store-deleted-queue-storeSettingsCollection",
+      deadRoutingKey: "dead-store-deleted",
+    },
+  },
 } satisfies Record<string, ConsumerRegister<StoreDeletedType, StoreDeletedEvent>>;
 
 function storeDeletedConsumers() {
@@ -82,6 +96,7 @@ function storeDeletedConsumers() {
   storeDeletedRegister({ ...consumers["categoriesCollection"] });
   storeDeletedRegister({ ...consumers["reviewsCollection"] });
   storeDeletedRegister({ ...consumers["storeStatsCollection"] });
+  storeDeletedRegister({ ...consumers["storeSettingsCollection"] });
 }
 
 export default storeDeletedConsumers;

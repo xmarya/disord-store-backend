@@ -5,7 +5,8 @@ import returnError from "@utils/returnError";
 import { format } from "date-fns";
 
 const handleParsedFiles = (fileDirectory: UploadFileData["fileDirectory"]) => catchAsync(async (request, response, next) => {
-    if (!request.parsedFile?.length) return next();
+  console.log("handleParsedFiles", !request.parsedFile);
+    if (!request.parsedFile) return next();
 
     let id:string;
 

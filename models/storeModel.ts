@@ -53,25 +53,6 @@ export const storeSchema = new Schema<StoreDocument>(
         default: [], //is more intuitive than null.
       },
     ],
-    /* OLD CODE (kept for reference): unique in an array doesn't enforce uniqueness across documents!!!
-    categories: [{
-      type: String,
-      unique: true,
-      colour: String,
-      }],
-      */
-    // to be honest, I don't see any reasonable to store the categories inside the store doc
-    // categories: [{
-    //   type:Schema.Types.ObjectId,
-    //   ref:"Category"
-    // }],
-    colourTheme: {
-      /* SOLILOQUY: this should be one object not an array, 
-      of course the plus users can views many theme but eventually they are going to select only one*/
-      type: Schema.Types.ObjectId,
-      ref: "ColourTheme",
-      // default:"default-theme" //TODO: will be defined later
-    },
     status: {
       type: String,
       enum: ["inProgress", "active", "maintenance", "suspended", "deleted"],
@@ -82,31 +63,10 @@ export const storeSchema = new Schema<StoreDocument>(
       type: Boolean,
       default: false,
     },
-    shipmentCompanies: [
-      {
-        name: { type: String, required: true },
-        accountNumber: { type: String, required: true },
-      },
-    ],
-    address: {
-      street: { type: String },
-      city: { type: String },
-      state: { type: String },
-      postalCode: { type: String },
-      country: { type: String },
-      phone: { type: String },
-    },
     inPlan: {
       type: String,
       required: true,
       enum: ["basic", "plus", "unlimited"],
-    },
-    socialMedia: {
-      instagram: String,
-      tiktok: String,
-      twitter: String,
-      whatsapp: [String],
-      email: String,
     },
     ranking: {
       type: Number,
@@ -134,13 +94,6 @@ export const storeSchema = new Schema<StoreDocument>(
   }
 );
 
-/* SOLILOQUY: I'm not sure about this virtual, since I can got all the store itself and its stats 
-from the StoreStats Model, also using the virtual won't allow to do date filtering process */
-// storeSchema.virtual<StoreStatsDocument[]>("stats", {
-//   ref: "StoreStats",
-//   localField: "_id",
-//   foreignField: "store",
-// });
 
 //NOTE: I'm not sure if commenting out the below hook would break the code somewhere. I searched to see if it is essential inside a controller or a service but didn't find any thing.
 // And for the reason why I commented it out is because the product model needs to populate the store,
@@ -151,17 +104,6 @@ from the StoreStats Model, also using the virtual won't allow to do date filteri
 //   next();
 // });
 
-// storeSchema.virtual<ProductDocument[]>("products", {
-//   ref: "Product",
-//   localField: "_id",
-//   foreignField: "store",
-// });
-
-// storeSchema.virtual<ReviewDocument[]>("reviews", {
-//   ref: "Review",
-//   localField: "_id",
-//   foreignField: "reviewedResourceId",
-// });
 
 // TODO: وثيقة العمل الحر أو اثبات التجارية
 

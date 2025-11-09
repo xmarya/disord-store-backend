@@ -1,0 +1,25 @@
+import StoreSetting from "@models/storeSettingModel";
+import { deleteDoc } from "@repositories/global";
+import { StoreDeletedEvent } from "@Types/events/StoreEvents";
+import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
+import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
+import safeThrowable from "@utils/safeThrowable";
+import mongoose from "mongoose";
+
+async function deleteStoreSettingsConsumer(event: StoreDeletedEvent) {
+  const { storeId } = event.payload;
+  const store = new mongoose.Types.ObjectId(storeId);
+  const safeDelete = safeThrowable(
+    () => deleteDoc(StoreSetting,store),
+    (error) => new Failure((error as Error).message)
+  );
+
+  const deleteResult = await extractSafeThrowableResult(() => safeDelete);
+
+  if (!deleteResult.ok) return new Failure(deleteResult.message, { serviceName: "storeSettingsCollection", ack: false });
+
+  return new Success({ serviceName: "storeSettingsCollection", ack: true });
+}
+
+export default deleteStoreSettingsConsumer;
