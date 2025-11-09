@@ -31,15 +31,17 @@ type StoreShipmentMethods = {
 };
 
 export type StoreSettingDataBody = {
-  storeId: MongoId;
   domain: StoreDomain;
   seo?: StoreSEO;
   colourTheme?: MongoId; // reference to one of the themes that defined inside ColourTheme Model, the user is going to select one theme
-  storePages?: Array<StorePages>;
   socialMedia?: StoreSocialMedia;
+  storePages?: Array<{ pageTitle: string; htmlContent: string }>;
   address?: StoreAddress;
   shipmentCompanies?: StoreShipmentMethods[];
   paymentMethods?: StorePaymentMethods;
-}
+};
 
-export type StoreSettingDocument = StoreSettingDataBody & mongoose.Document
+export type StoreSettingDocument = Omit<StoreSettingDataBody, "storePages"> & {
+  storeId: MongoId;
+  storePages?: Array<StorePages>;
+} & mongoose.Document;

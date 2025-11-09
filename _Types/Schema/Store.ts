@@ -28,9 +28,4 @@ export interface StoreOptionals {
   storeAssistants?: Array<MongoId>;  
 }
 
-export type UpdateStoreDataBody = StoreDataBody & {
-  pageTitle:string
-  htmlContent:string
-}
-
 export type StoreDocument = StoreBasic & StoreOptionals & mongoose.Document;
