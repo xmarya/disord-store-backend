@@ -1,7 +1,7 @@
 import { CRITICAL_QUEUE_OPTIONS } from "@constants/rabbitmq";
 import { ConsumerRegister, ProductDeletedType } from "@Types/events/OutboxEvents";
 import { ProductDeletedEvent } from "@Types/events/ProductEvents";
-import deleteAllReviewsOfResourceConsumer from "eventConsumers/deleteAllReviewsOfResourceConsumer";
+import deleteAllReviewsOfResourceConsumer from "eventConsumers/review/deleteAllReviewsOfResourceConsumer";
 import deleteProductFromCategoriesConsumer from "eventConsumers/product/deleteProductFromCategoriesConsumer";
 import productDeletedRegister from "./productDeletedRegister";
 
