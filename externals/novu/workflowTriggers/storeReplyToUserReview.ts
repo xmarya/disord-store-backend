@@ -3,11 +3,11 @@ import { Failure } from "@Types/ResultTypes/errors/Failure";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
 import safeThrowable from "@utils/safeThrowable";
 
-async function novuStoreReplyToUserReview({ reviewId, storeName, userId, email }: { reviewId: string; storeName: string; userId: string; email: string }) {
+async function novuStoreReplyToUserReview({ reviewId,reviewBody, storeName, userId, email }: { reviewId: string; reviewBody:string, storeName: string; userId: string; email: string }) {
   const replyURL = `/review/url/${reviewId}`;
   const workflowId = "store-reply-to-user-review";
   const subscriberData = { subscriberId: userId, email };
-  const payload = { storeName, replyURL };
+  const payload = { reviewBody, storeName, replyURL };
 
   const triggerResult = safeThrowable(
     () =>

@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 
 async function storeReplyToUserReviewConsumer(event: StoreRepliedToUserReview) {
   const {
-    review: { _id, writer, reviewedResourceId, storeOrProduct },
+    review: { _id, reviewBody, writer, reviewedResourceId, storeOrProduct },
   } = event.payload;
 
   const documentStoreOrProduct = await getOneDocById(mongoose.model(storeOrProduct), reviewedResourceId);
@@ -17,7 +17,7 @@ async function storeReplyToUserReviewConsumer(event: StoreRepliedToUserReview) {
   const userResult = await getUserProfile(writer);
 
   const email = userResult.ok ? userResult.result.email : "";
-  const novuResult = await novuStoreReplyToUserReview({ reviewId: (_id as string).toString(), storeName, userId: (writer as string).toString(), email });
+  const novuResult = await novuStoreReplyToUserReview({ reviewId: (_id as string).toString(),reviewBody, storeName, userId: (writer as string).toString(), email });
   if (novuResult.ok) return new Success({ serviceName: "novu", ack: true });
 
   return new Failure(novuResult.message, { serviceName: "novu", ack: false });
