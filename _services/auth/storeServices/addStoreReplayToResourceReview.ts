@@ -12,7 +12,7 @@ async function addStoreReplayToResourceReview(reviewId: string, storeReply: stri
     const updatedReview = await updateDoc(Review, reviewId, { storeReply }, {session});
 
     if(updatedReview) {
-      await createOutboxRecord<[StoreRepliedToUserReview]>([{type: "store-replied-to-user-review", payload:{review:updatedReview}}], session);
+      await createOutboxRecord<[StoreRepliedToUserReview]>([{type: "store-replied-to-review", payload:{review:updatedReview}}], session);
     }
 
     return updatedReview;
