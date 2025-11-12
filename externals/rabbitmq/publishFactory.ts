@@ -33,7 +33,7 @@ const publishers: Record<OutboxEventTypesMap, PublisherFunction> = {
 };
 
 async function publishFactory(outboxRecord: OutboxRecordDocument) {
-  // console.log("inside publishFactory", outboxRecord.type);
+
   const { type, payload, id } = outboxRecord;
   const event = {
     type,
