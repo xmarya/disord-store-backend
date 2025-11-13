@@ -12,6 +12,8 @@ import { getOneDocById } from "@repositories/global";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { getPaymentSuccessHtml, processPaymobWebhook } from "../../externals/paymob/paymnetProcessor";
 import { ProcessPaymobPayment } from "../../externals/paymob/paymobService";
+import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
+import { OrderCreated } from "@Types/events/OrderEvents";
 
 export const validateOrderInput = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -98,7 +100,10 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
     TODO: trigger a new event called NewOrderCreated after successful payment process that does:
         1- create a new invoice to be stored in the db
         2- send a notification using Novu
-    */
+
+        */
+   // await createOutboxRecord<[OrderCreated]>([{type:"order-created", payload:{/*payload for invoice*/}}],session);
+
 
     await session.commitTransaction();
     session.endSession();
