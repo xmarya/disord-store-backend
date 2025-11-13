@@ -1,17 +1,11 @@
-import { format } from "date-fns";
+import Invoice from "@models/invoiceModel";
+import Order from "@models/orderModel";
+import { getOneDocByFindOne } from "@repositories/global";
+import { catchAsync } from "@utils/catchAsync";
 import { Request, Response } from "express";
 import { dirname, join } from "path";
 import PDFDocument from "pdfkit";
 import { fileURLToPath } from "url";
-import { getOneDocByFindOne } from "@repositories/global";
-import { createNewInvoices } from "@repositories/invoice/invoiceRepo";
-import { InvoiceDataBody } from "@Types/Schema/Invoice";
-import { AppError } from "@Types/ResultTypes/errors/AppError";
-import { catchAsync } from "@utils/catchAsync";
-import Invoice from "@models/invoiceModel";
-import Order from "@models/orderModel";
-import { updateStoreStatsController } from "./storeStatsController";
-import addJob from "../../externals/bullmq/addJob";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -113,30 +107,6 @@ export const generateRevenuePDF = async (req: Request, res: Response) => {
   }
 };
 
-export async function createNewInvoiceController(data: InvoiceDataBody) {
-  const { orderId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees } = data;
-
-  if (!orderId || !buyer || !paymentMethod?.trim() || !productsPerStore.length || !status || !invoiceTotal) throw new AppError(400, "some invoice data are missing");
-
-  const operationType = status === "successful" || status === "processed" ? "new-purchase" : "cancellation";
-
-  // STEP 1) create invoiceId and releasedAt:
-  const releasedAt = new Date();
-  const invoiceId = format(releasedAt, "yyMMdd-HHmmssSSS");
-
-  const fullData = { releasedAt, invoiceId, ...data };
-  await updateStoreStatsController(fullData, operationType);
-
-  // STEP 2) save the data in the cache be batched and to be handled later by bullmq:
-  const success = await addJob("Invoices", invoiceId, fullData);
-
-  // STEP 3) in case of failure, save it directly to the db.
-  if (!success) createNewInvoices(fullData);
-  // NOTE: no need to await this too. let it do its job in the background;
-  // the most important part is to show the profits ASAP in the store's dashboard.
-
-  return fullData;
-}
 
 export const getOneInvoiceController = catchAsync(async (request, response, next) => {
   // it depends on the /order/:orderId/invoice
@@ -149,31 +119,3 @@ export const getOneInvoiceController = catchAsync(async (request, response, next
   });
 });
 
-export const testInvoiceController = catchAsync(async (request, response, next) => {
-  const { paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees } = request.body as InvoiceDataBody;
-  if (!paymentMethod?.trim() || !productsPerStore.length || !status || !invoiceTotal) throw new AppError(400, "some invoice data are missing");
-
-  const operationType = status === "successful" || status === "processed" ? "new-purchase" : "cancellation";
-
-  const orderId = request.user.id;
-  const buyer = request.user.id;
-  // STEP 1) create invoiceId and releasedAt:
-  const releasedAt = new Date();
-  const invoiceId = format(releasedAt, "yyMMdd-HHmmssSSS");
-
-  const data = { orderId, invoiceId, buyer, paymentMethod, productsPerStore, status, invoiceTotal, shippingAddress, billingAddress, shippingCompany, shippingFees };
-  await updateStoreStatsController(data, operationType);
-
-  // STEP 2) save the data in the cache be batched and to be handled later by bullmq:
-  const success = await addJob("Invoice", invoiceId, data);
-
-  // STEP 3) in case of failure, save it directly to the db.
-  if (!success) createNewInvoices(data);
-  // NOTE: no need to await this too. let it do its job in the background;
-  // the most important part is to show the profits ASAP in the store's dashboard.
-
-  response.status(201).json({
-    success: true,
-    data: { invoice: data },
-  });
-});
