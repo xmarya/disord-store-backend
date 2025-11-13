@@ -95,9 +95,9 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
     await newOrder.save({ session });
 
     /*
-    TODO: add a new invoice after successful payment process:
-    const newInvoice = await createNewInvoiceController();
-    and return the invoice in the response
+    TODO: trigger a new event called NewOrderCreated after successful payment process that does:
+        1- create a new invoice to be stored in the db
+        2- send a notification using Novu
     */
 
     await session.commitTransaction();
