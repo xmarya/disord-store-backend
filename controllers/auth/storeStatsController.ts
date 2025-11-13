@@ -1,40 +1,7 @@
-import { startSession } from "mongoose";
-import { getOneStoreStats, updateStoreStats } from "@repositories/store/storeStatsRepo";
-import { InvoiceDataBody } from "@Types/Schema/Invoice";
-import { MongoId } from "@Types/Schema/MongoId";
+import { getOneStoreStats } from "@repositories/store/storeStatsRepo";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
-import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 
-type StatsPerStore = Array<{
-  storeId: MongoId;
-  profit: number;
-  products: Array<{ productId: MongoId; quantity: number }>;
-}>;
-export async function updateStoreStatsController(data: Pick<InvoiceDataBody, "productsPerStore">, operationType: "new-purchase" | "cancellation") {
-  const { productsPerStore } = data;
-  const statsPerStore: StatsPerStore = productsPerStore.map(({ storeId, products }) => ({
-    storeId,
-    products: products.map(({ productId, quantity }) => ({ productId, quantity })),
-    profit: products.reduce((sum, { productTotal }) => sum + productTotal, 0),
-  }));
-
-  const session = await startSession();
-  try {
-    session.startTransaction();
-    for (const { storeId, products, profit } of statsPerStore) {
-      await updateStoreStats(storeId, profit, products, operationType, session);
-    }
-    // await listenToStream(); // should be outside the loop
-    await session.commitTransaction();
-  } catch (error) {
-    await session.abortTransaction();
-    console.log(error);
-    return new AppError(500, INTERNAL_ERROR_MESSAGE);
-  } finally {
-    await session.endSession();
-  }
-}
 
 export const getStoreStatsController = catchAsync(async (request, response, next) => {
   /* BUG: 
