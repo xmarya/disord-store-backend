@@ -170,7 +170,7 @@ export async function updateStoreStats(
     soldProductsUpdate.$inc[key] = isIncrement ? quantity : -quantity;
   }
 
-  let updatedStats;
+  let updatedStats:StoreStatsDocument;
   const now = new Date();
   const $gte = operationDate?.$gte ?? startOfDay(now);
   const $lte = operationDate?.$lte ?? endOfDay(now);
@@ -195,9 +195,9 @@ export async function updateStoreStats(
   if (updatedStats) await updatedStats.validate(); // manually trigger validation; since runValidator option doesn't get triggered with $inc or $setOnInsert
 
   // clean up any quantity with 0 or minus value:
-  let cleanedStats;
+  let cleanedStats:StoreStatsDocument | undefined | null;
   if (!isIncrement && updatedStats) {
-    const soldProductCleanUp: any = {};
+    const soldProductCleanUp: Record<string, number | string> = {};
 
     for (const [productId, quantity] of updatedStats.soldProducts.entries()) {
       if (quantity <= 0) soldProductCleanUp[`soldProducts.${productId}`] = "";
