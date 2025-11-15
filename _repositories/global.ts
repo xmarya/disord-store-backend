@@ -4,8 +4,9 @@ import { MongoId } from "@Types/Schema/MongoId";
 import { buildQuery } from "@utils/queryModifiers/buildRequestQuery";
 import { QueryParams } from "@Types/helperTypes/Request";
 
-export async function createDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, data: any /*locals?: any*/): Promise<T> {
-  const newDoc = await Model.create(data);
+export async function createDoc<T extends mongoose.Document>(Model: mongoose.Model<T>, data: any, options?: QueryOptions<T> /*locals?: any*/): Promise<T> {
+    const session = options?.session ?? null;
+    const newDoc = await Model.create([{...data}], {session});
 
   /* OLD CODE (kept for reference): 
     const newDoc = new Model(data);
@@ -13,7 +14,7 @@ export async function createDoc<T extends mongoose.Document>(Model: mongoose.Mod
     
     await newDoc.save();
     */
-  return newDoc;
+  return newDoc[0];
 }
 
 export async function getAllDocs<T extends mongoose.Document>(Model: mongoose.Model<T>, query: QueryParams, options?: QueryOptions<T>): Promise<T[]> {
