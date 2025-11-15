@@ -146,7 +146,6 @@ export async function getOneStoreStats(
   return formattedStats;
 }
 
-// TODO: call it after a successful payment/cancellation (using loop, at the end of the invoice, no await)
 export async function updateStoreStats(
   storeId: MongoId,
   profit: number,
@@ -155,9 +154,7 @@ export async function updateStoreStats(
   session: mongoose.ClientSession,
   operationDate?: { $gte: Date; $lte: Date }
 ) {
-  // const now = new Date();
-  // const dayStart = startOfDay(now);
-  // const dayEnd = endOfDay(now);
+
 
   const isIncrement = operationType === "new-purchase";
   const profits = isIncrement ? profit : -profit;
@@ -174,27 +171,6 @@ export async function updateStoreStats(
     soldProductsUpdate.$inc ??= {};
     soldProductsUpdate.$inc[key] = isIncrement ? quantity : -quantity;
   }
-
-  /*
-  1)  console.log("...[soldProductsUpdate] => ", ...[soldProductsUpdate]); this way doesn't do anything
-
-...[soldProductsUpdate] =>  {
-  '$inc': {
-    '684ac4c648085d1348231248': 1,
-    '684ac76f9e4ba6351f4fa887': 2,
-    '684ac6ed0d7b4453cf566bc5': 2
-  }
-}
-
-2) console.log("soldProductsUpdate.$inc => ", soldProductsUpdate.$inc);
-soldProductsUpdate.$inc =>  {
-  '684ac4c648085d1348231248': 1,
-  '684ac76f9e4ba6351f4fa887': 2,
-  '684ac6ed0d7b4453cf566bc5': 2
-}
-  */
-
-  // console.log("soldProductsUpdate.$inc => ", soldProductsUpdate.$inc);
 
   let updatedStats;
   const now = new Date();
