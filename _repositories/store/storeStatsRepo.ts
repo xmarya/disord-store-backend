@@ -154,8 +154,6 @@ export async function updateStoreStats(
   session: mongoose.ClientSession,
   operationDate?: { $gte: Date; $lte: Date }
 ) {
-
-
   const isIncrement = operationType === "new-purchase";
   const profits = isIncrement ? profit : -profit;
   const purchase = isIncrement ? 1 : 0;
@@ -177,26 +175,22 @@ export async function updateStoreStats(
   const $gte = operationDate?.$gte ?? startOfDay(now);
   const $lte = operationDate?.$lte ?? endOfDay(now);
 
-  try {
-    updatedStats = await StoreStats.findOneAndUpdate(
-      { store: storeId, date: { $gte, $lte } },
-      {
-        $inc: {
-          ...soldProductsUpdate.$inc,
-          profits,
-          numOfPurchases: purchase,
-          numOfCancellations: cancellation,
-        },
-        $setOnInsert: {
-          store: storeId,
-          date: now,
-        },
+  updatedStats = await StoreStats.findOneAndUpdate(
+    { store: storeId, date: { $gte, $lte } },
+    {
+      $inc: {
+        ...soldProductsUpdate.$inc,
+        profits,
+        numOfPurchases: purchase,
+        numOfCancellations: cancellation,
       },
-      { new: true, upsert: true, runValidators: true, session }
-    );
-  } catch (error) {
-    console.log(error);
-  }
+      $setOnInsert: {
+        store: storeId,
+        date: now,
+      },
+    },
+    { new: true, upsert: true, runValidators: true, session }
+  );
 
   if (updatedStats) await updatedStats.validate(); // manually trigger validation; since runValidator option doesn't get triggered with $inc or $setOnInsert
 
