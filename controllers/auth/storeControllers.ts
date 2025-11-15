@@ -8,7 +8,7 @@ import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import isErr from "@utils/isErr";
 import returnError from "@utils/returnError";
-import getStoreOf from "@services/auth/storeServices/getStoreOfOwner";
+import getStoreOf from "@services/auth/storeServices/getStoreOf";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
 import getStoreSettings from "@services/auth/storeServices/storeSettings/getStoreSettings";
 import updateStoreSettings from "@services/auth/storeServices/storeSettings/updateStoreSettings";
@@ -16,14 +16,14 @@ import updateStoreSettings from "@services/auth/storeServices/storeSettings/upda
 export const createStoreController = catchAsync(async (request, response, next) => {
   const storeOwner = request.user as StoreOwnerDocument;
 
-  const { storeName, description , productsType}: StoreDataBody = request.body;
-  if (!storeName?.trim() || !description?.trim() || !productsType?.trim()) return (new BadRequest("الرجاء تعبئة جميع الحقول"));
+  const { storeName, description, productsType }: StoreDataBody = request.body;
+  if (!storeName?.trim() || !description?.trim() || !productsType?.trim()) return new BadRequest("الرجاء تعبئة جميع الحقول");
 
   const result = await createNewStore(storeOwner, request.body);
 
-  if(!result.ok) return next(returnError(result));
+  if (!result.ok) return next(returnError(result));
 
-  const {result :newStore} = result;
+  const { result: newStore } = result;
 
   response.status(201).json({
     success: true,
@@ -32,7 +32,6 @@ export const createStoreController = catchAsync(async (request, response, next) 
 });
 
 export const getMyStoreController = catchAsync(async (request, response, next) => {
-
   const userId = request.user.id;
   const result = await getStoreOf(userId);
 
@@ -47,7 +46,6 @@ export const getMyStoreController = catchAsync(async (request, response, next) =
 });
 
 export const updateMyStoreController = catchAsync(async (request, response, next) => {
-  
   const result = await updateStore(request.store, request.body);
   if (!result.ok) return next(returnError(result));
 
@@ -78,32 +76,31 @@ export const updateMyStoreStatus = catchAsync(async (request, response, next) =>
   });
 });
 
-export const getStoreSettingsController = catchAsync(async(request, response, next) => {
+export const getStoreSettingsController = catchAsync(async (request, response, next) => {
   const result = await getStoreSettings(request.store);
-  if(!result.ok) return next(returnError(result));
+  if (!result.ok) return next(returnError(result));
 
   response.status(200).json({
-    success:true,
-    data: result.result
-  })
+    success: true,
+    data: result.result,
+  });
 });
 
-export const updateStoreSettingsController = catchAsync(async(request, response, next) => {
+export const updateStoreSettingsController = catchAsync(async (request, response, next) => {
   const result = await updateStoreSettings(request.store, request.body);
-  if(!result.ok) return next(returnError(result));
+  if (!result.ok) return next(returnError(result));
 
   response.status(203).json({
-    success:true,
-    data: result.result
-  })
-
+    success: true,
+    data: result.result,
+  });
 });
 
 export const deleteMyStoreController = catchAsync(async (request, response, next) => {
   const storeId = request.store;
 
   const result = await deleteMyStore(storeId);
-  if(!result.ok) return next (returnError(result));
+  if (!result.ok) return next(returnError(result));
 
   response.status(204).json({
     success: true,

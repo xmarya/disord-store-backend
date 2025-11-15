@@ -1,4 +1,4 @@
-import getStoreOf from "@services/auth/storeServices/getStoreOfOwner";
+import getStoreOf from "@services/auth/storeServices/getStoreOf";
 import { Forbidden } from "@Types/ResultTypes/errors/Forbidden";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 import { catchAsync } from "@utils/catchAsync";
