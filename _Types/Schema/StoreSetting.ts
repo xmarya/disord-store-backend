@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { MongoId } from "./MongoId";
 
-type StoreAddress = { street: string; city: string; postalCode?: string; country: string; phone?: string };
+export type StoreAddress = { street: string; city: string; postalCode?: string; country: string; phone?: string };
 type StoreSocialMedia = {
   instagram?: string;
   tiktok?: string;

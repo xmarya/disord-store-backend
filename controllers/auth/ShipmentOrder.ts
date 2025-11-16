@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { IOrderItem } from "@Types/Schema/Order"; // Add IOrderItem
 import Order from "@models/orderModel";
 import { HandleErrorResponse } from "@utils/common";
-import { IStoreAddress } from "@Types/Schema/Store";
+import { StoreAddress } from "@Types/Schema/StoreSetting";
 
 export const GetShipmentData = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -10,7 +10,7 @@ export const GetShipmentData = async (req: Request, res: Response): Promise<void
 
     const order = await Order.findById(orderId)
       .populate<{
-        storeId: { address: IStoreAddress };
+        storeId: { address: StoreAddress };
         items: IOrderItem[];
       }>({
         path: "storeId items",
