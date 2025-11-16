@@ -1,6 +1,5 @@
 import express from "express";
 import canCreateStore from "middlewares/protectors/canCreateStore";
-import { testInvoiceController } from "../controllers/auth/invoiceController";
 import { createReviewController } from "../controllers/auth/reviews/publicReviewController";
 import { createStoreController } from "../controllers/auth/storeControllers";
 import { logout } from "../controllers/auth/userAuthController";
@@ -44,8 +43,6 @@ router.route("/store/:resourceId/reviews").post(restrict("user"), createReviewCo
 router.route("/products/:resourceId/reviews").post(restrict("user"), createReviewController);
 router.use("/platform/reviews", platformReviewsRouter);
 
-// for testing purpose:
-router.post("/test-invoices", testInvoiceController);
 router.use(assignFromCacheToRequest, /*assignStoreIdToRequest,*/ assignPlanIdToRequest, verifyPlanSubscription);
 
 router.use("/store", storeRouter);
