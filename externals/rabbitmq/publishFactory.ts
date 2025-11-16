@@ -14,6 +14,7 @@ import storeDeletedPublisher from "./storeDeleted/storeDeletedPublisher";
 import storeOwnerDeletedPublisher from "./storeOwnerDeleted/storeOwnerDeletedPublisher";
 import storeCreatedPublisher from "./storeCreated/storeCreatedPublisher";
 import storeRepliedToReviewPublisher from "./storeRepliedToReview/storeRepliedToReviewPublisher";
+import reviewCreatedPublisher from "./reviewCreated/reviewCreatedPublisher";
 
 type PublisherFunction = (event: any) => Promise<Success<any> | Failure>;
 
@@ -29,6 +30,7 @@ const publishers: Record<OutboxEventTypesMap, PublisherFunction> = {
   "store-deleted": storeDeletedPublisher,
   "product-deleted": productDeletedPublisher,
   "planSubscription-updated": planSubscriptionUpdatedPublisher,
+  "review-created":reviewCreatedPublisher,
   "store-replied-to-review": storeRepliedToReviewPublisher,
 };
 
