@@ -17,7 +17,6 @@ import { router as assistantRouter } from "./auth/assistantRoutes";
 import { router as categoryRouter } from "./auth/categoryRoutes";
 import { router as couponsRouter } from "./auth/couponRoutes";
 import { router as meRouter } from "./auth/meRoutes";
-import { router as orderRouter } from "./auth/orderRoutes";
 import { router as productRouter } from "./auth/productRoutes";
 import { router as platformReviewsRouter } from "./auth/reviews/platformReviewsRoutes";
 import { router as settingsRouter } from "./auth/settingsRouter";
@@ -50,7 +49,6 @@ router.use("/products", productRouter);
 router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
 router.use("/:storeId/coupons", couponsRouter);
-router.use("/orders", orderRouter);
 router.use("/files", fileRouter);
 
 /* TODO

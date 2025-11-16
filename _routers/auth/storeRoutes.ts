@@ -2,7 +2,7 @@ import express from "express";
 import { deleteMyStoreController, getMyStoreController, getStoreSettingsController, updateMyStoreController, updateMyStoreStatus, updateStoreSettingsController } from "@controllers/auth/storeControllers";
 import { getStoreStatsController } from "@controllers/auth/storeStatsController";
 import getDateQuery from "@middlewares/getDateQuery";
-import { router as invoiceRouter } from "./invoiceRoutes";
+import { router as storeOrderRouter } from "./orders/storeOrderRoutes";
 import { router as reviewRouter } from "./reviews/privateReviewRoutes";
 import hasAuthorization from "@middlewares/protectors/hasAuthorization";
 import sanitisedData from "@middlewares/validators/sanitisedData";
@@ -15,7 +15,7 @@ export const router = express.Router();
 router.use(hasAuthorization);
 
 router.use("/reviews", reviewRouter);
-router.use("/invoices", invoiceRouter);
+router.use("/orders", storeOrderRouter);
 
 router
 .route("/")
