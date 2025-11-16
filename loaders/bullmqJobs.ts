@@ -3,7 +3,6 @@ import pendingOutboxRecordBullMQ from "@externals/bullmq/jobProcessors/getPendin
 
 
 async function initiateBullMQJobs() {
-  // await invoiceBullMQ();
   await pendingOutboxRecordBullMQ();
   await completedOutboxRecordBullMQ();
 }
