@@ -11,9 +11,9 @@ import restrict from "@middlewares/protectors/restrict";
 
 
 export const router = express.Router();
+router.use(restrict("storeOwner", "storeAssistant"));
 router.use("/:orderId/invoice", validateRequestParams("orderId"), invoiceRouter);
 
-router.use(restrict("storeOwner", "storeAssistant"));
 // Paymob Webhook
 router.post("/paymob/webhook", validatePaymentData, handlePaymobWebhook);
 
