@@ -142,10 +142,10 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const GetUserOrders = async (req: Request, res: Response): Promise<any> => {
+export const GetAllUserOrders = async (req: Request, res: Response): Promise<any> => {
   try {
     // const { userId } = req.params; // NOTE: the user data is available inside the request, no need for passing params
-    const userId = req.user._id;
+    const userId = req.user.id;
     const orders = await Order.find({ userId }).select("orderNumber totalPrice status createdAt isDigital").populate("items", "name image").sort({ createdAt: -1 });
 
     if (orders.length === 0) {

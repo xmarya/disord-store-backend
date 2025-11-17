@@ -22,6 +22,7 @@ import { router as platformReviewsRouter } from "./auth/reviews/platformReviewsR
 import { router as settingsRouter } from "./auth/settingsRouter";
 import { router as storeRouter } from "./auth/storeRoutes";
 import { router as subscriptionsRouter } from "./auth/subscriptionsRoutes";
+import { router as storeOrderRouter } from "./auth/orders/storeOrderRoutes";
 import { router as fileRouter } from "./auth/fileRoutes";
 import streamParser from "@middlewares/streamParser";
 import handleParsedFiles from "@middlewares/requestModifiers/handleParsedFiles";
@@ -48,6 +49,7 @@ router.use("/store", storeRouter);
 router.use("/products", productRouter);
 router.use("/categories", categoryRouter);
 router.use("/assistants", assistantRouter);
+router.use("/orders", storeOrderRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/files", fileRouter);
 
