@@ -1,11 +1,11 @@
 import { ConsumerRegister, ReviewCreatedType } from "@Types/events/OutboxEvents";
 import { ReviewCreated } from "@Types/events/ReviewEvents";
-import novuNewReview from "@externals/novu/workflowTriggers/newReview";
+import newReviewNotificationConsumer from "eventConsumers/review/newReviewConsumer";
 import reviewCreatedRegister from "./reviewCreatedRegister";
 
 const consumers = {
     novu: {
-        receiver:novuNewReview,
+        receiver:newReviewNotificationConsumer,
         queueName:"review-created-queue-novu",
         queueOptions: {queueMode:"lazy", maxPriority:"hight", durable:true},
         retryLetterOptions: {
