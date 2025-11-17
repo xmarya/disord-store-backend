@@ -9,7 +9,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
-    const orders = await Order.find().populate("userId", "name").sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const orders = await Order.find({"items.storeId": req.store}).populate("userId", "name").sort({ createdAt: -1 }).skip(skip).limit(limit);
 
     const total = await Order.countDocuments();
     res.status(200).json({
