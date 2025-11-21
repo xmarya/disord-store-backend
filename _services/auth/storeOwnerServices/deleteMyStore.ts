@@ -1,7 +1,6 @@
 import { deleteStore } from "@repositories/store/storeRepo";
 import { resetStoreOwnerToDefault } from "@repositories/storeOwner/storeOwnerRepo";
 import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
-import deleteStorePermanently from "@services/auth/storeServices/deleteStorePermanently";
 import { StoreDeletedEvent } from "@Types/events/StoreEvents";
 import { UserUpdatedEvent } from "@Types/events/UserEvents";
 import { BadRequest } from "@Types/ResultTypes/errors/BadRequest";
