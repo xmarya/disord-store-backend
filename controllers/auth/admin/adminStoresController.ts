@@ -7,6 +7,7 @@ import Store from "@models/storeModel";
 import Product from "@models/productModel";
 import deleteStoreByAdmin from "@services/auth/adminServices/store/deleteStoreByAdmin";
 import returnError from "@utils/returnError";
+import suspendStoreByAdmin from "@services/auth/adminServices/store/suspendStoreByAdmin";
 
 export const getAllStoresInfo = catchAsync(async (request, response, next) => {
   const { sortBy, sortOrder, plan, verified } = request.body;
@@ -48,10 +49,13 @@ export const getOneStoreInfo = catchAsync(async (request, response, next) => {
 });
 
 export const suspendStore = catchAsync(async (request, response, next) => {
-  await updateDoc(Store, request.params.storeId, { status: "suspended" });
-  //TODO: create a new adminLog
+  const result = await suspendStoreByAdmin(request.params.storeId);
+  if(!result.ok) return next(returnError(result));
+
+  const {result: suspendedStore} = result;
   response.status(201).json({
     success: true,
+    data:suspendedStore
   });
 });
 
