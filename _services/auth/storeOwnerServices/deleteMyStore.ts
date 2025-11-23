@@ -21,6 +21,7 @@ async function deleteMyStore(storeId: MongoId) {
         user: updatedOwner,
       };
       const storePayload: StoreDeletedEvent["payload"] = {
+        creator:"storeOwner",
         storeId: updatedOwner.myStore || new mongoose.Types.ObjectId(storeId),
       };
       await createOutboxRecord<[UserUpdatedEvent, StoreDeletedEvent]>(
