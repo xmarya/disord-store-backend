@@ -1,22 +1,23 @@
 import Review from "@models/reviewModel";
 import { createDoc } from "@repositories/global";
+import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
+import { ReviewCreated } from "@Types/events/ReviewEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { Success } from "@Types/ResultTypes/Success";
 import { ReviewDataBody } from "@Types/Schema/Review";
-import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
-import safeThrowable from "@utils/safeThrowable";
-import setResourceRating from "./setResourceRating";
+import { startSession } from "mongoose";
 
 async function createNewResourceReview(data: ReviewDataBody) {
-  const { storeOrProduct, reviewedResourceId } = data;
-  const safeCreateReview = safeThrowable(
-    () => createDoc(Review, data),
-    (error) => new Failure((error as Error).message)
-  );
-  const newReview = await extractSafeThrowableResult(() => safeCreateReview);
 
-  if (newReview.ok) await setResourceRating(storeOrProduct, reviewedResourceId);
+  const session = await startSession();
+  const newReview = await session.withTransaction(async () => {
+    const newReview = await createDoc(Review, data, { session });
+    if (newReview?.id) await createOutboxRecord<[ReviewCreated]>([{type:"review-created", payload:{review: newReview}}], session);
+    return newReview;
+  });
 
-  return newReview;
+  if(!newReview?.id) return new Failure();
+  return new Success(newReview);
 }
 
 export default createNewResourceReview;
