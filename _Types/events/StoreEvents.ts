@@ -10,10 +10,19 @@ export interface StoreCreatedEvent extends OutboxEvent {
   };
 }
 
+export interface StoreSuspendedEvent extends OutboxEvent {
+  type: "store-suspended";
+  outboxRecordId: string;
+  payload: {
+    store: StoreDocument;
+  };
+}
+
 export interface StoreDeletedEvent extends OutboxEvent {
   type: "store-deleted";
   outboxRecordId: string;
   payload: {
+    creator: "storeOwner" | "admin";
     storeId: MongoId;
   };
 }
