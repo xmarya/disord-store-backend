@@ -10,10 +10,6 @@ export async function confirmReviewAuthorisation(reviewId: string, userId: strin
 }
 
 export async function calculateRatingsAverage(Model: Extract<Model, "Store" | "Product">, resourceId: MongoId, session: mongoose.ClientSession) {
-  /* OLD CODE (kept for reference):  
-    const collection = resourceName.concat(`s-${modelId}`);
-    const doc = await mongoose.connection.collection(collection).findOne({_id: new mongoose.Types.ObjectId(modelId)}) as ProductDocument; // this is what I want, it asks the db directly about the existing collections
-  */
 
   const stats = await Review.aggregate([
     {
