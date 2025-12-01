@@ -10,6 +10,7 @@ import storeCreatedConsumers from "@externals/rabbitmq/storeCreated/storeCreated
 import storeDeletedConsumers from "@externals/rabbitmq/storeDeleted/storeDeletedConsumers";
 import storeOwnerDeletedConsumers from "@externals/rabbitmq/storeOwnerDeleted/storeOwnerDeletedConsumers";
 import storeRepliedToReviewConsumers from "@externals/rabbitmq/storeRepliedToReview/storeRepliedToReviewConsumers";
+import storeSuspendedConsumers from "@externals/rabbitmq/storeSuspended/storeSuspendedConsumers";
 import userCreatedConsumers from "@externals/rabbitmq/userCreated/userCreatedConsumers";
 import userDeletedConsumers from "@externals/rabbitmq/userDeleted/userDeletedConsumers";
 import userUpdatedConsumers from "@externals/rabbitmq/userUpdated/userUpdatedConsumers";
@@ -27,6 +28,7 @@ async function initRabbitConsumers() {
   storeOwnerDeletedConsumers();
   storeCreatedConsumers();
   storeDeletedConsumers();
+  storeSuspendedConsumers();
   productDeletedConsumers();
   planSubscriptionUpdatedConsumers();
   reviewCreatedConsumers();
