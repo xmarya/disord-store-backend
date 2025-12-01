@@ -8,6 +8,7 @@ import deleteAllStoreProductsConsumer from "eventConsumers/store/deleteAllStoreP
 import deleteAllStoreAssistantsConsumer from "eventConsumers/store/deleteAllStoreAssistantsConsumer";
 import deleteAllStoreStatsConsumer from "eventConsumers/store/deleteAllStoreStatsConsumer";
 import deleteStoreSettingsConsumer from "eventConsumers/store/deleteStoreSettingsConsumer";
+import novuDeleteStoreEmail from "@externals/novu/workflowTriggers/deleteStoreEmail";
 
 const consumers = {
   assistantsCollection: {
@@ -88,6 +89,19 @@ const consumers = {
       deadRoutingKey: "dead-store-deleted",
     },
   },
+  
+  novu:{
+    receiver: novuDeleteStoreEmail,
+    queueName: "store-deleted-queue-novu",
+    queueOptions: CRITICAL_QUEUE_OPTIONS,
+    retryLetterOptions: {
+      mainExchangeName: "main-store-events",
+      mainRoutingKey: "store-deleted",
+      deadExchangeName: "dead-store-events",
+      deadQueueName: "dead-store-deleted-queue-novu",
+      deadRoutingKey: "dead-store-deleted",
+    },
+  }
 } satisfies Record<string, ConsumerRegister<StoreDeletedType, StoreDeletedEvent>>;
 
 function storeDeletedConsumers() {
@@ -97,6 +111,7 @@ function storeDeletedConsumers() {
   storeDeletedRegister({ ...consumers["reviewsCollection"] });
   storeDeletedRegister({ ...consumers["storeStatsCollection"] });
   storeDeletedRegister({ ...consumers["storeSettingsCollection"] });
+  storeDeletedRegister({ ...consumers["novu"] });
 }
 
 export default storeDeletedConsumers;
