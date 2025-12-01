@@ -130,5 +130,5 @@
     "outDir": "dist"
   },
   "include": ["./**/*"],
-  "exclude": ["./old", ".meantToBeDeleted.ts"]
+  "exclude": ["./old"]
 }
