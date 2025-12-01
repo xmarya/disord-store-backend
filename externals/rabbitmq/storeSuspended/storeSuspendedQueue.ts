@@ -18,7 +18,7 @@ async function storeSuspendedQueue(queueName: StoreSuspendedType["queueName"], q
     await channel.assertQueue(queueName, options);
     await channel.bindQueue(queueName, exchangeName, routingKey);
 
-    return new Success({ channel });
+    return new Success(channel);
   } catch (error) {
     return new Failure((error as Error).message);
   }
