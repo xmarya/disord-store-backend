@@ -6,6 +6,7 @@ import type { Request, Response } from "express";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
 import deleteStoreOwnerAccount from "@services/auth/storeOwnerServices/deleteStoreOwnerAccount";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
+import { deleteRedisKeyValuePair } from "@externals/redis/redisOperations/redisBasicFormat";
 
 export const getUserProfileController = catchAsync(async (request, response, next) => {
   const userId = request.user.id;
@@ -49,8 +50,9 @@ export const deleteStoreOwnerAccountController = catchAsync(async (request, resp
   });
 });
 
-export function logout(request: Request, response: Response) {
-  // TODO create service that deletes the cache
+export async function logout(request: Request, response: Response) {
+  
+  await deleteRedisKeyValuePair([`User:${request.user.id}`]);
 
   request.user.userType === "storeOwner" && deleteRedisHash(`StoreAndPlan:${request.user.myStore}`);
   response.clearCookie("jwt");
