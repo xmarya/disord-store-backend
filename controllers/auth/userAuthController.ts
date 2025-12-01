@@ -4,7 +4,6 @@ import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
 import type { Request, Response } from "express";
 import { deleteRedisHash } from "../../externals/redis/redisOperations/redisHash";
-import deleteUserFromCache from "@externals/redis/cacheControllers/deleteUserFromCache";
 import deleteStoreOwnerAccount from "@services/auth/storeOwnerServices/deleteStoreOwnerAccount";
 import { StoreOwnerDocument } from "@Types/Schema/Users/StoreOwner";
 
@@ -52,10 +51,9 @@ export const deleteStoreOwnerAccountController = catchAsync(async (request, resp
 
 export function logout(request: Request, response: Response) {
   // TODO create service that deletes the cache
-  // deleteUserFromCache(`User:${request.user.id}`);
 
   request.user.userType === "storeOwner" && deleteRedisHash(`StoreAndPlan:${request.user.myStore}`);
   response.clearCookie("jwt");
-  response.setHeader("Clear-Site-Data", "cookies"); // for browsers
+  response.setHeader("Clear-Site-Data", "cookies");
   response.status(200).json({ success: true, message: "you've logged-out" });
 }

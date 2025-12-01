@@ -26,9 +26,11 @@ import { router as storeOrderRouter } from "./auth/orders/storeOrderRoutes";
 import { router as fileRouter } from "./auth/fileRoutes";
 import streamParser from "@middlewares/streamParser";
 import handleParsedFiles from "@middlewares/requestModifiers/handleParsedFiles";
+import { testAnything } from "@controllers/test";
 
 export const router = express.Router();
 
+router.get("/test", testAnything)
 router.use(streamParser);
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
@@ -52,7 +54,3 @@ router.use("/assistants", assistantRouter);
 router.use("/orders", storeOrderRouter);
 router.use("/:storeId/coupons", couponsRouter);
 router.use("/files", fileRouter);
-
-/* TODO
-    1- blocking the assistants accounts if any in case the owner downgraded the plan to basic
-*/
