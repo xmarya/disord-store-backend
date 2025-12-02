@@ -26,11 +26,9 @@ import { router as storeOrderRouter } from "./auth/orders/storeOrderRoutes";
 import { router as fileRouter } from "./auth/fileRoutes";
 import streamParser from "@middlewares/streamParser";
 import handleParsedFiles from "@middlewares/requestModifiers/handleParsedFiles";
-import { testAnything } from "@controllers/test";
 
 export const router = express.Router();
 
-router.get("/test", testAnything)
 router.use(streamParser);
 
 router.use(validateJwtToken, getUserFromPayload, refreshToken);
