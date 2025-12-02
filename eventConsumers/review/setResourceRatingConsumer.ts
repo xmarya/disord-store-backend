@@ -1,11 +1,11 @@
 import { setRanking } from "@repositories/ranking/rankingRepo";
 import { calculateRatingsAverage } from "@repositories/review/reviewRepo";
-import { ReviewCreated } from "@Types/events/ReviewEvents";
+import { ReviewCreated, ReviewUpdatedOrDeleted } from "@Types/events/ReviewEvents";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
 import { Success } from "@Types/ResultTypes/Success";
 import { startSession } from "mongoose";
 
-async function setResourceRating(event: ReviewCreated) {
+async function setResourceRatingConsumer(event: ReviewCreated | ReviewUpdatedOrDeleted) {
   const { storeOrProduct, reviewedResourceId } = event.payload;
   const session = await startSession();
 
@@ -24,4 +24,4 @@ async function setResourceRating(event: ReviewCreated) {
   }
 }
 
-export default setResourceRating;
+export default setResourceRatingConsumer;

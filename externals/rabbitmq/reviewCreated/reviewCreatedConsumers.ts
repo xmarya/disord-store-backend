@@ -2,7 +2,7 @@ import { ConsumerRegister, ReviewCreatedType } from "@Types/events/OutboxEvents"
 import { ReviewCreated } from "@Types/events/ReviewEvents";
 import newReviewNotificationConsumer from "eventConsumers/review/newReviewConsumer";
 import reviewCreatedRegister from "./reviewCreatedRegister";
-import setResourceRating from "@services/auth/resourcesReviewServices/setResourceRating";
+import setResourceRating from "eventConsumers/review/setResourceRatingConsumer";
 
 const consumers = {
   novu: {
