@@ -1,21 +1,32 @@
 import { ReviewDataBody } from "@Types/Schema/Review";
-import setResourceRating from "./setResourceRating";
 import safeThrowable from "@utils/safeThrowable";
 import { updateDoc } from "@repositories/global";
 import Review from "@models/reviewModel";
 import extractSafeThrowableResult from "@utils/extractSafeThrowableResult";
-import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
 import { Failure } from "@Types/ResultTypes/errors/Failure";
+import { startSession } from "mongoose";
+import createOutboxRecord from "@services/_sharedServices/outboxRecordServices/createOutboxRecord";
+import { ReviewUpdatedOrDeleted } from "@Types/events/ReviewEvents";
+import { Success } from "@Types/ResultTypes/Success";
 
 async function updateResourceReview(reviewId: string, updatedDate: Partial<ReviewDataBody>) {
-  const safeUpdateReview = safeThrowable(
-    () => updateDoc(Review, reviewId, updatedDate),
-    (error) => new Failure((error as Error).message)
-  );
-  const updatedReview = await extractSafeThrowableResult(() => safeUpdateReview);
-  if (updatedReview.ok) await setResourceRating(updatedReview.result.storeOrProduct, updatedReview.result.reviewedResourceId);
+  const session = await startSession();
 
-  return updatedReview;
+  const updatedReview = await session.withTransaction(async () => {
+    const updatedReview = await updateDoc(Review, reviewId, updatedDate);
+    if (updatedReview) {
+      const { storeOrProduct, reviewedResourceId } = updatedReview;
+      await createOutboxRecord<[ReviewUpdatedOrDeleted]>([
+        { type: "review-updated-or-deleted", payload: { action: "updated", storeOrProduct, reviewedResourceId } }
+      ], session);
+    }
+    return updatedReview;
+  });
+
+  if(!updatedReview) return new Failure();
+
+  await session.endSession();
+  return new Success(updatedReview);
 }
 
 export default updateResourceReview;
