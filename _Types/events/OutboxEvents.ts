@@ -188,6 +188,17 @@ export type ReviewCreatedType = {
   deadRoutingKey: "dead-review-created";
 };
 
+export type ReviewUpdatedOrDeletedType = {
+  type: "review-updated-or-deleted";
+  exchangeName: "main-review-events";
+  queueName: `review-updated-or-deleted-queue-${string}`;
+  routingKey: "review-updated-or-deleted";
+
+  deadExchangeName: "dead-review-events";
+  deadQueueName: `dead-review-updated-or-deleted-queue-${string}`;
+  deadRoutingKey: "dead-review-updated-or-deleted";
+};
+
 export type StoreRepliedToReviewType = {
   type: "store-replied-to-review";
   exchangeName: "main-review-events";
@@ -213,6 +224,7 @@ export type AllOutbox =
   | StoreDeletedType
   | StoreSuspendedType
   | ReviewCreatedType
+  | ReviewUpdatedOrDeletedType
   | StoreRepliedToReviewType;
 
 export type OutboxEventTypesMap = AllOutbox["type"];

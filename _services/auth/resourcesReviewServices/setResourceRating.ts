@@ -6,7 +6,7 @@ import { Success } from "@Types/ResultTypes/Success";
 import { startSession } from "mongoose";
 
 async function setResourceRating(event: ReviewCreated) {
-  const { storeOrProduct, reviewedResourceId } = event.payload.review;
+  const { storeOrProduct, reviewedResourceId } = event.payload;
   const session = await startSession();
 
   try {
