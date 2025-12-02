@@ -6,8 +6,7 @@ export interface ReviewCreated extends OutboxEvent {
   type: "review-created";
   outboxRecordId: string;
   payload: {
-    storeOrProduct: "Store" | "Product";
-    reviewedResourceId: MongoId;
+    review: ReviewDocument;
   };
 }
 
