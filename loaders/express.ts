@@ -6,7 +6,7 @@ import mongoSanitize from "express-mongo-sanitize";
 import ratelimit from "express-rate-limit";
 import helmet from "helmet";
 
-const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", "https://discrod-next-app-m6o1.vercel.app/"];
+const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", "https://discrod-next-app-m6o1.vercel.app/", "https://unextractable-undesigningly-farah.ngrok-free.dev/admin", "https://unextractable-undesigningly-farah.ngrok-free.dev/"];
 export default function expressLoader(app: Application) {
   app.set("trust proxy", true);
   const limiter = ratelimit({
