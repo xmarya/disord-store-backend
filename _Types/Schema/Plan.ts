@@ -54,10 +54,10 @@ type PlanStats = {
   monthly: StatsData;
 };
 
-export interface PlanStatsModel extends mongoose.Model<PlanStatsDocument> {
-  getAnnualStatsReport: (sortBy: "year" | "profits" | "subscribers", sortOrder: "desc" | "asc", specificYear?: number) => Promise<any>;
-  getPlansTotalsReport: () => Promise<any>;
-}
+// export interface PlanStatsModel extends mongoose.Model<PlanStatsDocument> {
+//   getAnnualStatsReport: (sortBy: "year" | "profits" | "subscribers", sortOrder: "desc" | "asc", specificYear?: string) => Promise<any>;
+//   getPlansTotalsReport: () => Promise<any>;
+// }
 
 export type PlanDocument = PlanDetails & mongoose.Document;
 export type PlanStatsDocument = PlanStats & mongoose.Document;

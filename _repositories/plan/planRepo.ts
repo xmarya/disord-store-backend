@@ -4,6 +4,7 @@ import { PlansNames, SubscriptionTypes, UnlimitedPlanDataBody } from "@Types/Sch
 import Plan from "@models/planModel";
 import PlanStats from "@models/planStatsModel";
 import { MongoId } from "@Types/Schema/MongoId";
+import { endOfYear, startOfYear } from "date-fns";
 
 export async function createUnlimitedPlan(data: UnlimitedPlanDataBody, session: mongoose.ClientSession) {
   /*✅*/
@@ -46,11 +47,132 @@ export async function getMonthlyPlansStats(dateFilter: { date: { $gte: Date; $lt
 
   return monthlyStats;
 }
-export async function getPlansStatsReport(sortBy: "year" | "profits" | "subscribers" = "year", sortOrder: "desc" | "asc" = "desc", specificYear?: number) {
-  /*✅*/
-  const annualReport = await PlanStats.getAnnualStatsReport(sortBy, sortOrder, specificYear);
-  const totalsReport = await PlanStats.getPlansTotalsReport();
-  return { annualReport, totalsReport };
+
+export async function getAnnualStatsReport(sortBy: "year" | "profits" | "subscribers" = "year", sortOrder: "desc" | "asc" = "desc", year?: string) {
+  // aggregate, group them by the planName-year, return them as an array of years objects
+  // [2024: { planName1: {subscribers, profits}, planName2: {subscribers, profits} },
+  // 2025: { planName1: {subscribers, profits}, planName2: {subscribers, profits} }]
+  // if the specificYear was provided, return only its data
+  const sortByProperty = sortBy?.trim() !== "year" ? sortBy : "_id.year";
+  const yearStage = year?.trim()
+    ? {
+        $match: {
+          date: {
+            $gte: startOfYear(new Date(+year, 0, 1)),
+            $lte: endOfYear(new Date(+year, 0, 1)),
+          },
+        },
+      }
+    : null;
+
+    const results = await PlanStats.aggregate([
+    /* Since the object aren't iterable, how could I spread it? the way to get around this
+          is by wrapping the object by [] and spreading it
+          🧠 Rule of Thumb 👍🏻: Want to conditionally include an object in an array? → Wrap it in an array before spreading.
+          ...{} ❌
+          ...[{}] ✅
+          */
+    ...(yearStage ? [yearStage] : []), // [] because the aggregation is an array of stages, each stage is an object.
+    {
+      $group: {
+        _id: {
+          year: { $year: "$date" },
+          planName: "$planName",
+        },
+        subscribers: { $sum: "$monthly.subscribers" },
+        profits: { $sum: "$monthly.profits" },
+        newSubscribers: { $sum: "$monthly.newSubscribers" },
+        renewals: { $sum: "$monthly.renewals" },
+        upgrades: { $sum: "$monthly.upgrades" },
+        downgrades: { $sum: "$monthly.downgrades" },
+      },
+    },
+    {
+      $sort: {
+        // [sortBy]: sortOrder === "desc" ? -1 : 1,//✅
+        // "_id.year": sortOrder === "desc" ? -1 : 1
+        [sortByProperty]: sortOrder === "desc" ? -1 : 1,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id.year",
+        plans: {
+          $push: {
+            // these should be k,v. mongoose threw an error when they was key,value.
+            k: "$_id.planName",
+            v: {
+              subscribers: "$subscribers",
+              profits: "$profits",
+              newSubscribers: "$newSubscribers",
+              renewals: "$renewals",
+              upgrades: "$upgrades",
+              downgrades: "$downgrades",
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        year: "$_id",
+        plans: {
+          $arrayToObject: "$plans",
+        },
+      },
+    },
+  ]);
+  if (year) {
+    const match = results.find((res) => res.year === +year); // this condition had a bug resulted in an empty data because I was doing a comparison between a string and a number
+     return match || { [year]: {} };
+  } 
+    return results.reduce((acc, item) => {
+      acc[item.year] = item.plans;
+      return acc;
+    }, {});
+}
+export async function getPlansTotalsReport() {
+// aggregate, group them by the planName, return as an object {planName: {subscribers, profits}}
+  const pipeline = [
+    {
+      $group: {
+        _id: "$planName",
+        subscribers: { $sum: "$monthly.subscribers" },
+        profits: { $sum: "$monthly.profits" },
+        newSubscribers: { $sum: "$monthly.newSubscribers" },
+        renewals: { $sum: "$monthly.renewals" },
+        upgrades: { $sum: "$monthly.upgrades" },
+        downgrades: { $sum: "$monthly.downgrades" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        planName: "$_id",
+        subscribers: 1,
+        profits: 1,
+        newSubscribers: 1,
+        renewals: 1,
+        upgrades: 1,
+        downgrades: 1,
+      },
+    },
+  ];
+
+  const results = await PlanStats.aggregate(pipeline);
+
+  return results.reduce((acc, item) => {
+    acc[item.planName] = {
+      subscribers: item.subscribers,
+      profits: item.profits,
+      newSubscribers: item.newSubscribers,
+      renewals: item.renewals,
+      upgrades: item.upgrades,
+      downgrades: item.downgrades,
+    };
+    return acc;
+  }, {});
 }
 
 export async function updatePlanMonthlyStats(planName: PlansNames, profit: number, operationType: SubscriptionTypes | "cancellation" /*session: mongoose.ClientSession*/) {

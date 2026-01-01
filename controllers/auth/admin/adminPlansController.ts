@@ -1,11 +1,12 @@
 import { INTERNAL_ERROR_MESSAGE } from "@constants/primitives";
-import { getMonthlyPlansStats, getPlansStatsReport } from "@repositories/plan/planRepo";
+import { getMonthlyPlansStats } from "@repositories/plan/planRepo";
 import getOnePlan from "@services/auth/plan/getOnePlan";
 import updatePlan from "@services/auth/plan/updatePlan";
 import { PlanDataBody } from "@Types/Schema/Plan";
 import { AppError } from "@Types/ResultTypes/errors/AppError";
 import { catchAsync } from "@utils/catchAsync";
 import returnError from "@utils/returnError";
+import getPlansStatsReport from "@services/auth/plan/planStatsServices/getPlansStatsReport";
 
 export const getPlanController = catchAsync(async (request, response, next) => {
   const result = await getOnePlan(request.params.planId);
@@ -50,7 +51,7 @@ export const getMonthlyPlansStatsController = catchAsync(async (request, respons
 });
 
 export const getPlansStatsReportController = catchAsync(async (request, response, next) => {
-  const { sortBy, sortOrder, year } = request.body;
+  const { sortBy, sortOrder, year } = request.params as {sortBy?: "year" | "profits" | "subscribers", sortOrder?: "desc" | "asc", year?: string};
   const reports = await getPlansStatsReport(sortBy, sortOrder, year);
 
   if (!reports) return next(new AppError(500, INTERNAL_ERROR_MESSAGE));
