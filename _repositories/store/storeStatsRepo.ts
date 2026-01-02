@@ -46,6 +46,7 @@ export async function getAllStoresStats(
         createdAt: { $first: "$storeDoc.createdAt" },
       },
     },
+    { $sort: { [sortBy]: sortOrder === "desc" ? -1 : 1 } },
     {
       $project: {
         _id: 1,
@@ -58,7 +59,7 @@ export async function getAllStoresStats(
         createdAt: 1,
       },
     },
-    { $sort: { [sortBy]: sortOrder === "desc" ? -1 : 1 } },
+    
   ]);
 
   return allStats; // return the profits OAT only => [{storeName: "1", totalProfit: 123}, {storeName: "2", totalProfit: 123}]
