@@ -11,29 +11,6 @@ import jwtSignature from "@utils/jwtToken/generateSignature";
 import tokenWithCookies from "@utils/jwtToken/tokenWithCookies";
 import returnError from "@utils/returnError";
 
-export const oldCredentialsLogin = catchAsync(async (request, response, next) => {
-  const result1 = loginMethodValidator(request.body);
-  if (!result1.ok) return next(returnError(result1));
-  const { result: loginMethod } = result1;
-  const result2 = await getCredentialsVerifyResult(loginMethod, request.body.password);
-  if (!result2.ok) return next(returnError(result2));
-
-  const {
-    result: { loggedInUser, emailConfirmed },
-  } = result2;
-
-  const token = jwtSignature(loggedInUser.id, loggedInUser.userType, "1h");
-  tokenWithCookies(response, token);
-  request.user = loggedInUser;
-  request.emailConfirmed = emailConfirmed;
-
-  response.status(200).json({
-    success: true,
-    data: {
-      token,
-    },
-  });
-});
 
 export const createNewUserController = (userType: Extract<UserTypes, "user" | "storeOwner">) =>
   catchAsync(async (request, response, next) => {
@@ -61,8 +38,8 @@ export const credentialsLogin = catchAsync(async (request, response, next) => {
 export const sendOTP = catchAsync(async (request, response, next) => {
   const result = await authenticaSendOTP(request.user, request.loginMethod);
 
-  if(!result.ok) return next(returnError(result));
-  const {result: {message, loginMethod, temporeToken}} = result;
+  if (!result.ok) return next(returnError(result));
+  const { result: { message, loginMethod, temporeToken } } = result;
 
   response.status(200).json({
     success: true,
@@ -74,8 +51,8 @@ export const sendOTP = catchAsync(async (request, response, next) => {
 export const verifyOTP = catchAsync(async (request, response, next) => {
 
   const result = await authenticaVerifyOTP(request.body);
-  if(!result.ok) return next(returnError(result));
-  const {result: {status, message, token}} = result;
+  if (!result.ok) return next(returnError(result));
+  const { result: { status, message, token } } = result;
 
   tokenWithCookies(response, token);
 
