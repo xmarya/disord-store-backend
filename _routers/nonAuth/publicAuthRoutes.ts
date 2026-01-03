@@ -1,7 +1,7 @@
 import express from "express";
 import sanitisedData from "../../middlewares/validators/sanitisedData";
 import validateNewUserData from "../../middlewares/validators/validateNewUserData";
-import { createNewDiscordUserController, createNewUserController, credentialsLogin, oldCredentialsLogin, sendOTP, verifyOTP } from "../../controllers/nonAuth/publicAuthController";
+import { adminOnlyLogin, createNewDiscordUserController, createNewUserController, credentialsLogin, oldCredentialsLogin, sendOTP, verifyOTP } from "../../controllers/nonAuth/publicAuthController";
 import validateRequestParams from "../../middlewares/validators/validateRequestParams";
 import { resetPassword } from "../../middlewares/resetPassword";
 import { forgetPassword } from "../../middlewares/forgetPassword";
@@ -13,7 +13,7 @@ import restrict from "@middlewares/protectors/restrict";
 export const router = express.Router();
 
 router.post("/noOTPLogin", oldCredentialsLogin);
-
+router.post("/adminLogin", adminOnlyLogin); // Admin-only login endpoint
 router.use(sanitisedData);
 router.post("/user-signup", validateNewUserData, createNewUserController("user"));
 router.post("/storeOwner-signup", validateNewUserData, createNewUserController("storeOwner"));
