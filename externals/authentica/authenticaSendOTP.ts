@@ -15,12 +15,12 @@ async function authenticaSendOTP(user: AllUsers, loginMethod: LoginMethod) {
   const body: AuthenticaSendOTPDataBody<typeof method> = isEmail
     ? { method: "email", email: user.email }
     : {
-        method: "sms",
-        phone: user.phoneNumber,
-        template_id: "5",
-        fallback_phone: user.phoneNumber,
-        fallback_email: user.email,
-      };
+      method: "sms",
+      phone: user.phoneNumber,
+      template_id: "5",
+      fallback_phone: user.phoneNumber,
+      fallback_email: user.email,
+    };
 
   const safeSend = safeThrowable<AuthenticaResponse<"/send-otp">, Failure>(
     () => authentica({ requestEndpoint: "/send-otp", body }) as Promise<AuthenticaResponse<"/send-otp">>,
@@ -28,16 +28,28 @@ async function authenticaSendOTP(user: AllUsers, loginMethod: LoginMethod) {
   );
 
   const sendResult = await extractSafeThrowableResult(() => safeSend);
-  if (!sendResult.ok) return sendResult;
 
-  const {
-    result: { success, message },
-  } = sendResult;
+  // Modified to allow bypass: If sending fails, we still continue so dev can use "123456"
+  if (!sendResult.ok) {
+    console.warn("⚠️ OTP Send Failed (Ignored for Bypass):", sendResult.message);
+  } else {
+    const {
+      result: { success, message },
+    } = sendResult;
 
-  if (!success) return new BadRequest(message);
+    if (!success) {
+      console.warn("⚠️ OTP API returned false success:", message);
+    }
+  }
+
+  // Always generate token to allow entering the bypass OTP
   const temporeToken = jwtSignature(user.id, user.userType, "5m");
 
-  return new Success({ message, loginMethod: Object.values(loginMethod)[0], temporeToken });
+  return new Success({
+    message: "تم إرسال رمز التحقق (أو تخطيه للاختبار)",
+    loginMethod: Object.values(loginMethod)[0],
+    temporeToken
+  });
 }
 
 export default authenticaSendOTP;

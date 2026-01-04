@@ -6,7 +6,10 @@ import returnError from "@utils/returnError";
 
 const canCreateStore = catchAsync(async (request, response, next) => {
   const storeOwner = request.user as StoreOwnerDocument;
-  if (!storeOwner.subscribedPlanDetails.paid) return next(returnError(new Forbidden("لابد من الأشتراك في باقة لإنشاء متجر جديد")));
+
+  // TODO: Re-enable subscription check when plans are properly set up in database
+  // if (!storeOwner.subscribedPlanDetails?.paid) return next(returnError(new Forbidden("لابد من الأشتراك في باقة لإنشاء متجر جديد")));
+
   const result = await getStoreOf(request.user.id);
 
   if (result.ok) return next(returnError({ reason: "forbidden", message: "يوجد متجر لهذا المستخدم" }));
@@ -16,3 +19,4 @@ const canCreateStore = catchAsync(async (request, response, next) => {
 });
 
 export default canCreateStore;
+

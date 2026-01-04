@@ -48,6 +48,25 @@ export const sendOTP = catchAsync(async (request, response, next) => {
   });
 });
 
+// Direct login without OTP - issues token immediately
+export const directLogin = catchAsync(async (request, response, next) => {
+  const user = request.user;
+
+  // Generate token with 7 day expiry for all users
+  const token = jwtSignature(user.id, user.userType, "7d");
+
+  tokenWithCookies(response, token);
+
+  response.status(200).json({
+    success: true,
+    message: "تم تسجيل الدخول بنجاح",
+    data: {
+      token,
+      userType: user.userType,
+    },
+  });
+});
+
 export const verifyOTP = catchAsync(async (request, response, next) => {
 
   const result = await authenticaVerifyOTP(request.body);

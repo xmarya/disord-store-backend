@@ -1,7 +1,7 @@
 import express from "express";
 import sanitisedData from "../../middlewares/validators/sanitisedData";
 import validateNewUserData from "../../middlewares/validators/validateNewUserData";
-import { createNewDiscordUserController, createNewUserController, credentialsLogin, sendOTP, verifyOTP } from "../../controllers/nonAuth/publicAuthController";
+import { createNewDiscordUserController, createNewUserController, credentialsLogin, directLogin, sendOTP, verifyOTP } from "../../controllers/nonAuth/publicAuthController";
 import validateRequestParams from "../../middlewares/validators/validateRequestParams";
 import { resetPassword } from "../../middlewares/resetPassword";
 import { forgetPassword } from "../../middlewares/forgetPassword";
