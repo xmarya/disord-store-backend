@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
-import app from "./app";
+// ⚠️ MUST be called BEFORE importing app to load env vars first
 dotenv.config({ path: "./.env" });
+
+import app from "./app";
 
 const port = process.env.PORT || 3000;
 
